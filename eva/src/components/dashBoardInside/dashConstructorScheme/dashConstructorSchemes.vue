@@ -22,6 +22,7 @@
         }"
       >
         <v-tooltip
+          v-if="dashboardEditMode"
           bottom
           :color="theme.$accent_ui_color"
         >
@@ -38,7 +39,7 @@
           </template>
           <span>Вкл\выкл режим редактирования</span>
         </v-tooltip>
-        <template v-if="isEdit">
+        <template v-if="isEdit && dashboardEditMode">
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
@@ -194,7 +195,7 @@
       />
       <!--Drag-and-drop panel-->
       <div
-        ref="dndPanelContainer"
+        :ref="`dndPanelContainer-${idFrom}`"
         class="dash-constructor-schemes__dnd-panel-container"
         :style="{
           'bottom': `${panelBottomOffset}px`,
@@ -223,7 +224,7 @@
         </div>
         <div
           v-show="!isLoading"
-          ref="dndPanel"
+          :ref="`dndPanel-${idFrom}`"
           class="dash-constructor-schemes__dnd-panel"
         >
           <v-expansion-panels
@@ -483,16 +484,20 @@
           'dash-constructor-schemes__data-panel--active': dataPanel,
         }"
       >
-        <div class="row">
+        <div class="row mb-3">
           <div class="col-12">
-            <button @click="closeDataPanel">
-              <v-icon
-                class="control-button edit-icon theme--dark"
-                :style="{ color: theme.$secondary_text }"
-              >
-                {{ closeIcon }}
-              </v-icon>
-            </button>
+            <div
+              class="d-flex justify-content-right"
+            >
+              <button @click="closeDataPanel">
+                <v-icon
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                >
+                  {{ closeIcon }}
+                </v-icon>
+              </button>
+            </div>
           </div>
         </div>
         <dash-constructor-schemes-settings
@@ -506,7 +511,7 @@
       <!--The GraphComponent-->
       <component
         :is="'div'"
-        ref="graphComponent"
+        :ref="`graphComponent-${idFrom}`"
         class="dash-constructor-schemes__graph-component"
         @keyup.ctrl="copyPaste"
       />
@@ -647,159 +652,6 @@ export default {
         edgeStrokeSize: '10px',
         edgeSmoothingLength: 0,
       },
-      // Список иконок для схемы
-      iconsList: [
-        {
-          src: '/icons/icon-test-1.svg',
-          width: 459,
-          height: 274,
-          label: 'ГС (Газосепаратор)',
-        },
-        {
-          src: '/icons/icon-test-2.svg',
-          width: 380,
-          height: 331,
-          label: 'ДЕ (Дренажная емкость)',
-        },
-        {
-          src: '/icons/icon-test-3.svg',
-          width: 378,
-          height: 466,
-          label: 'Дизельная электростанция',
-        },
-        {
-          src: '/icons/icon-test-4.svg',
-          width: 395,
-          height: 492,
-          label: 'Клапан регулятор',
-        },
-        {
-          src: '/icons/icon-test-5.svg',
-          width: 424,
-          height: 473,
-          label: 'НВО (Насосная внешней откачки)',
-        },
-        {
-          src: '/icons/icon-test-6.svg',
-          width: 523,
-          height: 296,
-          label: 'НГС (Нефтегазосепаратор)',
-        },
-        {
-          src: '/icons/icon-test-7.svg',
-          width: 560,
-          height: 211,
-          label: 'ОВ (Отстойник водяной)',
-        },
-        {
-          src: '/icons/icon-test-8.svg',
-          width: 556,
-          height: 224,
-          label: 'П (Печь OFF)',
-        },
-        {
-          src: '/icons/icon-test-9.svg',
-          width: 600,
-          height: 238,
-          label: 'П (Печь ON)',
-        },
-        {
-          src: '/icons/icon-test-10.svg',
-          width: 310,
-          height: 431,
-          label: 'РВС (Резервуар вертикальный стальной)',
-        },
-        {
-          src: '/icons/icon-test-11.svg',
-          width: 138,
-          height: 372,
-          label: 'Соединение №1',
-        },
-        {
-          src: '/icons/icon-test-12.svg',
-          width: 117,
-          height: 530,
-          label: 'Соединение №2(1)',
-        },
-        {
-          src: '/icons/icon-test-13.svg',
-          width: 116,
-          height: 530,
-          label: 'Соединение №2(2)',
-        },
-        {
-          src: '/icons/icon-test-14.svg',
-          width: 490,
-          height: 463,
-          label: 'Соединение №3(1)',
-        },
-        {
-          src: '/icons/icon-test-15.svg',
-          width: 464,
-          height: 488,
-          label: 'Соединение №3(2)',
-        },
-        {
-          src: '/icons/icon-test-15.svg',
-          width: 490,
-          height: 461,
-          label: 'Соединение №3(3)',
-        },
-        {
-          src: '/icons/icon-test-16.svg',
-          width: 459,
-          height: 488,
-          label: 'Соединение №3(4)',
-        },
-        {
-          src: '/icons/icon-test-17.svg',
-          width: 313,
-          height: 524,
-          label: 'ФВД и ФНД (Факел высокого давления) и (Факел низкого давления)',
-        },
-        {
-          src: '/icons/icon-test-18.svg',
-          width: 352,
-          height: 471,
-          label: 'Электроприводная задвижка',
-        },
-        // Слишком много весят иконки
-        // {
-        //   src: '/icons/icon-test-19.svg',
-        //   width: 633,
-        //   height: 475,
-        //   label: 'Баки 1',
-        // },
-        // {
-        //   src: '/icons/icon-test-20.svg',
-        //   width: 633,
-        //   height: 475,
-        //   label: 'Вентель зеленый 2',
-        // },
-        // {
-        //   src: '/icons/icon-test-21.svg',
-        //   width: 633,
-        //   height: 475,
-        //   label: 'Манометр 1',
-        // },
-        // {
-        //   src: '/icons/icon-test-22.svg',
-        //   width: 633,
-        //   height: 475,
-        //   label: 'Вентель красный 2',
-        // },
-        // {
-        //   src: '/icons/icon-test-23.svg',
-        //   width: 633,
-        //   height: 475,
-        //   label: 'Насос 1 1',
-        // },
-      ],
-      testData: [
-        {
-          id: '',
-        },
-      ],
       allItems: [],
       selectedNode: '',
       selectedDataType: '',
@@ -809,11 +661,16 @@ export default {
       isLoading: false,
       isConfirmModal: false,
       isConfirmUpdateScheme: false,
+      // Default value - graph
+      activeScheme: 'graph',
     };
   },
   computed: {
     dashFromStore() {
       return this.$store.state[this.idDashFrom];
+    },
+    dashboardEditMode() {
+      return this.dashFromStore.editMode;
     },
     primitivesFromStore() {
       if (this.dashFromStore[this.idFrom]?.options?.primitivesLibrary) {
@@ -825,7 +682,13 @@ export default {
       return [];
     },
     savedGraph() {
-      return this.dashFromStore.savedGraph || '';
+      return this.dashFromStore?.savedGraph || this.dashFromStore[this.idFrom]?.savedGraph || '';
+    },
+    savedGraphObject() {
+      if (this.dashFromStore[this.idFrom]?.savedGraphObject) {
+        return this.dashFromStore[this.idFrom]?.savedGraphObject[this.activeScheme] || [];
+      }
+      return [];
     },
     innerSize() {
       return {
@@ -891,13 +754,20 @@ export default {
         this.$nextTick(() => {
           this.createGraph();
           this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
+          this.updateSavedGraph = throttle(this.updateSavedGraph, 1000);
         });
       });
+    },
+    dashboardEditMode(val) {
+      if (!val) {
+        this.isEdit = false;
+      }
     },
   },
   mounted() {
     this.createGraph();
     this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
+    this.updateSavedGraph = throttle(this.updateSavedGraph, 1000);
   },
   methods: {
     updateDefaultElementColor(evt, field) {
@@ -919,15 +789,18 @@ export default {
     },
     createGraph() {
       this.constructorSchemes = new ConstructorSchemesClass({
-        dndPanelElem: this.$refs.dndPanel,
-        elem: this.$refs.graphComponent,
+        dndPanelElem: this.$refs[`dndPanel-${this.idFrom}`],
+        schemeId: this.idFrom,
+        elem: this.$refs[`graphComponent-${this.idFrom}`],
         dataRest: this.dataRestFrom,
         iconsList: this.primitivesFromStore,
         elementDefaultStyles: this.elementDefaultStyles,
         openDataPanelCallback: this.openDataPanel,
         closeDataPanelCallback: this.closeDataPanel,
         savedGraph: this.savedGraph,
+        savedGraphObject: this.savedGraphObject,
         updateStoreCallback: this.updateSavedGraph,
+        updateStoreCallbackV2: this.updateSavedGraphObject,
         toggleLoadingCallback: this.toggleLoading,
         isEdit: this.isEdit,
       });
@@ -945,11 +818,41 @@ export default {
       });
     },
     updateSavedGraph(data) {
+      if (this.dashFromStore?.savedGraph) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'savedGraph',
+          value: data,
+        }]);
+      }
       this.$store.commit('setState', [{
-        object: this.dashFromStore,
+        object: this.dashFromStore[this.idFrom],
         prop: 'savedGraph',
         value: data,
       }]);
+    },
+    createSavedGraphObjectField() {
+      if (!this.dashFromStore[this.idFrom]?.savedGraphObject) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.idFrom],
+          prop: 'savedGraphObject',
+          value: {},
+        }]);
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.idFrom].savedGraphObject,
+          prop: this.activeScheme,
+          value: [],
+        }]);
+      }
+    },
+    updateSavedGraphObject(data) {
+      this.createSavedGraphObjectField();
+      this.$store.commit('setState', [{
+        object: this.dashFromStore[this.idFrom].savedGraphObject,
+        prop: this.activeScheme,
+        value: data,
+      }]);
+      this.updateSavedGraph('');
     },
     closeDataPanel() {
       this.dataPanel = false;

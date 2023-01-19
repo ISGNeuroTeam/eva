@@ -3,12 +3,12 @@ import { ImageNodeStyle, Rect, SimpleNode } from 'yfiles';
 const regexpSize = /viewBox="0 0 (?<width>.*?) (?<height>.*?)"/;
 
 class GenerateIcons {
-  constructor({
-    maxItemSize,
-    minItemSize,
-  }) {
-    this.maxItemSize = maxItemSize;
-    this.minItemSize = minItemSize;
+  constructor(
+    tooltip = 'Элементы с картинкой',
+    dataType = 'image-node',
+  ) {
+    this.tooltip = tooltip;
+    this.dataType = dataType;
   }
 
   // Получаем изображения с сервера, отсеивая некорректные
@@ -75,51 +75,70 @@ class GenerateIcons {
       })).then((resultList) => resultList));
   }
 
-  generateIconNodes(iconsList) {
+  generateIconNodes(iconsList, maxItemSize, minItemSize) {
     return GenerateIcons.getIconsListWithSize(iconsList)
       .then((iconsWithSize) => iconsWithSize.map((item) => {
-        const imageStyleNode = this.getIconNode(item);
+        const imageStyleNode = GenerateIcons.getIconNode({
+          data: {
+            ...item,
+            tag: {
+              ...item.tag,
+              dataType: item?.tag?.dataType || this.dataType,
+            },
+          },
+          maxItemSize,
+          minItemSize,
+        });
         return {
           description: item.description,
           icon: {
             node: imageStyleNode,
-            tooltip: 'Элементы с картинкой',
-            dataType: 'image-node',
+            tooltip: this.tooltip,
+            dataType: this.dataType,
           },
         };
       }));
   }
 
-  getIconNode(data) {
+  static getIconNode({
+    data,
+    size,
+    maxItemSize,
+    minItemSize,
+  }) {
     const imageStyleNode = new SimpleNode();
-    const nodeSize = this.generateImageSize(data.layout);
+    const nodeSize = size || GenerateIcons.generateImageSize({
+      ...data.layout,
+      maxItemSize,
+      minItemSize,
+    });
     imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
     imageStyleNode.style = new ImageNodeStyle(`/svg/${data.icon}.svg`);
     imageStyleNode.tag = {
-      dataType: 'image-node',
+      dataType: data.tag.dataType,
       isAspectRatio: true,
     };
     return imageStyleNode;
   }
 
-  getTextNode() {}
-
-  generateImageSize({
+  static generateImageSize({
     width,
     height,
+    maxItemSize,
+    minItemSize,
   }) {
     let localWidth = width;
     let localHeight = height;
     if (width === height) {
-      if (width < this.minItemSize) {
-        localWidth = this.minItemSize;
+      if (width < minItemSize) {
+        localWidth = minItemSize;
       }
-      if (height < this.minItemSize) {
-        localHeight = this.minItemSize;
+      if (height < minItemSize) {
+        localHeight = minItemSize;
       }
     }
     const increaseSizeFn = (resultWidth, resultHeight) => {
-      if ((this.maxItemSize * 2) < (resultWidth + resultHeight)) {
+      if ((maxItemSize * 2) < (resultWidth + resultHeight)) {
         return increaseSizeFn(+resultWidth / 2, +resultHeight / 2);
       }
       return {
