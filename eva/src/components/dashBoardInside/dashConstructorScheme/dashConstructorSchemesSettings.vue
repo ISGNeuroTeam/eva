@@ -5,14 +5,15 @@
     class="dash-constructor-schemes__data-panel-wrapper"
   >
     <div class="dash-constructor-schemes__data-panel-item">
-      <template v-if="dataType === '0' || dataType === '1'">
+      <template v-if="dataType === 'data-type-0'">
+        <!--data-type-0-->
         <div
           v-for="(element, index) in dataObject.items"
           :key="`${dataObject.nodeId}-${index}`"
           class="column"
         >
           <div class="row align-center">
-            <v-select
+            <v-autocomplete
               v-model="element.id"
               :style="{ color: theme.$main_text }"
               :items="dataRestFrom"
@@ -40,7 +41,7 @@
                   </v-list-item-content>
                 </v-list-item>
               </template>
-            </v-select>
+            </v-autocomplete>
             <v-icon
               class="control-button edit-icon theme--dark col-2"
               :style="{ color: theme.$secondary_text }"
@@ -105,9 +106,10 @@
           Применить
         </v-btn>
       </template>
-      <template v-if="dataType === '2' || dataType === '3'">
+      <template v-if="dataType === 'data-type-1'">
+        <!--data-type-1-->
         <div class="column">
-          <v-select
+          <v-autocomplete
             v-model="dataObject.id"
             :items="dataRestFrom"
             item-value="TagName"
@@ -134,7 +136,7 @@
                 </v-list-item-content>
               </v-list-item>
             </template>
-          </v-select>
+          </v-autocomplete>
           <div
             class="mb-9"
             :style="{ color: theme.$secondary_text }"
@@ -143,9 +145,10 @@
           </div>
         </div>
       </template>
-      <template v-if=" dataType === '4'">
+      <template v-if=" dataType === 'data-type-2'">
+        <!--data-type-2-->
         <div class="column">
-          <v-select
+          <v-autocomplete
             v-model="dataObject.id"
             :items="dataRestFrom"
             item-value="TagName"
@@ -171,7 +174,7 @@
                 </v-list-item-content>
               </v-list-item>
             </template>
-          </v-select>
+          </v-autocomplete>
           <div
             class="mb-9"
             :style="{ color: theme.$secondary_text }"
@@ -184,7 +187,6 @@
           :rules="[value => value >= 0 || 'Некорректное значение.']"
           label="Максимальное значение*"
         />
-
         <div class="row">
           <div class="col-8">
             Цвет текущего
@@ -280,11 +282,12 @@
           Применить
         </v-btn>
       </template>
-      <template v-if="dataType === '5'">
+      <template v-if="dataType === 'data-type-3'">
+        <!--data-type-3-->
         <div class="row align-center">
           <div class="col-12">
             <div class="column">
-              <v-select
+              <v-autocomplete
                 v-model="dataObject.idFirst"
                 :items="dataRestFrom"
                 item-value="TagName"
@@ -310,7 +313,7 @@
                     </v-list-item-content>
                   </v-list-item>
                 </template>
-              </v-select>
+              </v-autocomplete>
               <div
                 class="mb-9"
                 :style="{ color: theme.$secondary_text }"
@@ -379,7 +382,7 @@
         <div class="row align-center">
           <div class="col-12">
             <div class="column">
-              <v-select
+              <v-autocomplete
                 v-model="dataObject.idSecond"
                 :items="dataRestFrom"
                 item-value="TagName"
@@ -405,7 +408,7 @@
                     </v-list-item-content>
                   </v-list-item>
                 </template>
-              </v-select>
+              </v-autocomplete>
               <div
                 class="mb-9"
                 :style="{ color: theme.$secondary_text }"
@@ -479,7 +482,8 @@
           Применить
         </v-btn>
       </template>
-      <template v-if="dataType === 'label-0'">
+      <template v-if="dataType === 'label-type-0'">
+        <!--label-type-0-->
         <div class="row align-center">
           <div class="col-12">
             <v-text-field
@@ -542,7 +546,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   :style="{
-                    'background-color': dataObject.bgColor,
+                    'background-color': dataObject.bgColor.rgbaString,
                   }"
                   dark
                   v-bind="attrs"
@@ -551,9 +555,10 @@
               </template>
 
               <v-color-picker
-                v-model="dataObject.bgColor"
+                :value="dataObject.bgColor.rgbaObject"
                 dot-size="12"
                 mode="rgba"
+                @update:color="updateSelectedNodeColor($event, 'bgColor')"
               />
             </v-menu>
           </div>
@@ -587,7 +592,7 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     :style="{
-                      'background-color': dataObject.borderColor,
+                      'background-color': dataObject.borderColor.rgbaString,
                     }"
                     dark
                     v-bind="attrs"
@@ -596,9 +601,10 @@
                 </template>
 
                 <v-color-picker
-                  v-model="dataObject.borderColor"
+                  :value="dataObject.borderColor.rgbaObject"
                   dot-size="12"
                   mode="rgba"
+                  @update:color="updateSelectedNodeColor($event, 'borderColor')"
                 />
               </v-menu>
             </div>
@@ -630,7 +636,7 @@
           Применить
         </v-btn>
       </template>
-      <template v-if="dataType === 'default-node'">
+      <template v-if="dataType === 'shape-type-0'">
         <div class="row align-center">
           <div class="col-8">
             Цвет блока:
@@ -700,7 +706,7 @@
             />
           </div>
           <div class="col-12">
-            <v-select
+            <v-autocomplete
               v-model="dataObject.shape"
               :items="shapeNodeStyleList"
               item-value="id"
@@ -950,6 +956,7 @@ export default {
 }
 
 .dash-constructor-schemes__data-panel-select {
-  max-width: 480px;
+  min-width: 420px;
+  max-width: 420px;
 }
 </style>

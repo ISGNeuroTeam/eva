@@ -64,14 +64,13 @@ export class EdgePathPortCandidateProvider extends PortCandidateProviderBase {
       candidates.push(
         new DefaultPortCandidate(
           edge,
-          EdgePathPortLocationModel.INSTANCE.createRatioParameter(0.025 * i),
+          EdgePathPortLocationModel.INSTANCE.createRatioParameter(0.05 * i),
         ),
       );
     }
 
     // add a dynamic candidate that can be used if shift is pressed to assign the exact location.
     candidates.push(new DefaultPortCandidate(edge, EdgePathPortLocationModel.INSTANCE));
-
     return IEnumerable.from(candidates);
   }
 }

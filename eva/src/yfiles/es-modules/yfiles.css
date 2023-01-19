@@ -1,6 +1,6 @@
 /****************************************************************************
  ** @license
- ** This file is part of yFiles for HTML 2.4.0.5.
+ ** This file is part of yFiles for HTML 2.5.0.1.
  **
  ** yWorks proprietary/confidential. Use is subject to license terms.
  **
@@ -9,7 +9,7 @@
  **
  ***************************************************************************/
 .yfiles-canvascomponent:before {
-  content: '__yfiles-stylesheet-loaded-2.4.0.5';
+  content: '__yfiles-stylesheet-loaded-2.5.0.1';
   display: none;
 }
 
@@ -162,6 +162,102 @@
   background-position-y: center;
   background-size: contain;
   background-repeat: no-repeat;
+}
+
+.yfiles-canvascomponent .yfiles-scrollbar.yfiles-scrollbar-dynamic {
+  opacity: 1;
+  background: transparent;
+  border-radius: 6px;
+}
+.yfiles-scrollbar.yfiles-scrollbar-dynamic:hover,
+.yfiles-scrollbar.yfiles-scrollbar-dynamic:active {
+  background: rgba(238, 238, 238, 0.85);
+}
+.yfiles-canvascomponent .yfiles-scrollbar.yfiles-scrollbar-dynamic.yfiles-scrollbar-vertical {
+  width: 12px;
+  bottom: 0;
+}
+.yfiles-canvascomponent
+  .yfiles-scrollbar.yfiles-scrollbar-dynamic.yfiles-scrollbar-vertical.yfiles-scrollbar-inset {
+  bottom: 12px;
+}
+.yfiles-canvascomponent
+  .yfiles-scrollbar.yfiles-scrollbar-dynamic.yfiles-scrollbar-vertical
+  .yfiles-scrollbar-range-vertical {
+  top: 12px;
+  bottom: 12px;
+}
+.yfiles-canvascomponent
+  .yfiles-scrollbar.yfiles-scrollbar-dynamic.yfiles-scrollbar-vertical
+  .yfiles-scrollbar-slider {
+  right: 2px;
+  width: 8px;
+}
+.yfiles-canvascomponent .yfiles-scrollbar.yfiles-scrollbar-dynamic.yfiles-scrollbar-horizontal {
+  height: 12px;
+  right: 0;
+}
+.yfiles-canvascomponent
+  .yfiles-scrollbar.yfiles-scrollbar-dynamic.yfiles-scrollbar-horizontal.yfiles-scrollbar-inset {
+  right: 12px;
+}
+.yfiles-canvascomponent
+  .yfiles-scrollbar.yfiles-scrollbar-dynamic.yfiles-scrollbar-horizontal
+  .yfiles-scrollbar-range-horizontal {
+  left: 12px;
+  right: 12px;
+}
+.yfiles-canvascomponent
+  .yfiles-scrollbar.yfiles-scrollbar-dynamic.yfiles-scrollbar-horizontal
+  .yfiles-scrollbar-slider {
+  height: 8px;
+  bottom: 2px;
+}
+.yfiles-canvascomponent .yfiles-scrollbar.yfiles-scrollbar-dynamic .yfiles-scrollbar-slider {
+  border-radius: 4px;
+  background: #666666;
+}
+.yfiles-canvascomponent .yfiles-scrollbar.yfiles-scrollbar-dynamic .yfiles-button {
+  opacity: 0.6;
+  background-size: 16px;
+  width: 12px;
+  height: 12px;
+}
+.yfiles-canvascomponent
+  .yfiles-scrollbar.yfiles-scrollbar-dynamic.yfiles-scrollbar-inactive:not(:hover):not(:active) {
+  opacity: 0;
+  transition-property: opacity, width, background;
+  transition-duration: 0.3s, 0.3s, 0.2s;
+  transition-delay: 1s;
+  transition-timing-function: ease-in;
+}
+.yfiles-canvascomponent .yfiles-scrollbar.yfiles-scrollbar-dynamic:not(:hover):not(:active) {
+  transition: background 0.3s ease-in 1s;
+}
+.yfiles-canvascomponent
+  .yfiles-scrollbar.yfiles-scrollbar-dynamic:not(:hover):not(:active)
+  .yfiles-button {
+  opacity: 0;
+  transition: opacity 0.3s ease-in 1s;
+}
+.yfiles-canvascomponent
+  .yfiles-scrollbar.yfiles-scrollbar-dynamic:not(:hover):not(:active)
+  .yfiles-scrollbar-slider {
+  transition-duration: 0.3s;
+  transition-timing-function: ease-in;
+  transition-delay: 1s;
+}
+.yfiles-canvascomponent
+  .yfiles-scrollbar.yfiles-scrollbar-dynamic:not(:hover):not(:active).yfiles-scrollbar-vertical
+  .yfiles-scrollbar-slider {
+  transition-property: width, background, right;
+  width: 4px;
+}
+.yfiles-canvascomponent
+  .yfiles-scrollbar.yfiles-scrollbar-dynamic:not(:hover):not(:active).yfiles-scrollbar-horizontal
+  .yfiles-scrollbar-slider {
+  transition-property: height, background, bottom;
+  height: 4px;
 }
 
 /* Tooltip styling and transition */
