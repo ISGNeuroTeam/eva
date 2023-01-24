@@ -335,6 +335,7 @@ class ConstructorSchemesClass {
     closeDataPanelCallback,
     toggleLoadingCallback,
     isEdit,
+    onClickObject,
   }) {
     this.dragAndDropPanel = null;
     this.mapper = null;
@@ -393,6 +394,7 @@ class ConstructorSchemesClass {
     this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
     // Привязка z-order у label к родителю
     this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
+    this.onClickObject = onClickObject;
   }
 
   disableResizeInvisibleNodes() {
@@ -671,6 +673,12 @@ class ConstructorSchemesClass {
   enableViewerInputMode() {
     this.graphComponent.inputMode = new GraphViewerInputMode({
       focusableItems: 'none',
+    });
+    this.graphComponent.inputMode.addItemClickedListener((sender, evt) => {
+      const { item } = evt;
+      if (typeof this.onClickObject === 'function') {
+        this.onClickObject(item?.tag.dataType, item?.tag);
+      }
     });
   }
 
