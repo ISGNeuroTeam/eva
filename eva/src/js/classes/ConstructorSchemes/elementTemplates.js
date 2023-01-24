@@ -241,7 +241,7 @@ export default {
          :dx="layout.width / 2"
          text-anchor="middle"
          class="b-data-node__text"
-         fill="#FFFFFF"
+         :fill="tag.valueColor || '#FFFFFF'"
          :dy="((layout.height / 2) - (layout.height / 4))"
          alignment-baseline="middle"
          :font-size="((layout.height / 2) * 0.8) + 'px'"
