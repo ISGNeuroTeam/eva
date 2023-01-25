@@ -125,8 +125,18 @@ class ElementCreator {
     return new Promise((resolve) => {
       let createdNode = null;
       if (element.tag.dataType === 'image-node') {
+        let icon = '';
+        if (element.icon.match(/\/svg\/([\s\S]+?)\.svg/)) {
+          // eslint-disable-next-line prefer-destructuring
+          icon = element.icon.match(/\/svg\/([\s\S]+?)\.svg/)[1];
+        } else {
+          icon = element.icon;
+        }
         const imageNode = GenerateIcons.getIconNode({
-          data: element,
+          data: {
+            ...element,
+            icon,
+          },
           size: element.layout,
         });
         createdNode = this.graph.createNodeAt({
