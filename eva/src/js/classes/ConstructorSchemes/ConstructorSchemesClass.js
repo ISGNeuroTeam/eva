@@ -1544,6 +1544,7 @@ class ConstructorSchemesClass {
             ...node.tag,
             textFirst: targetData?.value || '-',
             textSecond: targetData?.Description || '-',
+            valueColor: targetData?.value_color || null,
           };
         } else if (dataType === 'data-type-2') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);

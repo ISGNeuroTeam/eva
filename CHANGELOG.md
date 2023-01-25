@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added saving/loading of all elements in the "constructor-schemes" as an array of objects with parameters for creating an element
 - Added rgba color for text-node in the "constructor-schemes"
 - Added click event in the "constructor-schemes"
+- Added data-node value color from dataset in the "constructor-schemes"
 
 ### Changed
 - Update yFiles to v25.0.1
