@@ -50,7 +50,7 @@ import {
   FreeNodePortLocationModel,
   GraphViewerInputMode,
   PortRelocationHandleProvider,
-  Visualization,
+  Visualization, EdgeRouterData, EdgeRouter, EdgeRouterScope, BridgeManager, GraphObstacleProvider,
 } from 'yfiles';
 import Utils from './Utils.js';
 import { throttle } from '@/js/utils/throttle';
@@ -64,6 +64,7 @@ import EdgeDropInputMode from './EdgeDropInputModeClass';
 import GenerateIcons from './GenerateIcons.js';
 import SchemeUpdater from './SchemeUpdater.js';
 import elementTemplates from './elementTemplates.js';
+import ElementCreator from '@/js/classes/ConstructorSchemes/ElementCreator';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -335,6 +336,8 @@ class ConstructorSchemesClass {
     closeDataPanelCallback,
     toggleLoadingCallback,
     isEdit,
+    isEdgeRouterEnable,
+    isBridgesEnable,
   }) {
     this.dragAndDropPanel = null;
     this.mapper = null;
@@ -393,6 +396,12 @@ class ConstructorSchemesClass {
     this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
     // Привязка z-order у label к родителю
     this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
+    if (isEdgeRouterEnable) {
+      // this.enableEdgeRouter();
+    }
+    if (isBridgesEnable) {
+      this.enableBridges();
+    }
   }
 
   disableResizeInvisibleNodes() {
@@ -533,7 +542,6 @@ class ConstructorSchemesClass {
     this.savedGraph = window.localStorage.getItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml') || '';
     window.localStorage.removeItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml');
     if (updateStoreCallback && this.savedGraph) {
-      console.log(this.savedGraph);
       updateStoreCallback(this.savedGraph);
     }
   }
@@ -584,10 +592,19 @@ class ConstructorSchemesClass {
     });
   }
 
+  stopper(time) {
+    // clearTimeout(this.timeout);
+    // this.timer = time;
+    // this.timeout = setTimeout(this.stopper, 1000);
+    // if (time > 0) {
+    //   this.stopper(time - 1);
+    // }
+  }
+
   saveAnObject() {
     const schemeUpdater = this.initSchemeUpdater();
-    schemeUpdater.save().then((/* result */) => {
-      this.save(this.updateStoreCallback);
+    schemeUpdater.save().then((result) => {
+      this.updateStoreCallbackV2(result);
     });
   }
 
@@ -767,7 +784,7 @@ class ConstructorSchemesClass {
 
       // Сохранение в store
 
-      this.saveAnObject();
+      // this.saveAnObject();
     });
 
     // Событие клика по элементу
@@ -895,59 +912,32 @@ class ConstructorSchemesClass {
     }
   }
 
-  // TODO: Заменить на ElementCreator.createNode
   async nodeCreator({
-    graph,
     dropData,
     dropLocation,
     isCopiedElement = false,
   }) {
-    let createdNode = null;
-    if (dropData?.tag?.templateType) {
-      // Узел с данными
-      createdNode = this.createDataNode({
-        graph,
-        location: dropLocation,
-        data: dropData,
-      });
-    } else if (dropData?.tag?.textTemplateType) {
-      // Узел с текстом
-      createdNode = this.createTextNode({
-        graph,
-        location: dropLocation,
-        data: dropData,
-      });
-    } else if (dropData?.tag?.isAspectRatio) {
-      // Узел с картинкой
-      createdNode = graph.createNodeAt({
-        location: dropLocation,
-        style: dropData.style,
+    const elementCreator = new ElementCreator({
+      graph: this.graphComponent.graph,
+      elements: [],
+    });
+    return new Promise((resolve) => {
+      elementCreator.createNode({
+        layout: {
+          width: dropData.layout.width,
+          height: dropData.layout.height,
+          x: isCopiedElement ? dropLocation.x : dropLocation.x - (dropData.layout.width / 2),
+          y: isCopiedElement ? dropLocation.y : dropLocation.y - (dropData.layout.height / 2),
+        },
+        icon: dropData?.style?.image,
         tag: {
           ...dropData.tag,
-          nodeId: dropData?.id || dropData.hashCode(),
+          nodeId: dropData.hashCode(),
         },
+      }).then((createdElement) => {
+        resolve(createdElement);
       });
-    } else {
-      // Обычный узел
-      createdNode = graph.createNodeAt({
-        location: dropLocation,
-        style: new VuejsNodeStyle(this.elementTemplates['shape-type-0'].template),
-        labels: dropData.labels,
-        tag: {
-          ...dropData.tag,
-          nodeId: dropData?.id || dropData.hashCode(),
-        },
-      });
-    }
-    const nodePosition = new Rect(
-      isCopiedElement ? dropLocation.x : dropLocation.x - (dropData.layout.width / 2),
-      isCopiedElement ? dropLocation.y : dropLocation.y - (dropData.layout.height / 2),
-      dropData.layout.width,
-      dropData.layout.height,
-    );
-    createdNode.tag.nodeId = createdNode.hashCode();
-    graph.setNodeLayout(createdNode, nodePosition);
-    return createdNode;
+    });
   }
 
   settingsNodeDropInputMode() {
@@ -1899,6 +1889,24 @@ class ConstructorSchemesClass {
       }
       graph.undoEngine.clear();
     }
+  }
+
+  enableEdgeRouter() {
+    const layoutData = new EdgeRouterData();
+    const edgeRouter = new EdgeRouter();
+    // чтобы узлы не сливались
+    // TODO:Пока установлено временное значение, в дальнейшем вынести в настройки визуализации
+    edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance = this.defaultEdgeStyle.strokeSize;
+
+    edgeRouter.scope = EdgeRouterScope.ROUTE_ALL_EDGES;
+
+    this.graphComponent.graph.applyLayout(edgeRouter, layoutData);
+  }
+
+  enableBridges() {
+    const bridgeManager = new BridgeManager();
+    bridgeManager.canvasComponent = this.graphComponent;
+    bridgeManager.addObstacleProvider(new GraphObstacleProvider());
   }
 }
 

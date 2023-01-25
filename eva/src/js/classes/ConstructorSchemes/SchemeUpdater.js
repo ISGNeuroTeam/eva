@@ -7,6 +7,7 @@ import {
 } from 'yfiles';
 import Utils from './Utils.js';
 import ElementCreator from './ElementCreator.js';
+import { throttle } from '@/js/utils/throttle';
 
 class SchemeUpdater {
   constructor({ graph, elementsFromStore, updateStoreCallback }) {
@@ -53,7 +54,7 @@ class SchemeUpdater {
             });
           }
         });
-        this.updateStoreCallback(structuredClone(result));
+        // this.updateStoreCallback(structuredClone(result));
         resolve(structuredClone(result));
       } catch (e) {
         reject(e);
