@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.119.0]
+
+### Added
 - Added gen_distr command description
 - Added saving/loading of all elements in the "constructor-schemes" as an array of objects with parameters for creating an element
 - Added rgba color for text-node in the "constructor-schemes"
@@ -17,8 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Update yFiles to v25.0.1
 - Update yFiles license to 2.4
-
-### Fixed
 
 ## [1.118.0]
 
