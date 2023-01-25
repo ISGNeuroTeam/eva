@@ -535,7 +535,6 @@ class ConstructorSchemesClass {
     this.savedGraph = window.localStorage.getItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml') || '';
     window.localStorage.removeItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml');
     if (updateStoreCallback && this.savedGraph) {
-      console.log(this.savedGraph);
       updateStoreCallback(this.savedGraph);
     }
   }
