@@ -1,3 +1,16 @@
+# [1.119.0] - 2023-01-25
+
+### Added
+- Added gen_distr command description
+- Added saving/loading of all elements in the "constructor-schemes" as an array of objects with parameters for creating an element
+- Added rgba color for text-node in the "constructor-schemes"
+- Added click event in the "constructor-schemes"
+- Added data-node value color from dataset in the "constructor-schemes"
+
+### Changed
+- Update yFiles to v25.0.1
+- Update yFiles license to 2.4
+
 # [1.118.0] - 2022-12-29
 
 ### Added
