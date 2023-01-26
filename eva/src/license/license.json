@@ -1,7 +1,7 @@
 {
   "company": "ISG Neuro",
   "contact": "Andrey Starchenkov",
-  "date": "10/27/2020",
+  "date": "12/22/2021",
   "distribution": true,
   "domains": [
     "*"
@@ -14,8 +14,8 @@
   "package": "complete",
   "product": "yFiles for HTML",
   "projectname": "EVA",
-  "subscription": "10/26/2021",
+  "subscription": "10/26/2022",
   "type": "project",
-  "version": "2.3",
-  "key": "624c634061da3c9286e6d7372606ef4ff9a23ae8"
+  "version": "2.4",
+  "key": "7132da398ce4072ffec9beade19c388002ab9bcd"
 }

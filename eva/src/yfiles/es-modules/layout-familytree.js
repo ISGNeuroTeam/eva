@@ -1,6 +1,6 @@
 /****************************************************************************
  ** @license
- ** This file is part of yFiles for HTML 2.4.0.5.
+ ** This file is part of yFiles for HTML 2.5.0.1.
  **
  ** yWorks proprietary/confidential. Use is subject to license terms.
  **
@@ -8,4 +8,4 @@
  ** 72070 Tuebingen, Germany. All rights reserved.
  **
  ***************************************************************************/
-import y from"./impl/layout-familytree.js";export var FamilyTreeLayout=y.genealogy.FamilyTreeLayout;export var FamilyType=y.genealogy.FamilyType;export var VerticalNodeAlignment=y.genealogy.VerticalNodeAlignment;export var FamilyMembersSortingPolicy=y.genealogy.FamilyMembersSortingPolicy;export default y;
+import y from "./impl/layout-familytree.js";export var FamilyTreeLayout=y.genealogy.FamilyTreeLayout;export var FamilyType=y.genealogy.FamilyType;export var VerticalNodeAlignment=y.genealogy.VerticalNodeAlignment;export var FamilyMembersSortingPolicy=y.genealogy.FamilyMembersSortingPolicy;export default y;

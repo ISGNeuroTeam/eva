@@ -1,6 +1,6 @@
 /****************************************************************************
  ** @license
- ** This file is part of yFiles for HTML 2.4.0.5.
+ ** This file is part of yFiles for HTML 2.5.0.1.
  **
  ** yWorks proprietary/confidential. Use is subject to license terms.
  **
@@ -8,4 +8,4 @@
  ** 72070 Tuebingen, Germany. All rights reserved.
  **
  ***************************************************************************/
-import y from"./impl/layout-orthogonal.js";export var OrthogonalLayoutEdgeLayoutDescriptor=y.orthogonal.EdgeLayoutDescriptor;export var TreeLayoutStyle=y.orthogonal.TreeLayoutStyle;export var SubstructureOrientation=y.orthogonal.SubstructureOrientation;export var ChainLayoutStyle=y.orthogonal.ChainLayoutStyle;export var CycleLayoutStyle=y.orthogonal.CycleLayoutStyle;export var OrthogonalLayoutStyle=y.orthogonal.LayoutStyle;export var OrthogonalLayout=y.orthogonal.OrthogonalLayout;export default y;
+import y from "./impl/layout-orthogonal.js";export var OrthogonalLayoutEdgeLayoutDescriptor=y.orthogonal.EdgeLayoutDescriptor;export var TreeLayoutStyle=y.orthogonal.TreeLayoutStyle;export var SubstructureOrientation=y.orthogonal.SubstructureOrientation;export var ChainLayoutStyle=y.orthogonal.ChainLayoutStyle;export var CycleLayoutStyle=y.orthogonal.CycleLayoutStyle;export var OrthogonalLayoutStyle=y.orthogonal.LayoutStyle;export var OrthogonalLayout=y.orthogonal.OrthogonalLayout;export default y;

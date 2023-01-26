@@ -1,6 +1,6 @@
 /****************************************************************************
  ** @license
- ** This file is part of yFiles for HTML 2.4.0.5.
+ ** This file is part of yFiles for HTML 2.5.0.1.
  **
  ** yWorks proprietary/confidential. Use is subject to license terms.
  **
@@ -8,4 +8,4 @@
  ** 72070 Tuebingen, Germany. All rights reserved.
  **
  ***************************************************************************/
-import y from"./impl/layout-area.js";export var ClearAreaLayout=y.partial.ClearAreaLayout;export var FillAreaLayout=y.partial.FillAreaLayout;export default y;
+import y from "./impl/layout-area.js";export var ClearAreaLayout=y.partial.ClearAreaLayout;export var FillAreaLayout=y.partial.FillAreaLayout;export default y;

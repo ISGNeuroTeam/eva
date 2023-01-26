@@ -1,6 +1,6 @@
 /****************************************************************************
  ** @license
- ** This file is part of yFiles for HTML 2.4.0.5.
+ ** This file is part of yFiles for HTML 2.5.0.1.
  **
  ** yWorks proprietary/confidential. Use is subject to license terms.
  **
@@ -12,6 +12,7 @@ export * from './lang.js'
 export * from './core.js'
 export * from './algorithms.js'
 export * from './layout-area.js'
+export * from './layout-cactus.js'
 export * from './layout-core.js'
 export * from './layout-familytree.js'
 export * from './layout-hierarchic.js'
@@ -25,6 +26,7 @@ export * from './layout-tree.js'
 export * from './router-other.js'
 export * from './router-polyline.js'
 export * from './router-bus.js'
+export * from './styles-group.js'
 export * from './styles-other.js'
 export * from './styles-template.js'
 export * from './view-component.js'
