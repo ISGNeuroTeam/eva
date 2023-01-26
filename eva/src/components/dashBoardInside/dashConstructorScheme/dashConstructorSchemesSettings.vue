@@ -7,13 +7,24 @@
     <div class="dash-constructor-schemes__data-panel-item pb-4">
       <template v-if="dataType === 'data-type-0'">
         <!--data-type-0-->
+        <v-switch
+          v-model="textMode"
+          label="Ручной ввод TagName"
+        />
         <div
           v-for="(element, index) in dataObject.items"
           :key="`${dataObject.nodeId}-${index}`"
           class="column"
         >
           <div class="row align-center">
+            <v-text-field
+              v-if="textMode"
+              v-model="element.id"
+              label="TagName поля с данными"
+              class="col-10"
+            />
             <v-autocomplete
+              v-else
               v-model="element.id"
               :style="{ color: theme.$main_text }"
               :items="dataRestFrom"
@@ -110,7 +121,18 @@
       <template v-if="dataType === 'data-type-1'">
         <!--data-type-1-->
         <div class="column">
+          <v-switch
+            v-model="textMode"
+            label="Ручной ввод TagName"
+          />
+          <v-text-field
+            v-if="textMode"
+            v-model="dataObject.id"
+            label="TagName поля с данными"
+            @change="updateModelValue(dataObject)"
+          />
           <v-autocomplete
+            v-else
             v-model="dataObject.id"
             :items="dataRestFrom"
             item-value="TagName"
@@ -935,6 +957,7 @@ export default {
       closeIcon: mdiClose,
       addLineIcon: mdiTableRowPlusAfter,
       test12345: 50,
+      textMode: false,
     };
   },
   computed: {
