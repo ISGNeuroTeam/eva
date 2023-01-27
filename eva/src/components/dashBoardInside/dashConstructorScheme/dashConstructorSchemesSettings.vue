@@ -4,7 +4,7 @@
     ref="dataPanelItems"
     class="dash-constructor-schemes__data-panel-wrapper"
   >
-    <div class="dash-constructor-schemes__data-panel-item">
+    <div class="dash-constructor-schemes__data-panel-item pb-4">
       <template v-if="dataType === 'data-type-0'">
         <!--data-type-0-->
         <div
@@ -19,7 +19,8 @@
               :items="dataRestFrom"
               item-value="TagName"
               item-text="Description"
-              label="Данные для строки"
+              label="Значение"
+              :filter="tagNameAutocompleteFilter"
               :menu-props="{
                 'z-index': 100,
               }"
@@ -51,11 +52,18 @@
             </v-icon>
           </div>
           <div
-            class="mb-9"
+            class="mr-10"
             :style="{ color: theme.$secondary_text }"
           >
             {{ element.id | getObjectNameById(dataRestFrom) }}
           </div>
+          <v-text-field
+            v-model="element.description"
+            label="Подпись"
+            :color="theme.$accent_ui_color"
+            :style="{ color: theme.$main_text }"
+            class="mb-9 mr-10"
+          />
         </div>
         <div class="d-flex mb-9">
           <v-btn
@@ -115,10 +123,10 @@
             item-value="TagName"
             item-text="Description"
             label="Данные для строки"
+            :filter="tagNameAutocompleteFilter"
             :menu-props="{
               'z-index': 100,
             }"
-            @change="updateModelValue(dataObject)"
           >
             <template v-slot:item="{ item, on }">
               <v-list-item
@@ -138,11 +146,26 @@
             </template>
           </v-autocomplete>
           <div
-            class="mb-9"
+            class="mr-10"
             :style="{ color: theme.$secondary_text }"
           >
             {{ dataObject.id | getObjectNameById(dataRestFrom) }}
           </div>
+          <v-text-field
+            v-model="dataObject.description"
+            label="Подпись"
+            :color="theme.$accent_ui_color"
+            :style="{ color: theme.$main_text }"
+            class="mb-9 mr-10"
+          />
+          <v-btn
+            small
+            :color="theme.$primary_button"
+            :style="{ color: theme.$main_text }"
+            @click="updateModelValue"
+          >
+            Применить
+          </v-btn>
         </div>
       </template>
       <template v-if=" dataType === 'data-type-2'">
@@ -627,9 +650,62 @@
               />
             </div>
           </template>
+
+          <div class="col-12">
+            <v-text-field
+              v-model="dataObject.value1"
+              label="Значение value1"
+              :color="theme.$main_text"
+              outlined
+              hide-details
+              persistent-placeholder
+              dense
+            />
+            <v-text-field
+              v-model="dataObject.value2"
+              label="Значение value2"
+              class="mt-3"
+              :color="theme.$main_text"
+              outlined
+              hide-details
+              persistent-placeholder
+              dense
+            />
+            <v-text-field
+              v-model="dataObject.value3"
+              label="Значение value3"
+              class="mt-3"
+              :color="theme.$main_text"
+              outlined
+              hide-details
+              persistent-placeholder
+              dense
+            />
+            <v-text-field
+              v-model="dataObject.value4"
+              label="Значение value4"
+              class="mt-3"
+              :color="theme.$main_text"
+              outlined
+              hide-details
+              persistent-placeholder
+              dense
+            />
+            <v-text-field
+              v-model="dataObject.value5"
+              label="Значение value5"
+              class="mt-3"
+              :color="theme.$main_text"
+              outlined
+              hide-details
+              persistent-placeholder
+              dense
+            />
+          </div>
         </div>
         <v-btn
           small
+          class="mt-4"
           :color="theme.$primary_button"
           @click="updateModelValue(dataObject)"
         >
@@ -900,6 +976,17 @@ export default {
     this.updateSliderValue = throttle(this.updateSliderValue, 200);
   },
   methods: {
+    tagNameAutocompleteFilter(data, str) {
+      const subStr = str.toLowerCase();
+      const fields = ['TagName', 'NameObject', 'Description'];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const field of fields) {
+        if (data[field] && data[field].toLowerCase().indexOf(subStr) !== -1) {
+          return true;
+        }
+      }
+      return false;
+    },
     updateSelectedNodeColor(evt, field) {
       const updateValue = structuredClone(this.dataObject);
       updateValue[field] = {

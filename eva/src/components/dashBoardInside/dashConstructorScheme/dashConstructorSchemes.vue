@@ -8,7 +8,7 @@
         ...customStyle,
         'width': `${innerSize.width - 22}px`,
         'height': `${innerSize.height}px`,
-        background: theme.$secondary_bg,
+        background: isPanelBackHide ? 'transparent' : theme.$secondary_bg,
         margin: '0 10px',
       }"
       :class="customClass"
@@ -594,6 +594,9 @@ export default {
   },
   data() {
     return {
+      actions: [
+        { name: 'click:label', capture: ['value1', 'value2', 'value3', 'value4', 'value5'] },
+      ],
       isEdit: false,
       gear: mdiSettings,
       closeIcon: mdiClose,
@@ -663,7 +666,6 @@ export default {
       isConfirmUpdateScheme: false,
       // Default value - graph
       activeScheme: 'graph',
-      test: [],
       timeout: null,
       timer: 0,
     };
@@ -694,8 +696,7 @@ export default {
       get() {
         const savedGraph = this.dashFromStore[this.idFrom]?.savedGraphObject;
         if (savedGraph) {
-          if (savedGraph[this.schemeIdFromSearch]
-          ) {
+          if (savedGraph[this.schemeIdFromSearch] && this.optionsFromStore?.defaultFromSourceData) {
             return savedGraph[this.schemeIdFromSearch];
           }
           return savedGraph[this.activeScheme] || [];
@@ -704,9 +705,16 @@ export default {
       },
       set(value) {
         this.createSavedGraphObjectField();
+        if (this.optionsFromStore?.defaultFromSourceData) {
+          this.$store.commit('setState', [{
+            object: this.dashFromStore[this.idFrom].savedGraphObject,
+            prop: this.schemeIdFromSearch,
+            value,
+          }]);
+        }
         this.$store.commit('setState', [{
           object: this.dashFromStore[this.idFrom].savedGraphObject,
-          prop: this.schemeIdFromSearch || this.activeScheme,
+          prop: this.activeScheme,
           value,
         }]);
         if (this.dashFromStore[this.idFrom].savedGraph || this.dashFromStore.savedGraph) {
@@ -714,22 +722,6 @@ export default {
         }
       },
     },
-    // savedGraphObject() {
-    //   if (this.dashFromStore[this.idFrom]?.savedGraphObject) {
-    //     if (typeof this.dashFromStore[this.idFrom]?.savedGraphObject[this.schemeIdFromSearch
-    //     || this.activeScheme] === 'string') {
-    //       return JSON.parse(
-    //         this.dashFromStore[this.idFrom]?.savedGraphObject[this.schemeIdFromSearch
-    //           || this.activeScheme],
-    //       )
-    //           || [];
-    //     }
-    //     return this.dashFromStore[this.idFrom]?.savedGraphObject[this.schemeIdFromSearch
-    //     || this.activeScheme]
-    //     || [];
-    //   }
-    //   return [];
-    // },
     innerSize() {
       return {
         height: this.sizeFrom.height - 32,
@@ -747,6 +739,9 @@ export default {
         return this.dataSources[this.searchForBuildScheme]?.data || [];
       }
       return [];
+    },
+    isPanelBackHide() {
+      return this.dashFromStore[this.idFrom].options?.panelBackHide || false;
     },
     schemeIdFromSearch() {
       const searchFromStore = structuredClone(this.dashFromStore.searches)
@@ -818,9 +813,33 @@ export default {
     this.createGraph();
     this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
     this.updateSavedGraph = throttle(this.updateSavedGraph, 1000);
-    // this.updateSavedGraphObject = this.debounce(this.updateSavedGraphObject, 500);
+    this.setActions();
   },
   methods: {
+    setActions() {
+      this.$store.commit('setActions', {
+        actions: JSON.parse(JSON.stringify(this.actions)),
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+    },
+    getEvents({ event }) {
+      let result = [];
+      if (!this.$store.state[this.idDashFrom].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDashFrom],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      result = this.$store.state[this.idDashFrom].events.filter((item) => (
+        item.event === event
+        && item.element.indexOf(`${this.idFrom}:`) !== -1
+        && item.partelement === 'empty'
+      ));
+      return result;
+    },
     updateDefaultElementColor(evt, field) {
       const updateValue = structuredClone(this.elementDefaultStyles);
       updateValue[field] = {
@@ -856,6 +875,44 @@ export default {
         isEdit: this.isEdit,
         isBridgesEnable: this.isBridgeEnable,
         isEdgeRouterEnable: this.isEdgeRouterEnable,
+        onClickObject: (type, data) => {
+          if (type !== 'label-type-0') {
+            return;
+          }
+          const { tockens: tokens } = this.$store.state[this.idDashFrom];
+          if (tokens) {
+            tokens.forEach(({
+              name,
+              action,
+              capture,
+              elem,
+            }) => {
+              if (elem === this.idFrom && action === 'click:label' && data[capture]) {
+                this.$store.commit('setTocken', {
+                  token: { name, action, capture },
+                  idDash: this.idDashFrom,
+                  value: data[capture],
+                  store: this.$store,
+                });
+              }
+            });
+          }
+          const events = this.getEvents({ event: 'onclick' });
+          if (events.length !== 0) {
+            events.forEach((event) => {
+              const fieldName = event.element.match(/:label-(\w+)/);
+              if (event.action === 'go' && fieldName && data[fieldName[1]]) {
+                this.$store.dispatch('letEventGo', {
+                  event,
+                  idDash: this.idDashFrom,
+                  route: this.$router,
+                  store: this.$store,
+                  id: this.idFrom,
+                });
+              }
+            });
+          }
+        },
       });
       if (this.constructorSchemes) {
         this.shapeNodeStyleList = this.constructorSchemes.getShapeNodeStyleList;
@@ -893,13 +950,11 @@ export default {
         }]);
       }
       if (!this.dashFromStore[this.idFrom]?.savedGraphObject[this.schemeIdFromSearch]) {
-        console.log('this.schemeIdFromSearch', this.schemeIdFromSearch);
         this.$store.commit('setState', [{
           object: this.dashFromStore[this.idFrom].savedGraphObject,
           prop: `${this.schemeIdFromSearch}`,
           value: [],
         }]);
-        console.log('this.dashFromStore[this.idFrom].savedGraphObject', this.dashFromStore[this.idFrom].savedGraphObject);
       }
       if (!this.dashFromStore[this.idFrom]?.savedGraphObject[this.activeScheme]) {
         this.$store.commit('setState', [{
