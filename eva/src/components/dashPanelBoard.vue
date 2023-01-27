@@ -35,14 +35,18 @@
           :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
-            <v-icon
-              class="home"
-              :color="theme.$secondary_text"
+            <router-link
+              to="/main"
               v-on="on"
-              @click="toHome"
             >
-              {{ home }}
-            </v-icon>
+              <v-icon
+                class="home"
+                :color="theme.$secondary_text"
+                v-on="on"
+              >
+                {{ home }}
+              </v-icon>
+            </router-link>
           </template>
           <span>На главную</span>
         </v-tooltip>

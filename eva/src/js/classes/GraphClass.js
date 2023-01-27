@@ -532,23 +532,22 @@ class GraphClass {
     const { nodes } = this.graphComponent.graph;
     nodes.forEach((node) => {
       // node.labels.elementAt(0) -- label который name
-      this.graphComponent.graph.setStyle(
-        node.labels.elementAt(0),
-        this.labelStyle(true),
-      );
-      // node.labels.elementAt(1) -- label который label
-      this.graphComponent.graph.setStyle(
-        node.labels.elementAt(1),
-        this.labelStyle(false),
-      );
+      node.labels.toArray().forEach((el, index) => {
+        this.graphComponent.graph.setStyle(
+          el,
+          this.labelStyle(index === 1),
+        );
+      });
     });
 
     const { edges } = this.graphComponent.graph;
     edges.forEach((edge) => {
-      this.graphComponent.graph.setStyle(
-        edge.labels.elementAt(0),
-        this.labelStyle(false, this.colorFrom.backElement),
-      );
+      edge.labels.toArray().forEach((el) => {
+        this.graphComponent.graph.setStyle(
+          el,
+          this.labelStyle(false, this.colorFrom.backElement),
+        );
+      });
     });
   }
 
