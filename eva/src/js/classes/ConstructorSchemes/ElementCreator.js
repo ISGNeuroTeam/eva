@@ -285,6 +285,15 @@ class ElementCreator {
       });
     });
   }
+
+  buildSchemeFromSearch() {
+    const generateIcons = new GenerateIcons();
+    return new Promise((resolve) => {
+      generateIcons.generateIconNodes(this.elements).then((response) => {
+        resolve(response);
+      });
+    });
+  }
 }
 
 export default ElementCreator;

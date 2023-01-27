@@ -1908,6 +1908,16 @@ class ConstructorSchemesClass {
     bridgeManager.canvasComponent = this.graphComponent;
     bridgeManager.addObstacleProvider(new GraphObstacleProvider());
   }
+
+  buildSchemeFromSearch(dataFrom) {
+    const elementCreator = new ElementCreator({
+      graph: this.graphComponent.graph,
+      elements: dataFrom,
+    });
+    elementCreator.buildSchemeFromSearch().then((response) => {
+      console.log('buildSchemeFromSearch', response);
+    });
+  }
 }
 
 export default ConstructorSchemesClass;
