@@ -692,10 +692,13 @@ export default {
     },
     savedGraphObject: {
       get() {
-        if (this.dashFromStore[this.idFrom]?.savedGraphObject) {
-          return this.dashFromStore[this.idFrom]?.savedGraphObject[this.schemeIdFromSearch
-              || this.activeScheme]
-              || [];
+        const savedGraph = this.dashFromStore[this.idFrom]?.savedGraphObject;
+        if (savedGraph) {
+          if (savedGraph[this.schemeIdFromSearch]
+          ) {
+            return savedGraph[this.schemeIdFromSearch];
+          }
+          return savedGraph[this.activeScheme] || [];
         }
         return [];
       },
@@ -765,6 +768,9 @@ export default {
     isEdgeRouterEnable() {
       return this.optionsFromStore?.isEdgeRouterSupport || false;
     },
+    isAlwaysUpdateScheme() {
+      return this.optionsFromStore?.alwaysUpdateScheme || false;
+    },
   },
   watch: {
     primitivesFromStore: {
@@ -798,6 +804,14 @@ export default {
       if (!val) {
         this.isEdit = false;
       }
+    },
+    dataForBuildScheme: {
+      deep: true,
+      handler(value) {
+        if (this.isAlwaysUpdateScheme) {
+          this.constructorSchemes.buildSchemeFromSearch(value);
+        }
+      },
     },
   },
   mounted() {
@@ -905,7 +919,7 @@ export default {
         this.$store.commit('setState', [{
           object: this.dashFromStore[this.idFrom].savedGraphObject,
           prop: this.schemeIdFromSearch || this.activeScheme,
-          value: JSON.stringify(data),
+          value: data,
         }]);
         if (this.dashFromStore[this.idFrom].savedGraph || this.dashFromStore.savedGraph) {
           this.updateSavedGraph('');
