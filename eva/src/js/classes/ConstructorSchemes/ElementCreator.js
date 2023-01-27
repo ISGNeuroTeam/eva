@@ -1,7 +1,7 @@
 import {
   Point, PolylineEdgeStyle, Rect, ShapeNodeStyle, DefaultLabelStyle,
 } from 'yfiles';
-import elementTemplates from './elementTemplates.js';
+import ElementTemplates from './elementTemplates.js';
 import VuejsNodeStyle from '@/js/classes/ConstructorSchemes/VueNodeStyle';
 import GenerateIcons from '@/js/classes/ConstructorSchemes/GenerateIcons';
 
@@ -12,7 +12,7 @@ class ElementCreator {
   }) {
     this.graph = graph;
     this.elements = elements;
-    this.elementTemplates = elementTemplates;
+    this.elementTemplates = ElementTemplates.templates;
   }
 
   buildGraph() {
@@ -162,6 +162,7 @@ class ElementCreator {
           style: new VuejsNodeStyle(template),
           tag: {
             ...element.tag,
+            fontFamily: ElementTemplates.fontFamily,
             nodeId: element.tag.nodeId || element.hashCode(),
           },
         });

@@ -545,6 +545,7 @@ import SendToBack from '../../../images/send_to_back.svg';
 
 import ConstructorSchemesClass from '../../../js/classes/ConstructorSchemes/ConstructorSchemesClass';
 import { throttle } from '@/js/utils/throttle';
+import elementTemplates from '@/js/classes/ConstructorSchemes/elementTemplates';
 
 export default {
   name: 'DashConstructorSchemes',
@@ -613,7 +614,7 @@ export default {
       shapeNodeStyle: '',
       shapeNodeStyleList: [],
       elementDefaultStyles: {
-        labelFont: '12px Tahoma',
+        labelFont: `12px ${elementTemplates.fontFamily}`,
         labelTextFill: {
           rgbaString: 'rgba(255, 255, 255, 255)',
           rgbaObject: {

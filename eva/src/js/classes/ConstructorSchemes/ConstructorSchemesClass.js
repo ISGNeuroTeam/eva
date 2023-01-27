@@ -159,7 +159,7 @@ class ConstructorSchemesClass {
       smoothingLength: 0,
     },
     defaultLabelStyle: {
-      font: '12px Tahoma', // Size, family
+      font: '12px "ProximaNova", sans-serif', // Size, family
       textFill: '#000000', // Color
     },
     selectedShapeNodeStyle: '',
@@ -302,7 +302,7 @@ class ConstructorSchemesClass {
   }
 
   set defaultLabelStyle({
-    font = '12px Tahoma',
+    font = `12px ${this.fontFamily}`,
     textFill = '#000000',
   }) {
     this.options.defaultLabelStyle = {
@@ -355,7 +355,8 @@ class ConstructorSchemesClass {
     this.openDataPanelCallback = openDataPanelCallback;
     this.closeDataPanelCallback = closeDataPanelCallback;
     this.toggleLoadingCallback = toggleLoadingCallback;
-    this.elementTemplates = elementTemplates;
+    this.elementTemplates = elementTemplates.templates;
+    this.fontFamily = elementTemplates.fontFamily;
     // Вторая реализация сохранения данных
     this.targetDataNode = {};
     this.graphComponent = new GraphComponent(elem);
