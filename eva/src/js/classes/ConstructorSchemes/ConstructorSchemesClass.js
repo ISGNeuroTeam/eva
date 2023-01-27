@@ -336,6 +336,7 @@ class ConstructorSchemesClass {
     closeDataPanelCallback,
     toggleLoadingCallback,
     isEdit,
+    onClickObject,
     isEdgeRouterEnable,
     isBridgesEnable,
   }) {
@@ -396,6 +397,7 @@ class ConstructorSchemesClass {
     this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
     // Привязка z-order у label к родителю
     this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
+    this.onClickObject = onClickObject;
     if (isEdgeRouterEnable) {
       // this.enableEdgeRouter();
     }
@@ -592,15 +594,6 @@ class ConstructorSchemesClass {
     });
   }
 
-  stopper(time) {
-    // clearTimeout(this.timeout);
-    // this.timer = time;
-    // this.timeout = setTimeout(this.stopper, 1000);
-    // if (time > 0) {
-    //   this.stopper(time - 1);
-    // }
-  }
-
   saveAnObject() {
     const schemeUpdater = this.initSchemeUpdater();
     schemeUpdater.save().then((result) => {
@@ -688,6 +681,12 @@ class ConstructorSchemesClass {
   enableViewerInputMode() {
     this.graphComponent.inputMode = new GraphViewerInputMode({
       focusableItems: 'none',
+    });
+    this.graphComponent.inputMode.addItemClickedListener((sender, evt) => {
+      const { item } = evt;
+      if (typeof this.onClickObject === 'function') {
+        this.onClickObject(item?.tag.dataType, item?.tag);
+      }
     });
   }
 
@@ -1510,8 +1509,10 @@ class ConstructorSchemesClass {
             if (targetData) {
               nodeDataItem = {
                 ...nodeDataItem,
-                textLeft: targetData?.Description || '-',
-                textRight: targetData?.value || '-',
+                textRight: typeof targetData?.value === 'number'
+                || typeof targetData?.value === 'string'
+                  ? targetData.value
+                  : '-',
               };
             }
             return nodeDataItem;
@@ -1524,8 +1525,11 @@ class ConstructorSchemesClass {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
-            textFirst: targetData?.value || '-',
-            textSecond: targetData?.Description || '-',
+            textFirst: typeof targetData?.value === 'number'
+            || typeof targetData?.value === 'string'
+              ? targetData.value
+              : '-',
+            valueColor: targetData?.value_color || null,
           };
         } else if (dataType === 'data-type-2') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
@@ -1557,15 +1561,21 @@ class ConstructorSchemesClass {
         widthLeft: dataFromComponent?.widthLeft,
         items: dataFromComponent.items.map((item) => ({
           ...item,
-          textLeft: this.getDataItemById(item.id)?.Description || '-',
-          textRight: this.getDataItemById(item.id)?.value || '-',
+          textLeft: item?.description || this.getDataItemById(item.id)?.Description || '-',
+          textRight: typeof this.getDataItemById(item.id)?.value === 'number'
+          || typeof this.getDataItemById(item.id)?.value === 'string'
+            ? this.getDataItemById(item.id).value
+            : '-',
         })),
       };
     } else if (dataType === 'data-type-1') {
       updatedData = {
         ...dataFromComponent,
-        textFirst: this.getDataItemById(dataFromComponent.id)?.value || '-',
-        textSecond: this.getDataItemById(dataFromComponent.id)?.Description || '-',
+        textFirst: typeof this.getDataItemById(dataFromComponent.id)?.value === 'number'
+        || typeof this.getDataItemById(dataFromComponent.id)?.value === 'string'
+          ? this.getDataItemById(dataFromComponent.id).value
+          : '-',
+        textSecond: dataFromComponent?.description || this.getDataItemById(dataFromComponent.id)?.Description || '-',
       };
     } else if (dataType === 'data-type-2') {
       updatedData = {
@@ -1909,13 +1919,14 @@ class ConstructorSchemesClass {
     bridgeManager.addObstacleProvider(new GraphObstacleProvider());
   }
 
+  // TODO: Пока не работает
   buildSchemeFromSearch(dataFrom) {
     const elementCreator = new ElementCreator({
       graph: this.graphComponent.graph,
       elements: dataFrom,
     });
     elementCreator.buildSchemeFromSearch().then((response) => {
-      console.log('buildSchemeFromSearch', response);
+      // console.log('buildSchemeFromSearch', response);
     });
   }
 }
