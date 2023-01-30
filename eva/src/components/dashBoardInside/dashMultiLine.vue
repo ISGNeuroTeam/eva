@@ -183,7 +183,7 @@ export default {
     data() {
       const [first] = this.dataRestFrom;
       const isTimestamp = first && this.isTimestamp(first[this.xMetric]);
-      if (!this.options.stringOX && isTimestamp) {
+      if (!this.options?.stringOX && isTimestamp) {
         return this.dataRestFrom
           .map((item) => ({
             ...item,
@@ -377,7 +377,7 @@ export default {
       }
 
       this.y = {};
-      const yHeight = this.options.united
+      const yHeight = this.options?.united
         ? this.box.height
         : (this.box.height / this.metrics.length);
 
@@ -1060,7 +1060,7 @@ export default {
         .html(
           this.firstDataRowMetricList.reduce((prev, cur) => {
             let value = d[cur];
-            if (!this.options.stringOX && cur === this.xMetric) {
+            if (!this.options?.stringOX && cur === this.xMetric) {
               value = this.tickFormat(value);
             }
             return `${prev}<p><span>${cur}</span>: ${value}</p>`;
@@ -1239,7 +1239,7 @@ export default {
         .selectAll('g.yAxis.left g.tick line')
         .remove();
 
-      const els = this.options.united
+      const els = this.options?.united
         ? this.svg.select('g.yAxis.left')
         : this.svg;
 
