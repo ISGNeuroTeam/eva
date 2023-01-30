@@ -1179,7 +1179,7 @@ export default {
         return this.$store.state[this.idDash].elements.filter(
           (elem) => this.$store.state[this.idDash][elem].tab
               === this.$store.state[this.idDash].currentTab
-            || this.$store.state[this.idDash][elem].options.pinned,
+            || this.$store.state[this.idDash][elem].options?.pinned,
         );
       }
       return [];
