@@ -51,6 +51,12 @@
               class="icon"
               v-html="getIconSvgByID(metric.icon)"
             />
+            <v-icon
+              v-show="metric.icon === 'no_icon'"
+              class="icon"
+              color="#E0E0EC"
+              v-text="getIcon(metric)"
+            />
             <span
               class="title-text"
               v-text="metric.title"
@@ -105,6 +111,7 @@ import moment from 'moment';
 import dialSettings from './dashDialSettings.vue';
 import metricTitleIcons from './metricTitleIcons';
 import DialClass from '../../../js/classes/DialClass';
+import iconlist from '@/fonts/eva-iconfont/eva-iconlist.json';
 
 export default {
   name: 'Dial',
@@ -269,6 +276,16 @@ export default {
     this.checkTime();
   },
   methods: {
+    getIcon(metric) {
+      if (!metric.metadata) {
+        return undefined;
+      }
+      const ranges = JSON.parse(metric.metadata.replaceAll("'", '"'));
+      if (ranges.icon) {
+        return iconlist.find((icon) => ranges.icon === icon);
+      }
+      return '';
+    },
     checkTime() {
       if (
         this.currentSettings.countSections
