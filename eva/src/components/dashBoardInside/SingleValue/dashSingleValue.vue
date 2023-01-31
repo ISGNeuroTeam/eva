@@ -51,7 +51,8 @@
             />
             <v-icon
               v-show="metric.icon === 'no_icon'"
-              :style="{ ...getColor(metric) }"
+              class="icon"
+              color="#E0E0EC"
               v-text="getIcon(metric)"
             />
             <span
