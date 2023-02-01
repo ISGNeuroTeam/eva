@@ -875,6 +875,7 @@ export default {
       brushObj.selectionDown = () => {
         brushObj.mouseDown = true;
         brushObj.clearBrush();
+        // eslint-disable-next-line no-restricted-globals
         brushObj.startX = event.layerX - 65;
         brush
           .append('rect')
@@ -895,21 +896,27 @@ export default {
 
       brushObj.selectionMove = () => {
         if (brushObj.mouseDown) {
+          // eslint-disable-next-line no-restricted-globals
           if (event.layerX - 65 - brushObj.startX > 0) {
             brushObj.direction = 'right';
+            // eslint-disable-next-line no-restricted-globals
             brushObj.endX = event.layerX - 65;
             brush
               .select('.selection')
+              // eslint-disable-next-line no-restricted-globals
               .attr('width', event.layerX - 65 - brushObj.startX);
           } else {
             brushObj.direction = 'left';
+            // eslint-disable-next-line no-restricted-globals
             brushObj.endX = brushObj.startX + (event.layerX - 65 - brushObj.startX);
             brush
               .select('.selection')
               .attr(
                 'x',
+                // eslint-disable-next-line no-restricted-globals
                 brushObj.startX + (event.layerX - 65 - brushObj.startX),
               )
+              // eslint-disable-next-line no-restricted-globals
               .attr('width', -(event.layerX - 65 - brushObj.startX));
           }
         }
