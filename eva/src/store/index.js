@@ -2040,5 +2040,32 @@ export default new Vuex.Store({
     notify,
     app,
   },
-  plugins: [createPersistedState()],
+  plugins: [
+    createPersistedState({
+      key: 'dashes',
+      reducer: (obj) => Object.keys(obj).reduce((acc, item) => {
+        if (/^\d+$/.test(item)) {
+          acc[item] = obj[item];
+        }
+        return acc;
+      }, {}),
+      filter({ type }) {
+        // console.log('- mutation %c%s%c', 'color:yellow', type, 'color: inherit', payload);
+        if (['updateSearchStatus'].includes(type)) {
+          // console.log('- skip: %s', type);
+          return false;
+        }
+        return true;
+      },
+    }),
+    createPersistedState({
+      key: 'app',
+      reducer: (obj) => Object.keys(obj).reduce((acc, item) => {
+        if (!/^\d+$/.test(item)) {
+          acc[item] = obj[item];
+        }
+        return acc;
+      }, {}),
+    }),
+  ],
 });

@@ -196,7 +196,7 @@ export default {
       } = this.options;
       return {
         xMetric: this.xMetric,
-        type: (this.options.stringOX || !ChartClass.isTimestamp(this.firstDataRow[this.xMetric]))
+        type: (this.options?.stringOX || !ChartClass.isTimestamp(this.firstDataRow[this.xMetric]))
           ? 'linear' // linear, time, - log, point, band
           : 'time',
         timeFormat,
@@ -239,7 +239,7 @@ export default {
           }
           metricsByGroup[metricsByGroup.length - 1].push(metric);
           // если тащим настройки со старого мультилайна то добавим группы для не united графиков
-          if (this.options.united === false && nN !== newMetrics.length - 1) {
+          if (this.options?.united === false && nN !== newMetrics.length - 1) {
             metricsByGroup.push([]);
           }
         });
@@ -448,7 +448,7 @@ export default {
         ? (yAxesBinding.metricTypes[name] === 'barplot' || metricTypes[name] === 'barplot')
         : ['Bar chart', 'barplot'].includes(metricTypesOptions);
 
-      const color = (!isBarplot && !this.options.united)
+      const color = (!isBarplot && !this.options?.united)
         ? (optionsColor[name] || optionColor[name] || this.color(name))
         : this.color(name);
 
@@ -456,7 +456,7 @@ export default {
       const enabledBounding = metricOptions.manualBorder === true;
       const upperBound = parseFloat(metricOptions.upborder);
       const lowerBound = parseFloat(metricOptions.lowborder);
-      const typeLine = (!isBarplot && !this.options.united && this.options.type_line)
+      const typeLine = (!isBarplot && !this.options?.united && this.options.type_line)
         ? this.options.type_line[name]
         : null;
       const unit = this.metricUnits.find((d) => d.name === name);
