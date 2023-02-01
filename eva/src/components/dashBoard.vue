@@ -18,7 +18,7 @@
     >
       <v-card-title
         v-show="element.split('-')[0] === 'singleValue'
-          || element === 'dial'
+          || element.split('-')[0] === 'dial'
           ? settings.showTitle
           : props.disappear"
         class="card-title open_title"
