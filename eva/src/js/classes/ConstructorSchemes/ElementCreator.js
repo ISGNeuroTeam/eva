@@ -1,7 +1,7 @@
 import {
   Point, PolylineEdgeStyle, Rect, ShapeNodeStyle, DefaultLabelStyle,
 } from 'yfiles';
-import elementTemplates from './elementTemplates.js';
+import ElementTemplates from './elementTemplates.js';
 import VuejsNodeStyle from '@/js/classes/ConstructorSchemes/VueNodeStyle';
 import GenerateIcons from '@/js/classes/ConstructorSchemes/GenerateIcons';
 
@@ -12,7 +12,7 @@ class ElementCreator {
   }) {
     this.graph = graph;
     this.elements = elements;
-    this.elementTemplates = elementTemplates;
+    this.elementTemplates = ElementTemplates.templates;
   }
 
   buildGraph() {
@@ -125,8 +125,18 @@ class ElementCreator {
     return new Promise((resolve) => {
       let createdNode = null;
       if (element.tag.dataType === 'image-node') {
+        let icon = '';
+        if (element.icon.match(/\/svg\/([\s\S]+?)\.svg/)) {
+          // eslint-disable-next-line prefer-destructuring
+          icon = element.icon.match(/\/svg\/([\s\S]+?)\.svg/)[1];
+        } else {
+          icon = element.icon;
+        }
         const imageNode = GenerateIcons.getIconNode({
-          data: element,
+          data: {
+            ...element,
+            icon,
+          },
           size: element.layout,
         });
         createdNode = this.graph.createNodeAt({
@@ -152,6 +162,7 @@ class ElementCreator {
           style: new VuejsNodeStyle(template),
           tag: {
             ...element.tag,
+            fontFamily: ElementTemplates.fontFamily,
             nodeId: element.tag.nodeId || element.hashCode(),
           },
         });
@@ -272,6 +283,15 @@ class ElementCreator {
         }),
         text: el.data.text,
         tag: el.data.tag,
+      });
+    });
+  }
+
+  buildSchemeFromSearch() {
+    const generateIcons = new GenerateIcons();
+    return new Promise((resolve) => {
+      generateIcons.generateIconNodes(this.elements).then((response) => {
+        resolve(response);
       });
     });
   }
