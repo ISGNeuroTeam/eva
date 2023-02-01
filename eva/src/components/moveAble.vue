@@ -12,6 +12,7 @@
     :resizable="dragRes"
     :data-grid="true"
     :grid="movableProps.grid"
+    :class-name-active="!dataMod && !dragRes || !dragRes ? 'none' : 'active'"
     :style="{
       zIndex: movableProps.zIndex,
       outlineColor: theme.$accent_ui_color,
