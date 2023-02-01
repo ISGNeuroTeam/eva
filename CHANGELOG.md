@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Gauge component
 - Constructor-schemes: table-node: Entering values for the left column manually.
 - Constructor-schemes: added timeout for schema saving
 
