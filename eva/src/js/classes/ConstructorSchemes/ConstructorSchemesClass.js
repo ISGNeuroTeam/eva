@@ -50,7 +50,7 @@ import {
   FreeNodePortLocationModel,
   GraphViewerInputMode,
   PortRelocationHandleProvider,
-  Visualization,
+  Visualization, EdgeRouterData, EdgeRouter, EdgeRouterScope, BridgeManager, GraphObstacleProvider,
 } from 'yfiles';
 import Utils from './Utils.js';
 import { throttle } from '@/js/utils/throttle';
@@ -64,6 +64,7 @@ import EdgeDropInputMode from './EdgeDropInputModeClass';
 import GenerateIcons from './GenerateIcons.js';
 import SchemeUpdater from './SchemeUpdater.js';
 import elementTemplates from './elementTemplates.js';
+import ElementCreator from '@/js/classes/ConstructorSchemes/ElementCreator';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -158,7 +159,7 @@ class ConstructorSchemesClass {
       smoothingLength: 0,
     },
     defaultLabelStyle: {
-      font: '12px Tahoma', // Size, family
+      font: '12px "ProximaNova", sans-serif', // Size, family
       textFill: '#000000', // Color
     },
     selectedShapeNodeStyle: '',
@@ -301,7 +302,7 @@ class ConstructorSchemesClass {
   }
 
   set defaultLabelStyle({
-    font = '12px Tahoma',
+    font = `12px ${this.fontFamily}`,
     textFill = '#000000',
   }) {
     this.options.defaultLabelStyle = {
@@ -336,6 +337,8 @@ class ConstructorSchemesClass {
     toggleLoadingCallback,
     isEdit,
     onClickObject,
+    isEdgeRouterEnable,
+    isBridgesEnable,
   }) {
     this.dragAndDropPanel = null;
     this.mapper = null;
@@ -352,7 +355,8 @@ class ConstructorSchemesClass {
     this.openDataPanelCallback = openDataPanelCallback;
     this.closeDataPanelCallback = closeDataPanelCallback;
     this.toggleLoadingCallback = toggleLoadingCallback;
-    this.elementTemplates = elementTemplates;
+    this.elementTemplates = elementTemplates.templates;
+    this.fontFamily = elementTemplates.fontFamily;
     // Вторая реализация сохранения данных
     this.targetDataNode = {};
     this.graphComponent = new GraphComponent(elem);
@@ -395,6 +399,12 @@ class ConstructorSchemesClass {
     // Привязка z-order у label к родителю
     this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
     this.onClickObject = onClickObject;
+    if (isEdgeRouterEnable) {
+      // this.enableEdgeRouter();
+    }
+    if (isBridgesEnable) {
+      this.enableBridges();
+    }
   }
 
   disableResizeInvisibleNodes() {
@@ -587,8 +597,8 @@ class ConstructorSchemesClass {
 
   saveAnObject() {
     const schemeUpdater = this.initSchemeUpdater();
-    schemeUpdater.save().then((/* result */) => {
-      this.save(this.updateStoreCallback);
+    schemeUpdater.save().then((result) => {
+      this.updateStoreCallbackV2(result);
     });
   }
 
@@ -774,7 +784,7 @@ class ConstructorSchemesClass {
 
       // Сохранение в store
 
-      this.saveAnObject();
+      // this.saveAnObject();
     });
 
     // Событие клика по элементу
@@ -902,59 +912,32 @@ class ConstructorSchemesClass {
     }
   }
 
-  // TODO: Заменить на ElementCreator.createNode
   async nodeCreator({
-    graph,
     dropData,
     dropLocation,
     isCopiedElement = false,
   }) {
-    let createdNode = null;
-    if (dropData?.tag?.templateType) {
-      // Узел с данными
-      createdNode = this.createDataNode({
-        graph,
-        location: dropLocation,
-        data: dropData,
-      });
-    } else if (dropData?.tag?.textTemplateType) {
-      // Узел с текстом
-      createdNode = this.createTextNode({
-        graph,
-        location: dropLocation,
-        data: dropData,
-      });
-    } else if (dropData?.tag?.isAspectRatio) {
-      // Узел с картинкой
-      createdNode = graph.createNodeAt({
-        location: dropLocation,
-        style: dropData.style,
+    const elementCreator = new ElementCreator({
+      graph: this.graphComponent.graph,
+      elements: [],
+    });
+    return new Promise((resolve) => {
+      elementCreator.createNode({
+        layout: {
+          width: dropData.layout.width,
+          height: dropData.layout.height,
+          x: isCopiedElement ? dropLocation.x : dropLocation.x - (dropData.layout.width / 2),
+          y: isCopiedElement ? dropLocation.y : dropLocation.y - (dropData.layout.height / 2),
+        },
+        icon: dropData?.style?.image,
         tag: {
           ...dropData.tag,
-          nodeId: dropData?.id || dropData.hashCode(),
+          nodeId: dropData.hashCode(),
         },
+      }).then((createdElement) => {
+        resolve(createdElement);
       });
-    } else {
-      // Обычный узел
-      createdNode = graph.createNodeAt({
-        location: dropLocation,
-        style: new VuejsNodeStyle(this.elementTemplates['shape-type-0'].template),
-        labels: dropData.labels,
-        tag: {
-          ...dropData.tag,
-          nodeId: dropData?.id || dropData.hashCode(),
-        },
-      });
-    }
-    const nodePosition = new Rect(
-      isCopiedElement ? dropLocation.x : dropLocation.x - (dropData.layout.width / 2),
-      isCopiedElement ? dropLocation.y : dropLocation.y - (dropData.layout.height / 2),
-      dropData.layout.width,
-      dropData.layout.height,
-    );
-    createdNode.tag.nodeId = createdNode.hashCode();
-    graph.setNodeLayout(createdNode, nodePosition);
-    return createdNode;
+    });
   }
 
   settingsNodeDropInputMode() {
@@ -1527,8 +1510,10 @@ class ConstructorSchemesClass {
             if (targetData) {
               nodeDataItem = {
                 ...nodeDataItem,
-                textLeft: targetData?.Description || '-',
-                textRight: targetData?.value || '-',
+                textRight: typeof targetData?.value === 'number'
+                || typeof targetData?.value === 'string'
+                  ? targetData.value
+                  : '-',
               };
             }
             return nodeDataItem;
@@ -1541,8 +1526,10 @@ class ConstructorSchemesClass {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
-            textFirst: targetData?.value || '-',
-            textSecond: targetData?.Description || '-',
+            textFirst: typeof targetData?.value === 'number'
+            || typeof targetData?.value === 'string'
+              ? targetData.value
+              : '-',
             valueColor: targetData?.value_color || null,
           };
         } else if (dataType === 'data-type-2') {
@@ -1575,15 +1562,21 @@ class ConstructorSchemesClass {
         widthLeft: dataFromComponent?.widthLeft,
         items: dataFromComponent.items.map((item) => ({
           ...item,
-          textLeft: this.getDataItemById(item.id)?.Description || '-',
-          textRight: this.getDataItemById(item.id)?.value || '-',
+          textLeft: item?.description || this.getDataItemById(item.id)?.Description || '-',
+          textRight: typeof this.getDataItemById(item.id)?.value === 'number'
+          || typeof this.getDataItemById(item.id)?.value === 'string'
+            ? this.getDataItemById(item.id).value
+            : '-',
         })),
       };
     } else if (dataType === 'data-type-1') {
       updatedData = {
         ...dataFromComponent,
-        textFirst: this.getDataItemById(dataFromComponent.id)?.value || '-',
-        textSecond: this.getDataItemById(dataFromComponent.id)?.Description || '-',
+        textFirst: typeof this.getDataItemById(dataFromComponent.id)?.value === 'number'
+        || typeof this.getDataItemById(dataFromComponent.id)?.value === 'string'
+          ? this.getDataItemById(dataFromComponent.id).value
+          : '-',
+        textSecond: dataFromComponent?.description || this.getDataItemById(dataFromComponent.id)?.Description || '-',
       };
     } else if (dataType === 'data-type-2') {
       updatedData = {
@@ -1907,6 +1900,35 @@ class ConstructorSchemesClass {
       }
       graph.undoEngine.clear();
     }
+  }
+
+  enableEdgeRouter() {
+    const layoutData = new EdgeRouterData();
+    const edgeRouter = new EdgeRouter();
+    // чтобы узлы не сливались
+    // TODO:Пока установлено временное значение, в дальнейшем вынести в настройки визуализации
+    edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance = this.defaultEdgeStyle.strokeSize;
+
+    edgeRouter.scope = EdgeRouterScope.ROUTE_ALL_EDGES;
+
+    this.graphComponent.graph.applyLayout(edgeRouter, layoutData);
+  }
+
+  enableBridges() {
+    const bridgeManager = new BridgeManager();
+    bridgeManager.canvasComponent = this.graphComponent;
+    bridgeManager.addObstacleProvider(new GraphObstacleProvider());
+  }
+
+  // TODO: Пока не работает
+  buildSchemeFromSearch(dataFrom) {
+    const elementCreator = new ElementCreator({
+      graph: this.graphComponent.graph,
+      elements: dataFrom,
+    });
+    elementCreator.buildSchemeFromSearch().then((response) => {
+      // console.log('buildSchemeFromSearch', response);
+    });
   }
 }
 
