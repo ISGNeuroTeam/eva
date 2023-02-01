@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Constructor-schemes: table-node: Entering values for the left column manually.
 - Constructor-schemes: added timeout for schema saving
+- Constructor-schemes: build scheme from search
 
 ### Changed
 - Constructor-schemes: change font family to "ProximaNova", sans-serif

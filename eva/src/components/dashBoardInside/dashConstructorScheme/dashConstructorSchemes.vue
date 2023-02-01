@@ -693,35 +693,15 @@ export default {
     savedGraph() {
       return this.dashFromStore?.savedGraph || this.dashFromStore[this.idFrom]?.savedGraph || '';
     },
-    savedGraphObject: {
-      get() {
-        const savedGraph = this.dashFromStore[this.idFrom]?.savedGraphObject;
-        if (savedGraph) {
-          if (savedGraph[this.schemeIdFromSearch] && this.optionsFromStore?.defaultFromSourceData) {
-            return savedGraph[this.schemeIdFromSearch];
-          }
-          return savedGraph[this.activeScheme] || [];
+    savedGraphObject() {
+      const savedGraph = this.dashFromStore[this.idFrom]?.savedGraphObject;
+      if (savedGraph) {
+        if (this.schemeIdFromSearch && savedGraph[this.schemeIdFromSearch]) {
+          return savedGraph[this.schemeIdFromSearch];
         }
-        return [];
-      },
-      set(value) {
-        this.createSavedGraphObjectField();
-        if (this.optionsFromStore?.defaultFromSourceData) {
-          this.$store.commit('setState', [{
-            object: this.dashFromStore[this.idFrom].savedGraphObject,
-            prop: this.schemeIdFromSearch,
-            value,
-          }]);
-        }
-        this.$store.commit('setState', [{
-          object: this.dashFromStore[this.idFrom].savedGraphObject,
-          prop: this.activeScheme,
-          value,
-        }]);
-        if (this.dashFromStore[this.idFrom].savedGraph || this.dashFromStore.savedGraph) {
-          this.updateSavedGraph('');
-        }
-      },
+        return savedGraph[this.activeScheme] || [];
+      }
+      return [];
     },
     innerSize() {
       return {
@@ -761,9 +741,6 @@ export default {
     isBridgeEnable() {
       return this.optionsFromStore?.isBridgeEdgeSupport || false;
     },
-    isEdgeRouterEnable() {
-      return this.optionsFromStore?.isEdgeRouterSupport || false;
-    },
     isAlwaysUpdateScheme() {
       return this.optionsFromStore?.alwaysUpdateScheme || false;
     },
@@ -775,14 +752,11 @@ export default {
       },
       deep: true,
     },
-    dataRestFrom: {
-      deep: true,
-      handler(value) {
-        if (this.constructorSchemes) {
-          this.constructorSchemes.updateDataRest(structuredClone(value));
-          this.constructorSchemes.updateDataInNode(structuredClone(value));
-        }
-      },
+    dataRestFrom(value) {
+      if (this.constructorSchemes && value?.length > 0) {
+        this.constructorSchemes.updateDataRest(structuredClone(value));
+        this.constructorSchemes.updateDataInNode(structuredClone(value));
+      }
     },
     isKeymapOpen() {
       this.setPanelBottomOffset();
@@ -801,13 +775,10 @@ export default {
         this.isEdit = false;
       }
     },
-    dataForBuildScheme: {
-      deep: true,
-      handler(value) {
-        if (this.isAlwaysUpdateScheme) {
-          this.constructorSchemes.buildSchemeFromSearch(value);
-        }
-      },
+    dataForBuildScheme(value) {
+      if (this.isAlwaysUpdateScheme) {
+        this.constructorSchemes.buildSchemeFromSearch(value);
+      }
     },
   },
   mounted() {
@@ -875,7 +846,6 @@ export default {
         toggleLoadingCallback: this.toggleLoading,
         isEdit: this.isEdit,
         isBridgesEnable: this.isBridgeEnable,
-        isEdgeRouterEnable: this.isEdgeRouterEnable,
         onClickObject: (type, data) => {
           if (type !== 'label-type-0') {
             return;
@@ -972,11 +942,19 @@ export default {
       this.timer = 500;
       this.timeout = setTimeout(() => {
         this.createSavedGraphObjectField();
-        this.$store.commit('setState', [{
-          object: this.dashFromStore[this.idFrom].savedGraphObject,
-          prop: this.schemeIdFromSearch || this.activeScheme,
-          value: data,
-        }]);
+        if (typeof this.searchForBuildScheme !== 'undefined' && this.schemeIdFromSearch !== '') {
+          this.$store.commit('setState', [{
+            object: this.dashFromStore[this.idFrom].savedGraphObject,
+            prop: `${this.schemeIdFromSearch}`,
+            value: data,
+          }]);
+        } else {
+          this.$store.commit('setState', [{
+            object: this.dashFromStore[this.idFrom].savedGraphObject,
+            prop: this.activeScheme,
+            value: data,
+          }]);
+        }
         if (this.dashFromStore[this.idFrom].savedGraph || this.dashFromStore.savedGraph) {
           this.updateSavedGraph('');
         }
@@ -1060,15 +1038,18 @@ export default {
     },
     async startSearch(confirm) {
       if (confirm) {
-        this.isConfirmUpdateScheme = true;
-        this.$store.commit('updateSearchStatus', {
-          idDash: this.idDashFrom,
-          id: this.searchForBuildScheme,
-          status: 'empty',
-        });
-      } else {
-        this.isConfirmModal = false;
+        this.constructorSchemes.buildSchemeFromSearch(this.dataForBuildScheme);
       }
+      // if (confirm) {
+      //   this.isConfirmUpdateScheme = true;
+      //   this.$store.commit('updateSearchStatus', {
+      //     idDash: this.idDashFrom,
+      //     id: this.searchForBuildScheme,
+      //     status: 'empty',
+      //   });
+      // } else {
+      //   this.isConfirmModal = false;
+      // }
     },
     updateIconsList(iconsListFrom) {
       return iconsListFrom
@@ -1077,7 +1058,6 @@ export default {
         .map((element) => element.icon);
     },
   },
-
 };
 </script>
 

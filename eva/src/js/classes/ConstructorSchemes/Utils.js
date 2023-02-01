@@ -5,7 +5,14 @@ class Utils {
     this.graph = graph;
   }
 
-  static generateColor(color) {
+  static generateColor(color, opacity) {
+    if (opacity) {
+      return {
+        // For correct work with vuetify color-picker
+        rgbaObject: Utils.colorToRgbaObject(color, opacity),
+        rgbaString: Utils.colorToString(Color.from(color), opacity),
+      };
+    }
     return {
       // For correct work with vuetify color-picker
       rgbaObject: Utils.colorToRgbaObject(color),
@@ -15,17 +22,25 @@ class Utils {
 
   static colorToString({
     r, g, b, a,
-  }) {
+  }, opacity) {
+    if (opacity) {
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
     if (a) {
       return `rgba(${r}, ${g}, ${b}, ${a})`;
     }
     return `rgb(${r}, ${g}, ${b})`;
   }
 
-  static colorToRgbaObject(color) {
+  static colorToRgbaObject(color, opacity) {
     const {
       r, g, b, a,
     } = Color.from(color);
+    if (opacity) {
+      return {
+        r, g, b, opacity,
+      };
+    }
     return {
       r, g, b, a,
     };
