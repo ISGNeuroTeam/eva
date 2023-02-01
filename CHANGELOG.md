@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Constructor-schemes: change font family to "ProximaNova", sans-serif
 
 ### Fixed
+- Not working custom categories
 - Fixed singleValue: coloring text value
 - Fixed transitions from the map
 - Constructor-schemes: "transparent background" setting didn`t work
