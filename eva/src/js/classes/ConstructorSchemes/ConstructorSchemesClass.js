@@ -50,6 +50,8 @@ import {
   FreeNodePortLocationModel,
   GraphViewerInputMode,
   PortRelocationHandleProvider,
+  PortSide,
+  PortConstraint,
   Visualization, EdgeRouterData, EdgeRouter, EdgeRouterScope, BridgeManager, GraphObstacleProvider,
 } from 'yfiles';
 import Utils from './Utils.js';
@@ -65,6 +67,7 @@ import GenerateIcons from './GenerateIcons.js';
 import SchemeUpdater from './SchemeUpdater.js';
 import elementTemplates from './elementTemplates.js';
 import ElementCreator from '@/js/classes/ConstructorSchemes/ElementCreator';
+import GenerateElementsFromSearch from '@/js/classes/ConstructorSchemes/GenerateElementsFromSearch';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -283,7 +286,7 @@ class ConstructorSchemesClass {
 
   set defaultEdgeStyle({
     strokeColor = '#FFFFFF',
-    strokeSize = '1.5px',
+    strokeSize = '1px',
     targetArrowColor = '#F4F4F4',
     targetArrowType = 'none',
     smoothingLength = 0,
@@ -337,7 +340,6 @@ class ConstructorSchemesClass {
     toggleLoadingCallback,
     isEdit,
     onClickObject,
-    isEdgeRouterEnable,
     isBridgesEnable,
   }) {
     this.dragAndDropPanel = null;
@@ -399,9 +401,6 @@ class ConstructorSchemesClass {
     // Привязка z-order у label к родителю
     this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
     this.onClickObject = onClickObject;
-    if (isEdgeRouterEnable) {
-      // this.enableEdgeRouter();
-    }
     if (isBridgesEnable) {
       this.enableBridges();
     }
@@ -932,7 +931,7 @@ class ConstructorSchemesClass {
         icon: dropData?.style?.image,
         tag: {
           ...dropData.tag,
-          nodeId: dropData.hashCode(),
+          nodeId: dropData?.id || dropData?.hashCode(),
         },
       }).then((createdElement) => {
         resolve(createdElement);
@@ -1122,6 +1121,7 @@ class ConstructorSchemesClass {
     }, 200));
     this.graphComponent.addMouseClickListener((sender, evt) => {
       const isShiftKeyPressed = evt.originalEvent?.shiftKey;
+      console.log('test', this.graphComponent);
       if (isShiftKeyPressed && this.isEdgeCreating) {
         const sourcePortLocation = {
           x: evt.location.x,
@@ -1904,11 +1904,13 @@ class ConstructorSchemesClass {
 
   enableEdgeRouter() {
     const layoutData = new EdgeRouterData();
+    layoutData.targetPortConstraints = PortConstraint.create(PortSide.SOUTH, true);
+    // layoutData.sourcePortConstraints = PortConstraint.create(PortSide.SOUTH);
     const edgeRouter = new EdgeRouter();
     // чтобы узлы не сливались
     // TODO:Пока установлено временное значение, в дальнейшем вынести в настройки визуализации
-    edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance = this.defaultEdgeStyle.strokeSize;
-
+    edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance = 15;
+    edgeRouter.defaultEdgeLayoutDescriptor.minimumLastSegmentLength = 25;
     edgeRouter.scope = EdgeRouterScope.ROUTE_ALL_EDGES;
 
     this.graphComponent.graph.applyLayout(edgeRouter, layoutData);
@@ -1922,12 +1924,48 @@ class ConstructorSchemesClass {
 
   // TODO: Пока не работает
   buildSchemeFromSearch(dataFrom) {
-    const elementCreator = new ElementCreator({
-      graph: this.graphComponent.graph,
+    const descriptionNodeStyles = {
+      tag: {
+        nodeId: 'label-node-default',
+        dataType: 'label-type-0',
+        textTemplateType: 'template-0',
+        text: 'Description',
+        bordered: true,
+        borderType: 'solid',
+        borderSize: 2,
+        borderDashed: false,
+        fontSize: 30,
+        borderColor: Utils.generateColor(Color.from('#FFFFFF')),
+        bgColor: Utils.generateColor(Color.from('rgba(60, 59, 69, 1)')),
+        textColor: Utils.generateColor(Color.from('#FFFFFF')),
+      },
+      layout: {
+        width: 120,
+        height: 30,
+        x: 0,
+        y: 0,
+      },
+    };
+    const generateElementFromSearch = new GenerateElementsFromSearch({
       elements: dataFrom,
+      defaultEdgeStyles: {
+        ...this.defaultEdgeStyle,
+        strokeSize: 3,
+      },
+      defaultDescriptionStyles: descriptionNodeStyles,
     });
-    elementCreator.buildSchemeFromSearch().then((response) => {
-      // console.log('buildSchemeFromSearch', response);
+    generateElementFromSearch.generate().then((response) => {
+      const elementCreator = new ElementCreator({
+        graph: this.graphComponent.graph,
+        elements: response,
+      });
+      elementCreator.buildGraph().then(() => {
+        this.enableEdgeRouter();
+        this.fitGraphContent();
+        this.setDefaultElementsOrder();
+      });
+    }).catch((e) => {
+      console.error(e);
     });
   }
 }
