@@ -51,7 +51,8 @@
             />
             <v-icon
               v-show="metric.icon === 'no_icon'"
-              :style="`color: ${getColor(metric)} !important;`"
+              class="icon"
+              color="#E0E0EC"
               v-text="getIcon(metric)"
             />
             <span
@@ -63,16 +64,19 @@
             v-if="metric.value"
             class="metric-value"
             :class="`color-${metric.color}`"
-            :style="`
-            color: ${getColor(metric)};
-            font-size: ${metric.fontSize || 16}px;
-            font-weight: ${metric.fontWeight || 200};
-            display: ${
-              metric.value
-              && metric.value.toString().split(',').length > 1
-                ? 'flex'
-                : 'block'};
-            `"
+            style="
+               color: #5980f8;
+             "
+            :style="{
+              ...getColor(metric),
+              fontSize: `${metric.fontSize || 16}px`,
+              fontWeight: `${metric.fontWeight || 200}`,
+              display: `${
+                metric.value
+                && metric.value.toString(10).split(',').length > 1
+                  ? 'flex'
+                  : 'block'}`
+            }"
           >
             <span
               v-for="(value, inx) in metric.value.toString().split(',')"
@@ -329,56 +333,66 @@ export default {
       return '';
     },
     getColor(metric) {
-      if (!metric.metadata) {
-        return undefined;
-      }
-      const ranges = JSON.parse(metric.metadata.replaceAll("'", '"'));
-      if (!ranges.range) {
-        Object.keys(ranges).forEach((key) => {
-          ranges[key] = `${ranges[key]}`.split(':').map(Number);
-        });
-
-        if (metric.color === 'range') {
-          if (!Number.isNaN(metric.value)) {
+      if (metric.metadata && metric.color === 'range') {
+        let color;
+        const ranges = JSON.parse(metric.metadata.replaceAll("'", '"'));
+        if (!ranges.range) {
+          Object.keys(ranges).forEach((key) => {
+            ranges[key] = `${ranges[key]}`.split(':');
+          });
+          if (!Number.isNaN(+metric.value)) {
             const val = Number(metric.value);
-            if (val >= ranges.red[0] && val <= ranges.red[1]) {
-              return '#FF5147';
-            }
-
-            if (val >= ranges.yellow[0] && val <= ranges.yellow[1]) {
-              return '#FFE065';
-            }
-            const greenrange = ranges.green[0] < ranges.green[1]
-              ? val >= ranges.green[0] && val <= ranges.green[1]
-              : val >= ranges.green[0];
-            if (greenrange) {
-              return '#5BD97A';
+            color = Object.keys(ranges).reduce((resultColor, currentColor) => {
+              const range = ranges[currentColor];
+              // eslint-disable-next-line no-nested-ternary
+              const colorRange = range[0]
+                ? range[0] < range[1]
+                  ? val >= range[0] && val <= range[1]
+                  : val >= range[0]
+                : val <= range[1];
+              return colorRange ? currentColor : resultColor;
+            }, null);
+          } else {
+            const val = metric.value;
+            color = Object.keys(ranges)
+              .reduce((resultColor, currentColor) => (
+                ranges[currentColor].includes(val) ? currentColor : resultColor), null);
+          }
+        } else if (ranges?.range.length > 0) {
+          ranges.range.forEach((item, index) => {
+            ranges.range[index] = item.split(':');
+          });
+          if (ranges.range.length === ranges.colors.length) {
+            if (!Number.isNaN(+metric.value)) {
+              const val = Number(metric.value);
+              color = ranges.colors.reduce((resultColor, currentColor, index) => {
+                const range = ranges.range[index];
+                // eslint-disable-next-line no-nested-ternary
+                const colorRange = range[0]
+                  ? range[0] < range[1]
+                    ? val >= range[0] && val <= range[1]
+                    : val >= range[0]
+                  : val <= range[1];
+                return colorRange ? currentColor : resultColor;
+              }, null);
+            } else {
+              const val = metric.value;
+              color = ranges.colors.reduce((resultColor, currentColor, index) => {
+                const range = ranges.range[index];
+                if (range.includes(val)) {
+                  return currentColor;
+                }
+                return resultColor;
+              }, null);
             }
           }
         }
-      } else if (metric.color === 'range' && ranges?.range.length > 0) {
-        ranges.range.forEach((item, index) => {
-          ranges.range[index] = item.split(':').map(Number);
-        });
-        if (ranges.range.length === ranges.colors.length) {
-          const val = Number(metric.value);
-          let localColor = null;
-          ranges.colors.forEach((color, index) => {
-            const colorRange = ranges.range[index][0] < ranges.range[index][1]
-              ? val >= ranges.range[index][0] && val <= ranges.range[index][1]
-              : val >= ranges.range[index][0];
-            if (colorRange) {
-              localColor = color;
-            }
-          });
-          return localColor;
-        }
+        return { color };
       }
-
       if (metric.color === 'secondary') {
-        return '#e0e0ec';
+        return { color: '#e0e0ec' };
       }
-      return '#5980f8';
+      return { color: '#5980f8' };
     },
     init(settings, up) {
       const options = structuredClone(this.getOptions);
@@ -471,7 +485,7 @@ export default {
           const startId = `${metric}_${id}`;
 
           const metricCurrent = metricOptionsCurrent?.find(
-            (m) => m.startId === startId,
+            (m) => m?.startId === startId,
           );
 
           const defaultMetricOption = {

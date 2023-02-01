@@ -1,4 +1,5 @@
-export default {
+const fontFamily = '"ProximaNova", sans-serif';
+const templates = {
   'shape-type-0': {
     template: `
       <g>
@@ -139,6 +140,7 @@ export default {
               :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
               alignment-baseline="middle"
               :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
+              :font-family="tag.fontFamily || ''"
               :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
             >
               {{ item.textLeft }}
@@ -152,6 +154,7 @@ export default {
               :transform="'translate(' + (layout.width - 8) / 2 + ')'"
               fill="white"
               :key="'row-' + tag.nodeId + '-' + index + '-text-right'"
+              :font-family="tag.fontFamily || ''"
               :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
             >
               {{ item.textRight }}
@@ -177,6 +180,7 @@ export default {
       dataType: 'data-type-0',
       templateType: 'template-0',
       widthLeft: 50,
+      fontFamily,
       items: [
         {
           id: '',
@@ -244,6 +248,7 @@ export default {
          :fill="tag.valueColor || '#FFFFFF'"
          :dy="((layout.height / 2) - (layout.height / 4))"
          alignment-baseline="middle"
+         :font-family="tag.fontFamily || ''"
          :font-size="((layout.height / 2) * 0.8) + 'px'"
         >
           {{ tag.textFirst }}
@@ -255,6 +260,7 @@ export default {
          fill="#3C3B45"
          :dy="(layout.height - (layout.height / 4))"
          alignment-baseline="middle"
+         :font-family="tag.fontFamily || ''"
          :font-size="((layout.height / 2) * 0.8) + 'px'"
         >
           {{ tag.textSecond }}
@@ -267,6 +273,7 @@ export default {
       dataType: 'data-type-1',
       nodeId: 'template-1',
       templateType: 'template-1',
+      fontFamily,
       id: '',
       textFirst: '-',
       textSecond: '-',
@@ -315,6 +322,7 @@ export default {
           alignment-baseline="middle"
           text-anchor="middle"
           :fill="tag.textColor"
+          :font-family="tag.fontFamily || ''"
           :font-size="((layout.height / 2) * 0.8) + 'px'"
         >
           {{ tag.currentValue }}
@@ -326,6 +334,7 @@ export default {
     dataRest: {
       dataType: 'data-type-2',
       nodeId: 'template-2',
+      fontFamily,
       id: '',
       templateType: 'template-2',
       currentValue: 1.5,
@@ -379,6 +388,7 @@ export default {
             alignment-baseline="middle"
             text-anchor="middle"
             :fill="tag.firstTextColor"
+            :font-family="tag.fontFamily || ''"
             :font-size="((layout.height / 3) * 0.8) + 'px'"
           >
               {{ tag.firstValue }}
@@ -390,6 +400,7 @@ export default {
             alignment-baseline="middle"
             text-anchor="middle"
             :fill="tag.secondTextColor"
+            :font-family="tag.fontFamily || ''"
             :font-size="((layout.height / 3) * 0.8) + 'px'"
           >
               {{ tag.secondValue }}
@@ -404,6 +415,7 @@ export default {
             text-anchor="middle"
             :style="'text-wrap:' + layout.width + 'px; text-extent: 3line'"
             :fill="tag.firstTextColor"
+            :font-family="tag.fontFamily || ''"
             :font-size="((layout.height / 3) * 0.8) + 'px'"
             >
               Выбраны некорректные значения
@@ -416,6 +428,7 @@ export default {
     dataRest: {
       dataType: 'data-type-3',
       nodeId: 'template-3',
+      fontFamily,
       idFirst: '',
       templateType: 'template-3',
       firstValue: 5,
@@ -500,6 +513,7 @@ export default {
       id: '',
       textTemplateType: 'template-0',
       text: 'Text',
+      fontFamily,
       isVertical: false,
       bordered: true,
       borderType: 'solid',
@@ -511,4 +525,9 @@ export default {
       fontSize: 12,
     },
   },
+};
+
+export default {
+  templates,
+  fontFamily,
 };
