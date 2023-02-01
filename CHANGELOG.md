@@ -10,8 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Do not highlight dashboard when edit mode is disabled
 
 ### Fixed
+- Fixed singleValue: coloring text value
+- Fixed transitions from the map
 
 ## [1.119.0]
 
