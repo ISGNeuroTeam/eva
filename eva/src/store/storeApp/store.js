@@ -150,7 +150,7 @@ export default {
       return findDeepById(state.treeGroups, id, idParam);
     },
     loadSettings: ({ commit, state }, lazy = false) => {
-      if (lazy && !!state.treeCategories.items.length) {
+      if (lazy && !!state.treeCategories.items?.length) {
         return Promise.resolve();
       }
       return rest.getSettings()
