@@ -21,6 +21,7 @@ import {
   mdiDotsHorizontal,
   mdiGroup,
   mdiInboxMultipleOutline,
+  mdiGauge,
 } from '@mdi/js';
 
 export default {
@@ -84,6 +85,24 @@ export default {
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
     { name: 'Число', img: mdiNumeric, type: 'single' },
+    {
+      name: 'Спидометр',
+      img: mdiGauge,
+      type: 'gauge',
+      dataSourceDescription:
+        '#### Обязательные поля:\n'
+        + '- ```value``` - значение спидометра, число\n'
+        + '#### Доп. поля с настройками:\n'
+        + '- ```metricName``` - Подпись значения\n'
+        + '- ```color, max``` - Цвет и максимум зоны\n'
+        + '#### Пример данных:\n'
+        + '| value | metricName | color | max |\n'
+        + '| :--- | :---: | :---: | ---: |\n'
+        + '| 120 | Speed | | |\n'
+        + '| | | green | 60 |\n'
+        + '| | | yellow | 110 |\n'
+        + '| | | #ff0000 | 180 |\n',
+    },
   ],
   size: {
     picker: {
@@ -190,6 +209,10 @@ export default {
       width: 700,
       height: 240,
     },
+    gauge: {
+      width: 400,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -218,6 +241,7 @@ export default {
     scatterPlot: mdiScatterPlotOutline,
     dynamicForm: mdiInboxMultipleOutline,
     frequencyGraph: mdiDotsHorizontal,
+    gauge: mdiGauge,
   },
   commonOptions: [
     'panelSettings',
@@ -375,6 +399,8 @@ export default {
     frequencyGraph: [
       'groupMetric',
       'tooltipMetrics',
+    ],
+    gauge: [
     ],
   },
   optionFields: [
@@ -1046,6 +1072,7 @@ export default {
     'tune',
     'scatterPlot',
     'constructorSchemes',
+    'gauge',
   ],
   reports: {
     table: {
@@ -1107,6 +1134,10 @@ export default {
     constructorSchemes: {
       tooltip: 'Конструктор схем',
       icon: mdiTuneVertical,
+    },
+    gauge: {
+      tooltip: 'Спидометр',
+      icon: mdiGauge,
     },
   },
   excludes: {
