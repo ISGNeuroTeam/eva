@@ -359,7 +359,18 @@ export default {
       'metricGroup',
       'scatterPlotLegend',
     ],
-    constructorSchemes: ['visible', 'level', 'pinned', 'primitives', 'defaultFromSourceData', 'primitivesLibrary'],
+    constructorSchemes: [
+      'visible',
+      'level',
+      'pinned',
+      'schemeSetting',
+      'searchForBuildScheme',
+      'alwaysUpdateScheme',
+      'isEdgeRouterSupport',
+      'isBridgeEdgeSupport',
+      'primitives',
+      'primitivesLibrary',
+    ],
     dynamicForm: ['visible', 'level', 'pinned', 'formGenerator', 'formOptions'],
     frequencyGraph: [
       'groupMetric',
@@ -481,32 +492,6 @@ export default {
       description: 'Установить насыщенности текста',
       elem: 'select',
       items: [100, 200, 400, 500, 800],
-    },
-    {
-      relation() {
-        return this.isDashBoard && !!this.$store.state[this.idDash].searches;
-      },
-      option: 'defaultFromSourceData',
-      description: 'Дефолтное значение из источника данных',
-      elem: 'select',
-      default: null,
-      items() {
-        const dashState = this.$store.state[this.idDash];
-        if (!dashState?.searches || !dashState.searches.map) {
-          return [];
-        }
-        const sourceDataList = dashState.searches.map(({ id, sid }) => ({
-          value: id,
-          text: sid,
-        }));
-        return [
-          {
-            value: null,
-            text: '-- Не использовать --',
-          },
-          ...sourceDataList,
-        ];
-      },
     },
     {
       relation: ['defaultFromSourceData'],
@@ -965,6 +950,62 @@ export default {
       elem: 'switch',
     },
 
+    {
+      group: 'Настройки ConstructorSchemes',
+      option: 'schemeSetting',
+    },
+    {
+      relation() {
+        return this.isDashBoard && !!this.$store.state[this.idDash].searches;
+      },
+      optionGroup: 'schemeSetting',
+      option: 'searchForBuildScheme',
+      description: 'Источник данных для построения схемы',
+      elem: 'select',
+      default: null,
+      items() {
+        const dashState = this.$store.state[this.idDash];
+        if (!dashState?.searches || !dashState.searches.map) {
+          return [];
+        }
+        const sourceDataList = dashState.searches.map(({ id, sid }) => ({
+          value: id,
+          text: sid,
+        }));
+        return [
+          {
+            value: null,
+            text: '-- Не использовать --',
+          },
+          ...sourceDataList,
+        ];
+      },
+    },
+    {
+      relation: ['searchForBuildScheme'],
+      optionGroup: 'schemeSetting',
+      option: 'alwaysUpdateScheme',
+      description: 'Всегда обновлять схему',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      relation: ['searchForBuildScheme'],
+      optionGroup: 'schemeSetting',
+      option: 'isEdgeRouterSupport',
+      description: 'Включить алгоритм маршрутизации линий',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      relation: ['searchForBuildScheme'],
+      optionGroup: 'schemeSetting',
+      option: 'isBridgeEdgeSupport',
+      description: 'Включить отображение пересечения линий',
+      elem: 'switch',
+      default: false,
+    },
+
     // fullWidthGroup
     {
       group: 'Библиотека примитивов',
@@ -1004,6 +1045,7 @@ export default {
     'singleValue',
     'tune',
     'scatterPlot',
+    'constructorSchemes',
   ],
   reports: {
     table: {
@@ -1061,6 +1103,10 @@ export default {
     scatterPlot: {
       tooltip: 'Точечный график',
       icon: mdiScatterPlotOutline,
+    },
+    constructorSchemes: {
+      tooltip: 'Конструктор схем',
+      icon: mdiTuneVertical,
     },
   },
   excludes: {

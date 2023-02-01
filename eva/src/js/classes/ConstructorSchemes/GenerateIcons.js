@@ -67,7 +67,23 @@ class GenerateIcons {
     // Получаем массив загруженых иконок в виде { icon, description, response }
       .then((responseIconsList) => Promise.all(responseIconsList.map(async (item) => {
         const layout = await GenerateIcons.getSvgLayoutSize(item.response.body);
+        const itemFields = {};
+        Object.keys(item).forEach((key) => {
+          if (
+            key !== 'response'
+              && key !== 'icon'
+              && key !== 'x'
+              && key !== 'y'
+          ) {
+            itemFields[key] = item[key];
+          }
+        });
+        if (item?.x && item?.y) {
+          layout.x = item.x;
+          layout.y = item.y;
+        }
         return {
+          ...itemFields,
           icon: item.icon,
           description: item.description,
           layout,
@@ -90,6 +106,7 @@ class GenerateIcons {
           minItemSize,
         });
         return {
+          ...item,
           description: item.description,
           icon: {
             node: imageStyleNode,
