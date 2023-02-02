@@ -207,7 +207,8 @@ export default {
               type: 'dash',
             })),
           },
-        }));
+        }))
+        .catch(() => Promise.resolve());
     },
   },
   getters: {
