@@ -7,19 +7,30 @@
     <div class="dash-constructor-schemes__data-panel-item pb-4">
       <template v-if="dataType === 'data-type-0'">
         <!--data-type-0-->
+        <v-switch
+          v-model="textMode"
+          label="Ручной ввод TagName"
+        />
         <div
           v-for="(element, index) in dataObject.items"
           :key="`${dataObject.nodeId}-${index}`"
           class="column"
         >
           <div class="row align-center">
+            <v-text-field
+              v-if="textMode"
+              v-model="element.id"
+              label="TagName поля с данными"
+              class="col-10"
+            />
             <v-autocomplete
+              v-else
               v-model="element.id"
               :style="{ color: theme.$main_text }"
               :items="dataRestFrom"
               item-value="TagName"
               item-text="Description"
-              label="Данные для строки"
+              label="Значение"
               :filter="tagNameAutocompleteFilter"
               :menu-props="{
                 'z-index': 100,
@@ -52,11 +63,18 @@
             </v-icon>
           </div>
           <div
-            class="mb-9"
+            class="mr-10"
             :style="{ color: theme.$secondary_text }"
           >
             {{ element.id | getObjectNameById(dataRestFrom) }}
           </div>
+          <v-text-field
+            v-model="element.description"
+            label="Подпись"
+            :color="theme.$accent_ui_color"
+            :style="{ color: theme.$main_text }"
+            class="mb-9 mr-10"
+          />
         </div>
         <div class="d-flex mb-9">
           <v-btn
@@ -110,7 +128,18 @@
       <template v-if="dataType === 'data-type-1'">
         <!--data-type-1-->
         <div class="column">
+          <v-switch
+            v-model="textMode"
+            label="Ручной ввод TagName"
+          />
+          <v-text-field
+            v-if="textMode"
+            v-model="dataObject.id"
+            label="TagName поля с данными"
+            @change="updateModelValue(dataObject)"
+          />
           <v-autocomplete
+            v-else
             v-model="dataObject.id"
             :items="dataRestFrom"
             item-value="TagName"
@@ -120,7 +149,6 @@
             :menu-props="{
               'z-index': 100,
             }"
-            @change="updateModelValue(dataObject)"
           >
             <template v-slot:item="{ item, on }">
               <v-list-item
@@ -140,11 +168,26 @@
             </template>
           </v-autocomplete>
           <div
-            class="mb-9"
+            class="mr-10"
             :style="{ color: theme.$secondary_text }"
           >
             {{ dataObject.id | getObjectNameById(dataRestFrom) }}
           </div>
+          <v-text-field
+            v-model="dataObject.description"
+            label="Подпись"
+            :color="theme.$accent_ui_color"
+            :style="{ color: theme.$main_text }"
+            class="mb-9 mr-10"
+          />
+          <v-btn
+            small
+            :color="theme.$primary_button"
+            :style="{ color: theme.$main_text }"
+            @click="updateModelValue"
+          >
+            Применить
+          </v-btn>
         </div>
       </template>
       <template v-if=" dataType === 'data-type-2'">
@@ -935,6 +978,7 @@ export default {
       closeIcon: mdiClose,
       addLineIcon: mdiTableRowPlusAfter,
       test12345: 50,
+      textMode: false,
     };
   },
   computed: {

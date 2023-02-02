@@ -730,12 +730,17 @@ export default {
   async getSettings() {
     return fetch('/api/settings')
       .then((res) => {
+        if (res.status === 409) {
+          // ответ 409 когда нет сохраненных настроек
+          return Promise.resolve({ settings: [] });
+        }
         if (res.status !== 200) {
           throw new Error(`Bad response from GET /api/settings, status: ${res.status} (${res.statusText})`);
         }
         return res.json();
       })
-      .then((res) => res?.settings.map((item) => ({ ...item, body: JSON.parse(item.body) })));
+      .then((res) => res?.settings
+        .map(({ id, name, body }) => ({ id, name, items: JSON.parse(body) })));
   },
   async saveSettings(settings, restAuth) {
     return Promise.all(settings.map((item) => {
