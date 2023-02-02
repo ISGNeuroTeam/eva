@@ -8,7 +8,7 @@
         ...customStyle,
         'width': `${innerSize.width - 22}px`,
         'height': `${innerSize.height}px`,
-        background: theme.$secondary_bg,
+        background: isPanelBackHide ? 'transparent' : theme.$secondary_bg,
         margin: '0 10px',
       }"
       :class="customClass"
@@ -142,7 +142,7 @@
               <span>На уровень ниже</span>
             </v-tooltip>
           </template>
-          <template v-if="defaultFromSourceData">
+          <template v-if="searchForBuildScheme">
             <v-tooltip
               :disabled="isLoading"
               bottom
@@ -165,7 +165,9 @@
           </template>
         </template>
       </div>
-      <div class="dash-constructor-schemes__keymap-button">
+      <div
+        v-if="dashboardEditMode"
+        class="dash-constructor-schemes__keymap-button">
         <v-tooltip
           top
           :nudge-top="5"
@@ -545,6 +547,7 @@ import SendToBack from '../../../images/send_to_back.svg';
 
 import ConstructorSchemesClass from '../../../js/classes/ConstructorSchemes/ConstructorSchemesClass';
 import { throttle } from '@/js/utils/throttle';
+import elementTemplates from '@/js/classes/ConstructorSchemes/elementTemplates';
 
 export default {
   name: 'DashConstructorSchemes',
@@ -613,7 +616,7 @@ export default {
       shapeNodeStyle: '',
       shapeNodeStyleList: [],
       elementDefaultStyles: {
-        labelFont: '12px Tahoma',
+        labelFont: `12px ${elementTemplates.fontFamily}`,
         labelTextFill: {
           rgbaString: 'rgba(255, 255, 255, 255)',
           rgbaObject: {
@@ -666,6 +669,8 @@ export default {
       isConfirmUpdateScheme: false,
       // Default value - graph
       activeScheme: 'graph',
+      timeout: null,
+      timer: 0,
     };
   },
   computed: {
@@ -674,6 +679,9 @@ export default {
     },
     dashboardEditMode() {
       return this.dashFromStore.editMode;
+    },
+    optionsFromStore() {
+      return this.dashFromStore[this.idFrom].options;
     },
     primitivesFromStore() {
       if (this.dashFromStore[this.idFrom]?.options?.primitivesLibrary) {
@@ -687,11 +695,35 @@ export default {
     savedGraph() {
       return this.dashFromStore?.savedGraph || this.dashFromStore[this.idFrom]?.savedGraph || '';
     },
-    savedGraphObject() {
-      if (this.dashFromStore[this.idFrom]?.savedGraphObject) {
-        return this.dashFromStore[this.idFrom]?.savedGraphObject[this.activeScheme] || [];
-      }
-      return [];
+    savedGraphObject: {
+      get() {
+        const savedGraph = this.dashFromStore[this.idFrom]?.savedGraphObject;
+        if (savedGraph) {
+          if (savedGraph[this.schemeIdFromSearch] && this.optionsFromStore?.defaultFromSourceData) {
+            return savedGraph[this.schemeIdFromSearch];
+          }
+          return savedGraph[this.activeScheme] || [];
+        }
+        return [];
+      },
+      set(value) {
+        this.createSavedGraphObjectField();
+        if (this.optionsFromStore?.defaultFromSourceData) {
+          this.$store.commit('setState', [{
+            object: this.dashFromStore[this.idFrom].savedGraphObject,
+            prop: this.schemeIdFromSearch,
+            value,
+          }]);
+        }
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.idFrom].savedGraphObject,
+          prop: this.activeScheme,
+          value,
+        }]);
+        if (this.dashFromStore[this.idFrom].savedGraph || this.dashFromStore.savedGraph) {
+          this.updateSavedGraph('');
+        }
+      },
     },
     innerSize() {
       return {
@@ -702,14 +734,40 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
-    defaultFromSourceData() {
-      return this.dashFromStore[this.idFrom].options.defaultFromSourceData;
+    searchForBuildScheme() {
+      return this.dashFromStore[this.idFrom].options.searchForBuildScheme;
     },
-    getDefaultDataSource() {
-      if (this.defaultFromSourceData) {
-        return this.dataSources[this.defaultFromSourceData]?.data || [];
+    dataForBuildScheme() {
+      if (this.searchForBuildScheme) {
+        return this.dataSources[this.searchForBuildScheme]?.data || [];
       }
       return [];
+    },
+    isPanelBackHide() {
+      return this.dashFromStore[this.idFrom].options?.panelBackHide || false;
+    },
+    schemeIdFromSearch() {
+      const searchFromStore = structuredClone(this.dashFromStore.searches)
+        .find((search) => search.id === this.searchForBuildScheme);
+      if (this.dashFromStore.tockens?.length > 0 && searchFromStore && this.searchForBuildScheme) {
+        const otl = searchFromStore.original_otl;
+        const result = structuredClone(this.dashFromStore.tockens)
+          .filter((token) => otl.includes(`$${token.name}$`) && token.value !== '' && token.value !== token.defaultValue);
+        if (result?.length > 0) {
+          return result.map((token) => token.value).join('-');
+        }
+        return '';
+      }
+      return '';
+    },
+    isBridgeEnable() {
+      return this.optionsFromStore?.isBridgeEdgeSupport || false;
+    },
+    isEdgeRouterEnable() {
+      return this.optionsFromStore?.isEdgeRouterSupport || false;
+    },
+    isAlwaysUpdateScheme() {
+      return this.optionsFromStore?.alwaysUpdateScheme || false;
     },
   },
   watch: {
@@ -725,27 +783,6 @@ export default {
         if (this.constructorSchemes) {
           this.constructorSchemes.updateDataRest(structuredClone(value));
           this.constructorSchemes.updateDataInNode(structuredClone(value));
-        }
-      },
-    },
-    getDefaultDataSource: {
-      deep: true,
-      handler(value) {
-        if (this.constructorSchemes && value?.length > 0 && this.isConfirmUpdateScheme) {
-          this.constructorSchemes.buildGraph(structuredClone(value));
-          const updatedIcons = this.updateIconsList(value);
-          if (updatedIcons?.length > 0) {
-            this.$store.commit('setState', [{
-              object: this.dashFromStore[this.idFrom].options,
-              prop: 'primitivesLibrary',
-              value: JSON.stringify(
-                [...this.primitivesFromStore
-                  .map(({ icon }) => icon),
-                ...updatedIcons],
-              ),
-            }]);
-          }
-          this.isConfirmUpdateScheme = false;
         }
       },
     },
@@ -765,6 +802,14 @@ export default {
       if (!val) {
         this.isEdit = false;
       }
+    },
+    dataForBuildScheme: {
+      deep: true,
+      handler(value) {
+        if (this.isAlwaysUpdateScheme) {
+          this.constructorSchemes.buildSchemeFromSearch(value);
+        }
+      },
     },
   },
   mounted() {
@@ -831,13 +876,20 @@ export default {
         updateStoreCallbackV2: this.updateSavedGraphObject,
         toggleLoadingCallback: this.toggleLoading,
         isEdit: this.isEdit,
+        isBridgesEnable: this.isBridgeEnable,
+        isEdgeRouterEnable: this.isEdgeRouterEnable,
         onClickObject: (type, data) => {
           if (type !== 'label-type-0') {
             return;
           }
           const { tockens: tokens } = this.$store.state[this.idDashFrom];
           if (tokens) {
-            tokens.forEach(({ name, action, capture, elem }) => {
+            tokens.forEach(({
+              name,
+              action,
+              capture,
+              elem,
+            }) => {
               if (elem === this.idFrom && action === 'click:label' && data[capture]) {
                 this.$store.commit('setTocken', {
                   token: { name, action, capture },
@@ -899,6 +951,15 @@ export default {
           prop: 'savedGraphObject',
           value: {},
         }]);
+      }
+      if (!this.dashFromStore[this.idFrom]?.savedGraphObject[this.schemeIdFromSearch]) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.idFrom].savedGraphObject,
+          prop: `${this.schemeIdFromSearch}`,
+          value: [],
+        }]);
+      }
+      if (!this.dashFromStore[this.idFrom]?.savedGraphObject[this.activeScheme]) {
         this.$store.commit('setState', [{
           object: this.dashFromStore[this.idFrom].savedGraphObject,
           prop: this.activeScheme,
@@ -907,13 +968,21 @@ export default {
       }
     },
     updateSavedGraphObject(data) {
-      this.createSavedGraphObjectField();
-      this.$store.commit('setState', [{
-        object: this.dashFromStore[this.idFrom].savedGraphObject,
-        prop: this.activeScheme,
-        value: data,
-      }]);
-      this.updateSavedGraph('');
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+      }
+      this.timer = 500;
+      this.timeout = setTimeout(() => {
+        this.createSavedGraphObjectField();
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.idFrom].savedGraphObject,
+          prop: this.schemeIdFromSearch || this.activeScheme,
+          value: data,
+        }]);
+        if (this.dashFromStore[this.idFrom].savedGraph || this.dashFromStore.savedGraph) {
+          this.updateSavedGraph('');
+        }
+      }, this.timer);
     },
     closeDataPanel() {
       this.dataPanel = false;
@@ -996,7 +1065,7 @@ export default {
         this.isConfirmUpdateScheme = true;
         this.$store.commit('updateSearchStatus', {
           idDash: this.idDashFrom,
-          id: this.defaultFromSourceData,
+          id: this.searchForBuildScheme,
           status: 'empty',
         });
       } else {
