@@ -246,151 +246,194 @@
                       <v-expansion-panel-content>
                         <div class="dash-constructor-schemes__inner-options">
                           <!--TODO: Возможно стоит вынести в отдельный компонент-->
-                          <div class="row">
-                            <div class="col-12">
-                              Настройки линии
-                            </div>
-                            <!--Цвет линии-->
-                            <div class="col-8">
-                              Цвет:
-                            </div>
-                            <div class="col-4">
-                              <v-menu
-                                top
-                                offset-x
-                                z-index="100"
-                                :close-on-content-click="false"
-                              >
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-btn
-                                    :style="{
-                                      // eslint-disable-next-line max-len
-                                      'background-color': elementDefaultStyles.edgeStrokeColor.rgbaString,
-                                    }"
-                                    dark
-                                    v-bind="attrs"
-                                    v-on="on"
-                                  />
-                                </template>
-
-                                <v-color-picker
-                                  :value="elementDefaultStyles.edgeStrokeColor.rgbaObject"
-                                  dot-size="12"
-                                  mode="rgba"
-                                  @update:color="updateDefaultElementColor($event, 'edgeStrokeColor')"
-                                />
-                              </v-menu>
-                            </div>
-                            <!--Размер линии-->
-                            <div class="col-8">
-                              Размер:
-                            </div>
-                            <div class="col-4">
-                              <v-text-field
-                                v-model="elementDefaultStyles.edgeStrokeSize"
-                                dense
-                              />
-                            </div>
-                            <!--Скругление линии-->
-                            <div class="col-8">
-                              Скругление:
-                            </div>
-                            <div class="col-4">
-                              <v-text-field
-                                v-model.number="elementDefaultStyles.edgeSmoothingLength"
-                                dense
-                                placeholder="Скругление"
-                              />
-                            </div>
-                            <div class="col-12">
-                              Настройки блока
-                            </div>
-                            <!--Фигура-->
-                            <div class="col-12">
-                              <v-select
-                                v-model="elementDefaultStyles.nodeShape"
-                                :items="shapeNodeStyleList"
-                                item-value="id"
-                                item-text="label"
-                                label="Фигура"
-                                :menu-props="{
-                                  'z-index': 100,
+                          <div class="column">
+                            <div
+                              :style="{
+                                border: `1px solid ${theme.$main_border}`,
+                                'border-radius': '2px',
+                              }"
+                              class="row ma-0 mb-2 align-center"
+                            >
+                              <div
+                                class="col-12 text-center"
+                                :style="{
+                                  'border-bottom': `1px solid ${theme.$main_border}`
                                 }"
-                              />
-                            </div>
-                            <!--Цвет блока-->
-                            <div class="col-8">
-                              Цвет фона:
-                            </div>
-                            <div class="col-4">
-                              <v-menu
-                                top
-                                offset-x
-                                z-index="100"
-                                :close-on-content-click="false"
                               >
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-btn
-                                    :style="{
-                                      'background-color': elementDefaultStyles.nodeFill.rgbaString,
-                                    }"
-                                    dark
-                                    v-bind="attrs"
-                                    v-on="on"
-                                  />
-                                </template>
+                                Линия
+                              </div>
+                              <!--Цвет линии-->
+                              <div class="col-7 text-left">
+                                Цвет:
+                              </div>
+                              <div class="col-5">
+                                <v-menu
+                                  top
+                                  offset-x
+                                  z-index="100"
+                                  :close-on-content-click="false"
+                                >
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                      min-width="100%"
+                                      :style="{
+                                        // eslint-disable-next-line max-len
+                                        'background-color': elementDefaultStyles.edgeStrokeColor.rgbaString,
+                                      }"
+                                      dark
+                                      v-bind="attrs"
+                                      v-on="on"
+                                    />
+                                  </template>
 
-                                <v-color-picker
-                                  :value="elementDefaultStyles.nodeFill.rgbaObject"
-                                  dot-size="12"
-                                  mode="rgba"
-                                  @update:color="updateDefaultElementColor($event, 'nodeFill')"
+                                  <v-color-picker
+                                    :value="elementDefaultStyles.edgeStrokeColor.rgbaObject"
+                                    dot-size="12"
+                                    mode="rgba"
+                                    @update:color="updateDefaultElementColor(
+                                      $event,
+                                      'edgeStrokeColor'
+                                    )"
+                                  />
+                                </v-menu>
+                              </div>
+                              <!--Размер линии-->
+                              <div class="col-7 text-left">
+                                Размер:
+                              </div>
+                              <div class="col-5">
+                                <v-text-field
+                                  v-model="elementDefaultStyles.edgeStrokeSize"
+                                  outlined
+                                  dense
+                                  class="dash-constructor-schemes__text-field"
                                 />
-                              </v-menu>
+                              </div>
+                              <!--Скругление линии-->
+                              <div class="col-7 text-left">
+                                Скругление:
+                              </div>
+                              <div class="col-5">
+                                <v-text-field
+                                  v-model.number="elementDefaultStyles.edgeSmoothingLength"
+                                  dense
+                                  outlined
+                                  placeholder="Скругление"
+                                  class="dash-constructor-schemes__text-field"
+                                />
+                              </div>
                             </div>
-                            <!--Цвет рамки блока-->
-                            <div class="col-8">
-                              Цвет рамки:
-                            </div>
-                            <div class="col-4">
-                              <v-menu
-                                top
-                                offset-x
-                                z-index="100"
-                                :close-on-content-click="false"
+                            <div
+                              :style="{
+                                border: `1px solid ${theme.$main_border}`,
+                                'border-radius': '2px',
+                              }"
+                              class="row ma-0 mb-2 align-center"
+                            >
+                              <div
+                                class="col-12 text-center"
+                                :style="{
+                                  'border-bottom': `1px solid ${theme.$main_border}`
+                                }"
                               >
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-btn
-                                    :style="{
-                                      // eslint-disable-next-line max-len
-                                      'background-color': elementDefaultStyles.nodeStrokeColor.rgbaString,
-                                    }"
-                                    dark
-                                    v-bind="attrs"
-                                    v-on="on"
-                                  />
-                                </template>
-
-                                <v-color-picker
-                                  :value="elementDefaultStyles.nodeStrokeColor.rgbaObject"
-                                  dot-size="12"
-                                  mode="rgba"
-                                  @update:color="updateDefaultElementColor($event, 'nodeStrokeColor')"
+                                Блок
+                              </div>
+                              <!--Фигура-->
+                              <div class="col-12">
+                                <v-select
+                                  v-model="elementDefaultStyles.nodeShape"
+                                  :items="shapeNodeStyleList"
+                                  class="dash-constructor-schemes__select-field"
+                                  item-value="id"
+                                  item-text="label"
+                                  label="Фигура"
+                                  :menu-props="{
+                                    'z-index': 100,
+                                  }"
                                 />
-                              </v-menu>
+                              </div>
+                              <!--Цвет блока-->
+                              <div class="col-7 text-left">
+                                Цвет фона:
+                              </div>
+                              <div class="col-5">
+                                <v-menu
+                                  top
+                                  offset-x
+                                  z-index="100"
+                                  :close-on-content-click="false"
+                                >
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                      min-width="100%"
+                                      :style="{
+                                        'background-color': elementDefaultStyles.nodeFill.rgbaString,
+                                      }"
+                                      dark
+                                      v-bind="attrs"
+                                      v-on="on"
+                                    />
+                                  </template>
+
+                                  <v-color-picker
+                                    :value="elementDefaultStyles.nodeFill.rgbaObject"
+                                    dot-size="12"
+                                    mode="rgba"
+                                    @update:color="updateDefaultElementColor($event, 'nodeFill')"
+                                  />
+                                </v-menu>
+                              </div>
+                              <!--Цвет рамки блока-->
+                              <div class="col-7 text-left">
+                                Цвет рамки:
+                              </div>
+                              <div class="col-5">
+                                <v-menu
+                                  top
+                                  offset-x
+                                  z-index="100"
+                                  :close-on-content-click="false"
+                                >
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                      min-width="100%"
+                                      :style="{
+                                        // eslint-disable-next-line max-len
+                                        'background-color': elementDefaultStyles.nodeStrokeColor.rgbaString,
+                                      }"
+                                      dark
+                                      v-bind="attrs"
+                                      v-on="on"
+                                    />
+                                  </template>
+
+                                  <v-color-picker
+                                    :value="elementDefaultStyles.nodeStrokeColor.rgbaObject"
+                                    dot-size="12"
+                                    mode="rgba"
+                                    @update:color="updateDefaultElementColor(
+                                      $event,
+                                      'nodeStrokeColor'
+                                    )"
+                                  />
+                                </v-menu>
+                              </div>
+                              <!--Размер рамки блока-->
+                              <div class="col-7 text-left text-no-wrap">
+                                Размер рамки:
+                              </div>
+                              <div class="col-5">
+                                <v-text-field
+                                  v-model="elementDefaultStyles.nodeStrokeSize"
+                                  dense
+                                  outlined
+                                  class="dash-constructor-schemes__text-field"
+                                />
+                              </div>
                             </div>
-                            <!--Размер рамки блока-->
-                            <div class="col-8">
-                              Размер рамки:
-                            </div>
-                            <div class="col-4">
-                              <v-text-field
-                                v-model="elementDefaultStyles.nodeStrokeSize"
-                                dense
-                              />
-                            </div>
-                            <div class="col-12">
+                            <div class="col-12 text-left">
                               <v-btn
+                                outlined
                                 small
                                 :color="theme.$primary_button"
                                 class="dash-constructor-schemes__apply-options"
@@ -440,16 +483,6 @@
               </v-expansion-panel-header>
               <v-expansion-panel-content eager>
                 <div class="dndPanelItem__group dndPanelItem__group--image-node">
-                  <div class="dndPanelItem__group-items" />
-                </div>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-header class="dndPanelItem__group-title">
-                Подписи к блокам
-              </v-expansion-panel-header>
-              <v-expansion-panel-content eager>
-                <div class="dndPanelItem__group dndPanelItem__group--label-node">
                   <div class="dndPanelItem__group-items" />
                 </div>
               </v-expansion-panel-content>
@@ -888,6 +921,7 @@ export default {
       if (this.constructorSchemes) {
         this.shapeNodeStyleList = this.constructorSchemes.getShapeNodeStyleList;
         this.nodeShape = this.constructorSchemes.defaultNodeStyle.shape;
+        this.applyOptions();
       }
     },
     changeDataSelectedNode(updatedData) {
@@ -1062,9 +1096,29 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .dash-constructor-schemes {
   position: relative;
   overflow: hidden;
+  &__text-field, &__select-field {
+    ::v-deep.v-text-field__details {
+      display: none;
+    }
+
+  }
+  &__text-field {
+    ::v-deep.theme--light.v-input {
+      color: var(--main_text);
+      .v-icon {
+        color: var(--main-text);
+      }
+    }
+  }
+  &__select-field {
+    ::v-deep {
+      border-color: var(--main_text);
+    }
+  }
   &__loading-circular {
     height: 100%;
     display: flex;
