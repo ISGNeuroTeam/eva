@@ -22,6 +22,7 @@ import {
   mdiGroup,
   mdiInboxMultipleOutline,
   mdiGauge,
+  mdiFinance,
 } from '@mdi/js';
 
 export default {
@@ -103,6 +104,24 @@ export default {
         + '| | | green | 0 | 60 |\n'
         + '| | | yellow | 60 | 110 |\n'
         + '| | | #ff0000 | 110 | 180 |\n',
+    },
+    {
+      name: 'Водопад',
+      img: mdiFinance,
+      type: 'waterfall',
+      dataSourceDescription:
+        '#### Обязательные поля:\n'
+        + '- ```value``` - ????????, число\n'
+        + '#### Пример данных:\n'
+        + '| title | value | isTotal |\n'
+        + '| :--- | :---: | ---: |\n'
+        + '| Total Revenue | 182527 | |\n'
+        + '| Cost of Revenue | -84732 | |\n'
+        + '| Operating Expenses | -56571 | |\n'
+        + '| Gross Profit | | true |\n'
+        + '| Interest Income | 8583 | |\n'
+        + '| Interest | 7813 | |\n'
+        + '| Operating Income | | true |\n',
     },
   ],
   size: {
@@ -214,6 +233,10 @@ export default {
       width: 400,
       height: 400,
     },
+    waterfall: {
+      width: 600,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -243,6 +266,7 @@ export default {
     dynamicForm: mdiInboxMultipleOutline,
     frequencyGraph: mdiDotsHorizontal,
     gauge: mdiGauge,
+    waterfall: mdiFinance,
   },
   commonOptions: [
     'panelSettings',
@@ -402,6 +426,8 @@ export default {
       'tooltipMetrics',
     ],
     gauge: [
+    ],
+    waterfall: [
     ],
   },
   optionFields: [
@@ -1074,6 +1100,7 @@ export default {
     'scatterPlot',
     'constructorSchemes',
     'gauge',
+    'waterfall',
   ],
   reports: {
     table: {
@@ -1139,6 +1166,10 @@ export default {
     gauge: {
       tooltip: 'Спидометр',
       icon: mdiGauge,
+    },
+    waterfall: {
+      tooltip: 'Водопад',
+      icon: mdiFinance,
     },
   },
   excludes: {

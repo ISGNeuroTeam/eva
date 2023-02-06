@@ -169,6 +169,8 @@ Vue.component('dash-frequencyGraph', () => import('./components/dashBoardInside/
 Vue.component('code-editor', () => import('./components/codeEditor.vue'));
 // Спидометр
 Vue.component('dash-gauge', () => import('./components/dashBoardInside/dashGauge/dashGauge'));
+// Водопад
+Vue.component('dash-waterfall', () => import('./components/dashBoardInside/dashWaterfall/dashWaterfall'));
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {
