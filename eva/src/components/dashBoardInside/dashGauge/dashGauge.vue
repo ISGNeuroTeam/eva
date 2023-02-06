@@ -25,7 +25,7 @@
         <span :style="`color: ${valueColor}`">{{ value | displayValue }}</span>
       </div>
       <div class="gauge-metric-text">
-        <span>{{ dsMetricName || options.metricName }}</span>
+        <span>{{ options.metricName || dsMetricName }}</span>
       </div>
       <DashGaugeSettings
         ref="gaugeSettings"
@@ -90,7 +90,7 @@ export default {
     defaultZones: {
       type: Array,
       default: () => ([
-        { color: '#cccccc', max: 100 },
+        { color: '#cccccc', min: 0, max: 100 },
       ]),
     },
   },
@@ -120,34 +120,39 @@ export default {
       };
     },
     valueColor() {
-      let lastColor = this.theme.$main_text;
-      // eslint-disable-next-line no-restricted-syntax
-      for (const item of this.staticZones) {
-        lastColor = item.strokeStyle;
-        if (this.value >= item.min && this.value < item.max) {
-          return item.strokeStyle;
-        }
+      const zone = this.staticZones.find(({ min, max }) => (this.value >= min && this.value < max));
+      if (zone) {
+        return zone.strokeStyle;
       }
-      return lastColor;
+      if (this.value <= this.gauge.minValue) {
+        return this.staticZones[0].strokeStyle;
+      }
+      if (this.value >= this.gauge.minValue) {
+        return this.staticZones[this.staticZones.length - 1].strokeStyle;
+      }
+      return this.theme.$main_text;
     },
     staticZones() {
       let zones = [];
-      if (this.dsZones.length) {
-        zones = this.dsZones;
-      } else if (this.zones.length) {
+      if (this.zones.length) {
         zones = this.zones;
+      } else if (this.dsZones.length) {
+        zones = this.dsZones;
       } else {
         zones = this.defaultZones;
       }
-      return zones.reduce((acc, { color, max }, i) => {
-        acc.push({ strokeStyle: color, min: i > 0 ? acc[i - 1].max : 0, max });
+      return zones.reduce((acc, { color, min, max }) => {
+        acc.push({ strokeStyle: color, min: +min, max: +max });
         return acc;
       }, []);
     },
     staticLabels() {
       return {
         font: '15px sans-serif',
-        labels: [0, ...this.staticZones.map(({ max }) => +max)],
+        labels: [0, ...this.staticZones.map(({ min, max }) => ([min, max])).flat()]
+          .filter((value, index, self) => (self.indexOf(value) === index))
+          // eslint-disable-next-line no-nested-ternary
+          .sort((a, b) => ((a > b) ? 1 : (a < b) ? -1 : 0)),
         color: this.theme.$main_text, // Optional: Label text color
         fractionDigits: 0, // Optional: Numerical precision. 0=round off.
       };
@@ -165,7 +170,7 @@ export default {
         lineWidth: 0.2, // The line thickness
         radiusScale: 0.95, // Relative radius
         limitMax: true, // If false, max value increases automatically if value > maxValue
-        limitMin: false, // If true, the min value of the gauge will be fixed
+        limitMin: true, // If true, the min value of the gauge will be fixed
         generateGradient: true,
         highDpiSupport: true, // High resolution support
         pointer: this.pointer,
@@ -207,7 +212,7 @@ export default {
       }
       this.gauge = new Gauge(this.$refs.gauge);
       this.gauge.setOptions(this.gaugeOptions);
-      this.gauge.minValue = 0;
+      this.gauge.minValue = Math.min(...this.staticZones.map(({ min }) => (+min)));
       this.gauge.maxValue = this.staticZones[this.staticZones.length - 1].max;
       this.gauge.animationSpeed = 10;
       this.gauge.set(this.value);
@@ -222,8 +227,8 @@ export default {
       const { zones } = this.options;
       if (zones) {
         this.zones = [];
-        zones.forEach(({ color, max }) => {
-          this.zones.push({ color: `${color}`, max: +max });
+        zones.forEach(({ color, min, max }) => {
+          this.zones.push({ color: `${color}`, min: +min, max: +max });
         });
       }
     },
@@ -234,6 +239,7 @@ export default {
         options,
       });
       this.zones = options.zones;
+      this.gauge.minValue = Math.min(...this.staticZones.map(({ min }) => (+min)));
       this.gauge.maxValue = this.staticZones[this.staticZones.length - 1].max;
     },
     loadData(data) {
@@ -243,10 +249,11 @@ export default {
 
       // set zones
       const zones = data
-        .filter(({ color }) => (['string'].includes(typeof color) && color !== ''))
+        .filter(({ color, min, max }) => (['string'].includes(typeof color) && color !== '' && !isNaN(+min) && !isNaN(+max)))
         // eslint-disable-next-line no-nested-ternary
         .sort((a, b) => ((a.max > b.max) ? 1 : (a.max < b.max) ? -1 : 0));
       this.dsZones = zones?.length ? zones : [];
+      this.gauge.minValue = Math.min(...this.staticZones.map(({ min }) => (+min)));
       this.gauge.maxValue = this.staticZones[this.staticZones.length - 1].max;
 
       // set value
