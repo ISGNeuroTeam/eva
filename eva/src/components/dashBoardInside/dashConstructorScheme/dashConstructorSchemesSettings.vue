@@ -10,7 +10,7 @@
         <div
           v-for="(element, index) in dataObject.items"
           :key="`${dataObject.nodeId}-${index}`"
-          class="column"
+          class="column dash-constructor-schemes__data-type-0"
         >
           <div class="row align-center">
             <v-autocomplete
@@ -62,7 +62,7 @@
             label="Подпись"
             :color="theme.$accent_ui_color"
             :style="{ color: theme.$main_text }"
-            class="mb-9 mr-10"
+            class="mr-10"
           />
         </div>
         <div class="d-flex mb-9">
@@ -70,12 +70,12 @@
             class="mr-4"
             ripple
             small
-            :color="theme.$primary_button"
+            color="transparent"
             @click="addLine()"
           >
             <v-icon
               class="control-button edit-icon theme--dark"
-              :style="{ color: theme.$secondary_text }"
+              :style="{ color: theme.$main_text }"
             >
               {{ addLineIcon }}
             </v-icon>
@@ -107,6 +107,7 @@
         </div>
         <v-btn
           small
+          outlined
           :color="theme.$primary_button"
           :style="{ color: theme.$main_text }"
           @click="updateModelValue"
@@ -1032,6 +1033,12 @@ export default {
     ::v-deep.v-list-item--link {
       max-width: 480px;
     }
+  }
+  .dash-constructor-schemes__data-type-0 {
+    border: 1px solid var(--main_border);
+    border-radius: 5px;
+    padding: 4px 8px;
+    margin-bottom: 24px;
   }
   .dash-constructor-schemes__slider {
     .dash-constructor-schemes__slider-title {

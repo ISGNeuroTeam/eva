@@ -179,23 +179,23 @@ class ConstructorSchemesClass {
 
   shapeNodeStyleList = [
     {
-      label: 'Rectangle(rounded)',
+      label: 'Квадрат(скругленный)',
       id: 0,
     },
     {
-      label: 'Rectangle',
+      label: 'Квадрат',
       id: 1,
     },
     {
-      label: 'Ellipse',
+      label: 'Круг',
       id: 2,
     },
     {
-      label: 'Triangle(left)',
+      label: 'Треугольник(влево)',
       id: 3,
     },
     {
-      label: 'Triangle(right)',
+      label: 'Треугольник(вправо)',
       id: 4,
     },
   ]
@@ -365,7 +365,7 @@ class ConstructorSchemesClass {
     this.additionalEdgeToEdgeSettings();
     this.setDefaultLabelParameters();
     // Configures default styles for newly created graph elements
-    this.applyStylesElements(elementDefaultStyles);
+    // this.applyStylesElements(elementDefaultStyles);
     this.enableUndo();
     if (this.isEdit) {
       this.configureInputModes(
@@ -429,8 +429,25 @@ class ConstructorSchemesClass {
       strokeColor: Utils.generateColor(data.dataRest.strokeColor),
       thickness: data.dataRest.strokeSize,
       shape: data.dataRest.shape,
+      nodeId: 'dnd-simple-node',
     };
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
+  }
+
+  createDndPanelDefaultEdge(tooltip, elementType) {
+    const edge = new SimpleEdge({
+      style: new PolylineEdgeStyle({
+        smoothingLength: this.defaultEdgeStyle.smoothingLength,
+        targetArrow: 'none',
+        sourceArrow: 'none',
+        stroke: `${this.defaultEdgeStyle.strokeSize} solid ${this.defaultEdgeStyle.strokeColor}`,
+      }),
+    });
+    edge.tag = {
+      ...edge.tag,
+      edgeId: 'dnd-simple-edge',
+    };
+    return new DragAndDropPanelItem(edge, tooltip, elementType);
   }
 
   initSchemeUpdater() {
@@ -651,15 +668,33 @@ class ConstructorSchemesClass {
         targetArrowColor: styles.edgeStrokeColor.rgbaString,
         targetArrowType: 'none',
       };
-      this.defaultLabelStyle = {
-        font: styles.labelFont,
-        textFill: styles.labelTextFill.rgbaString,
-      };
+      if (this.dragAndDropPanel) {
+        this.dragAndDropPanel.updateElement(
+          this.createDndPanelDefaultEdge('Стандартные элементы', 'default-element'),
+          'default-edge',
+        );
+        const shapeNode = this.elementTemplates['shape-type-0'];
+        this.dragAndDropPanel.updateElement(
+          this.createDnDPanelDefaultNode(
+            {
+              ...shapeNode,
+              dataRest: {
+                ...shapeNode.dataRest,
+                shape: this.defaultNodeStyle.shape,
+                fill: this.defaultNodeStyle.fill,
+                strokeColor: this.defaultNodeStyle.strokeColor,
+                strokeSize: this.defaultNodeStyle.strokeSize,
+              },
+            },
+          ),
+          'default-node',
+        );
+      }
     }
     this.setDefaultStyles();
-    if (this.dndPanelElem) {
-      this.initializeDnDPanel();
-    }
+    // if (this.dndPanelElem) {
+    //   this.initializeDnDPanel();
+    // }
   }
 
   toggleInputMode() {
@@ -1121,7 +1156,6 @@ class ConstructorSchemesClass {
     }, 200));
     this.graphComponent.addMouseClickListener((sender, evt) => {
       const isShiftKeyPressed = evt.originalEvent?.shiftKey;
-      console.log('test', this.graphComponent);
       if (isShiftKeyPressed && this.isEdgeCreating) {
         const sourcePortLocation = {
           x: evt.location.x,
@@ -1264,22 +1298,6 @@ class ConstructorSchemesClass {
 
   setDefaultStyles() {
     const { graph } = this.graphComponent;
-
-    // Creates a nice ShapeNodeStyle instance, using an orange Fill.
-    // Sets this style as the default for all nodes that don't have another
-    // style assigned explicitly
-    graph.nodeDefaults.ports.autoCleanUp = false;
-    graph.nodeDefaults.style = new ShapeNodeStyle({
-      shape: 'round-rectangle',
-      fill: this.defaultNodeStyle.fill,
-      stroke: `${this.defaultNodeStyle.strokeSize} ${this.defaultNodeStyle.strokeColor}`,
-    });
-    // Sets the default size for nodes explicitly to 40x40
-    graph.nodeDefaults.size = new Size(
-      this.defaultNodeSize[0],
-      this.defaultNodeSize[1],
-    );
-
     // Creates a PolylineEdgeStyle which will be used as default for all edges
     // that don't have another style assigned explicitly
     graph.edgeDefaults.style = new PolylineEdgeStyle({
@@ -1371,9 +1389,6 @@ class ConstructorSchemesClass {
     this.dragAndDropPanel.maxItemWidth = 160;
     this.createDnDPanelItems({
       iconsList: updatedPrimitives || this.iconsList,
-      defaultEdgeStyle: this.defaultEdgeStyle,
-      defaultNodeStyle: this.defaultNodeStyle,
-      defaultLabelStyle: this.defaultLabelStyle,
     }).then((response) => {
       this.dragAndDropPanel.populatePanel(response);
       this.toggleLoadingCallback(false);
@@ -1387,30 +1402,22 @@ class ConstructorSchemesClass {
 
   async createDnDPanelItems({
     iconsList,
-    defaultEdgeStyle,
-    defaultLabelStyle,
   }) {
     this.loadingDnDPanelItems = true;
     return new Promise((resolve) => {
       const items = [];
       // Ребра
-      const edge1 = new SimpleEdge({
-        style: new PolylineEdgeStyle({
-          smoothingLength: defaultEdgeStyle.smoothingLength,
-          targetArrow: 'none',
-          sourceArrow: 'none',
-          stroke: `${defaultEdgeStyle.strokeSize} solid ${defaultEdgeStyle.strokeColor}`,
-        }),
+      items.push({
+        panelItem: this.createDndPanelDefaultEdge('Стандартные элементы', 'default-element'),
+        id: 'default-edge',
       });
-      edge1.tag = {
-        ...edge1.tag,
-        edgeId: edge1.hashCode(),
-      };
-      items.push(new DragAndDropPanelItem(edge1, 'Стандартные элементы', 'default-element'));
       if (this.elementTemplates) {
         Object.entries(this.elementTemplates).forEach(([key, value]) => {
           if (key.includes('shape-type')) {
-            items.push(this.createDnDPanelDefaultNode(value));
+            items.push({
+              panelItem: this.createDnDPanelDefaultNode(value),
+              id: 'default-node',
+            });
           }
           if (key.includes('data-type')) {
             items.push(
@@ -1434,28 +1441,28 @@ class ConstructorSchemesClass {
       }
 
       // Подписи к узлам\ребрам
-      const labelNode = new SimpleNode();
-      labelNode.layout = new Rect(0, 0, this.defaultNodeSize[0], 16);
-      labelNode.style = new VoidNodeStyle();
+      // const labelNode = new SimpleNode();
+      // labelNode.layout = new Rect(0, 0, this.defaultNodeSize[0], 16);
+      // labelNode.style = new VoidNodeStyle();
+      //
+      // const labelStyle = new DefaultLabelStyle({
+      //   backgroundStroke: 'transparent',
+      //   backgroundFill: 'transparent',
+      //   insets: [3, 5, 3, 5],
+      //   textFill: defaultLabelStyle.textFill,
+      //   font: defaultLabelStyle.font,
+      // });
 
-      const labelStyle = new DefaultLabelStyle({
-        backgroundStroke: 'transparent',
-        backgroundFill: 'transparent',
-        insets: [3, 5, 3, 5],
-        textFill: defaultLabelStyle.textFill,
-        font: defaultLabelStyle.font,
-      });
-
-      const label = new SimpleLabel(
-        labelNode,
-        'label',
-        FreeNodeLabelModel.INSTANCE.createDefaultParameter(),
-      );
-      label.style = labelStyle;
-      label.preferredSize = labelStyle.renderer.getPreferredSize(label, labelStyle);
-      labelNode.tag = label;
-      labelNode.labels = new ListEnumerable([label]);
-      items.push(new DragAndDropPanelItem(labelNode, 'Подписи к блокам', 'label-node'));
+      // const label = new SimpleLabel(
+      //   labelNode,
+      //   'label',
+      //   FreeNodeLabelModel.INSTANCE.createDefaultParameter(),
+      // );
+      // label.style = labelStyle;
+      // label.preferredSize = labelStyle.renderer.getPreferredSize(label, labelStyle);
+      // labelNode.tag = label;
+      // labelNode.labels = new ListEnumerable([label]);
+      // items.push(new DragAndDropPanelItem(labelNode, 'Подписи к блокам', 'label-node'));
 
       const portNode = new SimpleNode();
       portNode.layout = new Rect(0, 0, 5, 5);
