@@ -24,6 +24,7 @@
           label="Название метрики"
           hide-details
           dense
+          @change="isChanged = true"
         />
         <h4>Цвет шкалы</h4>
         <div
@@ -32,18 +33,31 @@
           class="zone-item mt-2"
         >
           <v-row>
-            <v-col cols="4">
+            <v-col cols="3">
               <v-text-field
-                v-model="item.max"
-                class="ma-2"
+                v-model="item.min"
+                class="mt-2 ml-2"
                 outlined
-                label="Максимум"
+                label="От"
                 hide-details
                 type="number"
                 dense
+                @change="onChangeMinZoneValue($event, i)"
               />
             </v-col>
-            <v-col>
+            <v-col cols="2 px-0">
+              <v-text-field
+                v-model="item.max"
+                class="mt-2"
+                outlined
+                label="До"
+                hide-details
+                type="number"
+                dense
+                @change="onChangeMaxZoneValue($event, i)"
+              />
+            </v-col>
+            <v-col cols="5 pr-0">
               <v-color-picker
                 v-model="item.color"
                 hide-inputs
@@ -63,8 +77,8 @@
                 class="picker"
               />
             </v-col>
-            <v-col cols="2">
-              <div class="ma-2">
+            <v-col>
+              <div class="mt-2">
                 <v-btn
                   icon
                   color="red"
@@ -179,8 +193,6 @@ export default {
     isOpen(val) {
       if (val) {
         this.initOptions();
-      } else {
-        this.isChanged = false;
       }
     },
     receivedSettings() {
@@ -193,7 +205,8 @@ export default {
   methods: {
     save() {
       this.zones = this.zones
-        .map(({ color, max }) => ({ color: `${color}`, max: +max }))
+        .filter(({ min, max }) => (min !== '' && max !== '' && `${min}` !== `${max}`))
+        .map(({ color, min, max }) => ({ color: `${color}`, min: +min, max: +max }))
         // eslint-disable-next-line no-nested-ternary
         .sort((a, b) => ((a.max > b.max) ? 1 : (a.max < b.max) ? -1 : 0));
       this.$emit('save', {
@@ -208,7 +221,8 @@ export default {
         this.options.metricName = `${this.receivedSettings.metricName}`;
       }
       if (this.receivedSettings.zones) {
-        this.zones = this.receivedSettings.zones.map(({ color, max }) => ({ color: `${color}`, max: +max }));
+        this.zones = this.receivedSettings.zones
+          .map(({ color, min, max }) => ({ color: `${color}`, min: +min, max: +max }));
       }
     },
 
@@ -216,16 +230,32 @@ export default {
       this.$emit('close');
     },
 
-    colorPickerInputChange() {
-      this.colorPickerInputMode = !this.colorPickerInputMode;
-    },
-
     removeZone(idx) {
+      this.isChanged = true;
+      if (idx > 0 && idx < this.zones.length - 1) {
+        this.zones[idx - 1].max = this.zones[idx + 1].min;
+      }
       this.zones.splice(idx, 1);
     },
 
     addZone() {
-      this.zones.push({ color: '#ff0000', max: 100 });
+      this.isChanged = true;
+      const min = this.zones.length ? this.zones[this.zones.length - 1].max : 0;
+      this.zones.push({ color: '#ff0000', min: `${min}`, max: `${+min + 100}` });
+    },
+
+    onChangeMinZoneValue(val, i) {
+      this.isChanged = true;
+      if (i > 0) {
+        this.zones[i - 1].max = val;
+      }
+    },
+
+    onChangeMaxZoneValue(val, i) {
+      this.isChanged = true;
+      if (i < this.zones.length - 1) {
+        this.zones[i + 1].min = val;
+      }
     },
   },
 };
