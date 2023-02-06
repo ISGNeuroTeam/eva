@@ -167,6 +167,7 @@ class ElementCreator {
           ),
           style: new VuejsNodeStyle(template),
           tag: {
+            ...this.elementTemplates[element.tag.dataType].dataRest,
             ...element.tag,
             fontFamily: ElementTemplates.fontFamily,
             nodeId: element.tag.nodeId || element.hashCode(),

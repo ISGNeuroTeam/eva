@@ -114,9 +114,13 @@ class SchemeUpdater {
         layout: SchemeUpdater.getLayout(element.layout),
       };
     }
+    const filteredElementTagRest = Utils.deleteFieldsFromObject(
+      element.tag,
+      ['getTransform', 'getDy', 'getPosition', 'getHeight'],
+    );
     return {
       tag: {
-        ...element.tag,
+        ...filteredElementTagRest,
         nodeId: element.hashCode(),
       },
       layout: SchemeUpdater.getLayout(element.layout),

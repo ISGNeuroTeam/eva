@@ -296,37 +296,47 @@ const templates = {
             />
           </clipPath>
         </defs>
-        <!--Bg-left-->
+        <!--Bg-main-->
         <rect
           x="0"
           y="0"
           :width="layout.width"
           :height="layout.height"
-          :fill="tag.maxValueColor"
+          :fill="tag.mainBgColor.rgbaString"
           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
         />
-        <!--Bg-right-->
-        <rect
-          x="0"
-          y="0"
-          :width="layout.width"
-          :height="((layout.height / 100) * (tag.currentValue * 100 / tag.maxValue))"
-          :fill="tag.currentValueColor"
-          :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-          :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
-        />
-        <text
-          class="b-data-node__text"
-          :dx="layout.width / 2"
-          :dy="layout.height / 2"
-          alignment-baseline="middle"
-          text-anchor="middle"
-          :fill="tag.textColor"
-          :font-family="tag.fontFamily || ''"
-          :font-size="((layout.height / 2) * 0.8) + 'px'"
-        >
-          {{ tag.currentValue }}
-        </text>
+        <!--Bg-second-->
+        <template v-if="tag.items.length && tag.items.length > 0">
+          <template v-for="(item, index) in tag.items">
+            <rect
+              :key="index + '-bg-' + tag.nodeId"
+              x="0"
+              :y="index > 0
+               ? tag.getPosition(index, layout)
+               : 0"
+              :width="layout.width"
+              :height="tag.getHeight(layout, index)"
+              :fill="item.bgColor.rgbaString"
+              :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+              :transform="tag.getTransform(layout)"
+            />
+          </template>
+          <template v-for="(item, index) in tag.items.map((el) => el).reverse()">
+            <text
+                :key="index + '-text-' + tag.nodeId"
+                class="b-data-node__text"
+                :dx="layout.width / 2"
+                :dy="tag.getDy(layout, index)"
+                alignment-baseline="middle"
+                text-anchor="middle"
+                :fill="item.textColor.rgbaString"
+                :font-family="tag.fontFamily || ''"
+                :font-size="tag.fontSize + 'px'"
+              >
+                {{ item.value === '-' ? 0 : item.value }}
+              </text>
+          </template>
+        </template>
       </g>
     `,
     width: 150,
@@ -335,13 +345,65 @@ const templates = {
       dataType: 'data-type-2',
       nodeId: 'template-2',
       fontFamily,
+      fontSize: 10,
       id: '',
       templateType: 'template-2',
-      currentValue: 1.5,
-      currentValueColor: '#FFFFFF',
-      maxValue: 3,
-      maxValueColor: '#000000',
-      textColor: 'red',
+      maxValue: 1,
+      mainBgColor: {
+        rgbaString: 'rgba(0, 0, 0, 1)',
+        rgbaObject: {
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 1,
+        },
+      },
+      // Methods
+      // Обязательно удалять эти поля при сохранении схемы
+      getHeight(layout, index) {
+        const roundedValue = this.items[index].value;
+        return Math.round(((layout.height / 100) * (roundedValue * (100 / this.maxValue))));
+      },
+      getTransform(layout) {
+        return `translate(${layout.width},${layout.height}), rotate(180)`;
+      },
+      getDy(layout, index) {
+        return this.items?.length > 1 ? (((layout.height / this.items.length) * (index + 1))
+            - ((layout.height / this.items.length) / 2)) : layout.height / 2;
+      },
+      getPosition(index, layout) {
+        let sum = this.items?.length === 1 ? this.items[0].value : 0;
+        this.items.forEach((el, i) => {
+          if (i < index) {
+            sum += el.value === '-' ? 0 : el.value;
+          }
+        });
+        return Math.round(((layout.height / 100) * (sum * (100 / this.maxValue))));
+      },
+      items: [
+        {
+          value: 0,
+          id: '',
+          textColor: {
+            rgbaString: 'rgba(255, 0, 0, 1)',
+            rgbaObject: {
+              r: 255,
+              g: 0,
+              b: 0,
+              a: 1,
+            },
+          },
+          bgColor: {
+            rgbaString: 'rgba(255, 255, 255, 1)',
+            rgbaObject: {
+              r: 255,
+              g: 255,
+              b: 255,
+              a: 1,
+            },
+          },
+        },
+      ],
     },
   },
   'label-type-0': {

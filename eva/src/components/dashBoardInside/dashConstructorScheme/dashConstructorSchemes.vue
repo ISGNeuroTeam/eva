@@ -58,24 +58,6 @@
             </template>
             <span>Панель настроек</span>
           </v-tooltip>
-          <v-tooltip
-            bottom
-            :color="theme.$accent_ui_color"
-          >
-            <template v-slot:activator="{ on }">
-              <div class="pa-2 d-flex">
-                <v-icon
-                  class="control-button edit-icon theme--dark"
-                  :style="{ color: theme.$secondary_text }"
-                  v-on="on"
-                  @click="fitGraphContent"
-                >
-                  {{ fitToPage }}
-                </v-icon>
-              </div>
-            </template>
-            <span>Выровнять по центру</span>
-          </v-tooltip>
           <template v-if="dataSelectedNode">
             <v-tooltip
               bottom
@@ -164,6 +146,24 @@
             </v-tooltip>
           </template>
         </template>
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <div class="pa-2 d-flex">
+              <v-icon
+                class="control-button edit-icon theme--dark"
+                :style="{ color: theme.$secondary_text }"
+                v-on="on"
+                @click="fitGraphContent"
+              >
+                {{ fitToPage }}
+              </v-icon>
+            </div>
+          </template>
+          <span>Выровнять по центру</span>
+        </v-tooltip>
       </div>
       <div class="dash-constructor-schemes__keymap-button">
         <v-tooltip
@@ -435,7 +435,7 @@
                               <v-btn
                                 outlined
                                 small
-                                :color="theme.$primary_button"
+                                :color="theme.$main_text"
                                 class="dash-constructor-schemes__apply-options"
                                 @click="applyOptions"
                               >
