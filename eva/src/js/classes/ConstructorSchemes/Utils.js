@@ -77,6 +77,16 @@ class Utils {
     const r = new RegExp(`\\b${className}\\b`, '');
     return r.test(classes);
   }
+
+  static deleteFieldsFromObject(object, fieldsForDelete) {
+    const result = {};
+    Object.keys(object).forEach((key) => {
+      if (!fieldsForDelete.includes(key)) {
+        result[key] = object[key];
+      }
+    });
+    return result;
+  }
 }
 
 export default Utils;

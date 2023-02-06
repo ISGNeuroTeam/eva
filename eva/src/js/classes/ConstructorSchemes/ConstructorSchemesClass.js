@@ -486,7 +486,6 @@ class ConstructorSchemesClass {
   updateDataNodeTemplate() {
     this.graphComponent.graph.nodes.forEach((node) => {
       if (node.tag.dataType || node?.tag[0] === 'i' || node?.tag === 'invisible') {
-        node.tag = ConstructorSchemesClass.upgradeNodeTag(node);
         if (node.tag.dataType !== 'image-node' && node?.tag?.dataType !== 'invisible') {
           this.graphComponent.graph.setStyle(
             node,
@@ -495,65 +494,6 @@ class ConstructorSchemesClass {
         }
       }
     });
-  }
-
-  // TODO: Временный метод, для обновления
-  static upgradeNodeTag(node) {
-    if (node?.tag?.dataType === '0' || node?.tag?.dataType === '1') {
-      return {
-        ...node.tag,
-        dataType: 'data-type-0',
-      };
-    }
-    if (node?.tag?.dataType === '2' || node?.tag?.dataType === '3') {
-      return {
-        ...node.tag,
-        dataType: 'data-type-1',
-      };
-    }
-    if (node?.tag?.dataType === '4') {
-      return {
-        ...node.tag,
-        dataType: 'data-type-2',
-      };
-    }
-    if (node?.tag?.dataType === '5') {
-      return {
-        ...node.tag,
-        dataType: 'data-type-3',
-      };
-    }
-    if (node?.tag?.dataType === '5') {
-      return {
-        ...node.tag,
-        dataType: 'data-type-3',
-      };
-    }
-    if (node?.tag?.dataType === 'label-0' || node?.tag?.dataType === 'label-type-0') {
-      return {
-        ...node.tag,
-        borderColor: typeof node.tag.borderColor === 'string'
-          ? Utils.generateColor(Color.from(node.tag.borderColor))
-          : node.tag.borderColor,
-        bgColor: typeof node.tag.bgColor === 'string'
-          ? Utils.generateColor(Color.from(node.tag.bgColor))
-          : node.tag.bgColor,
-        dataType: 'label-type-0',
-      };
-    }
-    if (node?.tag?.dataType === 'default-node') {
-      return {
-        ...node.tag,
-        dataType: 'shape-type-0',
-      };
-    }
-    if (node?.tag[0] === 'i' || node?.tag === 'invisible') {
-      return {
-        dataType: 'invisible',
-        nodeId: node.hashCode(),
-      };
-    }
-    return node.tag;
   }
 
   // Load from LocalStorage to Store
@@ -831,9 +771,13 @@ class ConstructorSchemesClass {
       ) {
         // Достаем элемент в отдельную переменную для дальнейшей работы с ним
         this.targetDataNode = evt.item;
+        const filteredElementTag = Utils.deleteFieldsFromObject(
+          evt.item.tag,
+          ['getTransform', 'getDy', 'getPosition', 'getHeight'],
+        );
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
-          openDataPanelCallback(evt.item.tag);
+          openDataPanelCallback(filteredElementTag);
         } else if (evt.item instanceof IEdge) {
           openDataPanelCallback({
             ...ConstructorSchemesClass.getEdgeOptions(evt.item),
@@ -848,7 +792,7 @@ class ConstructorSchemesClass {
           });
         } else {
           openDataPanelCallback({
-            ...evt.item.tag,
+            ...filteredElementTag,
           });
         }
       } else {
@@ -1511,14 +1455,18 @@ class ConstructorSchemesClass {
     new Promise((resolve) => {
       this.graphComponent.graph.nodes.forEach((node) => {
         const { dataType } = node.tag;
-        if (dataType === 'data-type-0') {
+        if (dataType === 'data-type-0' || dataType === 'data-type-2') {
           const updatedItems = node.tag.items.map((nodeDataItem) => {
             const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
             if (targetData) {
               nodeDataItem = {
                 ...nodeDataItem,
-                textRight: typeof targetData?.value === 'number'
-                || typeof targetData?.value === 'string'
+                [
+                dataType === 'data-type-0'
+                  ? 'textRight'
+                  : 'value'
+                ]: typeof targetData?.value === 'number'
+                  || typeof targetData?.value === 'string'
                   ? targetData.value
                   : '-',
               };
@@ -1538,20 +1486,6 @@ class ConstructorSchemesClass {
               ? targetData.value
               : '-',
             valueColor: targetData?.value_color || null,
-          };
-        } else if (dataType === 'data-type-2') {
-          const targetData = updatedData.find((item) => item.TagName === node.tag.id);
-          node.tag = {
-            ...node.tag,
-            currentValue: targetData?.value ? +targetData.value : 0,
-          };
-        } else if (dataType === 'data-type-3') {
-          const targetDataFirst = updatedData.find((item) => item.TagName === node.tag.idFirst);
-          const targetDataSecond = updatedData.find((item) => item.TagName === node.tag.idSecond);
-          node.tag = {
-            ...node.tag,
-            firstValue: targetDataFirst?.value ? +targetDataFirst.value : 0,
-            secondValue: targetDataSecond?.value ? +targetDataSecond.value : 0,
           };
         }
       });
@@ -1587,15 +1521,13 @@ class ConstructorSchemesClass {
       };
     } else if (dataType === 'data-type-2') {
       updatedData = {
-        ...dataFromComponent,
-        currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value || 0),
-        maxValue: Number(dataFromComponent.maxValue || 0),
-      };
-    } else if (dataType === 'data-type-3') {
-      updatedData = {
-        ...dataFromComponent,
-        firstValue: Number(this.getDataItemById(dataFromComponent.idFirst)?.value),
-        secondValue: Number(this.getDataItemById(dataFromComponent.idSecond)?.value),
+        mainBgColor: dataFromComponent?.mainBgColor,
+        maxValue: dataFromComponent?.maxValue,
+        fontSize: dataFromComponent?.fontSize,
+        items: dataFromComponent.items.map((item) => ({
+          ...item,
+          value: this.getDataItemById(item.id)?.value || item?.value || '-',
+        })),
       };
     } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
       updatedData = dataFromComponent;

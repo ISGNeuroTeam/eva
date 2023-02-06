@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Constructor-schemes: "transparent background" setting didn`t work
 - Constructor-schemes: setting default elements didn`t work
+- Constructor-schemes: element "hoarder"(data-type-2) didn`t work
 
 ## [1.119.0]
 
