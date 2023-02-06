@@ -151,7 +151,6 @@ export default {
         font: '15px sans-serif',
         labels: [0, ...this.staticZones.map(({ min, max }) => ([min, max])).flat()]
           .filter((value, index, self) => (self.indexOf(value) === index))
-          // eslint-disable-next-line no-nested-ternary
           .sort((a, b) => ((a > b) ? 1 : (a < b) ? -1 : 0)),
         color: this.theme.$main_text, // Optional: Label text color
         fractionDigits: 0, // Optional: Numerical precision. 0=round off.
@@ -212,10 +211,13 @@ export default {
       }
       this.gauge = new Gauge(this.$refs.gauge);
       this.gauge.setOptions(this.gaugeOptions);
-      this.gauge.minValue = Math.min(...this.staticZones.map(({ min }) => (+min)));
-      this.gauge.maxValue = this.staticZones[this.staticZones.length - 1].max;
+      this.setGaugeMinMax();
       this.gauge.animationSpeed = 10;
       this.gauge.set(this.value);
+    },
+    setGaugeMinMax() {
+      this.gauge.minValue = Math.min(...this.staticZones.map(({ min }) => (+min)));
+      this.gauge.maxValue = Math.max(...this.staticZones.map(({ max }) => (+max)));
     },
     resize() {
       // из за специфической работы фулскрина
@@ -239,8 +241,7 @@ export default {
         options,
       });
       this.zones = options.zones;
-      this.gauge.minValue = Math.min(...this.staticZones.map(({ min }) => (+min)));
-      this.gauge.maxValue = this.staticZones[this.staticZones.length - 1].max;
+      this.setGaugeMinMax();
     },
     loadData(data) {
       if (!data.length) {
@@ -253,8 +254,7 @@ export default {
         // eslint-disable-next-line no-nested-ternary
         .sort((a, b) => ((a.max > b.max) ? 1 : (a.max < b.max) ? -1 : 0));
       this.dsZones = zones?.length ? zones : [];
-      this.gauge.minValue = Math.min(...this.staticZones.map(({ min }) => (+min)));
-      this.gauge.maxValue = this.staticZones[this.staticZones.length - 1].max;
+      this.setGaugeMinMax();
 
       // set value
       const valueData = data.find(({ value }) => (value !== null && value !== ''));
