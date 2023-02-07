@@ -19,9 +19,11 @@
 
         <v-row>
           <v-col cols="6 pr-0">
-            <h3 class="mt-4">Цвет положительного бара</h3>
+            <h3 class="mt-4">
+              Цвет положительного бара
+            </h3>
           </v-col>
-          <v-col cols="6">
+          <v-col cols="6 pb-0">
             <v-color-picker
               v-model="options.colorBarPositive"
               hide-inputs
@@ -46,9 +48,11 @@
         </v-row>
         <v-row>
           <v-col cols="6 pr-0">
-            <h3 class="mt-4">Цвет отрицательного бара</h3>
+            <h3 class="mt-4">
+              Цвет отрицательного бара
+            </h3>
           </v-col>
-          <v-col cols="6">
+          <v-col cols="6 pb-0">
             <v-color-picker
               v-model="options.colorBarNegative"
               hide-inputs
@@ -73,7 +77,9 @@
         </v-row>
         <v-row>
           <v-col cols="6 pr-0">
-            <h3 class="mt-4">Цвет суммарного бара</h3>
+            <h3 class="mt-4">
+              Цвет суммарного бара
+            </h3>
           </v-col>
           <v-col cols="6">
             <v-color-picker
@@ -100,7 +106,9 @@
         </v-row>
         <v-row>
           <v-col>
-            <h3 class="mt-4">Наклон подписей оси X</h3>
+            <h3 class="mt-4">
+              Наклон подписей оси X
+            </h3>
           </v-col>
           <v-col>
             <v-switch
@@ -110,6 +118,70 @@
           </v-col>
         </v-row>
 
+        <h2 class="my-4">
+          Замена заголовков
+        </h2>
+        <div
+          v-for="(item, i) of titleReplace"
+          :key="item.old"
+          class="title-replace-item mb-2 pa-2"
+          :class="{
+            'has-error': checkTitleReplaceError(item),
+          }"
+        >
+          <v-row>
+            <v-col>
+              <v-autocomplete
+                v-model="item.old"
+                :items="titles.filter(title => item.old === title
+                  || !titleReplace.map(d => d.old).includes(title))"
+                class="field-profile"
+                label="Заменить с"
+                :style="{ color: theme.$main_text }"
+                outlined
+                hide-details
+                dense
+              />
+            </v-col>
+            <v-col class="pl-0">
+              <v-text-field
+                v-model="item.to"
+                :color="theme.$accent_ui_color"
+                :style="{ color: theme.$main_text }"
+                class="textarea-item"
+                outlined
+                label="Заменить на"
+                hide-details
+                dense
+              />
+            </v-col>
+            <v-col class="flex-grow-0 pl-0">
+              <v-btn
+                icon
+                color="red"
+                class="mt-1"
+                @click="removeTitleReplaceItem(i)"
+              >
+                <v-icon>{{ icons.mdiDelete }}</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </div>
+
+        <div class="justify-center mt-3">
+          <v-btn
+            small
+            plain
+            :color="theme.$primary_button"
+            :disabled="titleReplace.length > 20"
+            @click="addTitleReplace()"
+          >
+            <v-icon left>
+              {{ icons.mdiPlus }}
+            </v-icon>
+            Добавить зону
+          </v-btn>
+        </div>
       </v-card-text>
 
       <v-card-actions class="footer pr-3 d-flex justify-end px-6">
@@ -171,7 +243,6 @@ export default {
   },
   data: () => ({
     options: {
-      title: '',
       colorText: '#ffffff',
       colorLabel: null,
       colorBarPositive: '#00dd00',
@@ -179,6 +250,8 @@ export default {
       colorBarTotal: '#999999',
       xLabelRotate: true,
     },
+    titles: [],
+    titleReplace: [],
     isChanged: false,
   }),
   computed: {
@@ -214,19 +287,41 @@ export default {
   },
   methods: {
     save() {
-      this.$emit('save', {
-        ...this.options,
-      });
+      const chartOptions = { ...this.options };
+      chartOptions.titleReplace = this.titleReplace
+        .filter((item) => !this.checkTitleReplaceError(item));
+      this.$emit('save', chartOptions);
       this.close(true);
     },
 
     initOptions() {
-      this.options = { ...this.receivedSettings };
-      console.log(this.options);
+      Object.keys(this.receivedSettings).forEach((param) => {
+        if (['titles', 'titleReplace'].includes(param)) {
+          this.$set(this, param, structuredClone(this.receivedSettings[param]));
+        } else {
+          this.options[param] = this.receivedSettings[param];
+        }
+      });
     },
 
     close() {
       this.$emit('close');
+    },
+
+    addTitleReplace() {
+      this.titleReplace.push({
+        old: '',
+        to: '',
+      });
+    },
+
+    removeTitleReplaceItem(idx) {
+      this.isChanged = true;
+      this.titleReplace.splice(idx, 1);
+    },
+
+    checkTitleReplaceError({ old, to }) {
+      return old === '' || to === '';
     },
   },
 };
@@ -244,4 +339,10 @@ export default {
 .picker::v-deep
   .v-color-picker__controls
     padding: 12px
+.title-replace-item
+  border: 1px solid $main_border
+  border-radius: 3px
+  &.has-error
+    border-color: #bd0000
+    background-color: #f002
 </style>

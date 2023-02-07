@@ -17,9 +17,8 @@
       </v-icon>
       <svg ref="waterfall" />
       <DashWaterfallSettings
-        ref="waterfallsettings"
         v-model="isSettingsComponentOpen"
-        :received-settings="options.chartOptions || {}"
+        :received-settings="chartOptions"
         @save="saveSettings"
         @close="closeSettings"
       />
@@ -53,10 +52,6 @@ export default {
       type: String,
       required: true,
     },
-    options: {
-      type: Object,
-      default: null,
-    },
     fullScreenMode: {
       type: Boolean,
       default: false,
@@ -84,11 +79,23 @@ export default {
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idFrom];
     },
+    options() {
+      return this.$store.state[this.idDashFrom][this.idFrom].options;
+    },
     box() {
       const { width, height } = this.sizeFrom;
       return {
         width: Math.round(width) - 8,
         height: Math.round(height) - 50,
+      };
+    },
+    tokensStore() {
+      return this.$store.state[this.idDashFrom].tockens || [];
+    },
+    chartOptions() {
+      return {
+        ...this.options.chartOptions,
+        titles: this.dataRestFrom.map((row) => row.title),
       };
     },
   },
@@ -108,7 +115,6 @@ export default {
     },
     fullScreenMode() {
       this.$nextTick().then(() => {
-        console.log('fullScreenMode', this.$refs.waterfall)
         this.chart.moveInNewContainer(this.$refs.waterfall);
         this.chart.setSize(this.box.width, this.box.height);
         this.chart.render();
@@ -118,17 +124,26 @@ export default {
   mounted() {
     this.initWaterfall();
     this.loadData(this.dataRestFrom);
+    this.setActions(this.dataRestFrom);
   },
   methods: {
     initWaterfall() {
       if (!this.$refs.waterfall) {
         return;
       }
-      const { options } = this;
       const { width, height } = this.box;
-      const { chartOptions } = options;
-      console.log(chartOptions)
-      this.chart = new WaterfallClass(this.$refs.waterfall, width, height, chartOptions);
+      this.chart = new WaterfallClass(this.$refs.waterfall, width, height, this.chartOptions);
+      this.chart.onClick = (row) => {
+        this.tokensStore
+          .filter(({ elem, action }) => (elem === this.idFrom && action === 'click'))
+          .forEach((token) => {
+            this.$store.commit('setTocken', {
+              token,
+              idDash: this.idDashFrom,
+              value: row[token.capture],
+            });
+          });
+      };
     },
     resize() {
       // из за специфической работы фулскрина
@@ -146,9 +161,21 @@ export default {
     },
     loadData(data) {
       this.chart.update(data);
+      this.setActions(data);
     },
     closeSettings() {
       this.isSettingsComponentOpen = false;
+    },
+    setActions(data) {
+      if (data.length) {
+        this.$store.commit('setActions', {
+          actions: [
+            { name: 'click', capture: Object.keys(data[0]) },
+          ],
+          idDash: this.idDashFrom,
+          id: this.idFrom,
+        });
+      }
     },
     saveSettings(options) {
       this.closeSettings();
