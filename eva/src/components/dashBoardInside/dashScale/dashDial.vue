@@ -51,6 +51,12 @@
               class="icon"
               v-html="getIconSvgByID(metric.icon)"
             />
+            <v-icon
+              v-show="metric.icon === 'no_icon'"
+              class="icon"
+              color="#E0E0EC"
+              v-text="getIcon(metric)"
+            />
             <span
               class="title-text"
               v-text="metric.title"
@@ -60,16 +66,19 @@
             v-if="metric.value"
             class="metric-value"
             :class="`color-${metric.color}`"
-            :style="`
-            color: ${getColor(metric)};
-            font-size: ${metric.fontSize || 16}px;
-            font-weight: ${metric.fontWeight || 200};
-            display: ${
-              metric.value
-              && metric.value.toString(10).split(',').length > 1
-                ? 'flex'
-                : 'block'};
-            `"
+            style="
+               color: #5980f8;
+             "
+            :style="{
+              ...getColor(metric),
+              fontSize: `${metric.fontSize || 16}px`,
+              fontWeight: `${metric.fontWeight || 200}`,
+              display: `${
+                metric.value
+                && metric.value.toString(10).split(',').length > 1
+                  ? 'flex'
+                  : 'block'}`
+            }"
           >
             <span
               v-for="(value, inx) in metric.value.toString(10).split(',')"
@@ -102,6 +111,7 @@ import moment from 'moment';
 import dialSettings from './dashDialSettings.vue';
 import metricTitleIcons from './metricTitleIcons';
 import DialClass from '../../../js/classes/DialClass';
+import iconlist from '@/fonts/eva-iconfont/eva-iconlist.json';
 
 export default {
   name: 'Dial',
@@ -266,6 +276,16 @@ export default {
     this.checkTime();
   },
   methods: {
+    getIcon(metric) {
+      if (!metric.metadata) {
+        return undefined;
+      }
+      const ranges = JSON.parse(metric.metadata.replaceAll("'", '"'));
+      if (ranges.icon) {
+        return iconlist.find((icon) => ranges.icon === icon);
+      }
+      return '';
+    },
     checkTime() {
       if (
         this.currentSettings.countSections
@@ -286,50 +306,66 @@ export default {
       }
     },
     getColor(metric) {
-      if (metric.metadata) {
+      if (metric.metadata && metric.color === 'range') {
+        let color;
         const ranges = JSON.parse(metric.metadata.replaceAll("'", '"'));
-        if (metric.color === 'range') {
+        if (!ranges.range) {
+          Object.keys(ranges).forEach((key) => {
+            ranges[key] = `${ranges[key]}`.split(':');
+          });
           if (!Number.isNaN(+metric.value)) {
-            const numbersRanges = Object.keys(ranges)
-              .reduce((acc, key) => ({
-                ...acc,
-                [key]: `${ranges[key]}`.split(':').map(Number),
-              }), {});
             const val = Number(metric.value);
-            if (val >= numbersRanges.red[0] && val <= numbersRanges.red[1]) {
-              return '#FF5147';
-            }
-
-            if (val >= numbersRanges.yellow[0] && val <= numbersRanges.yellow[1]) {
-              return '#FFE065';
-            }
-            const greenrange = numbersRanges.green[0] < numbersRanges.green[1]
-              ? val >= numbersRanges.green[0] && val <= numbersRanges.green[1]
-              : val >= numbersRanges.green[0];
-            if (greenrange) {
-              return '#5BD97A';
-            }
+            color = Object.keys(ranges).reduce((resultColor, currentColor) => {
+              const range = ranges[currentColor];
+              // eslint-disable-next-line no-nested-ternary
+              const colorRange = range[0]
+                ? range[0] < range[1]
+                  ? val >= range[0] && val <= range[1]
+                  : val >= range[0]
+                : val <= range[1];
+              return colorRange ? currentColor : resultColor;
+            }, null);
           } else {
-            if (metric.value === ranges.red) {
-              return '#FF5147';
-            }
-
-            if (metric.value === ranges.yellow) {
-              return '#FFE065';
-            }
-            if (metric.value === ranges.green) {
-              return '#5BD97A';
+            const val = metric.value;
+            color = Object.keys(ranges)
+              .reduce((resultColor, currentColor) => (
+                ranges[currentColor].includes(val) ? currentColor : resultColor), null);
+          }
+        } else if (ranges?.range.length > 0) {
+          ranges.range.forEach((item, index) => {
+            ranges.range[index] = item.split(':');
+          });
+          if (ranges.range.length === ranges.colors.length) {
+            if (!Number.isNaN(+metric.value)) {
+              const val = Number(metric.value);
+              color = ranges.colors.reduce((resultColor, currentColor, index) => {
+                const range = ranges.range[index];
+                // eslint-disable-next-line no-nested-ternary
+                const colorRange = range[0]
+                  ? range[0] < range[1]
+                    ? val >= range[0] && val <= range[1]
+                    : val >= range[0]
+                  : val <= range[1];
+                return colorRange ? currentColor : resultColor;
+              }, null);
+            } else {
+              const val = metric.value;
+              color = ranges.colors.reduce((resultColor, currentColor, index) => {
+                const range = ranges.range[index];
+                if (range.includes(val)) {
+                  return currentColor;
+                }
+                return resultColor;
+              }, null);
             }
           }
         }
-
-        if (metric.color === 'secondary') {
-          return '#e0e0ec';
-        }
-      } else if (!metric.metadata && metric.color === 'secondary'){
-        return '#e0e0ec';
+        return { color };
       }
-      return '#5980f8';
+      if (metric.color === 'secondary') {
+        return { color: '#e0e0ec' };
+      }
+      return { color: '#5980f8' };
     },
     init(settings, up) {
       const options = structuredClone(this.getOptions);
@@ -420,7 +456,7 @@ export default {
           }
           const startId = `${metric}_${id}`;
           const metricCurrent = metricOptionsCurrent?.find(
-            (m) => m.startId === startId,
+            (m) => m?.startId === startId,
           );
           const defaultMetricOption = {
             title: metric || data.phase,

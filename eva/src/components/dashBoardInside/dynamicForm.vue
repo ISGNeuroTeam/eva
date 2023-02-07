@@ -221,13 +221,6 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
       }
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
       if (!this.dashFromStore?.options.formOptions) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,

@@ -324,7 +324,7 @@ class MapClass {
     line
       .bindTooltip(tooltip)
       .on('click', (evn) => {
-        callback(element.ID, element, evn);
+        callback(element.ID, { ...lib, ...element }, evn);
       });
     line.setTooltipContent(element.label);
     this.layerGroup[element.type].addLayer(line);
@@ -373,7 +373,7 @@ class MapClass {
         interactive: true,
       })
       .on('click', (evn) => {
-        callback(element.ID, element, evn);
+        callback(element.ID, { ...lib, ...element }, evn);
       });
     this.layerGroup[element.type].addLayer(marker);
   }
@@ -397,7 +397,7 @@ class MapClass {
         className: 'leaftet-hover',
       })
       .on('click', (evn) => {
-        callback(element.ID, element, evn);
+        callback(element.ID, { ...lib, ...element }, evn);
       });
       // eslint-disable-next-line no-underscore-dangle
     this.layerGroup[element.type].addLayer(marker);
