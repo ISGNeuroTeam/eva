@@ -1,18 +1,21 @@
 import {
-  Point, PolylineEdgeStyle, Rect, ShapeNodeStyle, DefaultLabelStyle,
+  Point, PolylineEdgeStyle, Rect, ShapeNodeStyle, DefaultLabelStyle, FreeNodePortLocationModel,
 } from 'yfiles';
 import ElementTemplates from './elementTemplates.js';
 import VuejsNodeStyle from '@/js/classes/ConstructorSchemes/VueNodeStyle';
 import GenerateIcons from '@/js/classes/ConstructorSchemes/GenerateIcons';
+import Utils from '@/js/classes/ConstructorSchemes/Utils';
 
 class ElementCreator {
   constructor({
     graph,
     elements,
+    defaultEdgeStyles,
   }) {
     this.graph = graph;
     this.elements = elements;
     this.elementTemplates = ElementTemplates.templates;
+    this.defaultEdgeStyles = defaultEdgeStyles;
   }
 
   buildGraph() {
@@ -56,7 +59,7 @@ class ElementCreator {
 
   getTargetPort(targetPortId) {
     if (this.graph.ports.toArray()?.length > 0) {
-      return this.graph.ports.toArray().find(({ tag }) => tag.portId === targetPortId);
+      return this.graph.ports.toArray().find(({ tag }) => tag?.portId === targetPortId);
     }
     return null;
   }
@@ -142,7 +145,10 @@ class ElementCreator {
         createdNode = this.graph.createNodeAt({
           location: imageNode.layout,
           style: imageNode.style.clone(),
-          tag: imageNode.tag,
+          tag: {
+            ...imageNode.tag,
+            ...element.tag,
+          },
         });
       } else if (element.tag?.dataType === 'invisible') {
         createdNode = this.createInvisibleNode(
@@ -161,6 +167,7 @@ class ElementCreator {
           ),
           style: new VuejsNodeStyle(template),
           tag: {
+            ...this.elementTemplates[element.tag.dataType].dataRest,
             ...element.tag,
             fontFamily: ElementTemplates.fontFamily,
             nodeId: element.tag.nodeId || element.hashCode(),
@@ -221,10 +228,52 @@ class ElementCreator {
 
   createEdge(edge) {
     new Promise((resolve) => {
-      const targetPort = this.getTargetPort(edge.target.port.id);
-      const sourcePort = this.getSourcePort(edge.source.port.id);
-      const targetNode = targetPort.owner;
-      const sourceNode = sourcePort.owner;
+      let targetPort = typeof edge.target.port.id === 'number'
+        ? this.getTargetPort(edge.target.port.id)
+        : null;
+      let sourcePort = typeof edge.source.port.id === 'number'
+        ? this.getSourcePort(edge.source.port.id)
+        : null;
+      let targetNode = null;
+      if (targetPort?.owner) {
+        targetNode = targetPort?.owner;
+      } else {
+        targetNode = this.graph.nodes.toArray()
+          .find((el) => el.tag.nodeId === edge.target.node.nodeId);
+        if (!targetPort) {
+          if (typeof edge.target.port.id === 'string') {
+            targetPort = this.graph.addPort(
+              targetNode,
+              FreeNodePortLocationModel.NODE_BOTTOM_ANCHORED,
+            );
+          } else {
+            targetPort = this.graph.addPortAt(
+              targetNode,
+              edge.target.port.location,
+            );
+          }
+        }
+      }
+      let sourceNode = null;
+      if (sourcePort?.owner) {
+        sourceNode = sourcePort?.owner;
+      } else {
+        sourceNode = this.graph.nodes.toArray()
+          .find((el) => el.tag.nodeId === edge.source.node.nodeId);
+        if (!sourcePort) {
+          if (typeof edge.source.port.id === 'string') {
+            sourcePort = this.graph.addPortAt(
+              sourceNode,
+              edge.source.port.location,
+            );
+          } else {
+            sourcePort = this.graph.addPortAt(
+              sourceNode,
+              edge.source.port.location,
+            );
+          }
+        }
+      }
       resolve({
         sourceNode,
         targetNode,
@@ -239,7 +288,9 @@ class ElementCreator {
         targetPort: response.targetPort,
         style: new PolylineEdgeStyle({
           smoothingLength: edge.style.smoothingLength,
-          stroke: `${edge.style.strokeSize}px solid ${edge.style.strokeColor}`,
+          stroke: `${typeof edge.style.strokeSize === 'number'
+            ? `${edge.style.strokeSize}px`
+            : edge.style.strokeSize} solid ${edge.style.strokeColor}`,
           targetArrow: 'none',
           sourceArrow: 'none',
         }),
@@ -283,15 +334,6 @@ class ElementCreator {
         }),
         text: el.data.text,
         tag: el.data.tag,
-      });
-    });
-  }
-
-  buildSchemeFromSearch() {
-    const generateIcons = new GenerateIcons();
-    return new Promise((resolve) => {
-      generateIcons.generateIconNodes(this.elements).then((response) => {
-        resolve(response);
       });
     });
   }
