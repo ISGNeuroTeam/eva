@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Constructor-schemes: table-node: Entering values for the left column manually.
 - Constructor-schemes: added timeout for schema saving
+- Constructor-schemes: build scheme from search
 
 ### Changed
 - Do not highlight dashboard when edit mode is disabled
@@ -28,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed singleValue: coloring text value
 - Fixed transitions from the map
 - Constructor-schemes: "transparent background" setting didn`t work
+- Constructor-schemes: setting default elements didn`t work
+- Constructor-schemes: element "hoarder"(data-type-2) didn`t work
 
 ## [1.119.0]
 
