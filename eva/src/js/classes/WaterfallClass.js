@@ -8,6 +8,7 @@ export default class WaterfallClass {
     colorBarNegative: '#dd0000',
     colorBarTotal: '#999999',
     xLabelRotate: true,
+    titleReplace: [],
   }
 
   width = null
@@ -22,7 +23,9 @@ export default class WaterfallClass {
 
   svgContainer = null
 
-  _data = []
+  dataSet = []
+
+  onClick = null;
 
   constructor(svgContainer, width, height, options = {}) {
     this.options = { ...this.options, ...options };
@@ -38,7 +41,7 @@ export default class WaterfallClass {
   }
 
   set data(list) {
-    this._data = list.reduce((acc, item, idx) => {
+    this.dataSet = list.reduce((acc, item, idx) => {
       item.value = +item.value;
       if (idx === 0) {
         acc.push({ ...item, lastValue: 0, total: item.value });
@@ -57,7 +60,7 @@ export default class WaterfallClass {
   }
 
   get data() {
-    return this._data;
+    return this.dataSet;
   }
 
   update(data) {
@@ -100,7 +103,8 @@ export default class WaterfallClass {
       .data(this.data)
       .enter().append('g')
       .attr('class', 'bar')
-      .attr('transform', (d) => `translate(${this.x(d.title)},0)`);
+      .attr('transform', (d) => `translate(${this.x(d.title)},0)`)
+      .on('click', (d) => this.onClick(d));
 
     // add red/green bars
     barGroup.filter((d) => !d.isTotal).append('rect')
@@ -171,7 +175,16 @@ export default class WaterfallClass {
         .style('text-anchor', 'end')
         .attr('dx', '-.8em')
         .attr('dy', '.15em')
-        .attr('transform', 'rotate(-20)');
+        .attr('transform', 'rotate(-20)')
+        .text((title) => {
+          if (this.options.titleReplace.length) {
+            const replace = this.options.titleReplace.find(({ old }) => (old === title));
+            if (replace) {
+              return replace.to;
+            }
+          }
+          return title;
+        });
     }
   }
 
@@ -202,6 +215,7 @@ export default class WaterfallClass {
       .enter().filter((d) => d < 0)
       .append('line')
       .attr('class', 'zero')
+      .attr('stroke-width', 0.2)
       .attr('x1', 0)
       .attr('y1', this.y(0))
       .attr('x2', xWidth)

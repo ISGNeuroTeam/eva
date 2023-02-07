@@ -111,17 +111,17 @@ export default {
       type: 'waterfall',
       dataSourceDescription:
         '#### Обязательные поля:\n'
-        + '- ```value``` - ????????, число\n'
+        + '- ```title``` - Название столбца, строка\n'
+        + '- ```value``` - Значение столбца, число\n'
+        + '#### Дополнительные поля:\n'
+        + '- ```isTotal``` - Отобразить столбак суммы, булевый\n'
         + '#### Пример данных:\n'
         + '| title | value | isTotal |\n'
         + '| :--- | :---: | ---: |\n'
-        + '| Total Revenue | 182527 | |\n'
+        + '| Total 1 | 182527 | True |\n'
         + '| Cost of Revenue | -84732 | |\n'
         + '| Operating Expenses | -56571 | |\n'
-        + '| Gross Profit | | true |\n'
-        + '| Interest Income | 8583 | |\n'
-        + '| Interest | 7813 | |\n'
-        + '| Operating Income | | true |\n',
+        + '| Total 2 | | True |\n',
     },
   ],
   size: {
