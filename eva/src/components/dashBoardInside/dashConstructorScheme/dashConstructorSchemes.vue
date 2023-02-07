@@ -165,7 +165,9 @@
           <span>Выровнять по центру</span>
         </v-tooltip>
       </div>
-      <div class="dash-constructor-schemes__keymap-button">
+      <div
+        v-if="dashboardEditMode"
+        class="dash-constructor-schemes__keymap-button">
         <v-tooltip
           top
           :nudge-top="5"

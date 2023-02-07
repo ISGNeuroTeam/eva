@@ -18,7 +18,7 @@
     >
       <v-card-title
         v-show="element.split('-')[0] === 'singleValue'
-          || element === 'dial'
+          || element.split('-')[0] === 'dial'
           ? settings.showTitle
           : props.disappear"
         class="card-title open_title"
@@ -831,14 +831,6 @@ export default {
         this.$store.commit('setDefaultOptions', { id: this.element, idDash: this.idDash });
       }
 
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
       return this.dashFromStore.options;
     },
     lastResult() {
@@ -1398,7 +1390,7 @@ export default {
     },
     screenShot(screen) {
       screen.$el.style.background = this.theme.$main_bg;
-      this.$html2canvas(screen.$el, { type: 'dataURL', logging: false, })
+      this.$html2canvas(screen.$el, { type: 'dataURL', logging: false })
         .then((canvas) => {
           this.downloadTheme(canvas);
           screen.$el.style.background = 'transparent';

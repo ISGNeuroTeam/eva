@@ -6,7 +6,9 @@ import restAuth from '../storeAuth/storeRest';
 
 const defaultState = {
   treeOpen: false,
-  treeCategories: [],
+  treeCategories: {
+    items: [],
+  },
   treeGroups: [],
   treeOpenItems: [
     'categories',
@@ -51,9 +53,9 @@ export default {
   state: { ...defaultState },
   mutations: {
     setSettings(state, settings) {
-      settings.forEach(({ name, body }) => {
+      settings.forEach(({ id, name, items }) => {
         if (state[name] !== undefined) {
-          Vue.set(state, name, body);
+          Vue.set(state, name, { id, items });
         }
       });
     },
@@ -87,11 +89,11 @@ export default {
       });
     },
     removeCategoryItem(state, treeId) {
-      const rootItemIdx = state.treeCategories.findIndex((item) => item.treeId === treeId);
+      const rootItemIdx = state.treeCategories.items.findIndex((item) => item.treeId === treeId);
       if (rootItemIdx > -1) {
-        return state.treeCategories.splice(rootItemIdx, 1);
+        return state.treeCategories.items.splice(rootItemIdx, 1);
       }
-      const parent = findParentById(state.treeCategories, treeId);
+      const parent = findParentById(state.treeCategories.items, treeId);
       if (parent) {
         const parentIdx = parent.children.findIndex((item) => item.treeId === treeId);
         return parent.children.splice(parentIdx, 1);
@@ -100,10 +102,10 @@ export default {
     },
     pushCategoryItem(state, { treeId, item }) {
       if (treeId === 'categories') {
-        state.treeCategories.push(item);
+        state.treeCategories.items.push(item);
         return true;
       }
-      const founded = findDeepById(state.treeCategories, treeId);
+      const founded = findDeepById(state.treeCategories.items, treeId);
       if (founded && founded.children) {
         founded.children.push(item);
         return true;
@@ -113,11 +115,11 @@ export default {
     setCategoryItem(state, { treeId, props }) {
       if (treeId === 'categories') {
         Object.keys(props).forEach((prop) => {
-          state.treeCategories[prop] = props[prop];
+          state.treeCategories.items[prop] = props[prop];
         });
         return true;
       }
-      const founded = findDeepById(state.treeCategories, treeId);
+      const founded = findDeepById(state.treeCategories.items, treeId);
       if (founded) {
         Object.keys(props).forEach((prop) => {
           founded[prop] = props[prop];
@@ -142,13 +144,13 @@ export default {
       commit('resetState');
     },
     getTreeCategoryItem({ state }, { id, idParam }) {
-      return findDeepById(state.treeCategories, id, idParam);
+      return findDeepById(state.treeCategories.items, id, idParam);
     },
     getTreeGroupItem({ state }, { id, idParam }) {
       return findDeepById(state.treeGroups, id, idParam);
     },
     loadSettings: ({ commit, state }, lazy = false) => {
-      if (lazy && !!state.treeCategories.length) {
+      if (lazy && !!state.treeCategories.items?.length) {
         return Promise.resolve();
       }
       return rest.getSettings()
@@ -163,9 +165,9 @@ export default {
       return rest.getGroups(restAuth)
         .then((groups) => commit('setGroups', groups));
     },
-    saveTreeCategories: (_, categories) => rest.saveSettings([
+    saveTreeCategories: ({ state }, categories) => rest.saveSettings([
       {
-        id: 1,
+        id: state.treeCategories.id,
         name: 'treeCategories',
         body: categories,
       },
@@ -194,7 +196,7 @@ export default {
         }));
     },
     loadCategoryGroup({ state, commit, dispatch }, treeId) {
-      const item = findDeepById(state.treeCategories, treeId);
+      const item = findDeepById(state.treeCategories.items, treeId);
       return dispatch('getDashes', item.id)
         .then((data) => commit('setCategoryItem', {
           treeId,
@@ -205,15 +207,16 @@ export default {
               type: 'dash',
             })),
           },
-        }));
+        }))
+        .catch(() => Promise.resolve());
     },
   },
   getters: {
-    treeCategories: (state) => state.treeCategories,
+    treeCategories: (state) => state.treeCategories.items,
     treeOpenItems: (state) => state.treeOpenItems,
     treeGroups: (state) => state.treeGroups,
     isOpenTree: (state) => !!state.treeOpen,
-    hasCategories: (state) => !!state.treeCategories,
+    hasCategories: (state) => !!state.treeCategories?.items,
     hasGroups: (state) => !!state.treeGroups,
     roles: (state) => state.roles,
     roleList: (state) => state.roles.map((item) => item.name),

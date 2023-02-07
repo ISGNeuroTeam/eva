@@ -1,3 +1,19 @@
+# [1.120.0] - 2023-02-01
+
+### Added
+- Constructor-schemes: Entering values for the left column of the table-node manually.
+- Constructor-schemes: added timeout for schema saving
+
+### Changed
+- Do not highlight dashboard when edit mode is disabled
+- Constructor-schemes: change font family to "ProximaNova", sans-serif
+
+### Fixed
+- In some cases not working custom categories
+- Single value: coloring text value
+- Fixed transitions from the map
+- Constructor-schemes: "transparent background" setting didn't work
+
 # [1.119.0] - 2023-01-25
 
 ### Added
