@@ -31,6 +31,9 @@
           v-for="(item, i) in zones"
           :key="i"
           class="zone-item mt-2"
+          :class="{
+            'has-error': checkZoneError(item)
+          }"
         >
           <v-row>
             <v-col cols="3">
@@ -205,7 +208,7 @@ export default {
   methods: {
     save() {
       this.zones = this.zones
-        .filter(({ min, max }) => (min !== '' && max !== '' && `${min}` !== `${max}`))
+        .filter((item) => !this.checkZoneError(item))
         .map(({ color, min, max }) => ({ color: `${color}`, min: +min, max: +max }))
         // eslint-disable-next-line no-nested-ternary
         .sort((a, b) => ((a.max > b.max) ? 1 : (a.max < b.max) ? -1 : 0));
@@ -257,6 +260,13 @@ export default {
         this.zones[i + 1].min = val;
       }
     },
+
+    checkZoneError({ min, max }) {
+      if (min === '' || max === '') {
+        return true;
+      }
+      return +min >= +max;
+    },
   },
 };
 </script>
@@ -270,6 +280,15 @@ export default {
   border: 1px solid $main_border
   border-radius: 3px
   margin: 4px 0
+  padding-bottom: 2px
+  &.has-error::v-deep
+    border-color: #bd0000
+    background-color: #f002
+    .v-text-field__slot input
+      color: red
+    .picker
+      .v-color-picker__controls
+        background-color: #f002
 .picker::v-deep
   .v-color-picker__controls
     padding: 12px
