@@ -2,8 +2,7 @@ import * as d3 from 'd3';
 
 export default class WaterfallClass {
   options = {
-    colorText: '#ffffff',
-    colorLabel: null,
+    colorText: null,
     colorBarPositive: '#00dd00',
     colorBarNegative: '#dd0000',
     colorBarTotal: '#999999',
@@ -126,7 +125,7 @@ export default class WaterfallClass {
       .attr('dy', (d) => `${(d.isTotal ? (d.total < 0) : d.value < 0) ? '-' : ''}.75em`)
       .attr('font-size', '13')
       .attr('text-anchor', 'middle')
-      .attr('fill', options.colorLabel)
+      .attr('fill', options.colorText)
       .text((d) => (d.isTotal ? d.total : d.value).toLocaleString('ru'));
 
     barGroup.append('line').filter((d, idx) => idx !== this.data.length - 1)
@@ -169,22 +168,26 @@ export default class WaterfallClass {
       .attr('class', 'xAxis')
       .call(d3.axisBottom(this.x));
 
+    // replace titles
+    this.xAxis
+      .selectAll('text')
+      .text((title) => {
+        if (this.options.titleReplace.length) {
+          const replace = this.options.titleReplace.find(({ old }) => (old === title));
+          if (replace) {
+            return replace.to;
+          }
+        }
+        return title;
+      });
+
     if (this.options.xLabelRotate) {
       this.xAxis
         .selectAll('text')
         .style('text-anchor', 'end')
         .attr('dx', '-.8em')
         .attr('dy', '.15em')
-        .attr('transform', 'rotate(-20)')
-        .text((title) => {
-          if (this.options.titleReplace.length) {
-            const replace = this.options.titleReplace.find(({ old }) => (old === title));
-            if (replace) {
-              return replace.to;
-            }
-          }
-          return title;
-        });
+        .attr('transform', 'rotate(-20)');
     }
   }
 
@@ -215,11 +218,11 @@ export default class WaterfallClass {
       .enter().filter((d) => d < 0)
       .append('line')
       .attr('class', 'zero')
-      .attr('stroke-width', 0.2)
+      .attr('stroke-width', 0.3)
       .attr('x1', 0)
       .attr('y1', this.y(0))
       .attr('x2', xWidth)
       .attr('y2', this.y(0))
-      .attr('stroke', this.options.colorText);
+      .attr('stroke', 'currentColor');
   }
 }
