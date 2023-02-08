@@ -19,7 +19,7 @@
         <v-row>
           <v-col cols="6 pr-0">
             <h3 class="mt-4">
-              Цвет положительного столбика
+              Цвет положительного столбца
             </h3>
           </v-col>
           <v-col cols="6 pb-0">
@@ -48,7 +48,7 @@
         <v-row>
           <v-col cols="6 pr-0">
             <h3 class="mt-4">
-              Цвет отрицательного столбика
+              Цвет отрицательного столбца
             </h3>
           </v-col>
           <v-col cols="6 pb-0">
@@ -77,7 +77,7 @@
         <v-row>
           <v-col cols="6 pr-0">
             <h3 class="mt-4">
-              Цвет суммарного столбика
+              Цвет суммарного столбца
             </h3>
           </v-col>
           <v-col cols="6 pb-0">
@@ -136,7 +136,7 @@
         <v-row v-if="options.colorText">
           <v-col cols="6 pr-0">
             <h3 class="mt-4">
-              Цвет значений столбика
+              Цвет значения столбцов
             </h3>
           </v-col>
           <v-col cols="6">
@@ -164,7 +164,7 @@
         </v-row>
 
         <h2 class="mb-4 mt-6">
-          Настройки столбиков
+          Настройки столбцов
         </h2>
         <div
           v-for="(item, i) of barsOptions"
@@ -200,7 +200,7 @@
               />
               <v-checkbox
                 v-model="item.changeColor"
-                label="Заменить цвет столбика"
+                label="Заменить цвет столбца"
                 persistent-placeholder
                 dense
                 outlined
