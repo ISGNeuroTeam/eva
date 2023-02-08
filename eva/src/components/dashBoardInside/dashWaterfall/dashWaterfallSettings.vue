@@ -16,11 +16,10 @@
         <span class="main-title">Настройка визуализации</span>
       </v-card-title>
       <v-card-text class="content groups-multiline-settings">
-
         <v-row>
           <v-col cols="6 pr-0">
             <h3 class="mt-4">
-              Цвет положительного бара
+              Цвет положительного столбика
             </h3>
           </v-col>
           <v-col cols="6 pb-0">
@@ -49,7 +48,7 @@
         <v-row>
           <v-col cols="6 pr-0">
             <h3 class="mt-4">
-              Цвет отрицательного бара
+              Цвет отрицательного столбика
             </h3>
           </v-col>
           <v-col cols="6 pb-0">
@@ -78,7 +77,7 @@
         <v-row>
           <v-col cols="6 pr-0">
             <h3 class="mt-4">
-              Цвет суммарного бара
+              Цвет суммарного столбика
             </h3>
           </v-col>
           <v-col cols="6 pb-0">
@@ -114,8 +113,8 @@
           <v-col class="pb-0">
             <v-switch
               v-model="options.xLabelRotate"
-              @change="isChanged = true"
               hide-details
+              @change="isChanged = true"
             />
           </v-col>
         </v-row>
@@ -123,21 +122,21 @@
         <v-row>
           <v-col>
             <h3 class="mt-4">
-              Указать цвет значений
+              Заменить цвет значений
             </h3>
           </v-col>
           <v-col>
             <v-switch
               v-model="coloredTotal"
-              @change="isChanged = true"
               hide-details
+              @change="isChanged = true"
             />
           </v-col>
         </v-row>
         <v-row v-if="options.colorText">
           <v-col cols="6 pr-0">
             <h3 class="mt-4">
-              Цвет значений бара
+              Цвет значений столбика
             </h3>
           </v-col>
           <v-col cols="6">
@@ -165,11 +164,11 @@
         </v-row>
 
         <h2 class="mb-4 mt-6">
-          Замена заголовков
+          Настройки столбиков
         </h2>
         <div
-          v-for="(item, i) of titleReplace"
-          :key="item.old"
+          v-for="(item, i) of barsOptions"
+          :key="item.title"
           class="title-replace-item mb-2 pa-2"
           :class="{
             'has-error': checkTitleReplaceError(item),
@@ -178,27 +177,48 @@
           <v-row>
             <v-col>
               <v-autocomplete
-                v-model="item.old"
-                :items="titles.filter(title => item.old === title
-                  || !titleReplace.map(d => d.old).includes(title))"
+                v-model="item.title"
+                :items="titles.filter(title => item.title === title
+                  || !barsOptions.map(d => d.title).includes(title))"
                 class="field-profile"
-                label="Заменить с"
+                label="Столбец"
                 :style="{ color: theme.$main_text }"
                 outlined
                 hide-details
                 dense
               />
-            </v-col>
-            <v-col class="pl-0">
               <v-text-field
-                v-model="item.to"
+                v-model="item.newTitle"
                 :color="theme.$accent_ui_color"
                 :style="{ color: theme.$main_text }"
-                class="textarea-item"
+                class="textarea-item mt-3"
                 outlined
-                label="Заменить на"
+                label="Подпись столбца"
                 hide-details
                 dense
+                @update:color="isChanged = true"
+              />
+              <v-checkbox
+                v-model="item.changeColor"
+                label="Заменить цвет столбика"
+                persistent-placeholder
+                dense
+                outlined
+                hide-details
+                color="blue"
+                @update:color="isChanged = true"
+              />
+            </v-col>
+            <v-col class="pl-0">
+              <v-color-picker
+                v-model="item.color"
+                :disabled="!item.changeColor"
+                hide-inputs
+                width="230"
+                canvas-height="70"
+                flat
+                class="picker"
+                @update:color="isChanged = true"
               />
             </v-col>
             <v-col class="flex-grow-0 pl-0">
@@ -219,13 +239,13 @@
             small
             plain
             :color="theme.$primary_button"
-            :disabled="titleReplace.length > 20"
+            :disabled="barsOptions.length > 30"
             @click="addTitleReplace()"
           >
             <v-icon left>
               {{ icons.mdiPlus }}
             </v-icon>
-            Добавить зону
+            Добавить
           </v-btn>
         </div>
       </v-card-text>
@@ -297,7 +317,7 @@ export default {
       xLabelRotate: true,
     },
     titles: [],
-    titleReplace: [],
+    barsOptions: [],
     isChanged: false,
   }),
   computed: {
@@ -342,7 +362,7 @@ export default {
   methods: {
     save() {
       const chartOptions = { ...this.options };
-      chartOptions.titleReplace = this.titleReplace
+      chartOptions.barsOptions = this.barsOptions
         .filter((item) => !this.checkTitleReplaceError(item));
       this.$emit('save', chartOptions);
       this.close(true);
@@ -350,7 +370,7 @@ export default {
 
     initOptions() {
       Object.keys(this.receivedSettings).forEach((param) => {
-        if (['titles', 'titleReplace'].includes(param)) {
+        if (['titles', 'barsOptions'].includes(param)) {
           this.$set(this, param, structuredClone(this.receivedSettings[param]));
         } else {
           this.options[param] = this.receivedSettings[param];
@@ -363,19 +383,21 @@ export default {
     },
 
     addTitleReplace() {
-      this.titleReplace.push({
-        old: '',
-        to: '',
+      this.barsOptions.push({
+        title: '',
+        newTitle: '',
+        changeColor: false,
+        color: '#FF0000',
       });
     },
 
     removeTitleReplaceItem(idx) {
       this.isChanged = true;
-      this.titleReplace.splice(idx, 1);
+      this.barsOptions.splice(idx, 1);
     },
 
-    checkTitleReplaceError({ old, to }) {
-      return old === '' || to === '';
+    checkTitleReplaceError({ title, newTitle, changeColor }) {
+      return (title === null || title === '') || (newTitle === '' && !changeColor);
     },
   },
 };
@@ -393,10 +415,13 @@ export default {
 .picker::v-deep
   .v-color-picker__controls
     padding: 12px
-.title-replace-item
+.title-replace-item::v-deep
   border: 1px solid $main_border
   border-radius: 3px
   &.has-error
     border-color: #bd0000
     background-color: #f002
+    .picker
+      .v-color-picker__controls
+        background-color: #f002
 </style>

@@ -7,7 +7,7 @@ export default class WaterfallClass {
     colorBarNegative: '#dd0000',
     colorBarTotal: '#999999',
     xLabelRotate: true,
-    titleReplace: [],
+    barsOptions: [],
   }
 
   width = null
@@ -110,14 +110,30 @@ export default class WaterfallClass {
       .attr('y', (d) => this.y(d.value < 0 ? d.total - d.value : d.total))
       .attr('height', (d) => this.y(0) - this.y(Math.abs(d.value)))
       .attr('width', this.x.bandwidth())
-      .attr('fill', (d) => (d.value < 0 ? options.colorBarNegative : options.colorBarPositive));
+      .attr('fill', ({ title: barTitle, value }) => {
+        if (this.options.barsOptions.length) {
+          const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
+          if (opts?.changeColor) {
+            return opts.color;
+          }
+        }
+        return value < 0 ? options.colorBarNegative : options.colorBarPositive;
+      });
 
     // add total bars
     barGroup.filter((d) => d.isTotal).append('rect')
       .attr('y', (d) => (d.total < 0 ? this.y(0) : this.y(d.total)))
       .attr('height', (d) => this.y(0) - this.y(Math.abs(d.total)))
       .attr('width', this.x.bandwidth())
-      .attr('fill', options.colorBarTotal);
+      .attr('fill', ({ title: barTitle }) => {
+        if (this.options.barsOptions.length) {
+          const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
+          if (opts?.changeColor) {
+            return opts.color;
+          }
+        }
+        return options.colorBarTotal;
+      });
 
     barGroup.append('text')
       .attr('x', this.x.bandwidth() / 2)
@@ -171,14 +187,14 @@ export default class WaterfallClass {
     // replace titles
     this.xAxis
       .selectAll('text')
-      .text((title) => {
-        if (this.options.titleReplace.length) {
-          const replace = this.options.titleReplace.find(({ old }) => (old === title));
-          if (replace) {
-            return replace.to;
+      .text((barTitle) => {
+        if (this.options.barsOptions.length) {
+          const replace = this.options.barsOptions.find(({ title }) => (title === barTitle));
+          if (replace && replace.newTitle) {
+            return replace.newTitle;
           }
         }
-        return title;
+        return barTitle;
       });
 
     if (this.options.xLabelRotate) {

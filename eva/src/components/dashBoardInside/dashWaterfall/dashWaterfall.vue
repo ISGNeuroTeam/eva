@@ -190,7 +190,7 @@ export default {
 .waterfall {
   color: var(--main_text);
   .options-icon {
-    position: absolute;
+    position: absolute !important;
     top: 50px;
     right: 18px;
   }
