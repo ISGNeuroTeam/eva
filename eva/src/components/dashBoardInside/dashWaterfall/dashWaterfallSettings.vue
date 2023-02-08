@@ -228,8 +228,6 @@
             Добавить зону
           </v-btn>
         </div>
-
-        <pre>isChanged: {{ isChanged }}</pre>
       </v-card-text>
 
       <v-card-actions class="footer pr-3 d-flex justify-end px-6">
@@ -336,9 +334,6 @@ export default {
     },
     receivedSettings() {
       this.initOptions();
-    },
-    isChanged(val) {
-      console.log('isChanged', val)
     },
   },
   mounted() {
