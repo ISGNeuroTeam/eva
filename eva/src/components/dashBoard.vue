@@ -156,7 +156,6 @@
             >
               <template v-slot:activator="{ on }">
                 <v-icon
-                  v-show="searchingData"
                   class="icon"
                   :color="theme.$main_border"
                   v-on="on"
@@ -1415,10 +1414,12 @@ export default {
 @import '../sass/dashBoard.sass'
 </style>
 <style lang="sass" scoped>
-.source-descr
+.source-descr::v-deep
   margin: 16px
   color: var(--main_text)
   text-align: left
+  table
+    width: 100%
 </style>
 <style lang="sass">
 .settings-dash
