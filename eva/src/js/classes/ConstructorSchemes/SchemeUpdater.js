@@ -3,11 +3,9 @@ import {
   IEdge,
   IPort,
   ILabel,
-  ILabelModelParameter,
 } from 'yfiles';
 import Utils from './Utils.js';
 import ElementCreator from './ElementCreator.js';
-import { throttle } from '@/js/utils/throttle';
 
 class SchemeUpdater {
   constructor({ graph, elementsFromStore, updateStoreCallback }) {
@@ -54,7 +52,6 @@ class SchemeUpdater {
             });
           }
         });
-        // this.updateStoreCallback(structuredClone(result));
         resolve(structuredClone(result));
       } catch (e) {
         reject(e);
@@ -80,6 +77,25 @@ class SchemeUpdater {
 
   static getNode(element) {
     if (element.tag.dataType === 'image-node') {
+      if (element.tag?.fromOtl) {
+        const filteredObjectFromOtl = {};
+        Object.keys(element.tag.fromOtl).forEach((key) => {
+          if (key !== 'icon') {
+            filteredObjectFromOtl[key] = element.tag.fromOtl[key];
+          }
+        });
+        return {
+          tag: {
+            ...element.tag,
+            fromOtl: {
+              ...filteredObjectFromOtl,
+            },
+            nodeId: element.hashCode(),
+          },
+          icon: element.style.image.match(/\/svg\/([\s\S]+?)\.svg/)[1],
+          layout: SchemeUpdater.getLayout(element.layout),
+        };
+      }
       return {
         tag: {
           ...element.tag,
@@ -98,9 +114,13 @@ class SchemeUpdater {
         layout: SchemeUpdater.getLayout(element.layout),
       };
     }
+    const filteredElementTagRest = Utils.deleteFieldsFromObject(
+      element.tag,
+      ['getTransform', 'getDy', 'getPosition', 'getHeight'],
+    );
     return {
       tag: {
-        ...element.tag,
+        ...filteredElementTagRest,
         nodeId: element.hashCode(),
       },
       layout: SchemeUpdater.getLayout(element.layout),
