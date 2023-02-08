@@ -32,7 +32,7 @@
               canvas-height="50"
               flat
               class="picker float-left mt-1"
-              @change="isChanged = true"
+              @update:color="isChanged = true"
             />
             <v-color-picker
               v-model="options.colorBarPositive"
@@ -42,7 +42,7 @@
               canvas-height="50"
               flat
               class="picker"
-              @change="isChanged = true"
+              @update:color="isChanged = true"
             />
           </v-col>
         </v-row>
@@ -61,7 +61,7 @@
               canvas-height="50"
               flat
               class="picker float-left mt-1"
-              @change="isChanged = true"
+              @update:color="isChanged = true"
             />
             <v-color-picker
               v-model="options.colorBarNegative"
@@ -71,7 +71,7 @@
               canvas-height="50"
               flat
               class="picker"
-              @change="isChanged = true"
+              @update:color="isChanged = true"
             />
           </v-col>
         </v-row>
@@ -90,7 +90,7 @@
               canvas-height="50"
               flat
               class="picker float-left mt-1"
-              @change="isChanged = true"
+              @update:color="isChanged = true"
             />
             <v-color-picker
               v-model="options.colorBarTotal"
@@ -100,7 +100,7 @@
               canvas-height="50"
               flat
               class="picker"
-              @change="isChanged = true"
+              @update:color="isChanged = true"
             />
           </v-col>
         </v-row>
@@ -149,7 +149,7 @@
               canvas-height="50"
               flat
               class="picker float-left mt-1"
-              @change="isChanged = true"
+              @update:color="isChanged = true"
             />
             <v-color-picker
               v-model="options.colorText"
@@ -159,7 +159,7 @@
               canvas-height="50"
               flat
               class="picker"
-              @change="isChanged = true"
+              @update:color="isChanged = true"
             />
           </v-col>
         </v-row>
@@ -228,6 +228,8 @@
             Добавить зону
           </v-btn>
         </div>
+
+        <pre>isChanged: {{ isChanged }}</pre>
       </v-card-text>
 
       <v-card-actions class="footer pr-3 d-flex justify-end px-6">
@@ -321,7 +323,6 @@ export default {
         return this.modalValue;
       },
       set(val) {
-        this.panelMetric = [];
         this.$emit('updateModalValue', val);
       },
     },
@@ -329,11 +330,15 @@ export default {
   watch: {
     isOpen(val) {
       if (val) {
+        this.isChanged = false;
         this.initOptions();
       }
     },
     receivedSettings() {
       this.initOptions();
+    },
+    isChanged(val) {
+      console.log('isChanged', val)
     },
   },
   mounted() {
