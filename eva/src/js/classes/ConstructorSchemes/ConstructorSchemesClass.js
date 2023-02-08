@@ -50,6 +50,8 @@ import {
   FreeNodePortLocationModel,
   GraphViewerInputMode,
   PortRelocationHandleProvider,
+  PortSide,
+  PortConstraint,
   Visualization, EdgeRouterData, EdgeRouter, EdgeRouterScope, BridgeManager, GraphObstacleProvider,
 } from 'yfiles';
 import Utils from './Utils.js';
@@ -65,6 +67,7 @@ import GenerateIcons from './GenerateIcons.js';
 import SchemeUpdater from './SchemeUpdater.js';
 import elementTemplates from './elementTemplates.js';
 import ElementCreator from '@/js/classes/ConstructorSchemes/ElementCreator';
+import GenerateElementsFromSearch from '@/js/classes/ConstructorSchemes/GenerateElementsFromSearch';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -176,23 +179,23 @@ class ConstructorSchemesClass {
 
   shapeNodeStyleList = [
     {
-      label: 'Rectangle(rounded)',
+      label: 'Квадрат(скругленный)',
       id: 0,
     },
     {
-      label: 'Rectangle',
+      label: 'Квадрат',
       id: 1,
     },
     {
-      label: 'Ellipse',
+      label: 'Круг',
       id: 2,
     },
     {
-      label: 'Triangle(left)',
+      label: 'Треугольник(влево)',
       id: 3,
     },
     {
-      label: 'Triangle(right)',
+      label: 'Треугольник(вправо)',
       id: 4,
     },
   ]
@@ -283,7 +286,7 @@ class ConstructorSchemesClass {
 
   set defaultEdgeStyle({
     strokeColor = '#FFFFFF',
-    strokeSize = '1.5px',
+    strokeSize = '1px',
     targetArrowColor = '#F4F4F4',
     targetArrowType = 'none',
     smoothingLength = 0,
@@ -337,7 +340,6 @@ class ConstructorSchemesClass {
     toggleLoadingCallback,
     isEdit,
     onClickObject,
-    isEdgeRouterEnable,
     isBridgesEnable,
   }) {
     this.dragAndDropPanel = null;
@@ -363,7 +365,7 @@ class ConstructorSchemesClass {
     this.additionalEdgeToEdgeSettings();
     this.setDefaultLabelParameters();
     // Configures default styles for newly created graph elements
-    this.applyStylesElements(elementDefaultStyles);
+    // this.applyStylesElements(elementDefaultStyles);
     this.enableUndo();
     if (this.isEdit) {
       this.configureInputModes(
@@ -399,9 +401,6 @@ class ConstructorSchemesClass {
     // Привязка z-order у label к родителю
     this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
     this.onClickObject = onClickObject;
-    if (isEdgeRouterEnable) {
-      // this.enableEdgeRouter();
-    }
     if (isBridgesEnable) {
       this.enableBridges();
     }
@@ -430,8 +429,25 @@ class ConstructorSchemesClass {
       strokeColor: Utils.generateColor(data.dataRest.strokeColor),
       thickness: data.dataRest.strokeSize,
       shape: data.dataRest.shape,
+      nodeId: 'dnd-simple-node',
     };
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
+  }
+
+  createDndPanelDefaultEdge(tooltip, elementType) {
+    const edge = new SimpleEdge({
+      style: new PolylineEdgeStyle({
+        smoothingLength: this.defaultEdgeStyle.smoothingLength,
+        targetArrow: 'none',
+        sourceArrow: 'none',
+        stroke: `${this.defaultEdgeStyle.strokeSize} solid ${this.defaultEdgeStyle.strokeColor}`,
+      }),
+    });
+    edge.tag = {
+      ...edge.tag,
+      edgeId: 'dnd-simple-edge',
+    };
+    return new DragAndDropPanelItem(edge, tooltip, elementType);
   }
 
   initSchemeUpdater() {
@@ -470,7 +486,6 @@ class ConstructorSchemesClass {
   updateDataNodeTemplate() {
     this.graphComponent.graph.nodes.forEach((node) => {
       if (node.tag.dataType || node?.tag[0] === 'i' || node?.tag === 'invisible') {
-        node.tag = ConstructorSchemesClass.upgradeNodeTag(node);
         if (node.tag.dataType !== 'image-node' && node?.tag?.dataType !== 'invisible') {
           this.graphComponent.graph.setStyle(
             node,
@@ -479,65 +494,6 @@ class ConstructorSchemesClass {
         }
       }
     });
-  }
-
-  // TODO: Временный метод, для обновления
-  static upgradeNodeTag(node) {
-    if (node?.tag?.dataType === '0' || node?.tag?.dataType === '1') {
-      return {
-        ...node.tag,
-        dataType: 'data-type-0',
-      };
-    }
-    if (node?.tag?.dataType === '2' || node?.tag?.dataType === '3') {
-      return {
-        ...node.tag,
-        dataType: 'data-type-1',
-      };
-    }
-    if (node?.tag?.dataType === '4') {
-      return {
-        ...node.tag,
-        dataType: 'data-type-2',
-      };
-    }
-    if (node?.tag?.dataType === '5') {
-      return {
-        ...node.tag,
-        dataType: 'data-type-3',
-      };
-    }
-    if (node?.tag?.dataType === '5') {
-      return {
-        ...node.tag,
-        dataType: 'data-type-3',
-      };
-    }
-    if (node?.tag?.dataType === 'label-0' || node?.tag?.dataType === 'label-type-0') {
-      return {
-        ...node.tag,
-        borderColor: typeof node.tag.borderColor === 'string'
-          ? Utils.generateColor(Color.from(node.tag.borderColor))
-          : node.tag.borderColor,
-        bgColor: typeof node.tag.bgColor === 'string'
-          ? Utils.generateColor(Color.from(node.tag.bgColor))
-          : node.tag.bgColor,
-        dataType: 'label-type-0',
-      };
-    }
-    if (node?.tag?.dataType === 'default-node') {
-      return {
-        ...node.tag,
-        dataType: 'shape-type-0',
-      };
-    }
-    if (node?.tag[0] === 'i' || node?.tag === 'invisible') {
-      return {
-        dataType: 'invisible',
-        nodeId: node.hashCode(),
-      };
-    }
-    return node.tag;
   }
 
   // Load from LocalStorage to Store
@@ -652,15 +608,33 @@ class ConstructorSchemesClass {
         targetArrowColor: styles.edgeStrokeColor.rgbaString,
         targetArrowType: 'none',
       };
-      this.defaultLabelStyle = {
-        font: styles.labelFont,
-        textFill: styles.labelTextFill.rgbaString,
-      };
+      if (this.dragAndDropPanel) {
+        this.dragAndDropPanel.updateElement(
+          this.createDndPanelDefaultEdge('Стандартные элементы', 'default-element'),
+          'default-edge',
+        );
+        const shapeNode = this.elementTemplates['shape-type-0'];
+        this.dragAndDropPanel.updateElement(
+          this.createDnDPanelDefaultNode(
+            {
+              ...shapeNode,
+              dataRest: {
+                ...shapeNode.dataRest,
+                shape: this.defaultNodeStyle.shape,
+                fill: this.defaultNodeStyle.fill,
+                strokeColor: this.defaultNodeStyle.strokeColor,
+                strokeSize: this.defaultNodeStyle.strokeSize,
+              },
+            },
+          ),
+          'default-node',
+        );
+      }
     }
     this.setDefaultStyles();
-    if (this.dndPanelElem) {
-      this.initializeDnDPanel();
-    }
+    // if (this.dndPanelElem) {
+    //   this.initializeDnDPanel();
+    // }
   }
 
   toggleInputMode() {
@@ -797,9 +771,13 @@ class ConstructorSchemesClass {
       ) {
         // Достаем элемент в отдельную переменную для дальнейшей работы с ним
         this.targetDataNode = evt.item;
+        const filteredElementTag = Utils.deleteFieldsFromObject(
+          evt.item.tag,
+          ['getTransform', 'getDy', 'getPosition', 'getHeight'],
+        );
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
-          openDataPanelCallback(evt.item.tag);
+          openDataPanelCallback(filteredElementTag);
         } else if (evt.item instanceof IEdge) {
           openDataPanelCallback({
             ...ConstructorSchemesClass.getEdgeOptions(evt.item),
@@ -814,7 +792,7 @@ class ConstructorSchemesClass {
           });
         } else {
           openDataPanelCallback({
-            ...evt.item.tag,
+            ...filteredElementTag,
           });
         }
       } else {
@@ -932,7 +910,7 @@ class ConstructorSchemesClass {
         icon: dropData?.style?.image,
         tag: {
           ...dropData.tag,
-          nodeId: dropData.hashCode(),
+          nodeId: dropData?.id || dropData?.hashCode(),
         },
       }).then((createdElement) => {
         resolve(createdElement);
@@ -1264,22 +1242,6 @@ class ConstructorSchemesClass {
 
   setDefaultStyles() {
     const { graph } = this.graphComponent;
-
-    // Creates a nice ShapeNodeStyle instance, using an orange Fill.
-    // Sets this style as the default for all nodes that don't have another
-    // style assigned explicitly
-    graph.nodeDefaults.ports.autoCleanUp = false;
-    graph.nodeDefaults.style = new ShapeNodeStyle({
-      shape: 'round-rectangle',
-      fill: this.defaultNodeStyle.fill,
-      stroke: `${this.defaultNodeStyle.strokeSize} ${this.defaultNodeStyle.strokeColor}`,
-    });
-    // Sets the default size for nodes explicitly to 40x40
-    graph.nodeDefaults.size = new Size(
-      this.defaultNodeSize[0],
-      this.defaultNodeSize[1],
-    );
-
     // Creates a PolylineEdgeStyle which will be used as default for all edges
     // that don't have another style assigned explicitly
     graph.edgeDefaults.style = new PolylineEdgeStyle({
@@ -1371,9 +1333,6 @@ class ConstructorSchemesClass {
     this.dragAndDropPanel.maxItemWidth = 160;
     this.createDnDPanelItems({
       iconsList: updatedPrimitives || this.iconsList,
-      defaultEdgeStyle: this.defaultEdgeStyle,
-      defaultNodeStyle: this.defaultNodeStyle,
-      defaultLabelStyle: this.defaultLabelStyle,
     }).then((response) => {
       this.dragAndDropPanel.populatePanel(response);
       this.toggleLoadingCallback(false);
@@ -1387,30 +1346,22 @@ class ConstructorSchemesClass {
 
   async createDnDPanelItems({
     iconsList,
-    defaultEdgeStyle,
-    defaultLabelStyle,
   }) {
     this.loadingDnDPanelItems = true;
     return new Promise((resolve) => {
       const items = [];
       // Ребра
-      const edge1 = new SimpleEdge({
-        style: new PolylineEdgeStyle({
-          smoothingLength: defaultEdgeStyle.smoothingLength,
-          targetArrow: 'none',
-          sourceArrow: 'none',
-          stroke: `${defaultEdgeStyle.strokeSize} solid ${defaultEdgeStyle.strokeColor}`,
-        }),
+      items.push({
+        panelItem: this.createDndPanelDefaultEdge('Стандартные элементы', 'default-element'),
+        id: 'default-edge',
       });
-      edge1.tag = {
-        ...edge1.tag,
-        edgeId: edge1.hashCode(),
-      };
-      items.push(new DragAndDropPanelItem(edge1, 'Стандартные элементы', 'default-element'));
       if (this.elementTemplates) {
         Object.entries(this.elementTemplates).forEach(([key, value]) => {
           if (key.includes('shape-type')) {
-            items.push(this.createDnDPanelDefaultNode(value));
+            items.push({
+              panelItem: this.createDnDPanelDefaultNode(value),
+              id: 'default-node',
+            });
           }
           if (key.includes('data-type')) {
             items.push(
@@ -1434,28 +1385,28 @@ class ConstructorSchemesClass {
       }
 
       // Подписи к узлам\ребрам
-      const labelNode = new SimpleNode();
-      labelNode.layout = new Rect(0, 0, this.defaultNodeSize[0], 16);
-      labelNode.style = new VoidNodeStyle();
+      // const labelNode = new SimpleNode();
+      // labelNode.layout = new Rect(0, 0, this.defaultNodeSize[0], 16);
+      // labelNode.style = new VoidNodeStyle();
+      //
+      // const labelStyle = new DefaultLabelStyle({
+      //   backgroundStroke: 'transparent',
+      //   backgroundFill: 'transparent',
+      //   insets: [3, 5, 3, 5],
+      //   textFill: defaultLabelStyle.textFill,
+      //   font: defaultLabelStyle.font,
+      // });
 
-      const labelStyle = new DefaultLabelStyle({
-        backgroundStroke: 'transparent',
-        backgroundFill: 'transparent',
-        insets: [3, 5, 3, 5],
-        textFill: defaultLabelStyle.textFill,
-        font: defaultLabelStyle.font,
-      });
-
-      const label = new SimpleLabel(
-        labelNode,
-        'label',
-        FreeNodeLabelModel.INSTANCE.createDefaultParameter(),
-      );
-      label.style = labelStyle;
-      label.preferredSize = labelStyle.renderer.getPreferredSize(label, labelStyle);
-      labelNode.tag = label;
-      labelNode.labels = new ListEnumerable([label]);
-      items.push(new DragAndDropPanelItem(labelNode, 'Подписи к блокам', 'label-node'));
+      // const label = new SimpleLabel(
+      //   labelNode,
+      //   'label',
+      //   FreeNodeLabelModel.INSTANCE.createDefaultParameter(),
+      // );
+      // label.style = labelStyle;
+      // label.preferredSize = labelStyle.renderer.getPreferredSize(label, labelStyle);
+      // labelNode.tag = label;
+      // labelNode.labels = new ListEnumerable([label]);
+      // items.push(new DragAndDropPanelItem(labelNode, 'Подписи к блокам', 'label-node'));
 
       const portNode = new SimpleNode();
       portNode.layout = new Rect(0, 0, 5, 5);
@@ -1504,14 +1455,18 @@ class ConstructorSchemesClass {
     new Promise((resolve) => {
       this.graphComponent.graph.nodes.forEach((node) => {
         const { dataType } = node.tag;
-        if (dataType === 'data-type-0') {
+        if (dataType === 'data-type-0' || dataType === 'data-type-2') {
           const updatedItems = node.tag.items.map((nodeDataItem) => {
             const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
             if (targetData) {
               nodeDataItem = {
                 ...nodeDataItem,
-                textRight: typeof targetData?.value === 'number'
-                || typeof targetData?.value === 'string'
+                [
+                dataType === 'data-type-0'
+                  ? 'textRight'
+                  : 'value'
+                ]: typeof targetData?.value === 'number'
+                  || typeof targetData?.value === 'string'
                   ? targetData.value
                   : '-',
               };
@@ -1531,20 +1486,6 @@ class ConstructorSchemesClass {
               ? targetData.value
               : '-',
             valueColor: targetData?.value_color || null,
-          };
-        } else if (dataType === 'data-type-2') {
-          const targetData = updatedData.find((item) => item.TagName === node.tag.id);
-          node.tag = {
-            ...node.tag,
-            currentValue: targetData?.value ? +targetData.value : 0,
-          };
-        } else if (dataType === 'data-type-3') {
-          const targetDataFirst = updatedData.find((item) => item.TagName === node.tag.idFirst);
-          const targetDataSecond = updatedData.find((item) => item.TagName === node.tag.idSecond);
-          node.tag = {
-            ...node.tag,
-            firstValue: targetDataFirst?.value ? +targetDataFirst.value : 0,
-            secondValue: targetDataSecond?.value ? +targetDataSecond.value : 0,
           };
         }
       });
@@ -1580,15 +1521,13 @@ class ConstructorSchemesClass {
       };
     } else if (dataType === 'data-type-2') {
       updatedData = {
-        ...dataFromComponent,
-        currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value || 0),
-        maxValue: Number(dataFromComponent.maxValue || 0),
-      };
-    } else if (dataType === 'data-type-3') {
-      updatedData = {
-        ...dataFromComponent,
-        firstValue: Number(this.getDataItemById(dataFromComponent.idFirst)?.value),
-        secondValue: Number(this.getDataItemById(dataFromComponent.idSecond)?.value),
+        mainBgColor: dataFromComponent?.mainBgColor,
+        maxValue: dataFromComponent?.maxValue,
+        fontSize: dataFromComponent?.fontSize,
+        items: dataFromComponent.items.map((item) => ({
+          ...item,
+          value: this.getDataItemById(item.id)?.value || item?.value || '-',
+        })),
       };
     } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
       updatedData = dataFromComponent;
@@ -1904,11 +1843,13 @@ class ConstructorSchemesClass {
 
   enableEdgeRouter() {
     const layoutData = new EdgeRouterData();
+    layoutData.targetPortConstraints = PortConstraint.create(PortSide.SOUTH, true);
+    // layoutData.sourcePortConstraints = PortConstraint.create(PortSide.SOUTH);
     const edgeRouter = new EdgeRouter();
     // чтобы узлы не сливались
     // TODO:Пока установлено временное значение, в дальнейшем вынести в настройки визуализации
-    edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance = this.defaultEdgeStyle.strokeSize;
-
+    edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance = 15;
+    edgeRouter.defaultEdgeLayoutDescriptor.minimumLastSegmentLength = 25;
     edgeRouter.scope = EdgeRouterScope.ROUTE_ALL_EDGES;
 
     this.graphComponent.graph.applyLayout(edgeRouter, layoutData);
@@ -1922,12 +1863,48 @@ class ConstructorSchemesClass {
 
   // TODO: Пока не работает
   buildSchemeFromSearch(dataFrom) {
-    const elementCreator = new ElementCreator({
-      graph: this.graphComponent.graph,
+    const descriptionNodeStyles = {
+      tag: {
+        nodeId: 'label-node-default',
+        dataType: 'label-type-0',
+        textTemplateType: 'template-0',
+        text: 'Description',
+        bordered: true,
+        borderType: 'solid',
+        borderSize: 2,
+        borderDashed: false,
+        fontSize: 30,
+        borderColor: Utils.generateColor(Color.from('#FFFFFF')),
+        bgColor: Utils.generateColor(Color.from('rgba(60, 59, 69, 1)')),
+        textColor: Utils.generateColor(Color.from('#FFFFFF')),
+      },
+      layout: {
+        width: 120,
+        height: 30,
+        x: 0,
+        y: 0,
+      },
+    };
+    const generateElementFromSearch = new GenerateElementsFromSearch({
       elements: dataFrom,
+      defaultEdgeStyles: {
+        ...this.defaultEdgeStyle,
+        strokeSize: 3,
+      },
+      defaultDescriptionStyles: descriptionNodeStyles,
     });
-    elementCreator.buildSchemeFromSearch().then((response) => {
-      // console.log('buildSchemeFromSearch', response);
+    generateElementFromSearch.generate().then((response) => {
+      const elementCreator = new ElementCreator({
+        graph: this.graphComponent.graph,
+        elements: response,
+      });
+      elementCreator.buildGraph().then(() => {
+        this.enableEdgeRouter();
+        this.fitGraphContent();
+        this.setDefaultElementsOrder();
+      });
+    }).catch((e) => {
+      console.error(e);
     });
   }
 }
