@@ -81,7 +81,7 @@
               Цвет суммарного бара
             </h3>
           </v-col>
-          <v-col cols="6">
+          <v-col cols="6 pb-0">
             <v-color-picker
               v-model="options.colorBarTotal"
               hide-inputs
@@ -104,21 +104,67 @@
             />
           </v-col>
         </v-row>
+
         <v-row>
           <v-col>
             <h3 class="mt-4">
               Наклон подписей оси X
             </h3>
           </v-col>
-          <v-col>
+          <v-col class="pb-0">
             <v-switch
               v-model="options.xLabelRotate"
+              @change="isChanged = true"
+              hide-details
+            />
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col>
+            <h3 class="mt-4">
+              Указать цвет значений
+            </h3>
+          </v-col>
+          <v-col>
+            <v-switch
+              v-model="coloredTotal"
+              @change="isChanged = true"
+              hide-details
+            />
+          </v-col>
+        </v-row>
+        <v-row v-if="options.colorText">
+          <v-col cols="6 pr-0">
+            <h3 class="mt-4">
+              Цвет значений бара
+            </h3>
+          </v-col>
+          <v-col cols="6">
+            <v-color-picker
+              v-model="options.colorText"
+              hide-inputs
+              hide-sliders
+              width="50"
+              canvas-height="50"
+              flat
+              class="picker float-left mt-1"
+              @change="isChanged = true"
+            />
+            <v-color-picker
+              v-model="options.colorText"
+              hide-inputs
+              hide-canvas
+              width="250"
+              canvas-height="50"
+              flat
+              class="picker"
               @change="isChanged = true"
             />
           </v-col>
         </v-row>
 
-        <h2 class="my-4">
+        <h2 class="mb-4 mt-6">
           Замена заголовков
         </h2>
         <div
@@ -243,7 +289,7 @@ export default {
   },
   data: () => ({
     options: {
-      colorText: '#ffffff',
+      colorText: null,
       colorLabel: null,
       colorBarPositive: '#00dd00',
       colorBarNegative: '#dd0000',
@@ -259,6 +305,14 @@ export default {
       theme: 'getTheme',
       themeTitle: 'getThemeTitle',
     }),
+    coloredTotal: {
+      get() {
+        return this.options.colorText !== null;
+      },
+      set(val) {
+        this.options.colorText = val ? '#00FF00' : null;
+      },
+    },
     isDarkTheme() {
       return this.themeTitle.indexOf('light') === -1;
     },
