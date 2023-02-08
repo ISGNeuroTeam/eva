@@ -7,21 +7,28 @@
     <div class="dash-constructor-schemes__data-panel-item pb-4">
       <template v-if="dataType === 'data-type-0'">
         <!--data-type-0-->
-        <v-switch
-          v-model="textMode"
-          label="Ручной ввод TagName"
-        />
+        <div class="row justify-content-between align-center">
+          <div class="col text-left">
+            Ручной ввод TagName:
+          </div>
+          <div class="col-auto">
+            <v-switch
+              v-model="textMode"
+              dense
+            />
+          </div>
+        </div>
         <div
           v-for="(element, index) in dataObject.items"
           :key="`${dataObject.nodeId}-${index}`"
-          class="column"
+          class="column dash-constructor-schemes__data-type-0"
         >
-          <div class="row align-center">
+          <div class="row align-center relative">
             <v-text-field
               v-if="textMode"
               v-model="element.id"
               label="TagName поля с данными"
-              class="col-10"
+              class="col-11 pb-0"
             />
             <v-autocomplete
               v-else
@@ -35,7 +42,7 @@
               :menu-props="{
                 'z-index': 100,
               }"
-              class="col-10"
+              class="col-11 pb-0"
             >
               <template v-slot:item="{ item, on }">
                 <v-list-item
@@ -55,44 +62,57 @@
               </template>
             </v-autocomplete>
             <v-icon
-              class="control-button edit-icon theme--dark col-2"
+              v-if="dataObject.items.length > 1"
+              class="
+                control-button
+                edit-icon
+                theme--dark
+                col-2
+                pa-0
+                absolute
+                absolute--top
+                absolute--right
+              "
               :style="{ color: theme.$secondary_text }"
               @click="deleteLine(index)"
             >
               {{ closeIcon }}
             </v-icon>
-          </div>
-          <div
-            class="mr-10"
-            :style="{ color: theme.$secondary_text }"
-          >
-            {{ element.id | getObjectNameById(dataRestFrom) }}
-          </div>
-          <v-text-field
-            v-model="element.description"
-            label="Подпись"
-            :color="theme.$accent_ui_color"
-            :style="{ color: theme.$main_text }"
-            class="mb-9 mr-10"
-          />
-        </div>
-        <div class="d-flex mb-9">
-          <v-btn
-            class="mr-4"
-            ripple
-            small
-            :color="theme.$primary_button"
-            @click="addLine()"
-          >
-            <v-icon
-              class="control-button edit-icon theme--dark"
+            <div
+              class="col-12 mb-8 py-0 text-left"
               :style="{ color: theme.$secondary_text }"
             >
-              {{ addLineIcon }}
-            </v-icon>
-          </v-btn>
-          <div>
-            Добавить строку
+              {{ element.id | getObjectNameById(dataRestFrom) }}
+            </div>
+            <v-text-field
+              v-model="element.description"
+              label="Подпись"
+              :color="theme.$accent_ui_color"
+              :style="{ color: theme.$main_text }"
+              class="col-11 py-0"
+            />
+          </div>
+        </div>
+        <div class="row align-center mb-9">
+          <div class="col-9 text-left">
+            Добавить строку:
+          </div>
+          <div class="col-3">
+            <v-btn
+              ripple
+              small
+              height="36"
+              width="64"
+              color="transparent"
+              @click="addLine(elementTemplates['data-type-0'].dataRest.items[0])"
+            >
+              <v-icon
+                class="control-button edit-icon theme--dark"
+                :style="{ color: theme.$main_text }"
+              >
+                {{ addLineIcon }}
+              </v-icon>
+            </v-btn>
           </div>
         </div>
         <div class="dash-constructor-schemes__slider column align-stretch">
@@ -118,6 +138,7 @@
         </div>
         <v-btn
           small
+          outlined
           :color="theme.$primary_button"
           :style="{ color: theme.$main_text }"
           @click="updateModelValue"
@@ -128,60 +149,70 @@
       <template v-if="dataType === 'data-type-1'">
         <!--data-type-1-->
         <div class="column">
-          <v-switch
-            v-model="textMode"
-            label="Ручной ввод TagName"
-          />
-          <v-text-field
-            v-if="textMode"
-            v-model="dataObject.id"
-            label="TagName поля с данными"
-            @change="updateModelValue(dataObject)"
-          />
-          <v-autocomplete
-            v-else
-            v-model="dataObject.id"
-            :items="dataRestFrom"
-            item-value="TagName"
-            item-text="Description"
-            label="Данные для строки"
-            :filter="tagNameAutocompleteFilter"
-            :menu-props="{
-              'z-index': 100,
-            }"
-          >
-            <template v-slot:item="{ item, on }">
-              <v-list-item
-                ripple
-                class="v-list-item--link dash-constructor-schemes__data-panel-select"
-                v-on="on"
-              >
-                <v-list-item-content>
-                  <v-list-item-title>
-                    {{ item.Description }}
-                  </v-list-item-title>
-                  <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
-                    {{ item.NameObject }}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </template>
-          </v-autocomplete>
-          <div
-            class="mr-10"
-            :style="{ color: theme.$secondary_text }"
-          >
-            {{ dataObject.id | getObjectNameById(dataRestFrom) }}
+          <div class="row justify-content-between align-center mb-8">
+            <div class="col text-left">
+              Ручной ввод TagName:
+            </div>
+            <div class="col-auto">
+              <v-switch
+                v-model="textMode"
+                dense
+              />
+            </div>
+            <v-text-field
+              v-if="textMode"
+              v-model="dataObject.id"
+              label="TagName поля с данными"
+              class="col-11 pb-0"
+              @change="updateModelValue(dataObject)"
+            />
+            <v-autocomplete
+              v-else
+              v-model="dataObject.id"
+              :items="dataRestFrom"
+              item-value="TagName"
+              item-text="Description"
+              label="Данные для строки"
+              :filter="tagNameAutocompleteFilter"
+              :menu-props="{
+                'z-index': 100,
+              }"
+              class="col-11 pb-0"
+            >
+              <template v-slot:item="{ item, on }">
+                <v-list-item
+                  ripple
+                  class="v-list-item--link dash-constructor-schemes__data-panel-select"
+                  v-on="on"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      {{ item.Description }}
+                    </v-list-item-title>
+                    <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
+                      {{ item.NameObject }}
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-autocomplete>
+            <div
+              class="col-12 mb-8 py-0 text-left"
+              :style="{ color: theme.$secondary_text }"
+            >
+              {{ dataObject.id | getObjectNameById(dataRestFrom) }}
+            </div>
+            <v-text-field
+              v-model="dataObject.description"
+              label="Подпись"
+              :color="theme.$accent_ui_color"
+              :style="{ color: theme.$main_text }"
+              class="col-11 py-0"
+            />
           </div>
-          <v-text-field
-            v-model="dataObject.description"
-            label="Подпись"
-            :color="theme.$accent_ui_color"
-            :style="{ color: theme.$main_text }"
-            class="mb-9 mr-10"
-          />
           <v-btn
             small
+            outlined
             :color="theme.$primary_button"
             :style="{ color: theme.$main_text }"
             @click="updateModelValue"
@@ -190,338 +221,206 @@
           </v-btn>
         </div>
       </template>
-      <template v-if=" dataType === 'data-type-2'">
-        <!--data-type-2-->
-        <div class="column">
-          <v-autocomplete
-            v-model="dataObject.id"
-            :items="dataRestFrom"
-            item-value="TagName"
-            item-text="Description"
-            label="Данные для строки"
-            :menu-props="{
-              'z-index': 100,
-            }"
-          >
-            <template v-slot:item="{ item, on }">
-              <v-list-item
-                ripple
-                class="v-list-item--link dash-constructor-schemes__data-panel-select"
-                v-on="on"
-              >
-                <v-list-item-content>
-                  <v-list-item-title>
-                    {{ item.Description }}
-                  </v-list-item-title>
-                  <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
-                    {{ item.NameObject }}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </template>
-          </v-autocomplete>
-          <div
-            class="mb-9"
-            :style="{ color: theme.$secondary_text }"
-          >
-            {{ dataObject.id | getObjectNameById(dataRestFrom) }}
-          </div>
-        </div>
-        <v-text-field
-          v-model.number="dataObject.maxValue"
-          :rules="[value => value >= 0 || 'Некорректное значение.']"
-          label="Максимальное значение*"
-        />
-        <div class="row">
-          <div class="col-8">
-            Цвет текущего
-          </div>
-          <div class="col-4">
-            <v-menu
-              top
-              offset-x
-              :close-on-content-click="false"
-              z-index="100"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  :style="{
-                    'background-color': dataObject.currentValueColor,
-                  }"
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-
-              <v-color-picker
-                v-model="dataObject.currentValueColor"
-                dot-size="12"
-                mode="rgba"
-              />
-            </v-menu>
-          </div>
-          <div class="col-8">
-            Цвет максимального
-          </div>
-          <div class="col-4">
-            <v-menu
-              top
-              offset-x
-              :close-on-content-click="false"
-              z-index="100"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  :style="{
-                    'background-color': dataObject.maxValueColor,
-                  }"
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-
-              <v-color-picker
-                v-model="dataObject.maxValueColor"
-                dot-size="12"
-                mode="rgba"
-              />
-            </v-menu>
-          </div>
-          <div class="col-8">
-            Цвет текста
-          </div>
-          <div class="col-4">
-            <v-menu
-              top
-              offset-x
-              :close-on-content-click="false"
-              z-index="100"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  :style="{
-                    'background-color': dataObject.textColor,
-                  }"
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-
-              <v-color-picker
-                v-model="dataObject.textColor"
-                dot-size="12"
-                mode="rgba"
-              />
-            </v-menu>
-          </div>
-        </div>
-        <v-btn
-          small
-          :disabled="!(dataObject.maxValue >= 0)"
-          :color="theme.$primary_button"
-          @click="updateModelValue(dataObject)"
-        >
-          Применить
-        </v-btn>
-      </template>
-      <template v-if="dataType === 'data-type-3'">
+      <template v-if="dataType === 'data-type-2'">
         <!--data-type-3-->
         <div class="row align-center">
           <div class="col-12">
-            <div class="column">
-              <v-autocomplete
-                v-model="dataObject.idFirst"
-                :items="dataRestFrom"
-                item-value="TagName"
-                item-text="Description"
-                label="Первое значение"
-                :menu-props="{
-                  'z-index': 100,
-                }"
-              >
-                <template v-slot:item="{ item, on }">
-                  <v-list-item
-                    ripple
-                    class="v-list-item--link dash-constructor-schemes__data-panel-select"
-                    v-on="on"
-                  >
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        {{ item.Description }}
-                      </v-list-item-title>
-                      <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
-                        {{ item.NameObject }}
-                      </v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-                </template>
-              </v-autocomplete>
+            <div
+              v-for="(element, index) in dataObject.items"
+              :key="`${dataObject.nodeId}-${index}`"
+              class="column dash-constructor-schemes__data-type-2"
+            >
+              <div class="row align-center">
+                <v-autocomplete
+                  v-model="element.id"
+                  :style="{ color: theme.$main_text }"
+                  :items="dataRestFrom"
+                  item-value="TagName"
+                  item-text="Description"
+                  label="Значение"
+                  :filter="tagNameAutocompleteFilter"
+                  :menu-props="{
+                    'z-index': 100,
+                  }"
+                  :class="dataObject.items.length > 1 ? 'col-10' : 'col-12'"
+                >
+                  <template v-slot:item="{ item, on }">
+                    <v-list-item
+                      ripple
+                      class="v-list-item--link dash-constructor-schemes__data-panel-select"
+                      v-on="on"
+                    >
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          {{ item.Description }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
+                          {{ item.NameObject }}
+                        </v-list-item-subtitle>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </template>
+                </v-autocomplete>
+                <v-icon
+                  v-if="dataObject.items.length > 1"
+                  class="control-button edit-icon theme--dark col-2"
+                  :style="{ color: theme.$secondary_text }"
+                  @click="deleteLine(index)"
+                >
+                  {{ closeIcon }}
+                </v-icon>
+              </div>
               <div
-                class="mb-9"
+                class="mr-10 mb-3 text-left"
                 :style="{ color: theme.$secondary_text }"
               >
-                {{ dataObject.idFirst | getObjectNameById(dataRestFrom) }}
+                {{ element.id | getObjectNameById(dataRestFrom) }}
               </div>
-            </div>
-          </div>
-          <div class="col-8">
-            Цвет первого значения
-          </div>
-          <div class="col-4">
-            <v-menu
-              top
-              offset-x
-              :close-on-content-click="false"
-              z-index="100"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  :style="{
-                    'background-color': dataObject.firstValueColor,
-                  }"
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-
-              <v-color-picker
-                v-model="dataObject.firstValueColor"
-                dot-size="12"
-                mode="rgba"
-              />
-            </v-menu>
-          </div>
-          <div class="col-8">
-            Цвет текста первого значения
-          </div>
-          <div class="col-4">
-            <v-menu
-              top
-              offset-x
-              :close-on-content-click="false"
-              z-index="100"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  :style="{
-                    'background-color': dataObject.firstTextColor,
-                  }"
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-
-              <v-color-picker
-                v-model="dataObject.firstTextColor"
-                dot-size="12"
-                mode="rgba"
-              />
-            </v-menu>
-          </div>
-        </div>
-        <div class="row align-center">
-          <div class="col-12">
-            <div class="column">
-              <v-autocomplete
-                v-model="dataObject.idSecond"
-                :items="dataRestFrom"
-                item-value="TagName"
-                item-text="Description"
-                label="Второе значение"
-                :menu-props="{
-                  'z-index': 100,
-                }"
-              >
-                <template v-slot:item="{ item, on }">
-                  <v-list-item
-                    ripple
-                    class="v-list-item--link dash-constructor-schemes__data-panel-select"
-                    v-on="on"
+              <div class="row align-center">
+                <div class="col-8 text-left">
+                  Цвет накопителя
+                </div>
+                <div class="col-4">
+                  <v-menu
+                    top
+                    offset-x
+                    :close-on-content-click="false"
+                    z-index="100"
                   >
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        {{ item.Description }}
-                      </v-list-item-title>
-                      <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
-                        {{ item.NameObject }}
-                      </v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-                </template>
-              </v-autocomplete>
-              <div
-                class="mb-9"
-                :style="{ color: theme.$secondary_text }"
-              >
-                {{ dataObject.idSecond | getObjectNameById(dataRestFrom) }}
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        :style="{
+                          'background-color': element.bgColor.rgbaString,
+                        }"
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                      />
+                    </template>
+
+                    <v-color-picker
+                      v-model="element.bgColor.rgbaObject"
+                      dot-size="12"
+                      mode="rgba"
+                      @update:color="updateSelectedNodeColor($event, 'bgColor', index)"
+                    />
+                  </v-menu>
+                </div>
+                <div class="col-8 text-left">
+                  Цвет текста
+                </div>
+                <div class="col-4">
+                  <v-menu
+                    top
+                    offset-x
+                    :close-on-content-click="false"
+                    z-index="100"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        :style="{
+                          'background-color': element.textColor.rgbaString,
+                        }"
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                      />
+                    </template>
+
+                    <v-color-picker
+                      v-model="element.textColor.rgbaObject"
+                      dot-size="12"
+                      mode="rgba"
+                      @update:color="updateSelectedNodeColor($event, 'textColor', index)"
+                    />
+                  </v-menu>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-8">
-            Цвет второго значения
-          </div>
-          <div class="col-4">
-            <v-menu
-              top
-              offset-x
-              :close-on-content-click="false"
-              z-index="100"
-            >
-              <template v-slot:activator="{ on, attrs }">
+            <div class="row align-center">
+              <div class="col-8 text-left">
+                Добавить строку:
+              </div>
+              <div class="col-4">
                 <v-btn
-                  :style="{
-                    'background-color': dataObject.secondValueColor,
-                  }"
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
+                  ripple
+                  small
+                  height="36"
+                  width="64"
+                  color="transparent"
+                  @click="addLine(elementTemplates['data-type-2'].dataRest.items[0])"
+                >
+                  <v-icon
+                    class="control-button edit-icon theme--dark"
+                    :style="{ color: theme.$main_text }"
+                  >
+                    {{ addLineIcon }}
+                  </v-icon>
+                </v-btn>
+              </div>
+            </div>
+            <div class="row align-center mb-9">
+              <div class="col-8 text-left">
+                Основной фон:
+              </div>
+              <div class="col-4">
+                <v-menu
+                  top
+                  offset-x
+                  :close-on-content-click="false"
+                  z-index="100"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      :style="{
+                        'background-color': dataObject.mainBgColor.rgbaString,
+                      }"
+                      dark
+                      v-bind="attrs"
+                      v-on="on"
+                    />
+                  </template>
 
-              <v-color-picker
-                v-model="dataObject.secondValueColor"
-                dot-size="12"
-                mode="rgba"
-              />
-            </v-menu>
-          </div>
-          <div class="col-8">
-            Цвет текста второго значения
-          </div>
-          <div class="col-4">
-            <v-menu
-              top
-              offset-x
-              :close-on-content-click="false"
-              z-index="100"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  :style="{
-                    'background-color': dataObject.secondTextColor,
-                  }"
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
+                  <v-color-picker
+                    v-model="dataObject.mainBgColor.rgbaObject"
+                    dot-size="12"
+                    mode="rgba"
+                    @update:color="updateSelectedNodeColor($event, 'mainBgColor')"
+                  />
+                </v-menu>
+              </div>
+              <div class="col-8 text-left">
+                Максимальный объем:
+              </div>
+              <div class="col-4">
+                <v-text-field
+                  v-model="dataObject.maxValue"
+                  label=""
+                  :color="theme.$main_text"
+                  hide-details
+                  style="margin-bottom: 10px"
                 />
-              </template>
-
-              <v-color-picker
-                v-model="dataObject.secondTextColor"
-                dot-size="12"
-                mode="rgba"
-              />
-            </v-menu>
+              </div>
+              <div class="col-8 text-left">
+                Размер текста
+              </div>
+              <div class="col-4">
+                <v-text-field
+                  v-model="dataObject.fontSize"
+                  label=""
+                  :color="theme.$main_text"
+                  hide-details
+                  dense
+                  style="margin-bottom: 10px"
+                />
+              </div>
+            </div>
           </div>
         </div>
         <v-btn
           small
-          :color="theme.$primary_button"
+          outlined
+          :color="theme.$main_text"
           @click="updateModelValue(dataObject)"
         >
           Применить
@@ -529,11 +428,12 @@
       </template>
       <template v-if="dataType === 'label-type-0'">
         <!--label-type-0-->
-        <div class="row align-center">
+        <div class="row align-center text-left">
           <div class="col-12">
             <v-text-field
               v-model="dataObject.text"
               label="Текст"
+              dense
               :color="theme.$main_text"
               style="margin-bottom: 10px"
               outlined
@@ -541,7 +441,7 @@
             />
           </div>
           <div class="col-8">
-            Цвет текста
+            Цвет текста:
           </div>
           <div class="col-4">
             <v-menu
@@ -553,7 +453,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   :style="{
-                    'background-color': dataObject.textColor,
+                    'background-color': dataObject.textColor.rgbaString,
                   }"
                   dark
                   v-bind="attrs"
@@ -562,9 +462,10 @@
               </template>
 
               <v-color-picker
-                v-model="dataObject.textColor"
+                v-model="dataObject.textColor.rgbaObject"
                 dot-size="12"
                 mode="rgba"
+                @update:color="updateSelectedNodeColor($event, 'textColor')"
               />
             </v-menu>
           </div>
@@ -572,6 +473,7 @@
             <v-text-field
               v-model="dataObject.fontSize"
               label="Размер текста"
+              dense
               :color="theme.$main_text"
               outlined
               hide-details
@@ -579,7 +481,7 @@
             />
           </div>
           <div class="col-8">
-            Цвет заливки
+            Цвет заливки:
           </div>
           <div class="col-4">
             <v-menu
@@ -608,7 +510,7 @@
             </v-menu>
           </div>
           <div class="col-8">
-            Вертикальное расположение
+            Верт. расположение:
           </div>
           <div class="col-4">
             <v-switch
@@ -616,7 +518,7 @@
             />
           </div>
           <div class="col-8">
-            Отображение бордера
+            Отображение бордера:
           </div>
           <div class="col-4">
             <v-switch
@@ -625,7 +527,7 @@
           </div>
           <template v-if="dataObject.bordered">
             <div class="col-8">
-              Цвет бордера
+              Цвет бордера:
             </div>
             <div class="col-4">
               <v-menu
@@ -654,7 +556,7 @@
               </v-menu>
             </div>
             <div class="col-8">
-              Пунктирный бордер
+              Пунктирный бордер:
             </div>
             <div class="col-4">
               <v-switch
@@ -665,6 +567,7 @@
               <v-text-field
                 v-model="dataObject.borderSize"
                 label="Размер бордера"
+                dense
                 :color="theme.$main_text"
                 outlined
                 hide-details
@@ -735,7 +638,7 @@
         </v-btn>
       </template>
       <template v-if="dataType === 'shape-type-0'">
-        <div class="row align-center">
+        <div class="row align-center text-left mb-8">
           <div class="col-8">
             Цвет блока:
           </div>
@@ -818,14 +721,15 @@
         </div>
         <v-btn
           small
-          :color="theme.$primary_button"
+          outlined
+          :color="theme.$main_text"
           @click="updateModelValue(dataObject)"
         >
           Применить
         </v-btn>
       </template>
       <template v-if="dataType === 'edge'">
-        <div class="row">
+        <div class="row align-center text-left mb-8">
           <div class="col-8">
             Цвет линии:
           </div>
@@ -876,56 +780,8 @@
         </div>
         <v-btn
           small
-          :color="theme.$primary_button"
-          @click="updateModelValue(dataObject)"
-        >
-          Применить
-        </v-btn>
-      </template>
-      <template v-if="dataType === 'label'">
-        <v-text-field
-          v-model="dataObject.fontSize"
-          label="Размер текста"
-          :color="theme.$main_text"
-          style="margin-bottom: 10px"
           outlined
-          type="Number"
-          hide-details
-        />
-        <div class="row align-center">
-          <div class="col-8">
-            Цвет текста
-          </div>
-          <div class="col-4">
-            <v-menu
-              top
-              offset-x
-              :close-on-content-click="false"
-              z-index="100"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  :style="{
-                    'background-color': dataObject.color.rgbaString,
-                  }"
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-
-              <v-color-picker
-                v-model="dataObject.color.rgbaObject"
-                dot-size="12"
-                mode="rgba"
-                @update:color="updateSelectedNodeColor($event, 'color')"
-              />
-            </v-menu>
-          </div>
-        </div>
-        <v-btn
-          small
-          :color="theme.$primary_button"
+          :color="theme.$main_text"
           @click="updateModelValue(dataObject)"
         >
           Применить
@@ -938,6 +794,7 @@
 <script>
 import { mdiClose, mdiTableRowPlusAfter } from '@mdi/js';
 import { throttle } from '@/js/utils/throttle';
+import elementTemplates from '@/js/classes/ConstructorSchemes/elementTemplates';
 
 export default {
   name: 'DashConstructorSchemesSettings',
@@ -979,6 +836,7 @@ export default {
       addLineIcon: mdiTableRowPlusAfter,
       test12345: 50,
       textMode: false,
+      elementTemplates: elementTemplates.templates,
     };
   },
   computed: {
@@ -1010,23 +868,30 @@ export default {
       }
       return false;
     },
-    updateSelectedNodeColor(evt, field) {
-      const updateValue = structuredClone(this.dataObject);
+    updateSelectedNodeColor(evt, field, index) {
+      const updateValue = typeof index !== 'undefined'
+        ? structuredClone(this.dataObject.items[index])
+        : structuredClone(this.dataObject);
       updateValue[field] = {
         rgbaObject: evt.rgba,
         rgbaString: `rgba(${evt.rgba.r}, ${evt.rgba.g}, ${evt.rgba.b}, ${evt.rgba.a})`,
       };
-      this.dataObject = updateValue;
+      if (typeof index !== 'undefined') {
+        this.$set(this.dataObject, 'items', this.dataObject.items.map((item, i) => {
+          if (i === index) {
+            return updateValue;
+          }
+          return item;
+        }));
+      } else {
+        this.dataObject = updateValue;
+      }
     },
     deleteLine(index) {
       this.dataObject.items.splice(index, 1);
     },
-    addLine() {
-      this.dataObject.items.push({
-        id: '',
-        textLeft: 'Label',
-        textRight: 'Value',
-      });
+    addLine(template) {
+      this.dataObject.items.push(template);
     },
     updateModelValue() {
       this.$emit('changeDataSelectedNode', this.dataObject);
@@ -1055,6 +920,13 @@ export default {
     ::v-deep.v-list-item--link {
       max-width: 480px;
     }
+  }
+  .dash-constructor-schemes__data-type-0,
+  .dash-constructor-schemes__data-type-2 {
+    border: 1px solid var(--main_border);
+    border-radius: 5px;
+    padding: 15px 8px;
+    margin-bottom: 24px;
   }
   .dash-constructor-schemes__slider {
     .dash-constructor-schemes__slider-title {

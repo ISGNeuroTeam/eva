@@ -72,34 +72,44 @@ export class DragAndDropPanel {
 
     // Convert the nodes into plain visualizations
     this.graphComponent.graph.clear();
-
     items.forEach((item) => {
-      const modelItem = item instanceof INode || item instanceof IEdge ? item : item.element;
-      const visual = modelItem instanceof INode
-        ? this.createNodeVisual(modelItem)
-        : this.createEdgeVisual(modelItem);
-      this.addPointerDownListener(modelItem, visual, this.beginDragCallback);
-      const images = visual.querySelectorAll('image');
-      if (images?.length > 0) {
-        images.forEach((image) => {
-          image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-        });
+      if (item?.id) {
+        this.setDndPanelElement(item.panelItem, item.id);
+      } else {
+        this.setDndPanelElement(item);
       }
-      this.div
-        .querySelector(`.dndPanelItem__group--${item.elementType}`)
-        .querySelector('.dndPanelItem__group-items')
-        .appendChild(visual);
     });
   }
 
-  /**
-   * Creates an element that contains the visualization of the given node.
-   * This method is used by populatePanel to create the visualization
-   * for each node provided by the factory.
-   * @param {!Item.<INode>} original
-   * @returns {!HTMLDivElement}
-   */
-  createNodeVisual(original) {
+  updateElement(dndPanelItem, elementId = '') {
+    if (!dndPanelItem) {
+      return;
+    }
+    this.setDndPanelElement(dndPanelItem, elementId);
+  }
+
+  setDndPanelElement(item, elementId) {
+    const modelItem = item instanceof INode || item instanceof IEdge ? item : item.element;
+    const visual = modelItem instanceof INode
+      ? this.createNodeVisual(modelItem, elementId)
+      : this.createEdgeVisual(modelItem, elementId);
+    this.addPointerDownListener(modelItem, visual, this.beginDragCallback);
+    const images = visual.querySelectorAll('image');
+    if (images?.length > 0) {
+      images.forEach((image) => {
+        image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      });
+    }
+    const elementInHtml = this.div
+      .querySelector(`.dndPanelItem__group--${item.elementType}`)
+      .querySelector('.dndPanelItem__group-items');
+    if (elementId && elementInHtml.querySelector(`#${elementId}`)) {
+      elementInHtml.removeChild(elementInHtml.querySelector(`#${elementId}`));
+    }
+    elementInHtml.appendChild(visual);
+  }
+
+  createNodeVisual(original, elementId) {
     const { graph } = this.graphComponent;
     graph.clear();
 
@@ -134,16 +144,11 @@ export class DragAndDropPanel {
     this.updateViewport(this.graphComponent);
     return this.exportAndWrap(
       original?.tag || null,
-      original instanceof INode ? undefined : original.elementType,
+      elementId,
     );
   }
 
-  /**
-   * Creates an element that contains the visualization of the given edge.
-   * @param {!Item.<IEdge>} original
-   * @returns {!HTMLDivElement}
-   */
-  createEdgeVisual(original) {
+  createEdgeVisual(original, elementId) {
     const { graph } = this.graphComponent;
     graph.clear();
 
@@ -162,7 +167,7 @@ export class DragAndDropPanel {
 
     return this.exportAndWrap(
       this.graphComponent,
-      original instanceof IEdge ? undefined : original.elementType,
+      elementId,
     );
   }
 
@@ -188,7 +193,7 @@ export class DragAndDropPanel {
     this.graphComponent.zoomTo(viewport);
   }
 
-  exportAndWrap(nodeTag, elementType) {
+  exportAndWrap(nodeTag, elementId) {
     const exporter = new SvgExport({
       worldBounds: this.graphComponent.contentRect,
       margins: 2,
@@ -204,18 +209,22 @@ export class DragAndDropPanel {
 
     const div = document.createElement('div');
     div.setAttribute('class', 'dndPanelItem');
+    if (elementId) {
+      div.setAttribute('id', elementId);
+    }
     div.appendChild(visual);
     div.style.setProperty('width', visual.getAttribute('width'));
     div.style.setProperty('height', visual.getAttribute('height'));
     div.style.setProperty('touch-action', 'none');
+
     try {
       div.style.setProperty('cursor', 'grab', '');
     } catch (e) {
       /* IE9 doesn't support grab cursor */
     }
-    if (elementType) {
-      div.title = elementType;
-    }
+    // if (elementType) {
+    //   div.title = elementType;
+    // }
     return div;
   }
 
