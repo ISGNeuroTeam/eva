@@ -143,6 +143,58 @@ class ConstructorSchemesClass {
     return position + offset;
   }
 
+  // TODO: Временный метод, для обновления
+  static upgradeNodeTag(node) {
+    if (node?.tag?.dataType === '0' || node?.tag?.dataType === '1') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-0',
+      };
+    }
+    if (node?.tag?.dataType === '2' || node?.tag?.dataType === '3') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-1',
+      };
+    }
+    if (node?.tag?.dataType === '4') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-2',
+      };
+    }
+    if (node?.tag?.dataType === '5') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-3',
+      };
+    }
+    if (node?.tag?.dataType === '5') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-3',
+      };
+    }
+    if (node?.tag?.dataType === 'label-0') {
+      return {
+        ...node.tag,
+        dataType: 'label-type-0',
+      };
+    }
+    if (node?.tag?.dataType === 'default-node') {
+      return {
+        ...node.tag,
+        dataType: 'shape-type-0',
+      };
+    }
+    if (node?.tag === 'invisible') {
+      return {
+        dataType: 'invisible',
+      };
+    }
+    return node.tag;
+  }
+
   defaultDataSource = []
 
   // Main constructor options
@@ -487,6 +539,7 @@ class ConstructorSchemesClass {
     this.graphComponent.graph.nodes.forEach((node) => {
       if (node.tag.dataType || node?.tag[0] === 'i' || node?.tag === 'invisible') {
         if (node.tag.dataType !== 'image-node' && node?.tag?.dataType !== 'invisible') {
+          node.tag = ConstructorSchemesClass.upgradeNodeTag(node);
           this.graphComponent.graph.setStyle(
             node,
             new VuejsNodeStyle(this.elementTemplates[node.tag.dataType].template),
@@ -763,14 +816,13 @@ class ConstructorSchemesClass {
 
     // Событие клика по элементу
     mode.addItemClickedListener((sender, evt) => {
+      // Достаем элемент в отдельную переменную для дальнейшей работы с ним
+      this.targetDataNode = evt.item;
       // Проверяем на наличие данных в узле
       if (
         evt.item instanceof INode
-        || evt.item instanceof IEdge
         || evt.item instanceof ILabel
       ) {
-        // Достаем элемент в отдельную переменную для дальнейшей работы с ним
-        this.targetDataNode = evt.item;
         const filteredElementTag = Utils.deleteFieldsFromObject(
           evt.item.tag,
           ['getTransform', 'getDy', 'getPosition', 'getHeight'],
@@ -778,12 +830,6 @@ class ConstructorSchemesClass {
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
           openDataPanelCallback(filteredElementTag);
-        } else if (evt.item instanceof IEdge) {
-          openDataPanelCallback({
-            ...ConstructorSchemesClass.getEdgeOptions(evt.item),
-            dataType: 'edge',
-            nodeId: evt.item.hashCode(),
-          });
         } else if (evt.item instanceof ILabel) {
           openDataPanelCallback({
             dataType: 'label',
@@ -795,6 +841,17 @@ class ConstructorSchemesClass {
             ...filteredElementTag,
           });
         }
+      } else if (evt.item instanceof IEdge) {
+        if (!evt.item?.tag) {
+          evt.item.tag = {
+            dataType: 'edge',
+          };
+        }
+        openDataPanelCallback({
+          ...ConstructorSchemesClass.getEdgeOptions(evt.item),
+          dataType: 'edge',
+          nodeId: evt.item.hashCode(),
+        });
       } else {
         // Закрываем панель для редактирования данных элемента
         closeDataPanelCallback();
@@ -1049,8 +1106,12 @@ class ConstructorSchemesClass {
     mode.add(edgeDropInputMode);
 
     const { createEdgeInputMode } = mode;
-    createEdgeInputMode.addEdgeCreatedListener(() => {
+    createEdgeInputMode.addEdgeCreatedListener((sender, evt) => {
+      console.log(evt.item);
       if (originalEdgeDefaultStyle) {
+        evt.item.tag = {
+          dataType: 'edge',
+        };
         createEdgeInputMode.edgeDefaults.style = originalEdgeDefaultStyle;
         originalEdgeDefaultStyle = null;
       }
