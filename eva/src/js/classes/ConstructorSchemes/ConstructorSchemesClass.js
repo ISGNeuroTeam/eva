@@ -143,6 +143,58 @@ class ConstructorSchemesClass {
     return position + offset;
   }
 
+  // TODO: Временный метод, для обновления
+  static upgradeNodeTag(node) {
+    if (node?.tag?.dataType === '0' || node?.tag?.dataType === '1') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-0',
+      };
+    }
+    if (node?.tag?.dataType === '2' || node?.tag?.dataType === '3') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-1',
+      };
+    }
+    if (node?.tag?.dataType === '4') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-2',
+      };
+    }
+    if (node?.tag?.dataType === '5') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-3',
+      };
+    }
+    if (node?.tag?.dataType === '5') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-3',
+      };
+    }
+    if (node?.tag?.dataType === 'label-0') {
+      return {
+        ...node.tag,
+        dataType: 'label-type-0',
+      };
+    }
+    if (node?.tag?.dataType === 'default-node') {
+      return {
+        ...node.tag,
+        dataType: 'shape-type-0',
+      };
+    }
+    if (node?.tag === 'invisible') {
+      return {
+        dataType: 'invisible',
+      };
+    }
+    return node.tag;
+  }
+
   defaultDataSource = []
 
   // Main constructor options
@@ -487,6 +539,7 @@ class ConstructorSchemesClass {
     this.graphComponent.graph.nodes.forEach((node) => {
       if (node.tag.dataType || node?.tag[0] === 'i' || node?.tag === 'invisible') {
         if (node.tag.dataType !== 'image-node' && node?.tag?.dataType !== 'invisible') {
+          node.tag = ConstructorSchemesClass.upgradeNodeTag(node);
           this.graphComponent.graph.setStyle(
             node,
             new VuejsNodeStyle(this.elementTemplates[node.tag.dataType].template),
@@ -1049,8 +1102,11 @@ class ConstructorSchemesClass {
     mode.add(edgeDropInputMode);
 
     const { createEdgeInputMode } = mode;
-    createEdgeInputMode.addEdgeCreatedListener(() => {
+    createEdgeInputMode.addEdgeCreatedListener((sender, evt) => {
       if (originalEdgeDefaultStyle) {
+        evt.item.tag = {
+          dataType: 'edge',
+        };
         createEdgeInputMode.edgeDefaults.style = originalEdgeDefaultStyle;
         originalEdgeDefaultStyle = null;
       }
