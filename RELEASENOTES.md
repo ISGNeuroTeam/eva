@@ -1,3 +1,14 @@
+# [1.121.0] - 2023-02-09
+
+### Added
+- Gauge component
+- Waterfall component
+- Constructor-schemes: build scheme from search
+
+### Fixed
+- Constructor-schemes: setting default elements didn't work
+- Constructor-schemes: element "hoarder"(data-type-2) didn't work
+
 # [1.120.0] - 2023-02-01
 
 ### Added
