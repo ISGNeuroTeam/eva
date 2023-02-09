@@ -140,6 +140,7 @@ export default {
   watch: {
     dashFromStore: {
       deep: true,
+      immediate: true,
       handler(val) {
         if (val[this.dataElem]) {
           const { panelBackHide } = val[this.dataElem].options;
