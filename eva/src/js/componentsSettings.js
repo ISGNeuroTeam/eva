@@ -21,6 +21,8 @@ import {
   mdiDotsHorizontal,
   mdiGroup,
   mdiInboxMultipleOutline,
+  mdiGauge,
+  mdiFinance,
 } from '@mdi/js';
 
 export default {
@@ -84,6 +86,43 @@ export default {
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
     { name: 'Число', img: mdiNumeric, type: 'single' },
+    {
+      name: 'Спидометр',
+      img: mdiGauge,
+      type: 'gauge',
+      dataSourceDescription:
+        '#### Обязательные поля:\n'
+        + '- ```value``` - значение спидометра, число\n'
+        + '#### Доп. поля с настройками:\n'
+        + '- ```metricName``` - Подпись значения\n'
+        + '- ```color, min, max``` - Цвет, минимум и максимум зоны\n'
+        + '#### Пример данных:\n'
+        + '| value | metricName | color | min | max |\n'
+        + '| :--- | :---: | :---: | ---: | ---: |\n'
+        + '| 120 | Speed | | | |\n'
+        + '| | | blue | -20 | 0 |\n'
+        + '| | | green | 0 | 60 |\n'
+        + '| | | yellow | 60 | 110 |\n'
+        + '| | | #ff0000 | 110 | 180 |\n',
+    },
+    {
+      name: 'Водопад',
+      img: mdiFinance,
+      type: 'waterfall',
+      dataSourceDescription:
+        '#### Обязательные поля:\n'
+        + '- ```title``` - Название столбца, строка\n'
+        + '- ```value``` - Значение столбца, число\n'
+        + '#### Дополнительные поля:\n'
+        + '- ```isTotal``` - Отобразить столбак суммы, булевый\n'
+        + '#### Пример данных:\n'
+        + '| title | value | isTotal |\n'
+        + '| :--- | :---: | ---: |\n'
+        + '| Total 1 | 182527 | True |\n'
+        + '| Cost of Revenue | -84732 | |\n'
+        + '| Operating Expenses | -56571 | |\n'
+        + '| Total 2 | | True |\n',
+    },
   ],
   size: {
     picker: {
@@ -190,6 +229,14 @@ export default {
       width: 700,
       height: 240,
     },
+    gauge: {
+      width: 400,
+      height: 400,
+    },
+    waterfall: {
+      width: 600,
+      height: 500,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -218,6 +265,8 @@ export default {
     scatterPlot: mdiScatterPlotOutline,
     dynamicForm: mdiInboxMultipleOutline,
     frequencyGraph: mdiDotsHorizontal,
+    gauge: mdiGauge,
+    waterfall: mdiFinance,
   },
   commonOptions: [
     'panelSettings',
@@ -366,7 +415,6 @@ export default {
       'schemeSetting',
       'searchForBuildScheme',
       'alwaysUpdateScheme',
-      'isEdgeRouterSupport',
       'isBridgeEdgeSupport',
       'primitives',
       'primitivesLibrary',
@@ -375,6 +423,10 @@ export default {
     frequencyGraph: [
       'groupMetric',
       'tooltipMetrics',
+    ],
+    gauge: [
+    ],
+    waterfall: [
     ],
   },
   optionFields: [
@@ -992,14 +1044,6 @@ export default {
     {
       relation: ['searchForBuildScheme'],
       optionGroup: 'schemeSetting',
-      option: 'isEdgeRouterSupport',
-      description: 'Включить алгоритм маршрутизации линий',
-      elem: 'switch',
-      default: false,
-    },
-    {
-      relation: ['searchForBuildScheme'],
-      optionGroup: 'schemeSetting',
       option: 'isBridgeEdgeSupport',
       description: 'Включить отображение пересечения линий',
       elem: 'switch',
@@ -1046,6 +1090,8 @@ export default {
     'tune',
     'scatterPlot',
     'constructorSchemes',
+    'gauge',
+    'waterfall',
   ],
   reports: {
     table: {
@@ -1107,6 +1153,14 @@ export default {
     constructorSchemes: {
       tooltip: 'Конструктор схем',
       icon: mdiTuneVertical,
+    },
+    gauge: {
+      tooltip: 'Спидометр',
+      icon: mdiGauge,
+    },
+    waterfall: {
+      tooltip: 'Водопад',
+      icon: mdiFinance,
     },
   },
   excludes: {
