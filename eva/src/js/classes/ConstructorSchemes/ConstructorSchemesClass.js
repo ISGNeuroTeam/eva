@@ -8,7 +8,7 @@ import {
   EdgePathLabelModel,
   EdgeSides,
   EventRecognizers,
-  FreeNodeLabelModel,
+  ItemMapping,
   GraphComponent,
   GraphEditorInputMode,
   LabelLayerPolicy,
@@ -707,15 +707,16 @@ class ConstructorSchemesClass {
   }
 
   enableViewerInputMode() {
-    this.graphComponent.inputMode = new GraphViewerInputMode({
+    const mode = new GraphViewerInputMode({
       focusableItems: 'none',
     });
-    this.graphComponent.inputMode.addItemClickedListener((sender, evt) => {
+    mode.addItemClickedListener((sender, evt) => {
       const { item } = evt;
       if (typeof this.onClickObject === 'function') {
         this.onClickObject(item?.tag.dataType, item?.tag);
       }
     });
+    this.graphComponent.inputMode = mode;
   }
 
   // Setting up interaction with the graph
@@ -1107,11 +1108,10 @@ class ConstructorSchemesClass {
 
     const { createEdgeInputMode } = mode;
     createEdgeInputMode.addEdgeCreatedListener((sender, evt) => {
-      console.log(evt.item);
+      evt.item.tag = {
+        dataType: 'edge',
+      };
       if (originalEdgeDefaultStyle) {
-        evt.item.tag = {
-          dataType: 'edge',
-        };
         createEdgeInputMode.edgeDefaults.style = originalEdgeDefaultStyle;
         originalEdgeDefaultStyle = null;
       }
@@ -1706,6 +1706,7 @@ class ConstructorSchemesClass {
 
   fitGraphContent() {
     this.graphComponent.fitGraphBounds().then(() => {
+      this.graphComponent.fitContent();
       this.graphComponent.updateVisual();
     });
   }
@@ -1904,13 +1905,28 @@ class ConstructorSchemesClass {
 
   enableEdgeRouter() {
     const layoutData = new EdgeRouterData();
-    layoutData.targetPortConstraints = PortConstraint.create(PortSide.SOUTH, true);
+    const portSides = {
+      bottom: PortSide.SOUTH,
+      left: PortSide.WEST,
+      right: PortSide.EAST,
+      top: PortSide.NORTH,
+      any: PortSide.ANY,
+    };
+    // layoutData.targetPortConstraints.
+    layoutData.targetPortConstraints = ItemMapping.from((edge) => {
+      console.group();
+      console.log('target', edge.targetNode.tag);
+      console.log('source', edge.sourceNode.tag);
+      console.groupEnd();
+      return PortConstraint.create(PortSide.SOUTH, true);
+    });
+    // layoutData.targetPortConstraints = PortConstraint.create(PortSide.SOUTH, true);
     // layoutData.sourcePortConstraints = PortConstraint.create(PortSide.SOUTH);
     const edgeRouter = new EdgeRouter();
     // чтобы узлы не сливались
     // TODO:Пока установлено временное значение, в дальнейшем вынести в настройки визуализации
-    edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance = 15;
-    edgeRouter.defaultEdgeLayoutDescriptor.minimumLastSegmentLength = 25;
+    edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance = 5;
+    edgeRouter.defaultEdgeLayoutDescriptor.minimumLastSegmentLength = 15;
     edgeRouter.scope = EdgeRouterScope.ROUTE_ALL_EDGES;
 
     this.graphComponent.graph.applyLayout(edgeRouter, layoutData);
@@ -1922,8 +1938,58 @@ class ConstructorSchemesClass {
     bridgeManager.addObstacleProvider(new GraphObstacleProvider());
   }
 
-  // TODO: Пока не работает
+  toViewCoordinates(list) {
+    const filteredList = list.map((elem) => {
+      const { x, y } = this.graphComponent.toViewCoordinates(
+        new Point(
+          elem.x,
+          elem.y,
+        ),
+      );
+      return {
+        ...elem,
+        x,
+        y,
+        x1: elem.x,
+        y1: elem.y,
+      };
+    });
+    const initialSizes = filteredList.reduce((acc, el) => {
+      acc.xMin = acc.xMin === null || el.x < acc.xMin ? el.x : acc.xMin;
+      acc.xMax = acc.xMin === null || el.x > acc.xMax ? el.x : acc.xMax;
+
+      acc.yMin = acc.yMin === null || el.y < acc.yMin ? el.y : acc.yMin;
+      acc.yMax = acc.yMin === null || el.y > acc.yMax ? el.y : acc.yMax;
+
+      return acc;
+    }, {
+      xMin: null,
+      yMin: null,
+      xMax: null,
+      yMax: null,
+    });
+    initialSizes.width = (initialSizes.xMax) - (initialSizes.xMin);
+    initialSizes.height = (initialSizes.yMax) - (initialSizes.yMin);
+    return filteredList.map((el) => ({
+      ...el,
+      // TODO: + 1 - это костыль для фиксса ошибки NaN в node.layout т.к.
+      //  0 не определяется как число
+      x: 1 + Math.round(((this.graphComponent.size.width - 200) / 100)
+          * ((initialSizes.xMax - el.x) * (100 / initialSizes.width))),
+      y: 1 + Math.round(((this.graphComponent.size.height - 150) / 100)
+          * ((initialSizes.yMax - el.y) * (100 / initialSizes.height))),
+    }));
+  }
+
+  static sortByCoords(list) {
+    const sortedList = list.sort((a, b) => a.x - b.x);
+    return list;
+  }
+
+  // TODO: Пока не работает(или работает частично)
   buildSchemeFromSearch(dataFrom) {
+    const elementsList = this.toViewCoordinates(dataFrom);
+    const sortedList = ConstructorSchemesClass.sortByCoords(elementsList);
     const descriptionNodeStyles = {
       tag: {
         nodeId: 'label-node-default',
@@ -1947,10 +2013,11 @@ class ConstructorSchemesClass {
       },
     };
     const generateElementFromSearch = new GenerateElementsFromSearch({
-      elements: dataFrom,
+      elements: sortedList,
+      graphComponent: this.graphComponent,
       defaultEdgeStyles: {
         ...this.defaultEdgeStyle,
-        strokeSize: 3,
+        strokeSize: '2px',
       },
       defaultDescriptionStyles: descriptionNodeStyles,
     });
@@ -1963,6 +2030,7 @@ class ConstructorSchemesClass {
         this.enableEdgeRouter();
         this.fitGraphContent();
         this.setDefaultElementsOrder();
+        this.saveAnObject();
       });
     }).catch((e) => {
       console.error(e);

@@ -6,10 +6,12 @@ import Utils from '@/js/classes/ConstructorSchemes/Utils';
 
 class GenerateElementsFromSearch {
   constructor({
+    graphComponent,
     elements,
     defaultEdgeStyles,
     defaultDescriptionStyles,
   }) {
+    this.graphComponent = graphComponent;
     this.elements = elements;
     this.defaultEdgeStyles = defaultEdgeStyles;
     this.defaultDescriptionStyles = defaultDescriptionStyles;
@@ -103,26 +105,28 @@ class GenerateElementsFromSearch {
               }
               // Блок с подписью к блоку
               if (element.description) {
-                elementsForBuild.push({
-                  type: 'node',
-                  data: {
-                    tag: {
-                      ...this.defaultDescriptionStyles.tag,
-                      nodeId: `description-node-${index}`,
-                      text: element.description,
-                      borderColor: Utils.generateColor(Color.from(element.color)),
-                      bgColor: Utils.generateColor(Color.from('rgba(60, 59, 69, 1)')),
-                      textColor: Utils.generateColor(Color.from(element.color)).rgbaString,
-                    },
-                    layout: {
-                      ...this.defaultDescriptionStyles.layout,
-                      x: Number(element.layout.x) + (+element.layout.width / 2)
-                          - (this.defaultDescriptionStyles.layout.width / 2),
-                      y: Number(element.layout.y + +element.layout.height)
-                          - (this.defaultDescriptionStyles.layout.height / 2),
-                    },
-                  },
-                });
+                // elementsForBuild.push({
+                //   type: 'node',
+                //   data: {
+                //     tag: {
+                //       ...this.defaultDescriptionStyles.tag,
+                //       nodeId: `description-node-${index}`,
+                //       text: element.description,
+                //       borderColor: Utils.generateColor(Color.from(element.color)),
+                //       bgColor: Utils.generateColor(Color.from('rgba(60, 59, 69, 1)')),
+                //       textColor: Utils.generateColor(Color.from(element.color)).rgbaString,
+                //       width: this.defaultDescriptionStyles.layout.width,
+                //       height: this.defaultDescriptionStyles.layout.height,
+                //     },
+                //     layout: {
+                //       ...this.defaultDescriptionStyles.layout,
+                //       x: Number(element.layout.x) + (+element.layout.width / 2)
+                //           - (this.defaultDescriptionStyles.layout.width / 2),
+                //       y: Number(element.layout.y + +element.layout.height)
+                //           - (this.defaultDescriptionStyles.layout.height / 2),
+                //     },
+                //   },
+                // });
               }
               const filteredObjectFromOtl = {};
               // Удаление поля с нодой
@@ -140,12 +144,14 @@ class GenerateElementsFromSearch {
                     },
                     nodeId,
                     dataType: element.dataType,
+                    width: Number(element.layout.width),
+                    height: Number(element.layout.height),
                   },
                   icon: element.icon.node.style.image,
                   layout: {
                     ...element.layout,
-                    width: Number(element.layout.width),
-                    height: Number(element.layout.height),
+                    width: Number(element.layout.width * 0.3),
+                    height: Number(element.layout.height * 0.3),
                     x: Number(element.layout.x),
                     y: Number(element.layout.y),
                   },
