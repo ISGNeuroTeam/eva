@@ -819,7 +819,6 @@ class ConstructorSchemesClass {
       // Проверяем на наличие данных в узле
       if (
         evt.item instanceof INode
-        || evt.item instanceof IEdge
         || evt.item instanceof ILabel
       ) {
         // Достаем элемент в отдельную переменную для дальнейшей работы с ним
@@ -831,12 +830,6 @@ class ConstructorSchemesClass {
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
           openDataPanelCallback(filteredElementTag);
-        } else if (evt.item instanceof IEdge) {
-          openDataPanelCallback({
-            ...ConstructorSchemesClass.getEdgeOptions(evt.item),
-            dataType: 'edge',
-            nodeId: evt.item.hashCode(),
-          });
         } else if (evt.item instanceof ILabel) {
           openDataPanelCallback({
             dataType: 'label',
@@ -848,6 +841,17 @@ class ConstructorSchemesClass {
             ...filteredElementTag,
           });
         }
+      } else if (evt.item instanceof IEdge) {
+        if (!evt.item?.tag) {
+          evt.item.tag = {
+            dataType: 'edge',
+          };
+        }
+        openDataPanelCallback({
+          ...ConstructorSchemesClass.getEdgeOptions(evt.item),
+          dataType: 'edge',
+          nodeId: evt.item.hashCode(),
+        });
       } else {
         // Закрываем панель для редактирования данных элемента
         closeDataPanelCallback();
@@ -1103,6 +1107,7 @@ class ConstructorSchemesClass {
 
     const { createEdgeInputMode } = mode;
     createEdgeInputMode.addEdgeCreatedListener((sender, evt) => {
+      console.log(evt.item);
       if (originalEdgeDefaultStyle) {
         evt.item.tag = {
           dataType: 'edge',
