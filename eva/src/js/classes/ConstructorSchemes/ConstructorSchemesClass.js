@@ -816,13 +816,13 @@ class ConstructorSchemesClass {
 
     // Событие клика по элементу
     mode.addItemClickedListener((sender, evt) => {
+      // Достаем элемент в отдельную переменную для дальнейшей работы с ним
+      this.targetDataNode = evt.item;
       // Проверяем на наличие данных в узле
       if (
         evt.item instanceof INode
         || evt.item instanceof ILabel
       ) {
-        // Достаем элемент в отдельную переменную для дальнейшей работы с ним
-        this.targetDataNode = evt.item;
         const filteredElementTag = Utils.deleteFieldsFromObject(
           evt.item.tag,
           ['getTransform', 'getDy', 'getPosition', 'getHeight'],
