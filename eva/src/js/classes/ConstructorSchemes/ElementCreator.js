@@ -143,7 +143,12 @@ class ElementCreator {
           size: element.layout,
         });
         createdNode = this.graph.createNodeAt({
-          location: imageNode.layout,
+          location: [
+            element.layout.x || imageNode.layout.x,
+            element.layout.y || imageNode.layout.y,
+            element.layout.width || imageNode.layout.width,
+            element.layout.height || imageNode.layout.height,
+          ],
           style: imageNode.style.clone(),
           tag: {
             ...imageNode.tag,
@@ -228,11 +233,11 @@ class ElementCreator {
 
   createEdge(edge) {
     new Promise((resolve) => {
-      let targetPort = typeof edge.target.port.id === 'number'
-        ? this.getTargetPort(edge.target.port.id)
+      let targetPort = typeof edge?.target?.port?.id === 'number'
+        ? this.getTargetPort(edge?.target?.port?.id)
         : null;
-      let sourcePort = typeof edge.source.port.id === 'number'
-        ? this.getSourcePort(edge.source.port.id)
+      let sourcePort = typeof edge?.source?.port?.id === 'number'
+        ? this.getSourcePort(edge?.source?.port?.id)
         : null;
       let targetNode = null;
       if (targetPort?.owner) {
@@ -240,13 +245,18 @@ class ElementCreator {
       } else {
         targetNode = this.graph.nodes.toArray()
           .find((el) => el.tag.nodeId === edge.target.node.nodeId);
-        if (!targetPort) {
-          if (typeof edge.target.port.id === 'string') {
+        if (
+          !targetPort
+            && (edge?.target?.port?.location
+                || typeof edge?.target?.port?.id === 'string')
+        ) {
+          if (typeof edge?.target?.port?.id === 'string') {
             targetPort = this.graph.addPort(
               targetNode,
               FreeNodePortLocationModel.NODE_BOTTOM_ANCHORED,
             );
-          } else {
+          }
+          if (edge?.target?.port?.location) {
             targetPort = this.graph.addPortAt(
               targetNode,
               edge.target.port.location,
@@ -260,7 +270,11 @@ class ElementCreator {
       } else {
         sourceNode = this.graph.nodes.toArray()
           .find((el) => el.tag.nodeId === edge.source.node.nodeId);
-        if (!sourcePort) {
+        if (
+          !sourcePort
+            && (typeof edge?.source?.port?.id === 'string'
+                || edge?.source?.port?.location)
+        ) {
           if (typeof edge.source.port.id === 'string') {
             sourcePort = this.graph.addPortAt(
               sourceNode,
@@ -274,28 +288,45 @@ class ElementCreator {
           }
         }
       }
-      resolve({
-        sourceNode,
-        targetNode,
-        sourcePort,
-        targetPort,
-      });
+      const result = {};
+      if (sourceNode) result.sourceNode = sourceNode;
+      if (targetNode) result.targetNode = targetNode;
+      if (sourcePort) result.sourcePort = sourcePort;
+      if (targetPort) result.targetPort = targetPort;
+      resolve(result);
     }).then((response) => new Promise((resolve) => {
-      const createdEdge = this.graph.createEdge({
-        sourceNode: response.sourceNode,
-        targetNode: response.targetNode,
-        sourcePort: response.sourcePort,
-        targetPort: response.targetPort,
-        style: new PolylineEdgeStyle({
-          smoothingLength: edge.style.smoothingLength,
-          stroke: `${typeof edge.style.strokeSize === 'number'
-            ? `${edge.style.strokeSize}px`
-            : edge.style.strokeSize} solid ${edge.style.strokeColor}`,
-          targetArrow: 'none',
-          sourceArrow: 'none',
-        }),
-        tag: edge.tag,
-      });
+      let createdEdge;
+      if (response?.sourcePort && response?.targetPort) {
+        createdEdge = this.graph.createEdge({
+          sourceNode: response.sourceNode,
+          targetNode: response.targetNode,
+          sourcePort: response.sourcePort,
+          targetPort: response.targetPort,
+          style: new PolylineEdgeStyle({
+            smoothingLength: edge.style.smoothingLength,
+            stroke: `${typeof edge.style.strokeSize === 'number'
+              ? `${edge.style.strokeSize}px`
+              : edge.style.strokeSize} solid ${edge.style.strokeColor}`,
+            targetArrow: 'none',
+            sourceArrow: 'none',
+          }),
+          tag: edge.tag,
+        });
+      } else {
+        createdEdge = this.graph.createEdge({
+          source: response.sourceNode,
+          target: response.targetNode,
+          style: new PolylineEdgeStyle({
+            smoothingLength: edge.style.smoothingLength,
+            stroke: `${typeof edge.style.strokeSize === 'number'
+              ? `${edge.style.strokeSize}px`
+              : edge.style.strokeSize} solid ${edge.style.strokeColor}`,
+            targetArrow: 'none',
+            sourceArrow: 'none',
+          }),
+          tag: edge.tag,
+        });
+      }
       resolve(createdEdge);
     })).then((createdEdge) => new Promise((resolve) => {
       if (edge.bends?.length > 0) {

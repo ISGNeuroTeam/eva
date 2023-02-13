@@ -413,8 +413,12 @@ export default {
       'level',
       'pinned',
       'schemeSetting',
+      'saveMultipleScheme',
+      'tokensBySchemeId',
       'searchForBuildScheme',
       'alwaysUpdateScheme',
+      'minimumEdgeToEdgeDistance',
+      'minimumLastSegmentLength',
       'isBridgeEdgeSupport',
       'primitives',
       'primitivesLibrary',
@@ -544,6 +548,32 @@ export default {
       description: 'Установить насыщенности текста',
       elem: 'select',
       items: [100, 200, 400, 500, 800],
+    },
+    {
+      relation() {
+        return this.isDashBoard && !!this.$store.state[this.idDash].searches;
+      },
+      option: 'defaultFromSourceData',
+      description: 'Дефолтное значение из источника данных',
+      elem: 'select',
+      default: null,
+      items() {
+        const dashState = this.$store.state[this.idDash];
+        if (!dashState?.searches || !dashState.searches.map) {
+          return [];
+        }
+        const sourceDataList = dashState.searches.map(({ id, sid }) => ({
+          value: id,
+          text: sid,
+        }));
+        return [
+          {
+            value: null,
+            text: '-- Не использовать --',
+          },
+          ...sourceDataList,
+        ];
+      },
     },
     {
       relation: ['defaultFromSourceData'],
@@ -1007,6 +1037,28 @@ export default {
       option: 'schemeSetting',
     },
     {
+      optionGroup: 'schemeSetting',
+      option: 'saveMultipleScheme',
+      description: 'Сохранить несклько схем',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      relation: ['saveMultipleScheme'],
+      optionGroup: 'schemeSetting',
+      option: 'tokensBySchemeId',
+      description: 'Список токенов для генерации ID схемы',
+      elem: 'select-checkbox',
+      default: null,
+      items() {
+        if (this.$store.state[this.idDash]?.tockens?.length > 0) {
+          return this.$store.state[this.idDash].tockens
+            .map((el) => el.name) || [];
+        }
+        return [];
+      },
+    },
+    {
       relation() {
         return this.isDashBoard && !!this.$store.state[this.idDash].searches;
       },
@@ -1040,6 +1092,23 @@ export default {
       description: 'Всегда обновлять схему',
       elem: 'switch',
       default: false,
+    },
+
+    {
+      relation: ['searchForBuildScheme'],
+      optionGroup: 'schemeSetting',
+      option: 'minimumEdgeToEdgeDistance',
+      description: 'Мин. расстояние между линиями',
+      elem: 'text-field',
+      placeholder: '10',
+    },
+    {
+      relation: ['searchForBuildScheme'],
+      optionGroup: 'schemeSetting',
+      option: 'minimumLastSegmentLength',
+      description: 'Мин. длина последнего сегмента линии',
+      elem: 'text-field',
+      placeholder: '30',
     },
     {
       relation: ['searchForBuildScheme'],
