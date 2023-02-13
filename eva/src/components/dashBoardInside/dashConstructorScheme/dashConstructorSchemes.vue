@@ -167,7 +167,8 @@
       </div>
       <div
         v-if="dashboardEditMode"
-        class="dash-constructor-schemes__keymap-button">
+        class="dash-constructor-schemes__keymap-button"
+      >
         <v-tooltip
           top
           :nudge-top="5"
@@ -701,7 +702,7 @@ export default {
       isConfirmModal: false,
       isConfirmUpdateScheme: false,
       // Default value - graph
-      activeScheme: 'graph',
+      // activeScheme: 'graph',
       timeout: null,
       timer: 0,
     };
@@ -731,10 +732,7 @@ export default {
     savedGraphObject() {
       const savedGraph = this.dashFromStore[this.idFrom]?.savedGraphObject;
       if (savedGraph) {
-        if (this.schemeIdFromSearch && savedGraph[this.schemeIdFromSearch]) {
-          return savedGraph[this.schemeIdFromSearch];
-        }
-        return savedGraph[this.activeScheme] || [];
+        return savedGraph[this.activeSchemeId] || [];
       }
       return [];
     },
@@ -759,25 +757,34 @@ export default {
     isPanelBackHide() {
       return this.dashFromStore[this.idFrom].options?.panelBackHide || false;
     },
-    schemeIdFromSearch() {
-      const searchFromStore = structuredClone(this.dashFromStore.searches)
-        .find((search) => search.id === this.searchForBuildScheme);
-      if (this.dashFromStore.tockens?.length > 0 && searchFromStore && this.searchForBuildScheme) {
-        const otl = searchFromStore.original_otl;
-        const result = structuredClone(this.dashFromStore.tockens)
-          .filter((token) => otl.includes(`$${token.name}$`) && token.value !== '' && token.value !== token.defaultValue);
-        if (result?.length > 0) {
-          return result.map((token) => token.value).join('-');
-        }
-        return '';
-      }
-      return '';
-    },
     isBridgeEnable() {
       return this.optionsFromStore?.isBridgeEdgeSupport || false;
     },
     isAlwaysUpdateScheme() {
       return this.optionsFromStore?.alwaysUpdateScheme || false;
+    },
+    saveMultipleScheme() {
+      return this.optionsFromStore?.saveMultipleScheme;
+    },
+    activeSchemeId() {
+      if (
+        this.saveMultipleScheme
+          && this.optionsFromStore?.tokensBySchemeId?.length > 0
+          && this.dashFromStore?.tockens?.length > 0
+      ) {
+        const result = [];
+        this.optionsFromStore.tokensBySchemeId.forEach((tokenName) => {
+          const tokenByName = this.dashFromStore.tockens.find((el) => el.name === tokenName);
+          if (tokenName) {
+            result.push(tokenByName.value);
+          }
+        });
+        return result.join('-').replaceAll(' ', '_') || 'graph';
+      }
+      return 'graph';
+    },
+    allSavedSchemes() {
+      return Object.keys(this.dashFromStore[this.idFrom].savedGraphObject);
     },
   },
   watch: {
@@ -811,8 +818,13 @@ export default {
       }
     },
     dataForBuildScheme(value) {
-      if (this.isAlwaysUpdateScheme) {
+      if (this.isAlwaysUpdateScheme && value?.length > 0) {
         this.constructorSchemes.buildSchemeFromSearch(value);
+      }
+    },
+    activeSchemeId() {
+      if (this.constructorSchemes) {
+        this.constructorSchemes.update(this.savedGraphObject);
       }
     },
   },
@@ -956,17 +968,10 @@ export default {
           value: {},
         }]);
       }
-      if (!this.dashFromStore[this.idFrom]?.savedGraphObject[this.schemeIdFromSearch]) {
+      if (!this.dashFromStore[this.idFrom]?.savedGraphObject[this.activeSchemeId]) {
         this.$store.commit('setState', [{
           object: this.dashFromStore[this.idFrom].savedGraphObject,
-          prop: `${this.schemeIdFromSearch}`,
-          value: [],
-        }]);
-      }
-      if (!this.dashFromStore[this.idFrom]?.savedGraphObject[this.activeScheme]) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore[this.idFrom].savedGraphObject,
-          prop: this.activeScheme,
+          prop: this.activeSchemeId,
           value: [],
         }]);
       }
@@ -978,16 +983,16 @@ export default {
       this.timer = 500;
       this.timeout = setTimeout(() => {
         this.createSavedGraphObjectField();
-        if (typeof this.searchForBuildScheme !== 'undefined' && this.schemeIdFromSearch !== '') {
+        if (typeof this.searchForBuildScheme !== 'undefined') {
           this.$store.commit('setState', [{
             object: this.dashFromStore[this.idFrom].savedGraphObject,
-            prop: `${this.schemeIdFromSearch}`,
+            prop: `${this.activeSchemeId}`,
             value: data,
           }]);
         } else {
           this.$store.commit('setState', [{
             object: this.dashFromStore[this.idFrom].savedGraphObject,
-            prop: this.activeScheme,
+            prop: this.activeSchemeId,
             value: data,
           }]);
         }
