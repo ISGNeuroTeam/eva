@@ -18,7 +18,7 @@
         </div>
 
         <v-icon
-          v-show="dataModeFrom && !error"
+          v-show="dataModeFrom"
           size="22"
           class="settings-icon"
           @click.stop="openSettings"
@@ -190,6 +190,9 @@ export default {
     },
 
     metricsForRender() {
+      if (!this.metricList.length) {
+        return [];
+      }
       const elementsToShow = this.metricList.slice(0, this.metricCount);
       if (elementsToShow.length !== elementsToShow.filter(Boolean).length) {
         this.setError('Допущен пропуск номеров в последовательности значений поля "_order"');
