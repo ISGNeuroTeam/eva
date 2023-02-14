@@ -268,7 +268,7 @@ export default {
           this.setVisual(
             this.currentSettings.metricOptions?.length > 0
               ? this.currentSettings.metricOptions
-              : options.settings?.metricOptions,
+              : (options.settings?.metricOptions || []),
             isNew,
           );
         }
@@ -498,11 +498,11 @@ export default {
         this.titleToken = '';
       }
       if (metricOptions.length > 0 && metricList.length > 0) {
-        this.$set(this, 'metricList', metricList);
+        this.$set(this, 'metricList', metricList.filter((item) => !!item));
         this.$store.commit('setState', [{
           object: this.getOptions.settings,
           prop: 'metricOptions',
-          value: metricOptions,
+          value: metricOptions.filter((item) => !!item),
         }]);
       }
     },
@@ -528,7 +528,7 @@ export default {
     },
 
     saveSettings(settings = {}) {
-      const { metricCount, template, metricOptions } = settings;
+      const { metricCount, template, metricOptions = [] } = settings;
       metricOptions.forEach((item, idx) => {
         item.id = idx + 1;
         item.listOrder = idx + 1;
