@@ -1049,11 +1049,10 @@ export default {
       option: 'tokensBySchemeId',
       description: 'Список токенов для генерации ID схемы',
       elem: 'select-checkbox',
-      default: null,
       items() {
         if (this.$store.state[this.idDash]?.tockens?.length > 0) {
-          return this.$store.state[this.idDash].tockens
-            .map((el) => el.name) || [];
+          const tokens = structuredClone(this.$store.state[this.idDash].tockens);
+          return tokens.map((el) => el.name);
         }
         return [];
       },
