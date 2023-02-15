@@ -809,7 +809,7 @@
           </div>
           <div class="buttons-save">
             <v-btn
-              class="save-btn"
+              class="save-btn my-2"
               small
               :color="theme.$primary_button"
               @click="saveDash"
@@ -2285,6 +2285,10 @@ export default {
   display: flex;
   justify-content: center;
   flex-direction: row;
+}
+
+.save-name {
+  overflow-wrap: anywhere;
 }
 
 .v-tooltip__content {
