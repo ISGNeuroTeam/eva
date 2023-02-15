@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - SingleValue: component menu didn't closet
+- Dashboard name doesn't fit when saving dashboard
 
 ## [1.121.0]
 

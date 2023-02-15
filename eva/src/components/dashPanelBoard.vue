@@ -2301,4 +2301,14 @@ export default {
 .row-tocken::v-deep .v-menu__content {
   max-width: initial;
 }
+.main-title {
+  overflow: hidden;
+}
+.title-name {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.user-control-panel {
+  display: inline-flex;
+}
 </style>

@@ -17,8 +17,8 @@
             Вы точно хотите удалить
             <p>
               {{ nameFrom }}
+              ?
             </p>
-            ?
           </div>
         </v-card-text>
         <v-card-actions>
@@ -97,4 +97,7 @@ export default {
 // подключаем стили для этого компонента
 
 @import '../sass/modalDeleteFromMain.sass';
+.create-title {
+  overflow-wrap: anywhere;
+}
 </style>
