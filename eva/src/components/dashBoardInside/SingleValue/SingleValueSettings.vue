@@ -405,6 +405,7 @@ export default {
       this.isChanged = true;
     },
     setSettingTemplate(n) {
+      this.isChanged = true;
       this.$set(this.settings, 'template', n);
     },
     changeColorData(metric, color) {
