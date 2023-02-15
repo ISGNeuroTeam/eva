@@ -572,7 +572,7 @@ export default {
                 ? undefined
                 : ' d-none',
         }));
-      } else if (result) {
+      } else if (result && result.length) {
         this.props.titles = Object.keys(result[0]).reduce((titles, item) => {
           if (!this.excludeColumns.includes(item)) {
             return [
