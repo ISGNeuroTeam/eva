@@ -7,7 +7,7 @@
       :style="{
         ...customStyle,
         'width': `${innerSize.width - 22}px`,
-        'height': `${innerSize.height}px`,
+        'height': `${innerSize.height - 10}px`,
         background: isPanelBackHide ? 'transparent' : theme.$secondary_bg,
         margin: '0 10px',
       }"
@@ -754,6 +754,11 @@ export default {
       }
       return [];
     },
+    loadingSearchForBuildScheme() {
+      return this.dashFromStore.searches
+        .find((search) => search.id === this.searchForBuildScheme)
+        ?.status === 'pending';
+    },
     isPanelBackHide() {
       return this.dashFromStore[this.idFrom].options?.panelBackHide || false;
     },
@@ -765,6 +770,12 @@ export default {
     },
     saveMultipleScheme() {
       return this.optionsFromStore?.saveMultipleScheme;
+    },
+    minimumLastSegmentLength() {
+      return Number(this.optionsFromStore.minimumLastSegmentLength) || 30;
+    },
+    minimumEdgeToEdgeDistance() {
+      return Number(this.optionsFromStore.minimumEdgeToEdgeDistance) || 10;
     },
     activeSchemeId() {
       if (
@@ -819,13 +830,20 @@ export default {
     },
     dataForBuildScheme(value) {
       if (this.isAlwaysUpdateScheme && value?.length > 0) {
-        this.constructorSchemes.buildSchemeFromSearch(value);
+        this.constructorSchemes.buildSchemeFromSearch(
+          value,
+          this.minimumLastSegmentLength,
+          this.minimumEdgeToEdgeDistance,
+        );
       }
     },
     activeSchemeId() {
-      if (this.constructorSchemes) {
+      if (!this.isAlwaysUpdateScheme && this.constructorSchemes) {
         this.constructorSchemes.update(this.savedGraphObject);
       }
+    },
+    loadingSearchForBuildScheme(val) {
+      this.toggleLoading(val);
     },
   },
   mounted() {
@@ -874,6 +892,7 @@ export default {
       this.dndPanel = !this.dndPanel;
     },
     toggleLoading(isLoading) {
+      this.$emit('setLoading', isLoading);
       this.isLoading = isLoading;
     },
     createGraph() {
@@ -983,19 +1002,11 @@ export default {
       this.timer = 500;
       this.timeout = setTimeout(() => {
         this.createSavedGraphObjectField();
-        if (typeof this.searchForBuildScheme !== 'undefined') {
-          this.$store.commit('setState', [{
-            object: this.dashFromStore[this.idFrom].savedGraphObject,
-            prop: `${this.activeSchemeId}`,
-            value: data,
-          }]);
-        } else {
-          this.$store.commit('setState', [{
-            object: this.dashFromStore[this.idFrom].savedGraphObject,
-            prop: this.activeSchemeId,
-            value: data,
-          }]);
-        }
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.idFrom].savedGraphObject,
+          prop: this.activeSchemeId,
+          value: data,
+        }]);
         if (this.dashFromStore[this.idFrom].savedGraph || this.dashFromStore.savedGraph) {
           this.updateSavedGraph('');
         }
@@ -1131,6 +1142,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
   }
   &__options {
     position: absolute;
