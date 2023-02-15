@@ -56,7 +56,7 @@
         >
           <template v-slot:activator="{ on }">
             <v-icon
-              class="undo"
+              class="undo mr-4"
               :color="theme.$secondary_text"
               v-on="on"
               @click="toBackward"
