@@ -357,6 +357,7 @@ class GenerateElementsFromSearch {
                     tag: {
                       dataType: 'image-node',
                       nodeId: `arrow-${i}`,
+                      fromOtl: el.data.tag.fromOtl,
                       arrowWidth,
                       xByArrow,
                       yByArrow,
@@ -377,19 +378,71 @@ class GenerateElementsFromSearch {
           }))
           .then((arrowNodes) => new Promise((res, rej) => {
             try {
-              this.allArrowNodes = arrowNodes.map((el) => ({
-                type: 'node',
-                data: {
-                  ...el,
-                  layout: {
-                    x: el.tag.xByArrow,
-                    y: el.tag.yByArrow,
-                    width: Number(el.tag.arrowWidth),
-                    height: Number(el.tag.arrowWidth / (el.layout.width / el.layout.height)),
+              arrowNodes.forEach((el) => {
+                const textNode = {
+                  type: 'node',
+                  data: {
+                    ...this.defaultDescriptionStyles,
+                    tag: {
+                      ...this.defaultDescriptionStyles.tag,
+                      bgColor: {
+                        rgbaString: 'rgba(0,0,0,0)',
+                        rgbaObject: {
+                          r: 0,
+                          g: 0,
+                          b: 0,
+                          a: 0,
+                        },
+                      },
+                      borderColor: {
+                        rgbaString: 'rgba(0,0,0,0)',
+                        rgbaObject: {
+                          r: 0,
+                          g: 0,
+                          b: 0,
+                          a: 0,
+                        },
+                      },
+                      textColor: Utils.generateColor(Color.from('white')),
+                    },
+                    layout: {
+                      ...this.defaultDescriptionStyles.layout,
+                      x: el.layout.x,
+                      y: el.layout.y - el.layout.height,
+                    },
                   },
-                  icon: el.icon.node.style.image,
-                },
-              }));
+                };
+                this.allArrowNodes.push({
+                  ...textNode,
+                  data: {
+                    ...textNode.data,
+                    tag: {
+                      ...textNode.data.tag,
+                      text: el.tag.fromOtl.distance || '-',
+                    },
+                    layout: {
+                      x: el.tag.xByArrow,
+                      y: el.tag.yByArrow
+                          - Number(el.tag.arrowWidth / (el.layout.width / el.layout.height)),
+                      width: Number(el.tag.arrowWidth),
+                      height: Number(el.tag.arrowWidth / (el.layout.width / el.layout.height)),
+                    },
+                  },
+                });
+                this.allArrowNodes.push({
+                  type: 'node',
+                  data: {
+                    ...el,
+                    layout: {
+                      x: el.tag.xByArrow,
+                      y: el.tag.yByArrow,
+                      width: Number(el.tag.arrowWidth),
+                      height: Number(el.tag.arrowWidth / (el.layout.width / el.layout.height)),
+                    },
+                    icon: el.icon.node.style.image,
+                  },
+                });
+              });
               res();
             } catch (e) {
               rej(e);
@@ -444,7 +497,10 @@ class GenerateElementsFromSearch {
                         },
                       },
                     });
-                  } else if (el?.data?.tag?.fromOtl?.parent_description && el?.data?.tag?.nodeId.includes('parent')) {
+                  } else if (
+                    el?.data?.tag?.fromOtl?.parent_description
+                      && el?.data?.tag?.nodeId.includes('parent')
+                  ) {
                     // Element with description
                     allElements.push({
                       ...textNode,
