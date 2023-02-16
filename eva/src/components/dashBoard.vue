@@ -513,7 +513,6 @@
         class="loading-block"
       >
         <div
-          v-show="props.disappear"
           :style="{ borderColor: theme.$main_border, opacity: '0.2' }"
           class="loading-divider"
           :class="{ loading: loading, noBorder: !dataMode }"
@@ -532,7 +531,9 @@
         <vue-markdown
           v-if="toolSettings && toolSettings.dataSourceDescription"
           class="source-descr"
-        >{{ toolSettings.dataSourceDescription }}</vue-markdown>
+        >
+          {{ toolSettings.dataSourceDescription }}
+        </vue-markdown>
         <button
           class="selectDS"
           :style="{ color: '#FFFFFF', background: theme.$primary_button }"
