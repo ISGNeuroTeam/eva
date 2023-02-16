@@ -107,7 +107,7 @@
           handle=".burger"
         >
           <div
-            v-for="(metric, i) in settings.metricOptions"
+            v-for="(metric, i) in settings.metricOptions.filter(Boolean)"
             :key="`metric-${metric.listOrder}`"
             class="metric-section"
             :class="{ expanded: metric.expanded }"
@@ -405,6 +405,7 @@ export default {
       this.isChanged = true;
     },
     setSettingTemplate(n) {
+      this.isChanged = true;
       this.$set(this.settings, 'template', n);
     },
     changeColorData(metric, color) {
