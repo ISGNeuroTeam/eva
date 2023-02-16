@@ -2307,6 +2307,7 @@ export default {
 .title-name {
   overflow: hidden;
   white-space: nowrap;
+  min-height: 1.5em;
 }
 .user-control-panel {
   display: inline-flex;
