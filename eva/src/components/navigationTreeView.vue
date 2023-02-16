@@ -295,6 +295,7 @@ export default {
           }
           return item;
         });
+      const groupIds = this.$store.getters['app/groupOrder'];
       return [
         {
           type: 'categories',
@@ -318,7 +319,9 @@ export default {
           type: 'groups',
           treeId: 'groups',
           name: 'Доступные дашборды',
-          children: [...this.treeGroups],
+          children: this.treeGroups
+            .map((item) => ({ ...item, order: item.order || groupIds.indexOf(item.id) }))
+            .sort((a, b) => a.order - b.order),
         },
       ];
     },

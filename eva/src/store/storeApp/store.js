@@ -14,6 +14,10 @@ const defaultState = {
     'categories',
   ],
   roles: [],
+  groupOrder: {
+    id: null,
+    items: [],
+  },
 };
 
 function findDeepById(list, id, idProp = 'treeId', childrenProp = 'children') {
@@ -172,6 +176,21 @@ export default {
         body: categories,
       },
     ], restAuth),
+    saveGroupOrder: ({ state, commit }, groupIds) => {
+      const settings = [
+        {
+          id: state.groupOrder.id,
+          name: 'groupOrder',
+          body: groupIds,
+        },
+      ];
+      return rest.saveSettings(settings, restAuth)
+        .then((res) => commit('setSettings', res.map(({ id, name, body }) => ({
+          id,
+          name,
+          items: body,
+        }))));
+    },
     getDashes(_, groupId) {
       return fetch(`/api/group/dashs?id=${groupId}`)
         .then((res) => {
@@ -220,5 +239,6 @@ export default {
     hasGroups: (state) => !!state.treeGroups,
     roles: (state) => state.roles,
     roleList: (state) => state.roles.map((item) => item.name),
+    groupOrder: (state) => state.groupOrder.items,
   },
 };
