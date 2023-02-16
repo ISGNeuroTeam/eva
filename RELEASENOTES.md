@@ -2,6 +2,7 @@
 
 ### Added
 - Constructor-schemes: save multiple schemes by token
+- Group sorting
 
 ### Fixed
 - SingleValue: component menu didn't closet
