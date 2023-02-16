@@ -95,7 +95,7 @@ export default {
       height: 0,
       reload: 0,
       maxZIndex: 1,
-      panelBackHide: false,
+      // panelBackHide: false,
       movableProps: {
         vue_drag: false,
         zIndex: 1,
@@ -136,19 +136,11 @@ export default {
       }
       return 0;
     },
+    panelBackHide() {
+      return this.dashFromStore[this.dataElem]?.options?.panelBackHide;
+    },
   },
   watch: {
-    dashFromStore: {
-      deep: true,
-      handler(val) {
-        if (val[this.dataElem]) {
-          const { panelBackHide } = val[this.dataElem].options;
-          if (typeof panelBackHide === 'boolean' && this.panelBackHide !== panelBackHide) {
-            this.panelBackHide = panelBackHide;
-          }
-        }
-      },
-    },
     'movableProps.zIndex': {
       handler(val, oldVal) {
         if (oldVal > val) {
