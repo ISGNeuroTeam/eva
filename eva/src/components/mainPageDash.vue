@@ -377,15 +377,12 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
-    sortedAllDashs() {
-      return [...this.allDashs].sort((a, b) => this.getOrder(a) - this.getOrder(b));
-    },
     tabsOrder: {
       get() {
         return this.allDashs;
       },
       set(value) {
-        this.allDashs = structuredClone(value);
+        // this.allDashs = structuredClone(value);
       },
     },
     loading: {
@@ -460,33 +457,35 @@ export default {
       return dash?.groups.find((groupEl) => groupEl.name === this.curName)?.order;
     },
     dragend(e) {
-      this.draggedDash = e.moved.element.name;
+      const oldIndex = e.moved.oldIndex - 1;
+      const newIndex = e.moved.newIndex - 1;
+      if (newIndex === oldIndex) return;
+      const element = this.allDashs[oldIndex];
+      this.draggedDash = element.name;
       this.createEssence({
-        id: e.moved.element.id,
+        id: element.id,
         groups: [
           {
             name: this.curName,
-            order: e.moved.newIndex,
+            order: newIndex,
           },
         ],
       }, 'PUT', 'dash');
-      this.allDashs = this.allDashs.map((el) => {
-        if (el.id === e.moved.element.id) {
-          return {
-            ...el,
-            groups: el.groups.map((groupEl) => {
-              if (groupEl.name === this.curName) {
-                return {
-                  ...groupEl,
-                  order: e.moved.newIndex,
-                };
-              }
-              return groupEl;
-            }),
-          };
+
+      this.allDashs = this.allDashs.map((dash) => {
+        const result = {
+          ...dash,
+        };
+        if (dash.id === element.id) {
+          result.order = newIndex;
+        } else if (newIndex > oldIndex && dash.order <= newIndex && dash.order > oldIndex) {
+          result.order -= 1;
+        } else if (newIndex < oldIndex && dash.order >= newIndex && dash.order < oldIndex) {
+          result.order += 1;
         }
-        return el;
-      });
+        return result;
+      }).sort((a, b) => a.order - b.order);
+      // this.getDashs(this.curGroup);
     },
     createEssence(group, method, essence) {
       const response = this.$store.dispatch('auth/setEssence', {
@@ -590,11 +589,8 @@ export default {
     getDashs(id) {
       this.loading = true;
       this.allDashs = [];
-      this.$store.dispatch('getDashs', id).then((res) => {
-        this.allDashs = res.map((el, index) => ({
-          order: index,
-          ...el,
-        }));
+      return this.$store.dispatch('getDashs', id).then((res) => {
+        this.allDashs = res.sort((a, b) => a.order - b.order);
         this.loading = false;
       });
     },
