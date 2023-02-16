@@ -8,7 +8,7 @@ import {
   EdgePathLabelModel,
   EdgeSides,
   EventRecognizers,
-  FreeNodeLabelModel,
+  ItemMapping,
   GraphComponent,
   GraphEditorInputMode,
   LabelLayerPolicy,
@@ -611,6 +611,18 @@ class ConstructorSchemesClass {
     });
   }
 
+  update(elements) {
+    this.savedGraphObject = elements;
+    const schemeUpdater = this.initSchemeUpdater();
+    this.graphComponent.graph.clear();
+    schemeUpdater.load().then(() => {
+      this.updateDataNodeTemplate();
+      this.setDefaultElementsOrder();
+      // Выравнивание графа, инициализация dnd панели
+      return this.updateViewport();
+    });
+  }
+
   load(dndPanelElem) {
     const schemeUpdater = this.initSchemeUpdater();
     schemeUpdater.load().then(() => {
@@ -707,15 +719,16 @@ class ConstructorSchemesClass {
   }
 
   enableViewerInputMode() {
-    this.graphComponent.inputMode = new GraphViewerInputMode({
+    const mode = new GraphViewerInputMode({
       focusableItems: 'none',
     });
-    this.graphComponent.inputMode.addItemClickedListener((sender, evt) => {
+    mode.addItemClickedListener((sender, evt) => {
       const { item } = evt;
       if (typeof this.onClickObject === 'function') {
         this.onClickObject(item?.tag.dataType, item?.tag);
       }
     });
+    this.graphComponent.inputMode = mode;
   }
 
   // Setting up interaction with the graph
@@ -1107,11 +1120,10 @@ class ConstructorSchemesClass {
 
     const { createEdgeInputMode } = mode;
     createEdgeInputMode.addEdgeCreatedListener((sender, evt) => {
-      console.log(evt.item);
+      evt.item.tag = {
+        dataType: 'edge',
+      };
       if (originalEdgeDefaultStyle) {
-        evt.item.tag = {
-          dataType: 'edge',
-        };
         createEdgeInputMode.edgeDefaults.style = originalEdgeDefaultStyle;
         originalEdgeDefaultStyle = null;
       }
@@ -1706,6 +1718,7 @@ class ConstructorSchemesClass {
 
   fitGraphContent() {
     this.graphComponent.fitGraphBounds().then(() => {
+      this.graphComponent.fitContent();
       this.graphComponent.updateVisual();
     });
   }
@@ -1902,15 +1915,25 @@ class ConstructorSchemesClass {
     }
   }
 
-  enableEdgeRouter() {
+  enableEdgeRouter({
+    minimumEdgeToEdgeDistance,
+    minimumLastSegmentLength,
+  }) {
     const layoutData = new EdgeRouterData();
-    layoutData.targetPortConstraints = PortConstraint.create(PortSide.SOUTH, true);
-    // layoutData.sourcePortConstraints = PortConstraint.create(PortSide.SOUTH);
+    layoutData.targetPortConstraints = ItemMapping
+      .from((edge) => PortConstraint
+        .create(PortSide[edge.targetNode.tag?.fromOtl?.target_port_constraint || 'ALL'], true));
+    // Source ports
+    layoutData.sourcePortConstraints = ItemMapping
+      .from((edge) => PortConstraint
+        .create(PortSide[edge.sourceNode.tag?.fromOtl?.source_port_constraint || 'ALL'], false));
     const edgeRouter = new EdgeRouter();
     // чтобы узлы не сливались
     // TODO:Пока установлено временное значение, в дальнейшем вынести в настройки визуализации
-    edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance = 15;
-    edgeRouter.defaultEdgeLayoutDescriptor.minimumLastSegmentLength = 25;
+    edgeRouter.defaultEdgeLayoutDescriptor
+      .minimumEdgeToEdgeDistance = Number(minimumEdgeToEdgeDistance);
+    edgeRouter.defaultEdgeLayoutDescriptor
+      .minimumLastSegmentLength = Number(minimumLastSegmentLength);
     edgeRouter.scope = EdgeRouterScope.ROUTE_ALL_EDGES;
 
     this.graphComponent.graph.applyLayout(edgeRouter, layoutData);
@@ -1922,8 +1945,11 @@ class ConstructorSchemesClass {
     bridgeManager.addObstacleProvider(new GraphObstacleProvider());
   }
 
-  // TODO: Пока не работает
-  buildSchemeFromSearch(dataFrom) {
+  buildSchemeFromSearch(
+    dataFrom,
+    minimumEdgeToEdgeDistance = 10,
+    minimumLastSegmentLength = 30,
+  ) {
     const descriptionNodeStyles = {
       tag: {
         nodeId: 'label-node-default',
@@ -1932,7 +1958,7 @@ class ConstructorSchemesClass {
         text: 'Description',
         bordered: true,
         borderType: 'solid',
-        borderSize: 2,
+        borderSize: 3,
         borderDashed: false,
         fontSize: 30,
         borderColor: Utils.generateColor(Color.from('#FFFFFF')),
@@ -1941,16 +1967,17 @@ class ConstructorSchemesClass {
       },
       layout: {
         width: 120,
-        height: 30,
+        height: 34,
         x: 0,
         y: 0,
       },
     };
     const generateElementFromSearch = new GenerateElementsFromSearch({
       elements: dataFrom,
+      graphComponent: this.graphComponent,
       defaultEdgeStyles: {
         ...this.defaultEdgeStyle,
-        strokeSize: 3,
+        strokeSize: '2px',
       },
       defaultDescriptionStyles: descriptionNodeStyles,
     });
@@ -1960,9 +1987,13 @@ class ConstructorSchemesClass {
         elements: response,
       });
       elementCreator.buildGraph().then(() => {
-        this.enableEdgeRouter();
+        this.enableEdgeRouter({
+          minimumEdgeToEdgeDistance,
+          minimumLastSegmentLength,
+        });
         this.fitGraphContent();
         this.setDefaultElementsOrder();
+        this.saveAnObject();
       });
     }).catch((e) => {
       console.error(e);

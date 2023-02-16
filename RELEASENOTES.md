@@ -1,3 +1,14 @@
+# [1.122.0] - 2023-02-16
+
+### Added
+- Constructor-schemes: save multiple schemes by token
+- Group sorting
+
+### Fixed
+- SingleValue: component menu didn't closet
+- Dashboard name doesn't fit when saving dashboard
+- Dashboard sorting not working
+
 # [1.121.0] - 2023-02-09
 
 ### Added

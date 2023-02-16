@@ -47,78 +47,84 @@
                     type="card"
                   />
                 </template>
-                <v-card
-                  v-for="(group, i) in allGroups"
-                  :key="group.id"
-                  class="dash-group"
-                  :ripple="false"
-                  :style="{
-                    background: theme.$main_bg,
-                    color: theme.$main_text,
-                    borderColors: theme.$main_border
-                  }"
+                <draggable
+                  ref="tabPanel"
+                  v-model="allGroups"
+                  group="tabs"
+                  class="groups-of-dash-draggable"
+                  @change="groupDragEnd"
                 >
-                  <v-card-title class="dash-group-title">
-                    <div
-                      class="title-color"
-                      :style="{ borderColor: group.color }"
-                    />
-                    <div
-                      v-if="editGroupPermission"
-                      class="controls-group"
-                    >
-                      <v-tooltip
-                        bottom
-                        :color="theme.$accent_ui_color"
+                  <v-card
+                    v-for="(group, i) in allGroups"
+                    :key="group.id"
+                    class="dash-group"
+                    :ripple="false"
+                    :style="{
+                      background: theme.$main_bg,
+                      color: theme.$main_text,
+                      borderColors: theme.$main_border
+                    }"
+                  >
+                    <v-card-title class="dash-group-title">
+                      <div
+                        class="title-color"
+                        :style="{ borderColor: group.color }"
+                      />
+                      <div
+                        v-if="editGroupPermission"
+                        class="controls-group"
                       >
-                        <template v-slot:activator="{ on }">
-                          <v-icon
-                            class="edit control-group"
-                            :color="theme.$primary_button"
-                            v-on="on"
-                            @click="editGroup(group.id)"
-                          >
-                            {{ pencil }}
-                          </v-icon>
-                        </template>
-                        <span>Редактировать</span>
-                      </v-tooltip>
-                      <v-tooltip
-                        bottom
-                        :color="theme.$accent_ui_color"
-                      >
-                        <template v-slot:activator="{ on }">
-                          <v-icon
-                            class="delete control-group"
-                            :color="theme.$primary_button"
-                            v-on="on"
-                            @click="deleteGroup(group.id, i)"
-                          >
-                            {{ trash }}
-                          </v-icon>
-                        </template>
-                        <span>Удалить</span>
-                      </v-tooltip>
-                    </div>
-                  </v-card-title>
-                  <v-card-text
-                    class="dash-group-text"
-                    @click="
-                      getDash({
+                        <v-tooltip
+                          bottom
+                          :color="theme.$accent_ui_color"
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-icon
+                              class="edit control-group"
+                              :color="theme.$primary_button"
+                              v-on="on"
+                              @click="editGroup(group.id)"
+                            >
+                              {{ pencil }}
+                            </v-icon>
+                          </template>
+                          <span>Редактировать</span>
+                        </v-tooltip>
+                        <v-tooltip
+                          bottom
+                          :color="theme.$accent_ui_color"
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-icon
+                              class="delete control-group"
+                              :color="theme.$primary_button"
+                              v-on="on"
+                              @click="deleteGroup(group.id, i)"
+                            >
+                              {{ trash }}
+                            </v-icon>
+                          </template>
+                          <span>Удалить</span>
+                        </v-tooltip>
+                      </div>
+                    </v-card-title>
+                    <v-card-text
+                      class="dash-group-text"
+                      @click="getDash({
                         id: group.id,
                         color: group.color,
                         name: group.name,
-                      })
-                    "
-                  >
-                    <p
-                      class="group-text"
-                      :title="group.name"
+                      })"
                     >
-                      {{ checkName(group.name) }}
-                    </p>
-                  </v-card-text>
-                </v-card>
+                      <p
+                        class="group-text"
+                        :title="group.name"
+                      >
+                        {{ checkName(group.name) }}
+                      </p>
+                    </v-card-text>
+                  </v-card>
+                </draggable>
                 <v-btn
                   v-if="editGroupPermission"
                   :color="theme.$primary_button"
@@ -329,6 +335,7 @@ import {
   mdiShield,
 } from '@mdi/js';
 import draggable from 'vuedraggable';
+import { mapActions } from 'vuex';
 import NavigationTreeView from './navigationTreeView';
 import Notifications from './notifications';
 
@@ -371,21 +378,19 @@ export default {
       draggedDash: '',
       loadingState: false,
       loadingInt: null,
+      groupOrder: [],
     };
   },
   computed: {
     theme() {
       return this.$store.getters.getTheme;
     },
-    sortedAllDashs() {
-      return [...this.allDashs].sort((a, b) => this.getOrder(a) - this.getOrder(b));
-    },
     tabsOrder: {
       get() {
         return this.allDashs;
       },
       set(value) {
-        this.allDashs = structuredClone(value);
+        // this.allDashs = structuredClone(value);
       },
     },
     loading: {
@@ -454,39 +459,46 @@ export default {
     });
 
     document.title = 'EVA | Конструирование дашбордов';
+    this.loadSettings();
   },
   methods: {
+    ...mapActions('app', [
+      'loadSettings',
+      'saveGroupOrder',
+    ]),
     getOrder(dash) {
       return dash?.groups.find((groupEl) => groupEl.name === this.curName)?.order;
     },
     dragend(e) {
-      this.draggedDash = e.moved.element.name;
+      const oldIndex = e.moved.oldIndex - 1;
+      const newIndex = e.moved.newIndex - 1;
+      if (newIndex === oldIndex) return;
+      const element = this.allDashs[oldIndex];
+      this.draggedDash = element.name;
       this.createEssence({
-        id: e.moved.element.id,
+        id: element.id,
         groups: [
           {
             name: this.curName,
-            order: e.moved.newIndex,
+            order: newIndex,
           },
         ],
       }, 'PUT', 'dash');
-      this.allDashs = this.allDashs.map((el) => {
-        if (el.id === e.moved.element.id) {
-          return {
-            ...el,
-            groups: el.groups.map((groupEl) => {
-              if (groupEl.name === this.curName) {
-                return {
-                  ...groupEl,
-                  order: e.moved.newIndex,
-                };
-              }
-              return groupEl;
-            }),
-          };
+
+      this.allDashs = this.allDashs.map((dash) => {
+        const result = {
+          ...dash,
+        };
+        if (dash.id === element.id) {
+          result.order = newIndex;
+        } else if (newIndex > oldIndex && dash.order <= newIndex && dash.order > oldIndex) {
+          result.order -= 1;
+        } else if (newIndex < oldIndex && dash.order >= newIndex && dash.order < oldIndex) {
+          result.order += 1;
         }
-        return el;
-      });
+        return result;
+      }).sort((a, b) => a.order - b.order);
+      // this.getDashs(this.curGroup);
     },
     createEssence(group, method, essence) {
       const response = this.$store.dispatch('auth/setEssence', {
@@ -583,18 +595,19 @@ export default {
       this.loading = true;
       return this.$store.dispatch('getGroups').then((res) => {
         this.loading = false;
-        this.allGroups = res;
+        const groupIds = this.$store.getters['app/groupOrder'];
+        this.allGroups = res.map((item) => ({
+          ...item,
+          order: item.order || groupIds.indexOf(item.id),
+        })).sort((a, b) => a.order - b.order);
         return res;
       });
     },
     getDashs(id) {
       this.loading = true;
       this.allDashs = [];
-      this.$store.dispatch('getDashs', id).then((res) => {
-        this.allDashs = res.map((el, index) => ({
-          order: index,
-          ...el,
-        }));
+      return this.$store.dispatch('getDashs', id).then((res) => {
+        this.allDashs = res.sort((a, b) => a.order - b.order);
         this.loading = false;
       });
     },
@@ -682,6 +695,16 @@ export default {
         newName = `${name.slice(0, 12)}...`;
       }
       return newName;
+    },
+    groupDragEnd() {
+      const groupIds = this.allGroups.map(({ id }) => id);
+      this.saveGroupOrder(groupIds)
+        .catch((err) => {
+          this.$store.commit('notify/addNotification', {
+            id: 'saveGroupOrder_error',
+            message: `Не удалось сохранить порядок групп: ${err.statusText}`,
+          });
+        });
     },
   },
 };
