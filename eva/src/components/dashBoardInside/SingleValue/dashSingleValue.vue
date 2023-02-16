@@ -18,7 +18,7 @@
         </div>
 
         <v-icon
-          v-show="dataModeFrom && !error"
+          v-show="dataModeFrom"
           size="22"
           class="settings-icon"
           @click.stop="openSettings"
@@ -177,22 +177,34 @@ export default {
     metricList: [],
     metricCount: 0,
     template: 1,
-    providedSettings: {},
+    providedSettings: {
+      metricOptions: [],
+    },
     defaultSettings: {},
     isSettingsComponentOpen: false,
     update: 1,
     isHeaderOpen: true,
-    error: '',
   }),
   computed: {
     theme() {
       return this.$store.getters.getTheme;
     },
 
+    error() {
+      if (this.dataRestFrom.length) {
+        if (this.dataRestFrom.findIndex(({ _order }) => !_order) !== -1) {
+          return 'В запросе отсутствует обязательное поле "_order"';
+        }
+        if (this.dataRestFrom.map(({ _order }) => _order).sort().findIndex((order, idx) => order !== idx + 1) !== -1) {
+          return 'Допущен пропуск номеров в последовательности значений поля "_order"';
+        }
+      }
+      return '';
+    },
+
     metricsForRender() {
       const elementsToShow = this.metricList.slice(0, this.metricCount);
       if (elementsToShow.length !== elementsToShow.filter(Boolean).length) {
-        this.setError('Допущен пропуск номеров в последовательности значений поля "_order"');
         this.$store.commit('setState', [{
           object: this.getOptions.settings,
           prop: 'metricOptions',
@@ -200,8 +212,6 @@ export default {
         }]);
         return [];
       }
-      this.setError('');
-
       return elementsToShow;
     },
 
@@ -290,9 +300,6 @@ export default {
     this.init(null, true);
   },
   methods: {
-    setError(err) {
-      this.error = err;
-    },
     getIcon(metric) {
       if (!metric.metadata) {
         return undefined;
@@ -418,7 +425,6 @@ export default {
       }
       const metricList = [];
       const metricOptions = [];
-      this.error = '';
       structuredClone(this.dataRestFrom).forEach((data) => {
         const {
           metric, value, metadata, _order: sortOrder,
@@ -431,7 +437,6 @@ export default {
             metricOptionsCurrent
             && metricOptionsCurrent.length !== metricOptionsCurrent.filter(Boolean).length
           ) {
-            this.error = 'Допущен пропуск номеров в последовательности значений поля "_order"';
             this.$store.commit('setState', [{
               object: this.getOptions.settings,
               prop: 'metricOptions',
@@ -439,7 +444,6 @@ export default {
             }]);
           }
           if (!sortOrder) {
-            this.error = 'В запросе отсутствует обязательное поле "_order"';
             metricList.length = 0;
             metricOptions.length = 0;
             return;
@@ -525,7 +529,7 @@ export default {
     },
 
     saveSettings(settings = {}) {
-      const { metricCount, template, metricOptions } = settings;
+      const { metricCount, template, metricOptions = [] } = settings;
       metricOptions.forEach((item, idx) => {
         item.id = idx + 1;
         item.listOrder = idx + 1;
@@ -546,7 +550,7 @@ export default {
           const {
             icon, title, color, fontSize, fontWeight,
           } = updatedMetric;
-          const metric = this.metricList.find((m) => m.id === updatedMetric.id);
+          const metric = this.metricList.find((m) => m && m.id === updatedMetric.id);
           if (metric) {
             return [
               ...acc,
@@ -557,14 +561,14 @@ export default {
                 color,
                 fontSize,
                 fontWeight,
-                listOrder: index,
+                listOrder: index + 1,
               },
             ];
           }
           return acc;
         }, []);
 
-      this.$set(this, 'metricList', { ...newMetricList });
+      this.$set(this, 'metricList', [...newMetricList]);
 
       this.$set(this, 'providedSettings', { ...newSettings });
 

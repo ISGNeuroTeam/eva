@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.122.0]
+
+### Added
+- Constructor-schemes: save multiple schemes by token
+- Group sorting
+
+### Fixed
+- SingleValue: component menu didn't closet
+- Dashboard name doesn't fit when saving dashboard
+- Dashboard sorting not working
+
 ## [1.121.0]
 
 ### Added

@@ -56,7 +56,7 @@
         >
           <template v-slot:activator="{ on }">
             <v-icon
-              class="undo"
+              class="undo mr-4"
               :color="theme.$secondary_text"
               v-on="on"
               @click="toBackward"
@@ -809,7 +809,7 @@
           </div>
           <div class="buttons-save">
             <v-btn
-              class="save-btn"
+              class="save-btn my-2"
               small
               :color="theme.$primary_button"
               @click="saveDash"
@@ -2287,6 +2287,10 @@ export default {
   flex-direction: row;
 }
 
+.save-name {
+  overflow-wrap: anywhere;
+}
+
 .v-tooltip__content {
   width: fit-content;
 }
@@ -2296,5 +2300,16 @@ export default {
 }
 .row-tocken::v-deep .v-menu__content {
   max-width: initial;
+}
+.main-title {
+  overflow: hidden;
+}
+.title-name {
+  overflow: hidden;
+  white-space: nowrap;
+  min-height: 1.5em;
+}
+.user-control-panel {
+  display: inline-flex;
 }
 </style>

@@ -1724,6 +1724,7 @@ export default {
                   || item === 'ListTokens'
                   || item === 'scatterPlotLegend'
                   || item === 'tooltipMetrics'
+                  || item === 'tokensBySchemeId'
               ) {
                 localOptions[item] = options[item] || [];
               } else if (item === 'pieType') {
