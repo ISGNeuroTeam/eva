@@ -47,7 +47,7 @@
         <v-text-field
           v-model="sizeGrid.vert"
           placeholder="24"
-          label="Вертикально"
+          label="Горизонтально"
           :color="theme.$accent_ui_color"
           :style="{
             color: theme.$main_text,
@@ -63,7 +63,7 @@
         <v-text-field
           v-model="sizeGrid.hor"
           placeholder="24"
-          label="Горизонтально"
+          label="Вертикально"
           :color="theme.$accent_ui_color"
           :style="{
             color: theme.$main_text,
