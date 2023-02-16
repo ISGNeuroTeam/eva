@@ -748,12 +748,13 @@ export default {
       return fetch('/api/settings', {
         method: id ? 'PUT' : 'POST',
         body: JSON.stringify({ id, name, body: JSON.stringify(body) }),
-      }).then((response) => {
+      }).then(async (response) => {
         if (!response.ok) {
           return Promise.reject(response);
         }
+        const res = await response.json();
         return {
-          id,
+          id: id || res.id,
           name,
           body,
           response,
