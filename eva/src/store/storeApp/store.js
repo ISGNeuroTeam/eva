@@ -187,7 +187,7 @@ export default {
         .then((data) => commit('setGroupItem', {
           treeId,
           props: {
-            children: data.map((dash) => ({
+            children: data.sort((a, b) => a.order - b.order).map((dash) => ({
               ...dash,
               treeId: uuidv4(),
               type: 'dash',
@@ -201,7 +201,7 @@ export default {
         .then((data) => commit('setCategoryItem', {
           treeId,
           props: {
-            children: data.map((dash) => ({
+            children: data.sort((a, b) => a.order - b.order).map((dash) => ({
               ...dash,
               treeId: uuidv4(),
               type: 'dash',
