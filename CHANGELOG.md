@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Constructor-schemes: save multiple schemes by token
+
 ### Changed
 
 ### Fixed
@@ -18,9 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.121.0]
 
 ### Added
-- Constructor-schemes: build scheme from search
 - Gauge component
 - Waterfall component
+- Constructor-schemes: build scheme from search
 
 ### Changed
 
