@@ -23,8 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Waterfall component
 - Constructor-schemes: build scheme from search
 
-### Changed
-
 ### Fixed
 - Constructor-schemes: setting default elements didn't work
 - Constructor-schemes: element "hoarder"(data-type-2) didn't work
