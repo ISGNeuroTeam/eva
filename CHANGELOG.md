@@ -8,9 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Constructor-schemes: save multiple schemes by token
 
 ### Changed
+
+### Fixed
+
+## [1.122.0]
+
+### Added
+- Constructor-schemes: save multiple schemes by token
 
 ### Fixed
 - SingleValue: component menu didn't closet
