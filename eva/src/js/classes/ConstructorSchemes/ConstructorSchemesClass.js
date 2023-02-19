@@ -20,6 +20,7 @@ import {
   HandlePositions,
   HierarchicNestingPolicy,
   ICommand,
+  ImageNodeStyle,
   IEdge,
   IEdgeReconnectionPortCandidateProvider,
   ILabel,
@@ -109,8 +110,9 @@ class ConstructorSchemesClass {
     if (isRgbaColor) {
       dataNode.tag = {
         ...dataNode.tag,
-        borderColor: Utils.generateColor(Color.from(data.dataRest.borderColor)),
-        bgColor: Utils.generateColor(Color.from(data.dataRest.bgColor)),
+        borderColor: Utils.generateColor(Color.from(data.dataRest.borderColor.rgbaString)),
+        textColor: Utils.generateColor(Color.from(data.dataRest.textColor.rgbaString)),
+        bgColor: Utils.generateColor(Color.from(data.dataRest.bgColor.rgbaString)),
       };
     }
     dataNode.style = new VuejsNodeStyle(data.template);
@@ -194,6 +196,154 @@ class ConstructorSchemesClass {
     }
     return node.tag;
   }
+
+  updateImageNode(node) {
+    const { image } = node.style;
+    if (image?.includes('icon-test-11')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-11', 'element-10')),
+      );
+    } else if (image?.includes('icon-test-12')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-12', 'element-11-left')),
+      );
+    } else if (image?.includes('icon-test-13')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-13', 'element-11-right')),
+      );
+    } else if (image?.includes('icon-test-14')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-14', 'element-12-top')),
+      );
+    } else if (image?.includes('icon-test-18')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-18', 'element-13')),
+      );
+    } else if (image?.includes('icon-test-10')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-10', 'element-15')),
+      );
+    } else if (image?.includes('icon-test-1')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-1', 'element-1')),
+      );
+    }
+    if (image?.includes('icon-test-20')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-20', 'element-22')),
+      );
+    } else if (image?.includes('icon-test-2')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-2', 'element-2')),
+      );
+    }
+    if (image?.includes('icon-test-3')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-3', 'element-3')),
+      );
+    }
+    if (image?.includes('icon-test-4-top')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-4-top', 'element-4-top')),
+      );
+    } else if (image?.includes('icon-test-4-right')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-4-right', 'element-4-left')),
+      );
+    } else if (image?.includes('icon-test-4-left')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-4-left', 'element-4-left')),
+      );
+    } else if (image?.includes('icon-test-4-bottom')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-4-bottom', 'element-4-bottom')),
+      );
+    } else if (image?.includes('icon-test-4')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-4', 'element-4-top')),
+      );
+    }
+    if (image?.includes('icon-test-5')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-5', 'element-5')),
+      );
+    }
+    if (image?.includes('icon-test-6')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-6', 'element-6')),
+      );
+    }
+    if (image?.includes('icon-test-7')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-7', 'element-7')),
+      );
+    }
+    if (image?.includes('icon-test-8')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-8', 'element-8')),
+      );
+    }
+    if (image?.includes('icon-test-9')) {
+      this.graphComponent.graph.setStyle(
+        node,
+        new ImageNodeStyle(image.replace('icon-test-9', 'element-9')),
+      );
+    }
+  }
+  /*
+  * [
+    "element-1",
+    "element-2",
+    "element-3",
+    "element-4-top",
+    "element-4-left",
+    "element-4-right",
+    "element-4-bottom",
+    "element-5",
+    "element-5-green",
+    "element-5-red",
+    "element-5-yellow",
+    "element-6",
+    "element-7",
+    "element-8",
+    "element-9",
+    "element-10",
+    "element-10-rotate",
+    "element-11-left",
+    "element-11-right",
+    "element-12-top",
+    "element-12-left",
+    "element-12-right",
+    "element-12-bottom",
+    "element-13",
+    "element-14",
+    "element-15",
+    "element-16_1",
+    "element-17_1",
+    "element-18_1",
+    "element-19_1",
+    "element-20_1"
+]
+  * */
 
   defaultDataSource = []
 
@@ -545,6 +695,7 @@ class ConstructorSchemesClass {
             new VuejsNodeStyle(this.elementTemplates[node.tag.dataType].template),
           );
         }
+        this.updateImageNode(node);
       }
     });
   }
