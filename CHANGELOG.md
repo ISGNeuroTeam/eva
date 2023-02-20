@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Constructor-schemes: the ability to remove a scheme from the list of saved schemes
+- Constructor-schemes: token-action click:image
 
 ### Changed
 
