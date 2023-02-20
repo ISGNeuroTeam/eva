@@ -400,6 +400,14 @@ class ConstructorSchemesClass {
       label: 'Треугольник(вправо)',
       id: 4,
     },
+    {
+      label: 'Треугольник(вверх)',
+      id: 5,
+    },
+    {
+      label: 'Треугольник(вниз)',
+      id: 6,
+    },
   ]
 
   copiedElements = null

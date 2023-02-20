@@ -55,6 +55,24 @@ const templates = {
            :points="0 + ',' + layout.height + ' ' + layout.width + ',' + layout.height / 2 + ' ' + '0,0'"
           />
         </template>
+        <template v-else-if="tag.shape === 5">
+          <!--triangle-top-->
+          <polygon 
+            :fill="tag.fill.rgbaString || 'transparent'" 
+            :stroke="tag.strokeColor.rgbaString || 'transparent'" 
+            :stroke-width="tag.thickness || '0'"
+           :points="'0, ' + layout.height + ' ' + layout.width + ', ' + layout.height + ' ' + layout.width / 2 + ', ' + '0'"
+          />
+        </template>
+        <template v-else-if="tag.shape === 6">
+          <!--triangle-bottom-->
+          <polygon 
+            :fill="tag.fill.rgbaString || 'transparent'" 
+            :stroke="tag.strokeColor.rgbaString || 'transparent'" 
+            :stroke-width="tag.thickness || '0'"
+           :points="'0, ' + '0 ' + layout.width / 2 + ', ' + layout.height + ' ' + layout.width + ', ' + '0'"
+          />
+        </template>
       </g> 
     `,
     dataRest: {
