@@ -1985,8 +1985,18 @@ export default new Vuex.Store({
     setLoadingSvg(context, param) {
       return rest.setLoadingSvg(param, restAuth);
     },
-    getUserSettings(state, id) {
-      return rest.getUserSettings(restAuth, id);
+    async getUserSettings(state, id) {
+      const response = await rest.getUserSettings(restAuth, id);
+      response.setting = response.setting
+        .replaceAll("'", '"')
+        .replaceAll('True', 'true')
+        .replaceAll('False', 'false');
+      try {
+        response.setting = JSON.parse(response.setting);
+      } catch (e) {
+        response.setting = {};
+      }
+      return response;
     },
     setUserSettings(state, setting) {
       return rest.setUserSettings(setting, restAuth);
