@@ -23,25 +23,6 @@
           'dash-constructor-schemes__options--dnd-panel-is-open': dndPanel,
         }"
       >
-        <v-tooltip
-          v-if="false"
-          bottom
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <div v-on="on">
-              <v-switch
-                v-model="isEdit"
-                inset
-                dense
-                class="dash-constructor-schemes__switch"
-                label=""
-                @change="toggleInputMode"
-              />
-            </div>
-          </template>
-          <span>Вкл\выкл режим редактирования</span>
-        </v-tooltip>
         <template v-if="dashboardEditMode">
           <v-tooltip
             bottom
@@ -248,26 +229,6 @@
           'dash-constructor-schemes__dnd-panel-container--active': dndPanel,
         }"
       >
-        <div
-          v-show="!isLoading"
-          v-if="false"
-          class="row justify-end"
-        >
-          <div
-            class="col-auto"
-          >
-            <button
-              @click="toggleDnDPanel"
-            >
-              <v-icon
-                class="control-button edit-icon theme--dark"
-                :style="{ color: theme.$secondary_text }"
-              >
-                {{ closeIcon }}
-              </v-icon>
-            </button>
-          </div>
-        </div>
         <div
           v-show="!isLoading"
           :ref="`dndPanel-${idFrom}`"
@@ -686,6 +647,7 @@ export default {
     return {
       actions: [
         { name: 'click:label', capture: ['value1', 'value2', 'value3', 'value4', 'value5'] },
+        { name: 'click:image', capture: [] },
       ],
       isEdit: false,
       gear: mdiSettings,
@@ -793,6 +755,19 @@ export default {
         return savedGraph[this.localActiveSchemeId] || [];
       }
       return [];
+    },
+    captureFromImageNode() {
+      const result = [];
+      const prepareItems = [];
+      this.savedGraphObject
+        .filter((item) => item.data.tag.dataType === 'image-node' && item.data.tag.fromOtl)
+        .forEach((item) => {
+          prepareItems.push(...Object.keys(item.data.tag.fromOtl));
+        });
+      new Set(prepareItems).forEach((item) => {
+        result.push(item);
+      });
+      return result;
     },
     innerSize() {
       return {
@@ -911,6 +886,31 @@ export default {
     loadingSearchForBuildScheme(val) {
       this.toggleLoading(val);
     },
+    dataSelectedNode(node) {
+      if (node?.dataType === 'image-node') {
+        this.actions = this.actions.map((action) => {
+          if (action.name !== 'click:image') {
+            return action;
+          }
+          return {
+            ...action,
+            capture: Object.keys(node),
+          };
+        });
+      }
+    },
+    captureFromImageNode(imageCapture) {
+      this.actions = this.actions.map((action) => {
+        if (action.name === 'click:label') {
+          return action;
+        }
+        return {
+          ...action,
+          capture: imageCapture,
+        };
+      });
+      this.setActions();
+    },
   },
   created() {
     if (!this.dashFromStore[this.idFrom].savedGraphObject) {
@@ -923,8 +923,19 @@ export default {
     this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
     this.updateSavedGraph = throttle(this.updateSavedGraph, 1000);
     this.setActions();
-
+    this.localActiveSchemeId = this.activeSchemeId;
     this.isEdit = this.dashboardEditMode;
+    if (this.constructorSchemes) {
+      if (this.isAlwaysUpdateScheme && this.dataForBuildScheme?.length > 0) {
+        this.constructorSchemes.buildSchemeFromSearch(
+          this.dataForBuildScheme,
+          this.minimumLastSegmentLength,
+          this.minimumEdgeToEdgeDistance,
+        );
+      } else {
+        this.constructorSchemes.update(this.savedGraphObject);
+      }
+    }
   },
   methods: {
     setActions() {
@@ -987,7 +998,7 @@ export default {
         isEdit: this.dashboardEditMode,
         isBridgesEnable: this.isBridgeEnable,
         onClickObject: (type, data) => {
-          if (type !== 'label-type-0') {
+          if (!type.includes('label-type') && type !== 'image-node') {
             return;
           }
           const { tockens: tokens } = this.$store.state[this.idDashFrom];
@@ -998,11 +1009,21 @@ export default {
               capture,
               elem,
             }) => {
-              if (elem === this.idFrom && action === 'click:label' && data[capture]) {
+              if (
+                elem === this.idFrom
+                  && ((action === 'click:label' && data[capture])
+                      || (action === 'click:image'))
+              ) {
+                let value;
+                if (action === 'click:image') {
+                  value = data.fromOtl[capture] || 'Нет данных';
+                } else {
+                  value = data[capture];
+                }
                 this.$store.commit('setTocken', {
                   token: { name, action, capture },
                   idDash: this.idDashFrom,
-                  value: data[capture],
+                  value,
                   store: this.$store,
                 });
               }
