@@ -23,25 +23,6 @@
           'dash-constructor-schemes__options--dnd-panel-is-open': dndPanel,
         }"
       >
-        <v-tooltip
-          v-if="false"
-          bottom
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <div v-on="on">
-              <v-switch
-                v-model="isEdit"
-                inset
-                dense
-                class="dash-constructor-schemes__switch"
-                label=""
-                @change="toggleInputMode"
-              />
-            </div>
-          </template>
-          <span>Вкл\выкл режим редактирования</span>
-        </v-tooltip>
         <template v-if="dashboardEditMode">
           <v-tooltip
             bottom
@@ -248,26 +229,6 @@
           'dash-constructor-schemes__dnd-panel-container--active': dndPanel,
         }"
       >
-        <div
-          v-show="!isLoading"
-          v-if="false"
-          class="row justify-end"
-        >
-          <div
-            class="col-auto"
-          >
-            <button
-              @click="toggleDnDPanel"
-            >
-              <v-icon
-                class="control-button edit-icon theme--dark"
-                :style="{ color: theme.$secondary_text }"
-              >
-                {{ closeIcon }}
-              </v-icon>
-            </button>
-          </div>
-        </div>
         <div
           v-show="!isLoading"
           :ref="`dndPanel-${idFrom}`"
@@ -862,12 +823,15 @@ export default {
             result.push(tokenByName.value);
           }
         });
-        return result.join('-').replaceAll(' ', '_') || 'graph';
+        return result.join('-').replaceAll(' ', '_') || 'default-scheme';
       }
-      return 'graph';
+      return 'default-scheme';
     },
     allSavedSchemes() {
-      return Object.keys(this.dashFromStore[this.idFrom].savedGraphObject);
+      if (this.dashFromStore[this.idFrom]?.savedGraphObject) {
+        return Object.keys(this.dashFromStore[this.idFrom].savedGraphObject);
+      }
+      return [];
     },
   },
   watch: {
@@ -910,6 +874,9 @@ export default {
     },
     activeSchemeId(schemeId) {
       this.localActiveSchemeId = schemeId;
+      if (!this.dashFromStore[this.idFrom].savedGraphObject[schemeId]) {
+        this.updateSavedGraphObject([]);
+      }
     },
     localActiveSchemeId() {
       if (!this.isAlwaysUpdateScheme && this.constructorSchemes) {
@@ -944,6 +911,12 @@ export default {
       });
       this.setActions();
     },
+  },
+  created() {
+    if (!this.dashFromStore[this.idFrom].savedGraphObject) {
+      this.localActiveSchemeId = this.activeSchemeId || 'default-scheme';
+      this.createSavedGraphObjectField();
+    }
   },
   mounted() {
     this.createGraph();
@@ -1112,7 +1085,7 @@ export default {
       if (!this.dashFromStore[this.idFrom]?.savedGraphObject[this.localActiveSchemeId]) {
         this.$store.commit('setState', [{
           object: this.dashFromStore[this.idFrom].savedGraphObject,
-          prop: this.localActiveSchemeId,
+          prop: this.localActiveSchemeId || 'default-scheme',
           value: [],
         }]);
       }
