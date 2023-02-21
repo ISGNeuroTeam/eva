@@ -18,6 +18,10 @@ const defaultState = {
     id: null,
     items: [],
   },
+  userSettings: {
+    userTtlEnabled: false,
+    userTtl: '',
+  },
 };
 
 function findDeepById(list, id, idProp = 'treeId', childrenProp = 'children') {
@@ -142,10 +146,22 @@ export default {
       }
       return false;
     },
+    setUserSettings(state, settings) {
+      state.userSettings = { ...settings };
+    },
   },
   actions: {
     resetState({ commit }) {
       commit('resetState');
+    },
+    async getUserSettings({ commit, getters }) {
+      const response = await rest.getUserSettings(restAuth, Vue.$jwt.decode().user_id);
+      response.setting = response.setting
+        .replaceAll("'", '"')
+        .replaceAll('True', 'true')
+        .replaceAll('False', 'false');
+      commit('setUserSettings', JSON.parse(response.setting));
+      return getters.userSettings;
     },
     getTreeCategoryItem({ state }, { id, idParam }) {
       return findDeepById(state.treeCategories.items, id, idParam);
@@ -240,5 +256,6 @@ export default {
     roles: (state) => state.roles,
     roleList: (state) => state.roles.map((item) => item.name),
     groupOrder: (state) => state.groupOrder.items,
+    userSettings: (state) => state.userSettings,
   },
 };
