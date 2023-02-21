@@ -439,7 +439,7 @@ export default {
       isChanged: false,
       homePage: '',
       userTtlEnabled: false,
-      userTtl: '',
+      userTtl: '60',
     };
   },
   computed: {
@@ -550,7 +550,7 @@ export default {
           const {
             homePage = '',
             userTtlEnabled = false,
-            userTtl = '',
+            userTtl = '60',
           } = res.setting;
           this.homePage = homePage;
           this.userTtlEnabled = userTtlEnabled;
