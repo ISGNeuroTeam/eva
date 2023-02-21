@@ -1191,9 +1191,6 @@ export default {
     },
     orderTo(key) {
       this.constructorSchemes.orderTo(key);
-      this.$nextTick(() => {
-        this.constructorSchemes.save(this.updateSavedGraph);
-      });
     },
     addLine() {
       this.dataSelectedNode.items.push({
@@ -1282,10 +1279,11 @@ export default {
       }
     },
     exportJSON() {
-      this.constructorSchemes.saveGraphToLocalStorage(this.localActiveSchemeId);
+      console.trace();
+      this.constructorSchemes.exportGraphToJSON(this.localActiveSchemeId);
     },
     importFrom(file) {
-      this.constructorSchemes.loadGraph(file);
+      this.constructorSchemes.importGraphFromJSON(file);
       this.file = null;
     },
     updateFile(e) {
