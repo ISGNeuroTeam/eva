@@ -668,15 +668,7 @@ class ConstructorSchemesClass {
     });
   }
 
-  // old
-  // Save
-  save(updateStoreCallback) {
-    this.saveGraphToLocalStorage().then(() => {
-      this.updateGraphFromLocalStorage(updateStoreCallback);
-    });
-  }
-
-  async saveGraphToLocalStorage(schemeId = 'scheme') {
+  async exportGraphToJSON(schemeId = 'scheme') {
     return new Promise((resolve) => {
       const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(this.savedGraphObject))}`;
       const downloadAnchorNode = document.createElement('a');
@@ -690,7 +682,7 @@ class ConstructorSchemesClass {
   }
 
   // Load
-  async loadGraph(file) {
+  async importGraphFromJSON(file) {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (event) => {
