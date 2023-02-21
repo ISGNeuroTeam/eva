@@ -1279,7 +1279,6 @@ export default {
       }
     },
     exportJSON() {
-      console.trace();
       this.constructorSchemes.exportGraphToJSON(this.localActiveSchemeId);
     },
     importFrom(file) {
