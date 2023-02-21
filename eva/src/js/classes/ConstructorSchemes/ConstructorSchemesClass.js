@@ -400,6 +400,14 @@ class ConstructorSchemesClass {
       label: 'Треугольник(вправо)',
       id: 4,
     },
+    {
+      label: 'Треугольник(вверх)',
+      id: 5,
+    },
+    {
+      label: 'Треугольник(вниз)',
+      id: 6,
+    },
   ]
 
   copiedElements = null
@@ -668,17 +676,30 @@ class ConstructorSchemesClass {
     });
   }
 
-  async saveGraphToLocalStorage() {
+  async saveGraphToLocalStorage(schemeId = 'scheme') {
     return new Promise((resolve) => {
-      ICommand.SAVE.execute(null, this.graphComponent);
+      const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(this.savedGraphObject))}`;
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute('href', dataStr);
+      downloadAnchorNode.setAttribute('download', `${schemeId}.json`);
+      document.body.appendChild(downloadAnchorNode); // required for firefox
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
       resolve();
     });
   }
 
   // Load
-  async loadGraph() {
+  async loadGraph(file) {
     return new Promise((resolve) => {
-      ICommand.OPEN.execute(null, this.graphComponent);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const { result } = event.target;
+        if (result) {
+          this.update(JSON.parse(result));
+        }
+      };
+      reader.readAsText(file);
       resolve();
     }).then(() => {
       this.setDefaultElementsOrder();
@@ -751,7 +772,7 @@ class ConstructorSchemesClass {
     return new GraphMLSupport({
       graphComponent: this.graphComponent,
       graphMLIOHandler: graphmlHandler,
-      storageLocation: StorageLocation.LOCAL_STORAGE,
+      storageLocation: StorageLocation.FILE_SYSTEM,
     });
   }
 
