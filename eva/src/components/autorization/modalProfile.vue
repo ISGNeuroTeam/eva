@@ -44,23 +44,58 @@
           clearable
           @input="toggleIsChanged"
         />
+        <div
+          class="msg-profile"
+          :class="{ openMsg: openMsg }"
+          :style="{ color: theme.$error_color }"
+        >
+          {{ msg }}
+        </div>
+        <v-card-actions>
+          <v-btn
+            small
+            :color="theme.$primary_button"
+            class="profile-btn mx-auto mb-4"
+            @click="changeBtn('pass')"
+          >
+            Изменить пароль
+          </v-btn>
+        </v-card-actions>
+        <div class="title">
+          Настройки TTL
+        </div>
+        <v-switch
+          v-model="userTtlEnabled"
+          label="Заменять TTL в запросах"
+          persistent-placeholder
+          dense
+          outlined
+          hide-details
+          @change="toggleIsChanged"
+        />
+        <v-text-field
+          v-model="userTtl"
+          label="TTL в секундах"
+          :color="theme.$accent_ui_color"
+          :style="{ color: theme.$main_text }"
+          :disabled="!userTtlEnabled"
+          class="field-profile"
+          outlined
+          persistent-placeholder
+          hide-details
+          @input="toggleIsChanged"
+          @change="onChangeTTL"
+        />
       </v-card-text>
-      <div
-        class="msg-profile"
-        :class="{ openMsg: openMsg }"
-        :style="{ color: theme.$error_color }"
-      >
-        {{ msg }}
-      </div>
       <v-card-actions>
         <v-spacer />
         <v-btn
           small
           :color="theme.$primary_button"
           class="profile-btn"
-          @click="changeBtn('pass')"
+          @click="changeBtn(false)"
         >
-          Изменить
+          Применить
         </v-btn>
         <v-btn
           small
@@ -149,7 +184,7 @@
                 persistent-placeholder
                 hide-details
                 @input="toggleIsChanged"
-                @change="userTtl = userTtl.replace(/\D/ig, '')"
+                @change="onChangeTTL"
               />
             </v-col>
           </v-row>
@@ -743,6 +778,9 @@ export default {
     },
     toggleIsChanged() {
       this.isChanged = true;
+    },
+    onChangeTTL() {
+      this.userTtl = +this.userTtl.replace(/\D/ig, '') || 60;
     },
   },
 };
