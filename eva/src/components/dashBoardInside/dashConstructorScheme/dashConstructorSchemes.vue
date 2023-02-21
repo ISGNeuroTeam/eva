@@ -19,7 +19,7 @@
         class="dash-constructor-schemes__options"
         :class="{
           'dash-constructor-schemes__options--is-keymap-open': isKeymapOpen,
-          'dash-constructor-schemes__options--edit-mode': isEdit,
+          'dash-constructor-schemes__options--edit-mode': dashboardEditMode,
           'dash-constructor-schemes__options--dnd-panel-is-open': dndPanel,
         }"
       >
@@ -41,6 +41,53 @@
               </div>
             </template>
             <span>Панель настроек</span>
+          </v-tooltip>
+          <!--Export-->
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <div class="pa-5 d-flex">
+                <v-icon
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="exportJSON"
+                >
+                  {{ fileExportOutline }}
+                </v-icon>
+              </div>
+            </template>
+            <span>Экспорт</span>
+          </v-tooltip>
+          <!--Import-->
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <div
+                class="pa-5 ma-0 d-flex"
+                v-on="on"
+              >
+                <v-file-input
+                  ref="fileInput"
+                  :value="file"
+                  :color="theme.$secondary_text"
+                  :style="{ color: theme.$secondary_text, fill: theme.$secondary_text }"
+                  class="dash-constructor-schemes__file-input ma-0"
+                  hide-details
+                  hide-input
+                  :prepend-icon="fileImportOutline"
+                  dense
+                  outlined
+                  label=""
+                  @change="updateFile"
+                />
+              </div>
+            </template>
+            <span>Импорт</span>
           </v-tooltip>
           <template v-if="searchForBuildScheme">
             <v-tooltip
@@ -587,6 +634,8 @@ import {
   mdiHelp,
   mdiFitToPageOutline,
   mdiCloudDownloadOutline,
+  mdiFileImport,
+  mdiFileExport,
 } from '@mdi/js';
 import BringForward from '../../../images/bring_forward.svg';
 import BringToFront from '../../../images/bring_to_front.svg';
@@ -655,6 +704,8 @@ export default {
       arrowUp: mdiArrowUp,
       arrowCollapseLeft: mdiArrowCollapseLeft,
       arrowCollapseRight: mdiArrowCollapseRight,
+      fileImportOutline: mdiFileImport,
+      fileExportOutline: mdiFileExport,
       iconArrowUp: '/icons/OrderIcons/bring_to_front.svg',
       arrowDown: mdiArrowDown,
       iconHelp: mdiHelp,
@@ -725,6 +776,7 @@ export default {
       isConfirmModalDelete: false,
       schemeIdForDelete: '',
       localActiveSchemeId: '',
+      file: null,
     };
   },
   computed: {
@@ -835,6 +887,11 @@ export default {
     },
   },
   watch: {
+    file(value) {
+      if (value) {
+        this.importFrom(value);
+      }
+    },
     primitivesFromStore: {
       handler() {
         this.constructorSchemes.refreshDnDPanel(this.primitivesFromStore);
@@ -887,7 +944,7 @@ export default {
       this.toggleLoading(val);
     },
     dataSelectedNode(node) {
-      if (node?.dataType === 'image-node') {
+      if (node?.dataType === 'image-node' && this.dataForBuildScheme?.length > 0) {
         this.actions = this.actions.map((action) => {
           if (action.name !== 'click:image') {
             return action;
@@ -900,16 +957,18 @@ export default {
       }
     },
     captureFromImageNode(imageCapture) {
-      this.actions = this.actions.map((action) => {
-        if (action.name === 'click:label') {
-          return action;
-        }
-        return {
-          ...action,
-          capture: imageCapture,
-        };
-      });
-      this.setActions();
+      if (this.dataForBuildScheme?.length > 0) {
+        this.actions = this.actions.map((action) => {
+          if (action.name === 'click:label') {
+            return action;
+          }
+          return {
+            ...action,
+            capture: imageCapture,
+          };
+        });
+        this.setActions();
+      }
     },
   },
   created() {
@@ -1132,9 +1191,6 @@ export default {
     },
     orderTo(key) {
       this.constructorSchemes.orderTo(key);
-      this.$nextTick(() => {
-        this.constructorSchemes.save(this.updateSavedGraph);
-      });
     },
     addLine() {
       this.dataSelectedNode.items.push({
@@ -1222,6 +1278,22 @@ export default {
         this.schemeIdForDelete = '';
       }
     },
+    exportJSON() {
+      console.trace();
+      this.constructorSchemes.exportGraphToJSON(this.localActiveSchemeId);
+    },
+    importFrom(file) {
+      this.constructorSchemes.importGraphFromJSON(file);
+      this.file = null;
+    },
+    updateFile(e) {
+      if (e) {
+        this.file = e;
+        this.$nextTick(() => {
+          this.$refs.fileInput.$refs.input.value = '';
+        });
+      }
+    },
   },
 };
 </script>
@@ -1267,6 +1339,14 @@ export default {
             color: var(--secondary_text);
           }
         }
+      }
+    }
+  }
+  &__file-input {
+    ::v-deep.v-input__prepend-outer {
+      margin: 0 !important;
+      .v-icon__svg {
+        fill: var(--secondary_text);
       }
     }
   }
