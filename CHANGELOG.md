@@ -8,12 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.123.0]
+
+### Added
 - Constructor-schemes: the ability to remove a scheme from the list of saved schemes
 - Constructor-schemes: token-action click:image
 - Constructor-schemes: import\export schemes
 - User's TTL settings
-
-### Changed
 
 ### Fixed
 - constructor-schemes: import\export on click to "orderTo" button

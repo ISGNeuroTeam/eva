@@ -1,3 +1,14 @@
+# [1.123.0] - 2023-02-21
+
+### Added
+- Constructor-schemes: the ability to remove a scheme from the list of saved schemes
+- Constructor-schemes: token-action click:image
+- Constructor-schemes: import\export schemes
+- User's TTL settings
+
+### Fixed
+- constructor-schemes: import\export on click to "orderTo" button
+
 # [1.122.0] - 2023-02-16
 
 ### Added
