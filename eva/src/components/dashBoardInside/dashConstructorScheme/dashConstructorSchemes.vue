@@ -1075,7 +1075,7 @@ export default {
               ) {
                 let value;
                 if (action === 'click:image') {
-                  value = data.fromOtl[capture] || 'Нет данных';
+                  value = data?.fromOtl[capture] || 'Нет данных';
                 } else {
                   value = data[capture];
                 }
