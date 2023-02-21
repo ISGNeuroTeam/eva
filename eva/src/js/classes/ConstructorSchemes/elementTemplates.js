@@ -55,6 +55,24 @@ const templates = {
            :points="0 + ',' + layout.height + ' ' + layout.width + ',' + layout.height / 2 + ' ' + '0,0'"
           />
         </template>
+        <template v-else-if="tag.shape === 5">
+          <!--triangle-top-->
+          <polygon 
+            :fill="tag.fill.rgbaString || 'transparent'" 
+            :stroke="tag.strokeColor.rgbaString || 'transparent'" 
+            :stroke-width="tag.thickness || '0'"
+           :points="'0, ' + layout.height + ' ' + layout.width + ', ' + layout.height + ' ' + layout.width / 2 + ', ' + '0'"
+          />
+        </template>
+        <template v-else-if="tag.shape === 6">
+          <!--triangle-bottom-->
+          <polygon 
+            :fill="tag.fill.rgbaString || 'transparent'" 
+            :stroke="tag.strokeColor.rgbaString || 'transparent'" 
+            :stroke-width="tag.thickness || '0'"
+           :points="'0, ' + '0 ' + layout.width / 2 + ', ' + layout.height + ' ' + layout.width + ', ' + '0'"
+          />
+        </template>
       </g> 
     `,
     dataRest: {
@@ -460,7 +478,7 @@ const templates = {
               writingMode: tag.isVertical ? 'vertical-rl' : 'horizontal-tb',
               textOrientation: 'mixed', 
               transform: tag.isVertical ? 'rotate(180deg)' : 'rotate(0deg)',
-              color: tag.textColor,
+              color: tag.textColor.rgbaString,
               fontSize: tag.fontSize ? tag.fontSize + 'px' : '12px',
               fontFamily: tag.fontFamily,
              }"
@@ -485,9 +503,33 @@ const templates = {
       borderType: 'solid',
       borderSize: 1,
       borderDashed: true,
-      borderColor: '#000000',
-      bgColor: '#FFFFFF',
-      textColor: '#000000',
+      borderColor: {
+        rgbaObject: {
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 1,
+        },
+        rgbaString: 'rgba(0,0,0,1)',
+      },
+      bgColor: {
+        rgbaObject: {
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 1,
+        },
+        rgbaString: 'rgba(255,255,255,1)',
+      },
+      textColor: {
+        rgbaObject: {
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 1,
+        },
+        rgbaString: 'rgba(0,0,0,1)',
+      },
       fontSize: 12,
     },
   },

@@ -1039,7 +1039,7 @@ export default {
     {
       optionGroup: 'schemeSetting',
       option: 'saveMultipleScheme',
-      description: 'Сохранить несклько схем',
+      description: 'Сохранить несколько схем',
       elem: 'switch',
       default: false,
     },
