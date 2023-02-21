@@ -19,45 +19,135 @@
         class="dash-constructor-schemes__options"
         :class="{
           'dash-constructor-schemes__options--is-keymap-open': isKeymapOpen,
+          'dash-constructor-schemes__options--edit-mode': dashboardEditMode,
+          'dash-constructor-schemes__options--dnd-panel-is-open': dndPanel,
         }"
       >
-        <v-tooltip
-          v-if="dashboardEditMode"
-          bottom
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <div v-on="on">
-              <v-switch
-                v-model="isEdit"
-                inset
-                dense
-                label=""
-                @change="toggleInputMode"
-              />
-            </div>
-          </template>
-          <span>Вкл\выкл режим редактирования</span>
-        </v-tooltip>
-        <template v-if="isEdit && dashboardEditMode">
+        <template v-if="dashboardEditMode">
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
-              <div class="pa-2 d-flex">
+              <div class="pa-5 d-flex">
                 <v-icon
                   class="control-button edit-icon theme--dark"
                   :style="{ color: theme.$secondary_text }"
                   v-on="on"
                   @click="toggleDnDPanel"
                 >
-                  {{ gear }}
+                  {{ dndPanel ? arrowCollapseLeft : arrowCollapseRight }}
                 </v-icon>
               </div>
             </template>
             <span>Панель настроек</span>
           </v-tooltip>
+          <!--Export-->
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <div class="pa-5 d-flex">
+                <v-icon
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="exportJSON"
+                >
+                  {{ fileExportOutline }}
+                </v-icon>
+              </div>
+            </template>
+            <span>Экспорт</span>
+          </v-tooltip>
+          <!--Import-->
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <div
+                class="pa-5 ma-0 d-flex"
+                v-on="on"
+              >
+                <v-file-input
+                  ref="fileInput"
+                  :value="file"
+                  :color="theme.$secondary_text"
+                  :style="{ color: theme.$secondary_text, fill: theme.$secondary_text }"
+                  class="dash-constructor-schemes__file-input ma-0"
+                  hide-details
+                  hide-input
+                  :prepend-icon="fileImportOutline"
+                  dense
+                  outlined
+                  label=""
+                  @change="updateFile"
+                />
+              </div>
+            </template>
+            <span>Импорт</span>
+          </v-tooltip>
+          <template v-if="searchForBuildScheme">
+            <v-tooltip
+              :disabled="isLoading"
+              bottom
+              :color="theme.$accent_ui_color"
+            >
+              <template v-slot:activator="{ on }">
+                <div class="pa-2 d-flex">
+                  <v-icon
+                    class="control-button edit-icon theme--dark"
+                    :style="{ color: theme.$secondary_text }"
+                    v-on="on"
+                    @click="openConfirmModal"
+                  >
+                    {{ cloudDownloadOutlineIcon }}
+                  </v-icon>
+                </div>
+              </template>
+              <span>Загрузить с сервера</span>
+            </v-tooltip>
+          </template>
+          <template v-if="saveMultipleScheme">
+            <v-select
+              v-model="localActiveSchemeId"
+              :items="allSavedSchemes"
+              class="
+                dash-constructor-schemes__select-field
+                dash-constructor-schemes__select-field--with-padding
+              "
+              label="Активная схема"
+              dense
+              :menu-props="{
+                'offset-y': true,
+              }"
+            >
+              <template #item="{ item, on }">
+                <v-list-item
+                  ripple
+                  class="v-list-item--link"
+                  v-on="on"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title class="d-flex align-center justify-content-between">
+                      <div class="mr-auto">
+                        {{ item }}
+                      </div>
+                      <v-icon
+                        class="control-button edit-icon theme--dark"
+                        :style="{ color: theme.$secondary_text }"
+                        @click.stop="openConfirmDeleteModal(item)"
+                      >
+                        {{ closeIcon }}
+                      </v-icon>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-select>
+          </template>
           <template v-if="dataSelectedNode">
             <v-tooltip
               bottom
@@ -124,27 +214,6 @@
               <span>На уровень ниже</span>
             </v-tooltip>
           </template>
-          <template v-if="searchForBuildScheme">
-            <v-tooltip
-              :disabled="isLoading"
-              bottom
-              :color="theme.$accent_ui_color"
-            >
-              <template v-slot:activator="{ on }">
-                <div class="pa-2 d-flex">
-                  <v-icon
-                    class="control-button edit-icon theme--dark"
-                    :style="{ color: theme.$secondary_text }"
-                    v-on="on"
-                    @click="openConfirmModal"
-                  >
-                    {{ cloudDownloadOutlineIcon }}
-                  </v-icon>
-                </div>
-              </template>
-              <span>Загрузить с сервера</span>
-            </v-tooltip>
-          </template>
         </template>
         <v-tooltip
           bottom
@@ -205,26 +274,8 @@
         }"
         :class="{
           'dash-constructor-schemes__dnd-panel-container--active': dndPanel,
-        // 'dash-constructor-schemes__dnd-panel-container--is-keymap-open': isKeymapOpen
         }"
       >
-        <div
-          v-show="!isLoading"
-          class="row justify-end"
-        >
-          <div class="col-auto">
-            <button
-              @click="toggleDnDPanel"
-            >
-              <v-icon
-                class="control-button edit-icon theme--dark"
-                :style="{ color: theme.$secondary_text }"
-              >
-                {{ closeIcon }}
-              </v-icon>
-            </button>
-          </div>
-        </div>
         <div
           v-show="!isLoading"
           :ref="`dndPanel-${idFrom}`"
@@ -560,6 +611,14 @@
         btn-cancel-text="Нет"
         @result="startSearch"
       />
+      <modal-confirm
+        v-model="isConfirmModalDelete"
+        :theme="theme"
+        :modal-text="`Удалить выбранную схему из списка сохраненных ?`"
+        btn-confirm-text="Да"
+        btn-cancel-text="Нет"
+        @result="deleteSavedScheme"
+      />
     </div>
   </portal>
 </template>
@@ -569,10 +628,14 @@ import {
   mdiArrowDown,
   mdiArrowUp,
   mdiClose,
+  mdiArrowCollapseLeft,
+  mdiArrowCollapseRight,
   mdiSettings,
   mdiHelp,
   mdiFitToPageOutline,
   mdiCloudDownloadOutline,
+  mdiFileImport,
+  mdiFileExport,
 } from '@mdi/js';
 import BringForward from '../../../images/bring_forward.svg';
 import BringToFront from '../../../images/bring_to_front.svg';
@@ -633,11 +696,16 @@ export default {
     return {
       actions: [
         { name: 'click:label', capture: ['value1', 'value2', 'value3', 'value4', 'value5'] },
+        { name: 'click:image', capture: [] },
       ],
       isEdit: false,
       gear: mdiSettings,
       closeIcon: mdiClose,
       arrowUp: mdiArrowUp,
+      arrowCollapseLeft: mdiArrowCollapseLeft,
+      arrowCollapseRight: mdiArrowCollapseRight,
+      fileImportOutline: mdiFileImport,
+      fileExportOutline: mdiFileExport,
       iconArrowUp: '/icons/OrderIcons/bring_to_front.svg',
       arrowDown: mdiArrowDown,
       iconHelp: mdiHelp,
@@ -705,6 +773,10 @@ export default {
       // activeScheme: 'graph',
       timeout: null,
       timer: 0,
+      isConfirmModalDelete: false,
+      schemeIdForDelete: '',
+      localActiveSchemeId: '',
+      file: null,
     };
   },
   computed: {
@@ -732,9 +804,22 @@ export default {
     savedGraphObject() {
       const savedGraph = this.dashFromStore[this.idFrom]?.savedGraphObject;
       if (savedGraph) {
-        return savedGraph[this.activeSchemeId] || [];
+        return savedGraph[this.localActiveSchemeId] || [];
       }
       return [];
+    },
+    captureFromImageNode() {
+      const result = [];
+      const prepareItems = [];
+      this.savedGraphObject
+        .filter((item) => item.data.tag.dataType === 'image-node' && item.data.tag.fromOtl)
+        .forEach((item) => {
+          prepareItems.push(...Object.keys(item.data.tag.fromOtl));
+        });
+      new Set(prepareItems).forEach((item) => {
+        result.push(item);
+      });
+      return result;
     },
     innerSize() {
       return {
@@ -790,15 +875,23 @@ export default {
             result.push(tokenByName.value);
           }
         });
-        return result.join('-').replaceAll(' ', '_') || 'graph';
+        return result.join('-').replaceAll(' ', '_') || 'default-scheme';
       }
-      return 'graph';
+      return 'default-scheme';
     },
     allSavedSchemes() {
-      return Object.keys(this.dashFromStore[this.idFrom].savedGraphObject);
+      if (this.dashFromStore[this.idFrom]?.savedGraphObject) {
+        return Object.keys(this.dashFromStore[this.idFrom].savedGraphObject);
+      }
+      return [];
     },
   },
   watch: {
+    file(value) {
+      if (value) {
+        this.importFrom(value);
+      }
+    },
     primitivesFromStore: {
       handler() {
         this.constructorSchemes.refreshDnDPanel(this.primitivesFromStore);
@@ -824,9 +917,8 @@ export default {
       });
     },
     dashboardEditMode(val) {
-      if (!val) {
-        this.isEdit = false;
-      }
+      this.isEdit = val;
+      this.toggleInputMode();
     },
     dataForBuildScheme(value) {
       if (this.isAlwaysUpdateScheme && value?.length > 0) {
@@ -837,7 +929,13 @@ export default {
         );
       }
     },
-    activeSchemeId() {
+    activeSchemeId(schemeId) {
+      this.localActiveSchemeId = schemeId;
+      if (!this.dashFromStore[this.idFrom].savedGraphObject[schemeId]) {
+        this.updateSavedGraphObject([]);
+      }
+    },
+    localActiveSchemeId() {
       if (!this.isAlwaysUpdateScheme && this.constructorSchemes) {
         this.constructorSchemes.update(this.savedGraphObject);
       }
@@ -845,12 +943,58 @@ export default {
     loadingSearchForBuildScheme(val) {
       this.toggleLoading(val);
     },
+    dataSelectedNode(node) {
+      if (node?.dataType === 'image-node' && this.dataForBuildScheme?.length > 0) {
+        this.actions = this.actions.map((action) => {
+          if (action.name !== 'click:image') {
+            return action;
+          }
+          return {
+            ...action,
+            capture: Object.keys(node),
+          };
+        });
+      }
+    },
+    captureFromImageNode(imageCapture) {
+      if (this.dataForBuildScheme?.length > 0) {
+        this.actions = this.actions.map((action) => {
+          if (action.name === 'click:label') {
+            return action;
+          }
+          return {
+            ...action,
+            capture: imageCapture,
+          };
+        });
+        this.setActions();
+      }
+    },
+  },
+  created() {
+    if (!this.dashFromStore[this.idFrom].savedGraphObject) {
+      this.localActiveSchemeId = this.activeSchemeId || 'default-scheme';
+      this.createSavedGraphObjectField();
+    }
   },
   mounted() {
     this.createGraph();
     this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
     this.updateSavedGraph = throttle(this.updateSavedGraph, 1000);
     this.setActions();
+    this.localActiveSchemeId = this.activeSchemeId;
+    this.isEdit = this.dashboardEditMode;
+    if (this.constructorSchemes) {
+      if (this.isAlwaysUpdateScheme && this.dataForBuildScheme?.length > 0) {
+        this.constructorSchemes.buildSchemeFromSearch(
+          this.dataForBuildScheme,
+          this.minimumLastSegmentLength,
+          this.minimumEdgeToEdgeDistance,
+        );
+      } else {
+        this.constructorSchemes.update(this.savedGraphObject);
+      }
+    }
   },
   methods: {
     setActions() {
@@ -910,10 +1054,11 @@ export default {
         updateStoreCallback: this.updateSavedGraph,
         updateStoreCallbackV2: this.updateSavedGraphObject,
         toggleLoadingCallback: this.toggleLoading,
-        isEdit: this.isEdit,
+        isEdit: this.dashboardEditMode,
         isBridgesEnable: this.isBridgeEnable,
         onClickObject: (type, data) => {
-          if (type !== 'label-type-0') {
+          if (!type) return;
+          if (!type.includes('label-type') && type !== 'image-node') {
             return;
           }
           const { tockens: tokens } = this.$store.state[this.idDashFrom];
@@ -924,11 +1069,21 @@ export default {
               capture,
               elem,
             }) => {
-              if (elem === this.idFrom && action === 'click:label' && data[capture]) {
+              if (
+                elem === this.idFrom
+                  && ((action === 'click:label' && data[capture])
+                      || (action === 'click:image'))
+              ) {
+                let value;
+                if (action === 'click:image') {
+                  value = (data?.fromOtl && data?.fromOtl[capture]) ? data?.fromOtl[capture] : 'Нет данных';
+                } else {
+                  value = data[capture];
+                }
                 this.$store.commit('setTocken', {
                   token: { name, action, capture },
                   idDash: this.idDashFrom,
-                  value: data[capture],
+                  value,
                   store: this.$store,
                 });
               }
@@ -987,10 +1142,10 @@ export default {
           value: {},
         }]);
       }
-      if (!this.dashFromStore[this.idFrom]?.savedGraphObject[this.activeSchemeId]) {
+      if (!this.dashFromStore[this.idFrom]?.savedGraphObject[this.localActiveSchemeId]) {
         this.$store.commit('setState', [{
           object: this.dashFromStore[this.idFrom].savedGraphObject,
-          prop: this.activeSchemeId,
+          prop: this.localActiveSchemeId || 'default-scheme',
           value: [],
         }]);
       }
@@ -1004,7 +1159,7 @@ export default {
         this.createSavedGraphObjectField();
         this.$store.commit('setState', [{
           object: this.dashFromStore[this.idFrom].savedGraphObject,
-          prop: this.activeSchemeId,
+          prop: this.localActiveSchemeId,
           value: data,
         }]);
         if (this.dashFromStore[this.idFrom].savedGraph || this.dashFromStore.savedGraph) {
@@ -1037,9 +1192,6 @@ export default {
     },
     orderTo(key) {
       this.constructorSchemes.orderTo(key);
-      this.$nextTick(() => {
-        this.constructorSchemes.save(this.updateSavedGraph);
-      });
     },
     addLine() {
       this.dataSelectedNode.items.push({
@@ -1056,6 +1208,7 @@ export default {
     toggleInputMode() {
       if (this.constructorSchemes) {
         this.isEdit = this.constructorSchemes.toggleInputMode();
+        // this.localActiveSchemeId = this.activeSchemeId;
         if (!this.isEdit) {
           this.closeDataPanel();
           this.dndPanel = false;
@@ -1092,22 +1245,54 @@ export default {
       if (confirm) {
         this.constructorSchemes.buildSchemeFromSearch(this.dataForBuildScheme);
       }
-      // if (confirm) {
-      //   this.isConfirmUpdateScheme = true;
-      //   this.$store.commit('updateSearchStatus', {
-      //     idDash: this.idDashFrom,
-      //     id: this.searchForBuildScheme,
-      //     status: 'empty',
-      //   });
-      // } else {
-      //   this.isConfirmModal = false;
-      // }
     },
     updateIconsList(iconsListFrom) {
       return iconsListFrom
         .filter((elementFrom) => !this.primitivesFromStore
           .some((element) => element.icon === elementFrom.icon))
         .map((element) => element.icon);
+    },
+    openConfirmDeleteModal(schemeIdForDelete) {
+      this.schemeIdForDelete = schemeIdForDelete;
+      this.isConfirmModalDelete = true;
+    },
+    deleteSavedScheme(isCancelDelete) {
+      if (isCancelDelete) {
+        const deleteFn = (object, fieldsForDelete) => {
+          const result = {};
+          Object.keys(object).forEach((key) => {
+            if (!fieldsForDelete.includes(key)) {
+              result[key] = object[key];
+            }
+          });
+          return result;
+        };
+        const allSchemes = structuredClone(this.dashFromStore[this.idFrom].savedGraphObject);
+        const filteredSavedSchemes = deleteFn(allSchemes, [this.schemeIdForDelete]);
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.idFrom],
+          prop: 'savedGraphObject',
+          value: filteredSavedSchemes,
+        }]);
+        this.schemeIdForDelete = '';
+      } else {
+        this.schemeIdForDelete = '';
+      }
+    },
+    exportJSON() {
+      this.constructorSchemes.exportGraphToJSON(this.localActiveSchemeId);
+    },
+    importFrom(file) {
+      this.constructorSchemes.importGraphFromJSON(file);
+      this.file = null;
+    },
+    updateFile(e) {
+      if (e) {
+        this.file = e;
+        this.$nextTick(() => {
+          this.$refs.fileInput.$refs.input.value = '';
+        });
+      }
     },
   },
 };
@@ -1133,8 +1318,36 @@ export default {
     }
   }
   &__select-field {
+    &--with-padding {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
     ::v-deep {
-      border-color: var(--main_text);
+      &.v-input__control, .v-icon__svg {
+        caret-color: var(--main_text) !important;
+        color: var(--main_text) !important;
+        border-color: var(--main_text) !important;
+      }
+    }
+  }
+  &__switch {
+    padding-left: 20px;
+    ::v-deep.v-input__control {
+      .v-input__slot {
+        .v-input--selection-controls__input {
+          .v-input--switch__track {
+            color: var(--secondary_text);
+          }
+        }
+      }
+    }
+  }
+  &__file-input {
+    ::v-deep.v-input__prepend-outer {
+      margin: 0 !important;
+      .v-icon__svg {
+        fill: var(--secondary_text);
+      }
     }
   }
   &__loading-circular {
@@ -1146,11 +1359,32 @@ export default {
   }
   &__options {
     position: absolute;
-    left: 20px;
-    top: 0;
+    left: 0;
+    top: 5px;
     display: flex;
     align-items: center;
     z-index: 10;
+    padding-right: 5px;
+    transition: all .2s ease;
+    &--edit-mode {
+      &::before {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        transition: all .2s ease;
+        background-color: var(--main_bg);
+        opacity: .8;
+        z-index: -1;
+      }
+    }
+
+    &--dnd-panel-is-open {
+      left: 255px;
+    }
   }
   &__inner-options {
     display: flex;

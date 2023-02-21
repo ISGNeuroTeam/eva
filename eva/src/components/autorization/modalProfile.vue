@@ -44,23 +44,58 @@
           clearable
           @input="toggleIsChanged"
         />
+        <div
+          class="msg-profile"
+          :class="{ openMsg: openMsg }"
+          :style="{ color: theme.$error_color }"
+        >
+          {{ msg }}
+        </div>
+        <v-card-actions>
+          <v-btn
+            small
+            :color="theme.$primary_button"
+            class="profile-btn mx-auto mb-4"
+            @click="changeBtn('pass')"
+          >
+            Изменить пароль
+          </v-btn>
+        </v-card-actions>
+        <div class="title">
+          Настройки TTL
+        </div>
+        <v-switch
+          v-model="userTtlEnabled"
+          label="Заменять TTL в запросах"
+          persistent-placeholder
+          dense
+          outlined
+          hide-details
+          @change="toggleIsChanged"
+        />
+        <v-text-field
+          v-model="userTtl"
+          label="TTL в секундах"
+          :color="theme.$accent_ui_color"
+          :style="{ color: theme.$main_text }"
+          :disabled="!userTtlEnabled"
+          class="field-profile"
+          outlined
+          persistent-placeholder
+          hide-details
+          @input="toggleIsChanged"
+          @change="onChangeTTL"
+        />
       </v-card-text>
-      <div
-        class="msg-profile"
-        :class="{ openMsg: openMsg }"
-        :style="{ color: theme.$error_color }"
-      >
-        {{ msg }}
-      </div>
       <v-card-actions>
         <v-spacer />
         <v-btn
           small
           :color="theme.$primary_button"
           class="profile-btn"
-          @click="changeBtn('pass')"
+          @click="changeBtn(false)"
         >
-          Изменить
+          Применить
         </v-btn>
         <v-btn
           small
@@ -89,39 +124,70 @@
           v-if="showBlock.users"
           class="profile-block"
         >
-          <v-text-field
-            v-model="userData.username"
-            label="Логин пользователя"
-            :color="theme.$accent_ui_color"
-            :style="{ color: theme.$main_text }"
-            class="field-profile"
-            outlined
-            hide-details
-            clearable
-            @input="toggleIsChanged"
-          />
-          <v-text-field
-            v-model="userData.pass"
-            label="Пароль пользователя"
-            :color="theme.$accent_ui_color"
-            :style="{ color: theme.$main_text }"
-            autocomplete="new-password"
-            class="field-profile"
-            placeholder="********"
-            type="password"
-            outlined
-            hide-details
-            clearable
-            @input="toggleIsChanged"
-          />
-          <v-autocomplete
-            v-model="homePage"
-            :items="[{text:'--Нет--', value: ''}, ...dataRest.groups]"
-            class="field-profile"
-            label="Значение для группы по умолчанию"
-            :style="{ color: theme.$main_text }"
-            outlined
-          />
+          <v-row>
+            <v-col>
+              <v-text-field
+                v-model="userData.username"
+                label="Логин пользователя"
+                :color="theme.$accent_ui_color"
+                :style="{ color: theme.$main_text }"
+                class="field-profile"
+                outlined
+                hide-details
+                clearable
+                @input="toggleIsChanged"
+              />
+              <v-text-field
+                v-model="userData.pass"
+                label="Пароль пользователя"
+                :color="theme.$accent_ui_color"
+                :style="{ color: theme.$main_text }"
+                autocomplete="new-password"
+                class="field-profile"
+                placeholder="********"
+                type="password"
+                outlined
+                hide-details
+                clearable
+                @input="toggleIsChanged"
+              />
+              <v-autocomplete
+                v-model="homePage"
+                :items="[{text:'--Нет--', value: ''}, ...dataRest.groups]"
+                class="field-profile"
+                label="Значение для группы по умолчанию"
+                :style="{ color: theme.$main_text }"
+                outlined
+              />
+            </v-col>
+            <v-col>
+              <div class="title">
+                Настройки TTL
+              </div>
+              <v-switch
+                v-model="userTtlEnabled"
+                label="Заменять TTL в запросах"
+                persistent-placeholder
+                dense
+                outlined
+                hide-details
+                @change="toggleIsChanged"
+              />
+              <v-text-field
+                v-model="userTtl"
+                label="TTL в секундах"
+                :color="theme.$accent_ui_color"
+                :style="{ color: theme.$main_text }"
+                :disabled="!userTtlEnabled"
+                class="field-profile"
+                outlined
+                persistent-placeholder
+                hide-details
+                @input="toggleIsChanged"
+                @change="onChangeTTL"
+              />
+            </v-col>
+          </v-row>
           <data-profile
             v-for="item in Object.keys(user.tab)"
             :key="item"
@@ -372,6 +438,8 @@ export default {
       colorFrom: {},
       isChanged: false,
       homePage: '',
+      userTtlEnabled: false,
+      userTtl: '60',
     };
   },
   computed: {
@@ -479,10 +547,14 @@ export default {
     if (this.userFrom.id) {
       this.$store.dispatch('getUserSettings', this.userFrom.id).then((res) => {
         if (res.setting) {
-          const setting = JSON.parse(res.setting.replaceAll("'", '"'));
-          if (setting?.homePage) {
-            this.homePage = setting.homePage;
-          }
+          const {
+            homePage = '',
+            userTtlEnabled = false,
+            userTtl = '60',
+          } = res.setting;
+          this.homePage = homePage;
+          this.userTtlEnabled = userTtlEnabled;
+          this.userTtl = userTtl;
         }
       });
     }
@@ -672,14 +744,16 @@ export default {
       response.then(async (res) => {
         if (res.status === 200) {
           await res.json().then((responseData) => {
-            const getSetting = this.$store.dispatch('getUserSettings', this.userFrom.id || responseData.id);
+            const { setting } = this.$store.dispatch('getUserSettings', this.userFrom.id || responseData.id);
             this.$store.dispatch(
               'setUserSettings',
               JSON.stringify({
                 user_id: this.userFrom.id || responseData.id[0],
                 setting: {
-                  ...getSetting?.setting,
+                  ...setting,
                   homePage: this.homePage,
+                  userTtlEnabled: this.userTtlEnabled,
+                  userTtl: this.userTtl,
                 },
               }),
             );
@@ -704,6 +778,9 @@ export default {
     },
     toggleIsChanged() {
       this.isChanged = true;
+    },
+    onChangeTTL() {
+      this.userTtl = +this.userTtl.replace(/\D/ig, '') || 60;
     },
   },
 };
