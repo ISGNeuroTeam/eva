@@ -160,7 +160,12 @@ export default {
         .replaceAll("'", '"')
         .replaceAll('True', 'true')
         .replaceAll('False', 'false');
-      commit('setUserSettings', JSON.parse(response.setting));
+      try {
+        response.setting = JSON.parse(response.setting);
+      } catch (err) {
+        response.setting = {};
+      }
+      commit('setUserSettings', response.setting);
       return getters.userSettings;
     },
     getTreeCategoryItem({ state }, { id, idParam }) {
