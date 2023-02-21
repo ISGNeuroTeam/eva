@@ -1057,6 +1057,7 @@ export default {
         isEdit: this.dashboardEditMode,
         isBridgesEnable: this.isBridgeEnable,
         onClickObject: (type, data) => {
+          if (!type) return;
           if (!type.includes('label-type') && type !== 'image-node') {
             return;
           }
