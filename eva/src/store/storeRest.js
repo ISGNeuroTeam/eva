@@ -9,6 +9,11 @@ export default {
   async rest(formData, searchFrom, restAuth, idDash) {
     const jwt = Vue.$jwt.decode();
     formData.set('username', jwt.username);
+    const { userTtlEnabled, userTtl } = await this.store.getters['app/userSettings'];
+    if (userTtlEnabled) {
+      formData.set('cache_ttl', userTtl);
+      searchFrom.cache_ttl = userTtl;
+    }
     const response = await fetch('/api/makejob', {
       // сперва нужно подать post запрос
       method: 'POST',

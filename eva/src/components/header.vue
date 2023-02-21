@@ -211,7 +211,7 @@ export default {
           label: 'Редактировать',
           icon: mdiAccountEdit,
           onClick: this.edit,
-          hide: this.inside,
+          // hide: this.inside,
         },
         {
           id: 2,

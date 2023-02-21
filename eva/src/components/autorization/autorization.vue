@@ -136,13 +136,7 @@ export default {
             this.$store.dispatch('app/loadRoles');
             return res;
           });
-          const getSetting = await this.$store.dispatch('getUserSettings', userId.id);
-          let setting = getSetting.setting.replaceAll("'", '"');
-          try {
-            setting = JSON.parse(setting);
-          } catch (e) {
-            setting = '';
-          }
+          const { setting } = await this.$store.dispatch('getUserSettings', userId.id);
           const { redirect } = this.$route.query;
           if (setting && setting?.homePage && !redirect) {
             await this.$router.push({ path: '/dashboards', query: { home: setting.homePage } });
