@@ -95,6 +95,7 @@
             @downloadData="exportDataCSV"
             @SetRange="setRange($event, elem)"
             @ResetRange="resetRange($event)"
+            @activated="onActivated(elem.elem)"
           />
           <modal-delete
             :color-from="theme"
@@ -322,6 +323,7 @@ export default {
       isConfirmModal: false,
       deleteTabId: '',
       deleteTabName: '',
+      tempSorting: {},
     };
   },
   computed: {
@@ -401,6 +403,7 @@ export default {
             === this.currentTab
             || this.dashFromStore[elem].options?.pinned,
         )
+        .sort((a, b) => this.tempSorting[a] - this.tempSorting[b])
         .map((elem) => ({ elem, search: this.dashFromStore[elem].search }));
     },
     headerTop() {
@@ -477,6 +480,14 @@ export default {
     },
   },
   watch: {
+    'dashFromStore.elements.length': {
+      handler(val, old) {
+        if (val !== old) {
+          this.updateTempSorting();
+        }
+      },
+      deep: true,
+    },
     getSizeGrid() {
       this.calcSizeCell();
     },
@@ -543,8 +554,19 @@ export default {
     }
     this.checkTabOverflow();
     window.onresize = this.checkTabOverflow;
+    this.updateTempSorting();
   },
   methods: {
+    updateTempSorting() {
+      if (this.dashFromStore.elements?.reduce) {
+        this.tempSorting = this.dashFromStore.elements
+          .reduce((acc, elem) => {
+            const { options = {} } = this.dashFromStore[elem];
+            acc[elem] = +options.level || 1;
+            return acc;
+          }, {});
+      }
+    },
     startSearches(searches) {
       if (searches?.length > 0) {
         searches.forEach((search) => {
@@ -834,6 +856,12 @@ export default {
         this.dataObject[elem.search]
           .data = this.dataObjectConst[elem.search].data;
       });
+    },
+    onActivated(elem) {
+      this.elements.forEach(({ elem: itemElem }, i) => {
+        this.tempSorting[itemElem] = i + 1;
+      });
+      this.$set(this.tempSorting, elem, 100);
     },
   },
 };
