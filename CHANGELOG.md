@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.124.0]
+
+### Added
+- Constructor schemes: token-actions - click:el-parent-[type], click:el-child-all, click:el-child-[type], click:el-other
+
 ## [1.123.0]
 
 ### Added

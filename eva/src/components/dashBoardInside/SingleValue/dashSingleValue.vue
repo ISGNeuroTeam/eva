@@ -195,7 +195,11 @@ export default {
         if (this.dataRestFrom.findIndex(({ _order }) => !_order) !== -1) {
           return 'В запросе отсутствует обязательное поле "_order"';
         }
-        if (this.dataRestFrom.map(({ _order }) => _order).sort().findIndex((order, idx) => order !== idx + 1) !== -1) {
+        if (
+          this.dataRestFrom.map(({ _order }) => _order)
+            .sort((a, b) => a - b)
+            .findIndex((order, idx) => order !== idx + 1) !== -1
+        ) {
           return 'Допущен пропуск номеров в последовательности значений поля "_order"';
         }
       }
