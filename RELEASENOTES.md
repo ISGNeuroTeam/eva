@@ -1,3 +1,8 @@
+# [1.124.0] - 2023-03-01
+
+### Added
+- Constructor schemes: token-actions - added click events
+
 # [1.123.0] - 2023-02-21
 
 ### Added
