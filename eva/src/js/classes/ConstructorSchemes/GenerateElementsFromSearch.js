@@ -145,7 +145,10 @@ class GenerateElementsFromSearch {
                         type: 'node',
                         data: {
                           tag: {
-                            fromOtl,
+                            fromOtl: {
+                              ...fromOtl,
+                              token_type: `parent-${element.type}`,
+                            },
                             originalCoords: {
                               x: element.layout.x,
                               y: element.layout.y,
@@ -164,13 +167,16 @@ class GenerateElementsFromSearch {
                       type: 'node',
                       data: {
                         tag: {
-                          fromOtl,
+                          fromOtl: {
+                            ...fromOtl,
+                            token_type: `child-${element.type}_${index}`,
+                          },
                           originalCoords: {
                             x: element.layout.x,
                             y: element.layout.y,
                           },
                           dataType: 'image-node',
-                          nodeId: `child-node-${element.type}-${index}`,
+                          nodeId: `child-${element.type}_${index}`,
                           portType: element.type,
                         },
                         layout: element.layout,
@@ -196,7 +202,7 @@ class GenerateElementsFromSearch {
                         },
                         target: {
                           node: {
-                            nodeId: `child-node-${element.type}-${index}`,
+                            nodeId: `child-${element.type}_${index}`,
                           },
                           port: null,
                         },
@@ -208,13 +214,16 @@ class GenerateElementsFromSearch {
                       type: 'node',
                       data: {
                         tag: {
-                          fromOtl,
+                          fromOtl: {
+                            ...fromOtl,
+                            token_type: `other-${element.type}`,
+                          },
                           originalCoords: {
                             x: element.layout.x,
                             y: element.layout.y,
                           },
                           dataType: 'image-node',
-                          nodeId: `other-${element.type}`,
+                          nodeId: `other-${index}`,
                           portType: element.type,
                         },
                         icon: element.icon.node.style.image,
@@ -357,7 +366,10 @@ class GenerateElementsFromSearch {
                     tag: {
                       dataType: 'image-node',
                       nodeId: `arrow-${i}`,
-                      fromOtl: el.data.tag.fromOtl,
+                      fromOtl: {
+                        ...el.data.tag.fromOtl,
+                        token_type: `arrow-${el.data.tag.fromOtl.type}`,
+                      },
                       arrowWidth,
                       xByArrow,
                       yByArrow,

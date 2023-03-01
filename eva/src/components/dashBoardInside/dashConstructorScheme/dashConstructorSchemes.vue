@@ -27,9 +27,10 @@
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
+            z-index="1000"
           >
             <template v-slot:activator="{ on }">
-              <div class="pa-5 d-flex">
+              <div class="pa-3 d-flex">
                 <v-icon
                   class="control-button edit-icon theme--dark"
                   :style="{ color: theme.$secondary_text }"
@@ -46,9 +47,10 @@
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
+            z-index="1000"
           >
             <template v-slot:activator="{ on }">
-              <div class="pa-5 d-flex">
+              <div class="pa-3 d-flex">
                 <v-icon
                   class="control-button edit-icon theme--dark"
                   :style="{ color: theme.$secondary_text }"
@@ -65,10 +67,11 @@
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
+            z-index="1000"
           >
             <template v-slot:activator="{ on }">
               <div
-                class="pa-5 ma-0 d-flex"
+                class="pa-3 ma-0 d-flex"
                 v-on="on"
               >
                 <v-file-input
@@ -94,9 +97,10 @@
               :disabled="isLoading"
               bottom
               :color="theme.$accent_ui_color"
+              z-index="1000"
             >
               <template v-slot:activator="{ on }">
-                <div class="pa-2 d-flex">
+                <div class="pa-3 d-flex">
                   <v-icon
                     class="control-button edit-icon theme--dark"
                     :style="{ color: theme.$secondary_text }"
@@ -110,51 +114,14 @@
               <span>Загрузить с сервера</span>
             </v-tooltip>
           </template>
-          <template v-if="saveMultipleScheme">
-            <v-select
-              v-model="localActiveSchemeId"
-              :items="allSavedSchemes"
-              class="
-                dash-constructor-schemes__select-field
-                dash-constructor-schemes__select-field--with-padding
-              "
-              label="Активная схема"
-              dense
-              :menu-props="{
-                'offset-y': true,
-              }"
-            >
-              <template #item="{ item, on }">
-                <v-list-item
-                  ripple
-                  class="v-list-item--link"
-                  v-on="on"
-                >
-                  <v-list-item-content>
-                    <v-list-item-title class="d-flex align-center justify-content-between">
-                      <div class="mr-auto">
-                        {{ item }}
-                      </div>
-                      <v-icon
-                        class="control-button edit-icon theme--dark"
-                        :style="{ color: theme.$secondary_text }"
-                        @click.stop="openConfirmDeleteModal(item)"
-                      >
-                        {{ closeIcon }}
-                      </v-icon>
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-            </v-select>
-          </template>
           <template v-if="dataSelectedNode">
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="1000"
             >
               <template v-slot:activator="{ on }">
-                <div class="pa-2 d-flex">
+                <div class="pa-3 d-flex">
                   <bring-to-front
                     class="control-button edit-icon theme--dark"
                     :style="{ color: theme.$secondary_text }"
@@ -168,9 +135,10 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="1000"
             >
               <template v-slot:activator="{ on }">
-                <div class="pa-2 d-flex">
+                <div class="pa-3 d-flex">
                   <send-to-back
                     class="control-button edit-icon theme--dark"
                     :style="{ color: theme.$secondary_text }"
@@ -184,9 +152,10 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="1000"
             >
               <template v-slot:activator="{ on }">
-                <div class="pa-2 d-flex">
+                <div class="pa-3 d-flex">
                   <bring-forward
                     class="control-button edit-icon theme--dark"
                     :style="{ color: theme.$secondary_text }"
@@ -200,9 +169,10 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="1000"
             >
               <template v-slot:activator="{ on }">
-                <div class="pa-2 d-flex">
+                <div class="pa-3 d-flex">
                   <send-backward
                     class="control-button edit-icon theme--dark"
                     :style="{ color: theme.$secondary_text }"
@@ -218,9 +188,10 @@
         <v-tooltip
           bottom
           :color="theme.$accent_ui_color"
+          z-index="1000"
         >
           <template v-slot:activator="{ on }">
-            <div class="pa-2 d-flex">
+            <div class="pa-3 d-flex">
               <v-icon
                 class="control-button edit-icon theme--dark"
                 :style="{ color: theme.$secondary_text }"
@@ -281,6 +252,48 @@
           :ref="`dndPanel-${idFrom}`"
           class="dash-constructor-schemes__dnd-panel"
         >
+          <template v-if="saveMultipleScheme">
+            <v-select
+              v-model="localActiveSchemeId"
+              :items="allSavedSchemes"
+              class="
+                pt-3
+                px-0
+                pb-4
+                dash-constructor-schemes__select-field
+                dash-constructor-schemes__select-field--with-padding
+              "
+              label="Активная схема"
+              dense
+              :menu-props="{
+                'offset-y': true,
+                'z-index': 4000,
+              }"
+            >
+              <template #item="{ item, on }">
+                <v-list-item
+                  ripple
+                  class="v-list-item--link"
+                  v-on="on"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title class="d-flex align-center justify-content-between">
+                      <div class="mr-auto">
+                        {{ item }}
+                      </div>
+                      <v-icon
+                        class="control-button edit-icon theme--dark"
+                        :style="{ color: theme.$secondary_text }"
+                        @click.stop="openConfirmDeleteModal(item)"
+                      >
+                        {{ closeIcon }}
+                      </v-icon>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-select>
+          </template>
           <v-expansion-panels
             accordion
           >
@@ -605,8 +618,7 @@
       <modal-confirm
         v-model="isConfirmModal"
         :theme="theme"
-        :modal-text="`Все изображения и связанные с ними линии
-      на визуализации будут удалены. Продолжить ?`"
+        :modal-text="`Все элементы на визуализации будут удалены. Продолжить ?`"
         btn-confirm-text="Да"
         btn-cancel-text="Нет"
         @result="startSearch"
@@ -696,7 +708,6 @@ export default {
     return {
       actions: [
         { name: 'click:label', capture: ['value1', 'value2', 'value3', 'value4', 'value5'] },
-        { name: 'click:image', capture: [] },
       ],
       isEdit: false,
       gear: mdiSettings,
@@ -808,18 +819,54 @@ export default {
       }
       return [];
     },
-    captureFromImageNode() {
-      const result = [];
-      const prepareItems = [];
-      this.savedGraphObject
-        .filter((item) => item.data.tag.dataType === 'image-node' && item.data.tag.fromOtl)
-        .forEach((item) => {
-          prepareItems.push(...Object.keys(item.data.tag.fromOtl));
+    tokenActionsByElType() {
+      const filteredSavedElements = this.savedGraphObject
+        .filter((el) => typeof el.data?.tag?.fromOtl?.type !== 'undefined');
+      if (filteredSavedElements?.length > 0) {
+        let result = [];
+
+        let allChildCapture = [];
+        filteredSavedElements.forEach((el) => {
+          if (el.data.tag.fromOtl?.child_capture) {
+            const captureList = el.data.tag.fromOtl?.child_capture.split(',');
+            allChildCapture = [...new Set([...allChildCapture, ...captureList])];
+          }
         });
-      new Set(prepareItems).forEach((item) => {
-        result.push(item);
-      });
-      return result;
+
+        filteredSavedElements.forEach((el) => {
+          if (el.data.tag.fromOtl?.type) {
+            result.push(JSON.stringify({
+              name: `click:el-parent-${el.data.tag.fromOtl.type}`,
+              capture: el.data.tag.fromOtl?.parent_capture
+                  && typeof el.data.tag.fromOtl.parent_capture === 'string'
+                ? el.data.tag.fromOtl.parent_capture.split(',')
+                : Object.keys(el.data.tag.fromOtl),
+            }));
+            if (allChildCapture?.length > 0) {
+              result.push(JSON.stringify({
+                name: `click:el-child-${el.data.tag.fromOtl.type}`,
+                capture: allChildCapture,
+              }));
+            }
+            result.push(JSON.stringify({
+              name: 'click:el-child-all',
+              capture: Object.keys(el.data.tag.fromOtl),
+            }));
+          } else {
+            result.push(JSON.stringify({
+              name: 'click:el-other',
+              capture: el.data.tag.fromOtl?.other_capture
+                  && typeof el.data.tag.fromOtl.other_capture === 'string'
+                ? el.data.tag.fromOtl.other_capture.split(',')
+                : Object.keys(el.data.tag.fromOtl),
+            }));
+          }
+        });
+
+        result = [...new Set(result)];
+        return result.map((el) => JSON.parse(el));
+      }
+      return [];
     },
     innerSize() {
       return {
@@ -936,7 +983,7 @@ export default {
       }
     },
     localActiveSchemeId() {
-      if (!this.isAlwaysUpdateScheme && this.constructorSchemes) {
+      if (this.constructorSchemes) {
         this.constructorSchemes.update(this.savedGraphObject);
       }
     },
@@ -956,17 +1003,12 @@ export default {
         });
       }
     },
-    captureFromImageNode(imageCapture) {
+    tokenActionsByElType(value) {
       if (this.dataForBuildScheme?.length > 0) {
-        this.actions = this.actions.map((action) => {
-          if (action.name === 'click:label') {
-            return action;
-          }
-          return {
-            ...action,
-            capture: imageCapture,
-          };
-        });
+        this.actions = [
+          { name: 'click:label', capture: ['value1', 'value2', 'value3', 'value4', 'value5'] },
+          ...value,
+        ];
         this.setActions();
       }
     },
@@ -1069,23 +1111,69 @@ export default {
               capture,
               elem,
             }) => {
-              if (
-                elem === this.idFrom
-                  && ((action === 'click:label' && data[capture])
-                      || (action === 'click:image'))
-              ) {
-                let value;
-                if (action === 'click:image') {
-                  value = (data?.fromOtl && data?.fromOtl[capture]) ? data?.fromOtl[capture] : 'Нет данных';
-                } else {
-                  value = data[capture];
+              if (elem === this.idFrom) {
+                if (action === 'click:label' && data[capture]) {
+                  this.$store.commit('setTocken', {
+                    token: { name, action, capture },
+                    idDash: this.idDashFrom,
+                    value: data[capture],
+                    store: this.$store,
+                  });
+                } else if (action !== '' && action.includes('click:el')) {
+                  // TODO: Лучше переписать в дальнейшем, если будет такая возможность
+                  if (data?.fromOtl?.token_type) {
+                    if (
+                      data.fromOtl.token_type.includes('child-')
+                        && action.includes('click:el-child')
+                    ) {
+                      if (!action.includes('click:el-child-all')) {
+                        const actionType = action.replace('click:el-child-', '');
+                        const elType = data.fromOtl.token_type
+                          .split('_')[0]
+                          .replace('child-', '');
+                        if (elType === actionType) {
+                          this.$store.commit('setTocken', {
+                            token: { name, action, capture },
+                            idDash: this.idDashFrom,
+                            value: data.fromOtl[capture],
+                            store: this.$store,
+                          });
+                        }
+                      } else {
+                        this.$store.commit('setTocken', {
+                          token: { name, action, capture },
+                          idDash: this.idDashFrom,
+                          value: data.fromOtl[capture],
+                          store: this.$store,
+                        });
+                      }
+                    } else if (
+                      data.fromOtl.token_type.includes('parent-')
+                        && action.includes('click:el-parent-')
+                    ) {
+                      const actionType = action.replace('click:el-parent-', '');
+                      const elType = data.fromOtl.token_type.replace('parent-', '');
+                      if (elType === actionType) {
+                        this.$store.commit('setTocken', {
+                          token: { name, action, capture },
+                          idDash: this.idDashFrom,
+                          value: data.fromOtl[capture],
+                          store: this.$store,
+                        });
+                      }
+                    } else if (
+                      data.fromOtl.token_type.includes('other-')
+                        && action.includes('click:el-other')
+                    ) {
+                      this.$store.commit('setTocken', {
+                        token: { name, action, capture },
+                        idDash: this.idDashFrom,
+                        value: data.fromOtl[capture],
+                        store: this.$store,
+                      });
+                    }
+                  }
                 }
-                this.$store.commit('setTocken', {
-                  token: { name, action, capture },
-                  idDash: this.idDashFrom,
-                  value,
-                  store: this.$store,
-                });
               }
             });
           }
