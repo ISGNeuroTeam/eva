@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Constructor schemes: token-actions - click:el-parent-[type], click:el-child-all, click:el-child-[type], click:el-other
 
 ### Changed
 
