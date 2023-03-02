@@ -27,7 +27,6 @@
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
-            z-index="1000"
           >
             <template v-slot:activator="{ on }">
               <div class="pa-3 d-flex">
@@ -47,7 +46,6 @@
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
-            z-index="1000"
           >
             <template v-slot:activator="{ on }">
               <div class="pa-3 d-flex">
@@ -67,7 +65,6 @@
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
-            z-index="1000"
           >
             <template v-slot:activator="{ on }">
               <div
@@ -97,7 +94,6 @@
               :disabled="isLoading"
               bottom
               :color="theme.$accent_ui_color"
-              z-index="1000"
             >
               <template v-slot:activator="{ on }">
                 <div class="pa-3 d-flex">
@@ -118,7 +114,6 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
-              z-index="1000"
             >
               <template v-slot:activator="{ on }">
                 <div class="pa-3 d-flex">
@@ -135,7 +130,6 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
-              z-index="1000"
             >
               <template v-slot:activator="{ on }">
                 <div class="pa-3 d-flex">
@@ -152,7 +146,6 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
-              z-index="1000"
             >
               <template v-slot:activator="{ on }">
                 <div class="pa-3 d-flex">
@@ -169,7 +162,6 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
-              z-index="1000"
             >
               <template v-slot:activator="{ on }">
                 <div class="pa-3 d-flex">
@@ -188,7 +180,6 @@
         <v-tooltip
           bottom
           :color="theme.$accent_ui_color"
-          z-index="1000"
         >
           <template v-slot:activator="{ on }">
             <div class="pa-3 d-flex">
