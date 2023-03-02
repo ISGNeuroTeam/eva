@@ -414,9 +414,6 @@
                                   item-value="id"
                                   item-text="label"
                                   label="Фигура"
-                                  :menu-props="{
-                                    'z-index': 100,
-                                  }"
                                 />
                               </div>
                               <!--Цвет блока-->
