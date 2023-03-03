@@ -858,10 +858,15 @@ export default {
       });
     },
     onActivated(elem) {
-      this.elements.forEach(({ elem: itemElem }, i) => {
-        this.tempSorting[itemElem] = i + 1;
-      });
-      this.$set(this.tempSorting, elem, 100);
+      setTimeout(() => {
+        const newSorting = this.elements.reduce((acc, { elem: itemElem }, i) => {
+          acc[itemElem] = i + 1;
+          return acc;
+        }, {});
+        newSorting[elem] = 100;
+        this.$set(this, 'tempSorting', newSorting);
+      }, 120);
+      return true;
     },
   },
 };
