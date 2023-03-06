@@ -14,7 +14,6 @@
     :grid="movableProps.grid"
     :class-name-active="!dataMod && !dragRes || !dragRes ? 'none' : 'active'"
     :style="{
-      zIndex: movableProps.zIndex,
       outlineColor: theme.$accent_ui_color,
       backgroundColor: panelBackHide ? null : theme.$accent_ui_color,
     }"
@@ -33,7 +32,6 @@
       :search-data="searchData"
       :data-source-id="dataSourceId"
       :data-sources="dataSources"
-      @SetLevel="movableProps.zIndex = Number.parseInt($event)"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
       @SetRange="setRange($event)"
@@ -94,14 +92,13 @@ export default {
       width: 0, // 0 не должен быть, по умолчанию беруться эти настройки
       height: 0,
       reload: 0,
-      maxZIndex: 1,
       // panelBackHide: false,
       movableProps: {
         vue_drag: false,
-        zIndex: 1,
         step: {},
         grid: [60, 60],
       },
+      isMounted: false,
     };
   },
   computed: {
@@ -141,13 +138,6 @@ export default {
     },
   },
   watch: {
-    'movableProps.zIndex': {
-      handler(val, oldVal) {
-        if (oldVal > val) {
-          this.$set(this.movableProps, 'zIndex', oldVal);
-        }
-      },
-    },
     left() {
       const { clientWidth } = document.querySelector('#app');
       if (this.left < 0) this.left = 0;
@@ -171,8 +161,8 @@ export default {
     this.drawElement();
   },
   mounted() {
-    this.maxZIndex = 1;
     this.onActivated();
+    this.isMounted = true;
   },
   methods: {
     drawElement() {
@@ -196,13 +186,9 @@ export default {
       this.height = height;
     },
     onActivated() {
-      const testElements = document.getElementsByClassName('vdr');
-      for (let i = 0; i < testElements.length; i += 1) {
-        if (Number(testElements[i].style.zIndex) > this.maxZIndex) {
-          this.maxZIndex = Number(testElements[i].style.zIndex);
-        }
+      if (this.isMounted) {
+        this.$emit('activated');
       }
-      this.$set(this.movableProps, 'zIndex', this.maxZIndex + 1);
     },
     sendMove(x, y) {
       let top = Math.round(y / this.horizontalCell);
