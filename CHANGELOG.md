@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+
+## [1.125.0]
+
+### Fixed
 - Element display issues due to z-index
 
 ## [1.124.0]
