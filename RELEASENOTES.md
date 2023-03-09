@@ -1,3 +1,8 @@
+# [1.125.0] - 2023-03-09
+
+### Fixed
+- Element display issues due to z-index
+
 # [1.124.0] - 2023-03-01
 
 ### Added

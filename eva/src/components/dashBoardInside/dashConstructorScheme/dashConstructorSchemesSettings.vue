@@ -39,9 +39,6 @@
               item-text="Description"
               label="Значение"
               :filter="tagNameAutocompleteFilter"
-              :menu-props="{
-                'z-index': 100,
-              }"
               class="col-11 pb-0"
             >
               <template v-slot:item="{ item, on }">
@@ -174,9 +171,6 @@
               item-text="Description"
               label="Данные для строки"
               :filter="tagNameAutocompleteFilter"
-              :menu-props="{
-                'z-index': 100,
-              }"
               class="col-11 pb-0"
             >
               <template v-slot:item="{ item, on }">
@@ -239,9 +233,6 @@
                   item-text="Description"
                   label="Значение"
                   :filter="tagNameAutocompleteFilter"
-                  :menu-props="{
-                    'z-index': 100,
-                  }"
                   :class="dataObject.items.length > 1 ? 'col-10' : 'col-12'"
                 >
                   <template v-slot:item="{ item, on }">
@@ -713,9 +704,6 @@
               item-value="id"
               item-text="label"
               label="Фигура"
-              :menu-props="{
-                'z-index': 100,
-              }"
             />
           </div>
         </div>
