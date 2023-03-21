@@ -127,7 +127,7 @@ export default {
 
   // функция которая кладет логи в локальную бд - IndexedDB
   // и на рест после определенной заполненности
-  putLog(text) {
+  putLog(text, now = new Date()) {
     // возвращаем промис, потому что записи происходят асинхронно
     return new Promise((resolve) => {
       // переменная в которой будет лежать объект подключения к базе данных
@@ -147,7 +147,7 @@ export default {
         }
 
         // получаем дату и время
-        const now = new Date();
+        // const now = new Date();
         // приводим дату и время в нормальный вид, по сути добовляя нули где надо
         const date = `${checkZero(now.getHours())}:${checkZero(
           now.getMinutes(),
