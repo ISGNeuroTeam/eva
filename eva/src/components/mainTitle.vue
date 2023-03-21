@@ -569,6 +569,8 @@ export default {
     },
     startSearches(searches) {
       if (searches?.length > 0) {
+
+        const nextTick = this.$nextTick();
         searches.forEach((search) => {
           if (search.status === 'empty') {
             this.$set(this.dataObject, search.id, { data: [], loading: true });
@@ -582,7 +584,7 @@ export default {
               id: search.id,
               status: 'pending',
             });
-            this.$nextTick(() => {
+            nextTick.then(() => {
               this.getData(search);
             });
           }
