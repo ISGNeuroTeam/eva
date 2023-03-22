@@ -966,6 +966,7 @@ export default class ChartClass {
       yAxisLink,
       name,
       dontSplitLine,
+      lineBySteps,
     } = metric;
     let line = [];
 
@@ -990,12 +991,29 @@ export default class ChartClass {
         return;
       }
 
+      let drawLine = line;
+      if (lineBySteps) {
+        drawLine = line.reduce((acc, d, idx) => {
+          if (lineBySteps && idx !== 0) {
+            acc.push({
+              [this.xMetric]: d[this.xMetric],
+              [name]: line[idx - 1][name],
+            });
+          }
+          acc.push({
+            [this.xMetric]: d[this.xMetric],
+            [name]: d[name],
+          });
+          return acc;
+        }, []);
+      }
+
       // add the line itself
       const path = chartGroup
         .append('path')
         .attr('clip-path', `url(#group-rect-${num}-${this.id})`)
         .attr('class', `metric metric-${metric.n}`)
-        .datum(line)
+        .datum(drawLine)
         .attr('fill', 'none')
         .attr('stroke', color)
         .attr('stroke-width', metric.strokeWidth)
