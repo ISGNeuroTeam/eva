@@ -965,10 +965,13 @@ export default class ChartClass {
       color,
       yAxisLink,
       name,
+      dontSplitLine,
     } = metric;
     let line = [];
-    this.data
-      .reduce((prev, cur, currentIndex, arr) => {
+
+    const lines = dontSplitLine
+      ? [this.data.filter((item) => item[name] !== null)]
+      : this.data.reduce((prev, cur, currentIndex, arr) => {
         if (cur[name] === null) {
           prev.push(line);
           line = [];
@@ -979,49 +982,50 @@ export default class ChartClass {
           prev.push(line);
         }
         return prev;
-      }, [])
-      // eslint-disable-next-line no-shadow
-      .forEach((line) => {
-        if (line.length === 0) {
-          return;
-        }
+      }, []);
 
-        // add the line itself
-        const path = chartGroup
-          .append('path')
-          .attr('clip-path', `url(#group-rect-${num}-${this.id})`)
-          .attr('class', `metric metric-${metric.n}`)
-          .datum(line)
-          .attr('fill', 'none')
-          .attr('stroke', color)
-          .attr('stroke-width', metric.strokeWidth)
-          .style('stroke-dasharray', metric.strokeDasharray);
+    // eslint-disable-next-line no-shadow
+    lines.forEach((line) => {
+      if (line.length === 0) {
+        return;
+      }
 
-        // add red lines
-        this.renderRedLines(chartGroup, metric, height, line);
+      // add the line itself
+      const path = chartGroup
+        .append('path')
+        .attr('clip-path', `url(#group-rect-${num}-${this.id})`)
+        .attr('class', `metric metric-${metric.n}`)
+        .datum(line)
+        .attr('fill', 'none')
+        .attr('stroke', color)
+        .attr('stroke-width', metric.strokeWidth)
+        .style('stroke-dasharray', metric.strokeDasharray);
 
-        if (showArea) {
-          path
-            .attr('fill', d3.hsl(color).brighter(0.1))
-            .attr('d', d3.area()
-              .x((d) => this.x(d[this.xMetric]))
-              .y0((d) => this.y[yAxisLink || name](d[name]))
-              .y1(() => this.y[yAxisLink || name](0)));
-        } else {
-          path
-            .attr('d', d3.line()
-              .x((d) => this.x(d[this.xMetric]))
-              .y((d) => this.y[yAxisLink || name](d[name])));
-        }
+      // add red lines
+      this.renderRedLines(chartGroup, metric, height, line);
 
-        // add dots
-        this.renderPeakDots(chartGroup, metric, height, num, line);
+      if (showArea) {
+        path
+          .attr('fill', d3.hsl(color).brighter(0.1))
+          .attr('d', d3.area()
+            .x((d) => this.x(d[this.xMetric]))
+            .y0((d) => this.y[yAxisLink || name](d[name]))
+            .y1(() => this.y[yAxisLink || name](0)));
+      } else {
+        path
+          .attr('d', d3.line()
+            .x((d) => this.x(d[this.xMetric]))
+            .y((d) => this.y[yAxisLink || name](d[name])));
+      }
 
-        // add text
-        if (metric.showText) {
-          this.renderPeakTexts(chartGroup, metric, line);
-        }
-      });
+      // add dots
+      this.renderPeakDots(chartGroup, metric, height, num, line);
+
+      // add text
+      if (metric.showText) {
+        this.renderPeakTexts(chartGroup, metric, line);
+      }
+    });
   }
 
   addScatterDots(chartGroup, metric, height, num) {
