@@ -148,8 +148,6 @@ class GenerateElementsFromSearch {
                             fromOtl: {
                               ...fromOtl,
                               token_type: `parent-${element.type}`,
-                            },
-                            originalCoords: {
                               x: element.layout.x,
                               y: element.layout.y,
                             },
@@ -170,8 +168,6 @@ class GenerateElementsFromSearch {
                           fromOtl: {
                             ...fromOtl,
                             token_type: `child-${element.type}_${index}`,
-                          },
-                          originalCoords: {
                             x: element.layout.x,
                             y: element.layout.y,
                           },
@@ -217,8 +213,6 @@ class GenerateElementsFromSearch {
                           fromOtl: {
                             ...fromOtl,
                             token_type: `other-${element.type}`,
-                          },
-                          originalCoords: {
                             x: element.layout.x,
                             y: element.layout.y,
                           },
@@ -262,8 +256,8 @@ class GenerateElementsFromSearch {
                   layout: {
                     width: Number(el.layout.width),
                     height: Number(el.layout.height),
-                    x: el.tag.originalCoords.x,
-                    y: el.tag.originalCoords.y,
+                    x: el.tag.fromOtl.x,
+                    y: el.tag.fromOtl.y,
                   },
                 },
               }));
