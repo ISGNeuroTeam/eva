@@ -116,7 +116,7 @@ class SchemeUpdater {
     }
     const filteredElementTagRest = Utils.deleteFieldsFromObject(
       element.tag,
-      ['getTransform', 'getDy', 'getPosition', 'getHeight'],
+      ['getTransform', 'getDy', 'getPosition', 'getHeight', 'getActiveImage'],
     );
     return {
       tag: {
