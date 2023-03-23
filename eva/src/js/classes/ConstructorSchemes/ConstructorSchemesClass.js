@@ -1002,7 +1002,7 @@ class ConstructorSchemesClass {
       ) {
         const filteredElementTag = Utils.deleteFieldsFromObject(
           evt.item.tag,
-          ['getTransform', 'getDy', 'getPosition', 'getHeight'],
+          ['getTransform', 'getDy', 'getPosition', 'getHeight', 'getActiveImage'],
         );
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
@@ -1621,30 +1621,6 @@ class ConstructorSchemesClass {
         });
       }
 
-      // Подписи к узлам\ребрам
-      // const labelNode = new SimpleNode();
-      // labelNode.layout = new Rect(0, 0, this.defaultNodeSize[0], 16);
-      // labelNode.style = new VoidNodeStyle();
-      //
-      // const labelStyle = new DefaultLabelStyle({
-      //   backgroundStroke: 'transparent',
-      //   backgroundFill: 'transparent',
-      //   insets: [3, 5, 3, 5],
-      //   textFill: defaultLabelStyle.textFill,
-      //   font: defaultLabelStyle.font,
-      // });
-
-      // const label = new SimpleLabel(
-      //   labelNode,
-      //   'label',
-      //   FreeNodeLabelModel.INSTANCE.createDefaultParameter(),
-      // );
-      // label.style = labelStyle;
-      // label.preferredSize = labelStyle.renderer.getPreferredSize(label, labelStyle);
-      // labelNode.tag = label;
-      // labelNode.labels = new ListEnumerable([label]);
-      // items.push(new DragAndDropPanelItem(labelNode, 'Подписи к блокам', 'label-node'));
-
       const portNode = new SimpleNode();
       portNode.layout = new Rect(0, 0, 5, 5);
       portNode.style = new VoidNodeStyle();
@@ -1724,6 +1700,8 @@ class ConstructorSchemesClass {
               : '-',
             valueColor: targetData?.value_color || null,
           };
+        } else if (dataType === 'data-type-3') {
+          this.updateDynamicImageNode(node);
         }
       });
       resolve();
@@ -1766,6 +1744,31 @@ class ConstructorSchemesClass {
           value: this.getDataItemById(item.id)?.value || item?.value || '-',
         })),
       };
+    } else if (dataType === 'data-type-3') {
+      const mainImageFromNode = this.targetDataNode.tag.defaultImage;
+      const mainImageFromData = dataFromComponent.defaultImage;
+      const mainImageIsChange = mainImageFromNode !== mainImageFromData;
+      if (mainImageIsChange) {
+        updatedData = {
+          imageLayout: null,
+          defaultImagePath: '',
+          defaultImage: dataFromComponent.defaultImage,
+          activeImage: '',
+          id: dataFromComponent?.id,
+          value: this.getDataItemById(dataFromComponent.id)?.value
+              || dataFromComponent?.value
+              || '-',
+          imageList: dataFromComponent.imageList,
+        };
+      } else {
+        updatedData = {
+          id: dataFromComponent?.id,
+          value: this.getDataItemById(dataFromComponent.id)?.value
+              || dataFromComponent?.value
+              || '-',
+          imageList: dataFromComponent.imageList,
+        };
+      }
     } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
       updatedData = dataFromComponent;
     } else if (dataFromComponent.dataType === 'edge') {
@@ -1781,7 +1784,9 @@ class ConstructorSchemesClass {
     // Обновляем состояние графа
     this.graphComponent.updateVisual();
     // Сохраняем изменения
-
+    if (dataType === 'data-type-3') {
+      this.updateDynamicImageNode(this.targetDataNode);
+    }
     this.saveAnObject();
   }
 
@@ -1808,6 +1813,104 @@ class ConstructorSchemesClass {
         textSize: +updatedData.fontSize,
       }),
     );
+  }
+
+  updateDynamicImageNode(node) {
+    const updatedNodeTag = {};
+    const GenerateIconClass = new GenerateIcons(
+      'dynamic-image',
+      'dynamic-image-node',
+    );
+    let {
+      // Основные размеры изображения
+      imageLayout,
+      // Основное(по-умолчанию) изображение
+      // eslint-disable-next-line prefer-const
+      defaultImage,
+      // Полная ссылка на основное(по-умолчанию) изображение
+      defaultImagePath,
+    } = node.tag;
+    // Список изображений с полными ссылками
+    // Если это первое выбранное изображение или основное изображение заменили
+    if (!imageLayout) {
+      GenerateIconClass.generateIconNodes([{
+        icon: defaultImage,
+      }]).then((response) => {
+        response.forEach((item) => {
+          imageLayout = new Rect(
+            +node.layout.x,
+            +node.layout.y,
+            +item.layout.width,
+            +item.layout.height,
+          );
+          defaultImagePath = item.icon.node.style.image;
+          console.log('defaultImagePath promise', defaultImagePath);
+          this.graphComponent.graph.setNodeLayout(
+            node,
+            imageLayout,
+          );
+          updatedNodeTag.imageLayout = imageLayout;
+          updatedNodeTag.defaultImagePath = defaultImagePath;
+        });
+        this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath);
+      });
+    } else {
+      this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath);
+    }
+    return node;
+  }
+
+  updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath) {
+    let imageListFromIconClass = [];
+    // Список изображений из элемента(node)
+    const mappedImageListFromNode = node.tag.imageList.map((item) => ({
+      ...item,
+      icon: item.image,
+    }));
+    GenerateIconClass.generateIconNodes(mappedImageListFromNode)
+      .then((response) => new Promise((resolve) => {
+        imageListFromIconClass = response.map((item) => ({
+          value: item.value,
+          image: item.image,
+          path: item.icon?.node?.style?.image || '',
+        }));
+        const activeImageFromNode = node.tag.activeImage;
+        const activeImageFromData = imageListFromIconClass
+          .find((el) => el.value === node.tag.value);
+        const activeImageIsChanged = activeImageFromData?.image !== activeImageFromNode?.image;
+        if (activeImageFromData) {
+          if (activeImageIsChanged) {
+            node.tag.activeImage = activeImageFromData;
+          }
+        }
+        resolve(activeImageFromData);
+      }))
+      .then((activeImage) => new Promise((resolve, reject) => {
+        if (activeImage) {
+          this.graphComponent.graph.setStyle(
+            node,
+            new ImageNodeStyle(`${activeImage.path}`),
+          );
+          resolve();
+        } else if (!activeImage && defaultImagePath) {
+          this.graphComponent.graph.setStyle(
+            node,
+            new ImageNodeStyle(`${defaultImagePath}`),
+          );
+          resolve();
+        } else {
+          reject();
+        }
+      }))
+      .catch(() => {
+        // Если изображение не найдено на сервере или по какой-то причине не загрузилось
+        // Или по какой-то причине не загрузилось
+        // Или не указано в настройках элемента
+        this.graphComponent.graph.setStyle(
+          node,
+          new VuejsNodeStyle(this.elementTemplates['data-type-3'].template),
+        );
+      });
   }
 
   // Order commands
