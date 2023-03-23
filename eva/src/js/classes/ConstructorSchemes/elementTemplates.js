@@ -424,6 +424,67 @@ const templates = {
       ],
     },
   },
+  'data-type-3': {
+    template: `
+      <g class="b-data-node">
+        <!--Area-->
+        <defs>
+          <clipPath :id="'border-radius-' + tag.nodeId">
+            <rect 
+              x="0" 
+              y="0" 
+              :width="layout.width" 
+              :height="layout.height" 
+              fill="transparent" 
+              rx="3" 
+              ry="3" 
+            />
+          </clipPath>
+        </defs>
+        <text
+          :key="'text-' + tag.nodeId"
+          class="b-data-node__text"
+          :dx="layout.width / 2"
+          :dy="layout.height / 2"
+          alignment-baseline="middle"
+          text-anchor="middle"
+          fill="#000000"
+          :font-family="tag.fontFamily || ''"
+          :font-size="tag.fontSize + 'px'"
+        >
+          {{ tag.placeholder }}
+        </text>
+      </g>
+    `,
+    width: 150,
+    height: 30,
+    dataRest: {
+      dataType: 'data-type-3',
+      nodeId: 'template-3',
+      fontFamily,
+      fontSize: 16,
+      id: '',
+      value: 0,
+      imageLayout: null,
+      templateType: 'template-3',
+      // show if activeImage==='default'
+      placeholder: 'Изображение',
+      activeImage: '',
+      defaultImage: '',
+      imageList: [
+        {
+          value: 0,
+          image: '',
+        },
+      ],
+      getActiveImage() {
+        if (this.activeImage === '') {
+          return false;
+        }
+        return !!(this.imageList.find((item) => item.image === this.activeImage));
+      },
+    },
+  },
   'label-type-0': {
     template: `
       <g class="b-label-node">

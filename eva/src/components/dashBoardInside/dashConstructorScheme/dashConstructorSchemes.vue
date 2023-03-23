@@ -1226,6 +1226,13 @@ export default {
         }]);
       }
     },
+    clearSavedGraphObject() {
+      this.$store.commit('setState', [{
+        object: this.dashFromStore[this.idFrom].savedGraphObject,
+        prop: this.localActiveSchemeId,
+        value: [],
+      }]);
+    },
     updateSavedGraphObject(data) {
       if (this.timeout) {
         clearTimeout(this.timeout);
@@ -1359,6 +1366,7 @@ export default {
       this.constructorSchemes.exportGraphToJSON(this.localActiveSchemeId);
     },
     importFrom(file) {
+      this.clearSavedGraphObject();
       this.constructorSchemes.importGraphFromJSON(file);
       this.file = null;
     },
