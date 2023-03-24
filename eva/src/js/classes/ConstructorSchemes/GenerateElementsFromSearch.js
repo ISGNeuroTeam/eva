@@ -23,6 +23,37 @@ class GenerateElementsFromSearch {
     this.defaultEdgeStyles = defaultEdgeStyles;
     this.colorEdgeByType = colorEdgeByType;
     this.defaultDescriptionStyles = defaultDescriptionStyles;
+    this.edgeTemplate = {
+      type: 'edge',
+      data: {
+        bends: [],
+        labels: [],
+        style: defaultEdgeStyles,
+        source: {
+          node: null,
+          port: {
+            id: null,
+            location: {
+              x: null,
+              y: null,
+            },
+          },
+        },
+        target: {
+          node: null,
+          port: {
+            id: null,
+            location: {
+              x: null,
+              y: null,
+            },
+          },
+        },
+        tag: {
+          edgeId: null,
+        },
+      },
+    };
   }
 
   get getGraphHeight() {
@@ -89,37 +120,7 @@ class GenerateElementsFromSearch {
   // Generate all elements for build\save scheme elements from otl-search
   generate() {
     const generateIcons = new GenerateIcons();
-    const edgeTemplate = {
-      type: 'edge',
-      data: {
-        bends: [],
-        labels: [],
-        style: this.defaultEdgeStyles,
-        source: {
-          node: null,
-          port: {
-            id: null,
-            location: {
-              x: null,
-              y: null,
-            },
-          },
-        },
-        target: {
-          node: null,
-          port: {
-            id: null,
-            location: {
-              x: null,
-              y: null,
-            },
-          },
-        },
-        tag: {
-          edgeId: null,
-        },
-      },
-    };
+    const { edgeTemplate } = this;
     return new Promise((resolve, reject) => {
       try {
         // Get sizes equal to the size of the original icon
@@ -148,8 +149,6 @@ class GenerateElementsFromSearch {
                             fromOtl: {
                               ...fromOtl,
                               token_type: `parent-${element.type}`,
-                            },
-                            originalCoords: {
                               x: element.layout.x,
                               y: element.layout.y,
                             },
@@ -170,8 +169,6 @@ class GenerateElementsFromSearch {
                           fromOtl: {
                             ...fromOtl,
                             token_type: `child-${element.type}_${index}`,
-                          },
-                          originalCoords: {
                             x: element.layout.x,
                             y: element.layout.y,
                           },
@@ -217,8 +214,6 @@ class GenerateElementsFromSearch {
                           fromOtl: {
                             ...fromOtl,
                             token_type: `other-${element.type}`,
-                          },
-                          originalCoords: {
                             x: element.layout.x,
                             y: element.layout.y,
                           },
@@ -262,8 +257,8 @@ class GenerateElementsFromSearch {
                   layout: {
                     width: Number(el.layout.width),
                     height: Number(el.layout.height),
-                    x: el.tag.originalCoords.x,
-                    y: el.tag.originalCoords.y,
+                    x: el.tag.fromOtl.x,
+                    y: el.tag.fromOtl.y,
                   },
                 },
               }));
@@ -505,6 +500,12 @@ class GenerateElementsFromSearch {
                         ...textNode.data,
                         tag: {
                           ...textNode.data.tag,
+                          ...GenerateElementsFromSearch
+                            .deletePrefixFromFields(
+                              el.data.tag.fromOtl,
+                              'child_',
+                              'value',
+                            ),
                           text: el.data.tag.fromOtl.description,
                         },
                       },
@@ -520,6 +521,12 @@ class GenerateElementsFromSearch {
                         ...textNode.data,
                         tag: {
                           ...textNode.data.tag,
+                          ...GenerateElementsFromSearch
+                            .deletePrefixFromFields(
+                              el.data.tag.fromOtl,
+                              'parent_',
+                              'value',
+                            ),
                           text: el.data.tag.fromOtl.parent_description,
                         },
                       },
@@ -538,6 +545,18 @@ class GenerateElementsFromSearch {
         reject(e);
       }
     });
+  }
+
+  static deletePrefixFromFields(object, prefix, fieldName) {
+    const valueFields = {};
+    Object.keys(object)
+      .forEach((key) => {
+        if (key.includes(`${prefix}${fieldName}`)) {
+          const replacedKey = key.replace(prefix, '');
+          valueFields[replacedKey] = object[key];
+        }
+      });
+    return valueFields;
   }
 }
 
