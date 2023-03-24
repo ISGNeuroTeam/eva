@@ -703,10 +703,20 @@ class ConstructorSchemesClass {
       if (node.tag.dataType || node?.tag[0] === 'i' || node?.tag === 'invisible') {
         if (node.tag.dataType !== 'image-node' && node?.tag?.dataType !== 'invisible') {
           node.tag = ConstructorSchemesClass.upgradeNodeTag(node);
-          this.graphComponent.graph.setStyle(
-            node,
-            new VuejsNodeStyle(this.elementTemplates[node.tag.dataType].template),
-          );
+          if (node.tag.dataType === 'data-type-3') {
+            const imagePath = node.tag.activeImage?.path || node.tag.defaultImagePath;
+            this.graphComponent.graph.setStyle(
+              node,
+              imagePath
+                ? new ImageNodeStyle(imagePath)
+                : new VuejsNodeStyle(this.elementTemplates[node.tag.dataType].template),
+            );
+          } else {
+            this.graphComponent.graph.setStyle(
+              node,
+              new VuejsNodeStyle(this.elementTemplates[node.tag.dataType].template),
+            );
+          }
         }
         this.updateImageNode(node);
       }
@@ -1701,6 +1711,11 @@ class ConstructorSchemesClass {
             valueColor: targetData?.value_color || null,
           };
         } else if (dataType === 'data-type-3') {
+          const targetData = updatedData.find((item) => item.TagName === node.tag.id);
+          node.tag = {
+            ...node.tag,
+            value: targetData.value || '-',
+          };
           this.updateDynamicImageNode(node);
         }
       });
@@ -1748,7 +1763,7 @@ class ConstructorSchemesClass {
       const mainImageFromNode = this.targetDataNode.tag.defaultImage;
       const mainImageFromData = dataFromComponent.defaultImage;
       const mainImageIsChange = mainImageFromNode !== mainImageFromData;
-      if (mainImageIsChange) {
+      if (mainImageIsChange && mainImageFromNode) {
         updatedData = {
           imageLayout: null,
           defaultImagePath: '',
@@ -1762,6 +1777,7 @@ class ConstructorSchemesClass {
         };
       } else {
         updatedData = {
+          defaultImage: dataFromComponent.defaultImage,
           id: dataFromComponent?.id,
           value: this.getDataItemById(dataFromComponent.id)?.value
               || dataFromComponent?.value
@@ -1837,25 +1853,39 @@ class ConstructorSchemesClass {
         icon: defaultImage,
       }]).then((response) => {
         response.forEach((item) => {
-          imageLayout = new Rect(
-            +node.layout.x,
-            +node.layout.y,
-            +item.layout.width,
-            +item.layout.height,
-          );
+          imageLayout = {
+            x: +node.layout.x,
+            y: +node.layout.y,
+            width: +item.layout.width,
+            height: +item.layout.height,
+          };
           defaultImagePath = item.icon.node.style.image;
-          console.log('defaultImagePath promise', defaultImagePath);
           this.graphComponent.graph.setNodeLayout(
             node,
-            imageLayout,
+            new Rect(
+              +node.layout.x,
+              +node.layout.y,
+              +item.layout.width,
+              +item.layout.height,
+            ),
           );
           updatedNodeTag.imageLayout = imageLayout;
           updatedNodeTag.defaultImagePath = defaultImagePath;
         });
-        this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath);
+        this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath).then(() => {
+          node.tag = {
+            ...node.tag,
+            imageLayout,
+            defaultImage,
+            defaultImagePath,
+          };
+          this.saveAnObject();
+        });
       });
     } else {
-      this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath);
+      this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath).then(() => {
+        this.saveAnObject();
+      });
     }
     return node;
   }
@@ -1867,7 +1897,7 @@ class ConstructorSchemesClass {
       ...item,
       icon: item.image,
     }));
-    GenerateIconClass.generateIconNodes(mappedImageListFromNode)
+    return GenerateIconClass.generateIconNodes(mappedImageListFromNode)
       .then((response) => new Promise((resolve) => {
         imageListFromIconClass = response.map((item) => ({
           value: item.value,
@@ -1887,16 +1917,35 @@ class ConstructorSchemesClass {
       }))
       .then((activeImage) => new Promise((resolve, reject) => {
         if (activeImage) {
-          this.graphComponent.graph.setStyle(
-            node,
-            new ImageNodeStyle(`${activeImage.path}`),
-          );
+          // determine the intrinsic aspect ratio of the image
+          const imageAspectRatio = ImageNodeStyle.getAspectRatio(activeImage.path);
+          imageAspectRatio.then((result) => {
+            const style = new ImageNodeStyle({
+              image: activeImage.path,
+              // always keep the intrinsic aspect ratio independent of the node's size
+              aspectRatio: result,
+            });
+            this.graphComponent.graph.setStyle(
+              node,
+              style,
+            );
+          });
+
           resolve();
         } else if (!activeImage && defaultImagePath) {
-          this.graphComponent.graph.setStyle(
-            node,
-            new ImageNodeStyle(`${defaultImagePath}`),
-          );
+          // determine the intrinsic aspect ratio of the image
+          const imageAspectRatio = ImageNodeStyle.getAspectRatio(defaultImagePath);
+          imageAspectRatio.then((result) => {
+            const style = new ImageNodeStyle({
+              image: defaultImagePath,
+              // always keep the intrinsic aspect ratio independent of the node's size
+              aspectRatio: result,
+            });
+            this.graphComponent.graph.setStyle(
+              node,
+              style,
+            );
+          });
           resolve();
         } else {
           reject();

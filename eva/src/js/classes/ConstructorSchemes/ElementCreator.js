@@ -178,6 +178,7 @@ class ElementCreator {
       } else {
         const { template } = this.elementTemplates[element.tag.dataType];
         if (element.tag.dataType === 'data-type-3') {
+          const imagePath = element.tag.activeImage?.path || element.tag.defaultImagePath;
           createdNode = this.graph.createNodeAt({
             location: new Rect(
               0,
@@ -185,9 +186,9 @@ class ElementCreator {
               element.layout.width,
               element.layout.height,
             ),
-            style: new ImageNodeStyle(
-              element.tag.activeImage || element.tag.defaultImage,
-            ),
+            style: imagePath
+              ? new ImageNodeStyle(imagePath)
+              : new VuejsNodeStyle(template),
             tag: {
               ...this.elementTemplates[element.tag.dataType].dataRest,
               ...element.tag,
