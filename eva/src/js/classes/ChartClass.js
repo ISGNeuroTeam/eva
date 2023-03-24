@@ -206,6 +206,7 @@ export default class ChartClass {
 
     this.svgGroups = this.svg
       .append('g')
+      .attr('font-family', '"Roboto", sans-serif')
       .attr('class', 'groups');
 
     this.groups.forEach((num, i) => {
@@ -918,7 +919,7 @@ export default class ChartClass {
       .attr('font-size', '11')
       .attr('pointer-events', 'none')
       .attr('text-anchor', 'start') // middle
-      .attr('fill', 'var(--main_text)')
+      .attr('fill', this.theme.$main_text)
       .attr('class', `metric metric-${metric.n}`)
       .text((d) => ChartClass.valueToText(metric, d))
       .attr('x', (d) => {
