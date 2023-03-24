@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Constructor-schemes: json size is doubled when switching tabs on dashboard
 
 ## [1.125.0]
 
