@@ -1414,14 +1414,16 @@ export default new Vuex.Store({
                   search.parametrs?.isStartImmediately
                   || search.parametrs.isStartImmediately === undefined
                 ) {
-                  commit('setState', [
-                    {
-                      object: search,
-                      prop: 'status',
-                      value: 'empty',
-                    },
-                  ]);
-                } else {
+                  if (search.status !== 'empty') {
+                    commit('setState', [
+                      {
+                        object: search,
+                        prop: 'status',
+                        value: 'empty',
+                      },
+                    ]);
+                  }
+                } else if (search.status !== 'stop') {
                   commit('setState', [
                     {
                       object: search,
