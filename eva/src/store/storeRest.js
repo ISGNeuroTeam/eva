@@ -14,6 +14,42 @@ export default {
       formData.set('cache_ttl', userTtl);
       searchFrom.cache_ttl = userTtl;
     }
+
+    if (idDash !== 'reports' && window.Worker) {
+      const worker = new Worker('/js/job-worker.js');
+      return (new Promise((resolve) => {
+        worker.postMessage({
+          formData: Object.fromEntries(formData.entries()),
+          searchFrom,
+        });
+        worker.onmessage = (event) => {
+          // console.log('[response] worker: %s', searchFrom.sid/*, event.data*/)
+          worker.terminate();
+          const {
+            error,
+            data,
+            log = [],
+            notifications = [],
+          } = event.data;
+          if (log.length) {
+            log.forEach(([time, msg]) => restAuth.putLog(`[worker] ${msg}`, time));
+          }
+          if (error) {
+            console.log('[error]', error);
+            restAuth.putLog(error);
+          }
+          if (notifications.length) {
+            // console.log('[notifications]', notifications)
+            this.store.commit('notify/addNotifications', notifications);
+          }
+          return resolve(data || []);
+        };
+      }));
+    }
+    if (!window.Worker) {
+      console.warn('client is not support the worker API');
+    }
+
     const response = await fetch('/api/makejob', {
       // сперва нужно подать post запрос
       method: 'POST',
@@ -175,7 +211,7 @@ export default {
                       if (item.indexOf('SCHEMA') !== -1) {
                         shema = i;
                       }
-                      return fetch(`/${item}`);
+                      return fetch(`/${item}`, { cache: 'no-store' });
                     });
 
                     let resultProm = await Promise.all(promise);
