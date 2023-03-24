@@ -4,7 +4,6 @@
 - Multiline: added metric option "don't split line"
 - Multiline: added metric option "line by steps"
 - Constructor-schemes: added x\y coords into fromOtl object
-- Constructor-schemes: added dynamic-image element
 
 ### Changed
 - Optimized dashboard loading time
