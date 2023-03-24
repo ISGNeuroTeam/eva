@@ -430,7 +430,7 @@
             <div class="row align-center">
               <v-text-field
                 v-model="dataObject.defaultImage"
-                label="Значение"
+                label="Изображение (по-умолчанию)"
                 class="col-11"
               />
             </div>
@@ -989,7 +989,7 @@ export default {
       this.dataObject[objectName].splice(index, 1);
     },
     addLine(template, objectName) {
-      this.dataObject[objectName].push(template);
+      this.dataObject[objectName].push(structuredClone(template));
     },
     updateModelValue() {
       this.$emit('changeDataSelectedNode', this.dataObject);
