@@ -45,12 +45,6 @@ class SchemeUpdater {
               data: SchemeUpdater.getPortData(element),
             });
           }
-          if (element instanceof ILabel) {
-            result.push({
-              type: 'label',
-              data: SchemeUpdater.getLabelData(element),
-            });
-          }
         });
         resolve(structuredClone(result));
       } catch (e) {
