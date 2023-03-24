@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Constructor-schemes: added x\y coords into fromOtl object
 - Constructor-schemes: added dynamic-image element
 ### Changed
+- Optimized dashboard loading time
 
 ### Fixed
 
