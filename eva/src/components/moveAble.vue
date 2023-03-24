@@ -139,7 +139,7 @@ export default {
   },
   watch: {
     left() {
-      const { clientWidth } = document.querySelector('#app');
+      const { clientWidth } = this.$root.$el;
       if (this.left < 0) this.left = 0;
       if (this.left + this.width > clientWidth) {
         this.left = clientWidth - this.width;

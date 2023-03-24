@@ -71,7 +71,7 @@
                 absolute--right
               "
               :style="{ color: theme.$secondary_text }"
-              @click="deleteLine(index)"
+              @click="deleteLine(index, 'items')"
             >
               {{ closeIcon }}
             </v-icon>
@@ -101,7 +101,10 @@
               height="36"
               width="64"
               color="transparent"
-              @click="addLine(elementTemplates['data-type-0'].dataRest.items[0])"
+              @click="addLine(
+                elementTemplates['data-type-0'].dataRest.items[0],
+                'items',
+              )"
             >
               <v-icon
                 class="control-button edit-icon theme--dark"
@@ -256,7 +259,7 @@
                   v-if="dataObject.items.length > 1"
                   class="control-button edit-icon theme--dark col-2"
                   :style="{ color: theme.$secondary_text }"
-                  @click="deleteLine(index)"
+                  @click="deleteLine(index, 'items')"
                 >
                   {{ closeIcon }}
                 </v-icon>
@@ -339,7 +342,10 @@
                   height="36"
                   width="64"
                   color="transparent"
-                  @click="addLine(elementTemplates['data-type-2'].dataRest.items[0])"
+                  @click="addLine(
+                    elementTemplates['data-type-2'].dataRest.items[0],
+                    'items',
+                  )"
                 >
                   <v-icon
                     class="control-button edit-icon theme--dark"
@@ -404,6 +410,110 @@
                   dense
                   style="margin-bottom: 10px"
                 />
+              </div>
+            </div>
+          </div>
+        </div>
+        <v-btn
+          small
+          outlined
+          :color="theme.$main_text"
+          @click="updateModelValue(dataObject)"
+        >
+          Применить
+        </v-btn>
+      </template>
+      <template v-if="dataType === 'data-type-3'">
+        <!--data-type-3-->
+        <div class="row align-center">
+          <div class="col-12">
+            <div class="row align-center">
+              <v-text-field
+                v-model="dataObject.defaultImage"
+                label="Значение"
+                class="col-11"
+              />
+            </div>
+            <div class="row align-center mb-4">
+              <v-autocomplete
+                v-model="dataObject.id"
+                :style="{ color: theme.$main_text }"
+                :items="dataRestFrom"
+                item-value="TagName"
+                item-text="Description"
+                label="Значение"
+                :filter="tagNameAutocompleteFilter"
+                class="col-11"
+              >
+                <template v-slot:item="{ item, on }">
+                  <v-list-item
+                    ripple
+                    class="v-list-item&#45;&#45;link dash-constructor-schemes__data-panel-select"
+                    v-on="on"
+                  >
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ item.Description }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
+                        {{ item.NameObject }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+            </div>
+            <div
+              v-for="(element, index) in dataObject.imageList"
+              :key="`${dataObject.nodeId}-${index}`"
+              class="column dash-constructor-schemes__data-type-3"
+            >
+              <div class="row align-center">
+                <v-text-field
+                  v-model="element.image"
+                  label="Изображение"
+                  :class="dataObject.imageList.length > 1 ? 'col-10' : 'col-11'"
+                />
+                <v-icon
+                  v-if="dataObject.imageList.length > 1"
+                  class="control-button edit-icon theme--dark col-2"
+                  :style="{ color: theme.$secondary_text }"
+                  @click="deleteLine(index, 'imageList')"
+                >
+                  {{ closeIcon }}
+                </v-icon>
+              </div>
+              <div class="row align-center">
+                <v-text-field
+                  v-model="element.value"
+                  label="Значение"
+                  class="col-11"
+                />
+              </div>
+            </div>
+            <div class="row align-center mb-4">
+              <div class="col-9 text-left">
+                Добавить изображение:
+              </div>
+              <div class="col-3">
+                <v-btn
+                  ripple
+                  small
+                  height="36"
+                  width="64"
+                  color="transparent"
+                  @click="addLine(
+                    elementTemplates['data-type-3'].dataRest.imageList[0],
+                    'imageList'
+                  )"
+                >
+                  <v-icon
+                    class="control-button edit-icon theme--dark"
+                    :style="{ color: theme.$main_text }"
+                  >
+                    {{ addLineIcon }}
+                  </v-icon>
+                </v-btn>
               </div>
             </div>
           </div>
@@ -875,11 +985,11 @@ export default {
         this.dataObject = updateValue;
       }
     },
-    deleteLine(index) {
-      this.dataObject.items.splice(index, 1);
+    deleteLine(index, objectName) {
+      this.dataObject[objectName].splice(index, 1);
     },
-    addLine(template) {
-      this.dataObject.items.push(template);
+    addLine(template, objectName) {
+      this.dataObject[objectName].push(template);
     },
     updateModelValue() {
       this.$emit('changeDataSelectedNode', this.dataObject);
@@ -910,7 +1020,8 @@ export default {
     }
   }
   .dash-constructor-schemes__data-type-0,
-  .dash-constructor-schemes__data-type-2 {
+  .dash-constructor-schemes__data-type-2,
+  .dash-constructor-schemes__data-type-3 {
     border: 1px solid var(--main_border);
     border-radius: 5px;
     padding: 15px 8px;

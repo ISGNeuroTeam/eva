@@ -216,6 +216,26 @@
 
                       <v-checkbox
                         v-if="metric.type === 'line'"
+                        v-model="metric.dontSplitLine"
+                        label="Не разрывать линию"
+                        persistent-placeholder
+                        dense
+                        outlined
+                        hide-details
+                        color="blue"
+                      />
+                      <v-checkbox
+                        v-if="metric.type === 'line'"
+                        v-model="metric.lineBySteps"
+                        label="Линия-ступеньки"
+                        persistent-placeholder
+                        dense
+                        outlined
+                        hide-details
+                        color="blue"
+                      />
+                      <v-checkbox
+                        v-if="metric.type === 'line'"
                         v-model="metric.showArea"
                         label="Закрашивать область между линией и нулем"
                         persistent-placeholder

@@ -206,6 +206,7 @@ export default class ChartClass {
 
     this.svgGroups = this.svg
       .append('g')
+      .attr('font-family', '"Roboto", sans-serif')
       .attr('class', 'groups');
 
     this.groups.forEach((num, i) => {
@@ -918,7 +919,7 @@ export default class ChartClass {
       .attr('font-size', '11')
       .attr('pointer-events', 'none')
       .attr('text-anchor', 'start') // middle
-      .attr('fill', 'var(--main_text)')
+      .attr('fill', this.theme.$main_text)
       .attr('class', `metric metric-${metric.n}`)
       .text((d) => ChartClass.valueToText(metric, d))
       .attr('x', (d) => {
@@ -965,10 +966,14 @@ export default class ChartClass {
       color,
       yAxisLink,
       name,
+      dontSplitLine,
+      lineBySteps,
     } = metric;
     let line = [];
-    this.data
-      .reduce((prev, cur, currentIndex, arr) => {
+
+    const lines = dontSplitLine
+      ? [this.data.filter((item) => item[name] !== null)]
+      : this.data.reduce((prev, cur, currentIndex, arr) => {
         if (cur[name] === null) {
           prev.push(line);
           line = [];
@@ -979,49 +984,67 @@ export default class ChartClass {
           prev.push(line);
         }
         return prev;
-      }, [])
-      // eslint-disable-next-line no-shadow
-      .forEach((line) => {
-        if (line.length === 0) {
-          return;
-        }
+      }, []);
 
-        // add the line itself
-        const path = chartGroup
-          .append('path')
-          .attr('clip-path', `url(#group-rect-${num}-${this.id})`)
-          .attr('class', `metric metric-${metric.n}`)
-          .datum(line)
-          .attr('fill', 'none')
-          .attr('stroke', color)
-          .attr('stroke-width', metric.strokeWidth)
-          .style('stroke-dasharray', metric.strokeDasharray);
+    // eslint-disable-next-line no-shadow
+    lines.forEach((line) => {
+      if (line.length === 0) {
+        return;
+      }
 
-        // add red lines
-        this.renderRedLines(chartGroup, metric, height, line);
+      let drawLine = line;
+      if (lineBySteps) {
+        drawLine = line.reduce((acc, d, idx) => {
+          if (lineBySteps && idx !== 0) {
+            acc.push({
+              [this.xMetric]: d[this.xMetric],
+              [name]: line[idx - 1][name],
+            });
+          }
+          acc.push({
+            [this.xMetric]: d[this.xMetric],
+            [name]: d[name],
+          });
+          return acc;
+        }, []);
+      }
 
-        if (showArea) {
-          path
-            .attr('fill', d3.hsl(color).brighter(0.1))
-            .attr('d', d3.area()
-              .x((d) => this.x(d[this.xMetric]))
-              .y0((d) => this.y[yAxisLink || name](d[name]))
-              .y1(() => this.y[yAxisLink || name](0)));
-        } else {
-          path
-            .attr('d', d3.line()
-              .x((d) => this.x(d[this.xMetric]))
-              .y((d) => this.y[yAxisLink || name](d[name])));
-        }
+      // add the line itself
+      const path = chartGroup
+        .append('path')
+        .attr('clip-path', `url(#group-rect-${num}-${this.id})`)
+        .attr('class', `metric metric-${metric.n}`)
+        .datum(drawLine)
+        .attr('fill', 'none')
+        .attr('stroke', color)
+        .attr('stroke-width', metric.strokeWidth)
+        .style('stroke-dasharray', metric.strokeDasharray);
 
-        // add dots
-        this.renderPeakDots(chartGroup, metric, height, num, line);
+      // add red lines
+      this.renderRedLines(chartGroup, metric, height, line);
 
-        // add text
-        if (metric.showText) {
-          this.renderPeakTexts(chartGroup, metric, line);
-        }
-      });
+      if (showArea) {
+        path
+          .attr('fill', d3.hsl(color).brighter(0.1))
+          .attr('d', d3.area()
+            .x((d) => this.x(d[this.xMetric]))
+            .y0((d) => this.y[yAxisLink || name](d[name]))
+            .y1(() => this.y[yAxisLink || name](0)));
+      } else {
+        path
+          .attr('d', d3.line()
+            .x((d) => this.x(d[this.xMetric]))
+            .y((d) => this.y[yAxisLink || name](d[name])));
+      }
+
+      // add dots
+      this.renderPeakDots(chartGroup, metric, height, num, line);
+
+      // add text
+      if (metric.showText) {
+        this.renderPeakTexts(chartGroup, metric, line);
+      }
+    });
   }
 
   addScatterDots(chartGroup, metric, height, num) {
@@ -1360,6 +1383,9 @@ export default class ChartClass {
       ? captionKey
       : metric.name;
     const val = data[fieldName];
+    if (captionKey === fieldName) {
+      return val;
+    }
     const { zerosAfterDot } = metric;
     return (zerosAfterDot % 1 === 0 && zerosAfterDot >= 0 && zerosAfterDot <= 100)
       ? Number.parseFloat(val).toFixed(zerosAfterDot ?? 2)
