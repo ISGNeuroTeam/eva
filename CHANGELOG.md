@@ -8,12 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Multiline: added metric option "don't split line"
+- Multiline: added metric option "line by steps"
 - Constructor-schemes: added x\y coords into fromOtl object
 - Constructor-schemes: added dynamic-image element
+
 ### Changed
 - Optimized dashboard loading time
 
 ### Fixed
+- Multiline: showing dot's caption
 - Constructor-schemes: json size is doubled when switching tabs on dashboard
 
 ## [1.125.0]
