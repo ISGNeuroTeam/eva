@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="downloadModal"
-    width="500"
+    width="350"
   >
     <v-card class="report-card">
       <v-card-title
@@ -29,7 +29,7 @@
       </v-card-title>
 
       <v-card-text
-        class="card-text pt-4"
+        class="card-text pt-4 d-flex justify-center"
         :style="{ background: theme.$secondary_bg, color: theme.$main_text }"
       >
         <template>
@@ -158,6 +158,20 @@ export default {
 };
 </script>
 
-<style scoped>
-
+<style scoped lang="sass">
+.download-icon
+  margin-right: 5px
+.report-card
+  border-radius: 12px !important
+  .card-title
+    padding: 10px 16px 10px 16px !important
+    display: flex
+    justify-content: space-between
+  .card-text
+    padding: 14px 16px 14px 16px !important
+    .card-text-value
+      font-weight: bold
+.download-icon
+  svg
+    height: 17px
 </style>
