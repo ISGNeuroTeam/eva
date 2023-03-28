@@ -102,7 +102,7 @@
 
 <script>
 import { mdiFileOutline, mdiDownload, mdiClose } from '@mdi/js';
-import { utils, writeFileXLSX } from 'xlsx';
+import { utils, writeFile } from 'xlsx';
 
 export default {
   props: {
@@ -145,7 +145,7 @@ export default {
       const workSheet = utils.json_to_sheet(this.data);
       const wb = utils.book_new();
       utils.book_append_sheet(wb, workSheet, 'data');
-      writeFileXLSX(wb, 'report.xlsx');
+      writeFile(wb, 'report.xlsx');
     },
   },
 };

@@ -92,7 +92,7 @@
             :data-source-id="elem.search"
             :data-sources="dataObject"
             :loading="checkLoading(elem)"
-            @downloadData="exportDataCSV"
+            @downloadData="openModalDownload"
             @SetRange="setRange($event, elem)"
             @ResetRange="resetRange($event)"
             @activated="onActivated(elem.elem)"
@@ -278,6 +278,12 @@
       btn-cancel-text="Отмена"
       @result="deleteTab"
     />
+    <modal-download
+      v-model="isDownloadModal"
+      :data-object="dataObject"
+      :search-id="searchId"
+      :id-dash="idDash"
+    />
   </v-app>
 </template>
 
@@ -324,6 +330,8 @@ export default {
       deleteTabId: '',
       deleteTabName: '',
       tempSorting: {},
+      isDownloadModal: false,
+      searchId: 0,
     };
   },
   computed: {
@@ -869,6 +877,10 @@ export default {
         this.$set(this, 'tempSorting', newSorting);
       }, 120);
       return true;
+    },
+    openModalDownload(searchId) {
+      this.isDownloadModal = true;
+      this.searchId = searchId;
     },
   },
 };
