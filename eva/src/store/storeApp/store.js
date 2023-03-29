@@ -216,7 +216,8 @@ export default {
       return fetch(`/api/group/dashs?id=${groupId}`)
         .then((res) => {
           if (res.ok) {
-            return res.json().then(({ data }) => data);
+            return res.json()
+              .then(({ data }) => data.map((item) => ({ ...item, body: undefined })));
           }
           return Promise.reject(res.statusText);
         });

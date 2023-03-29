@@ -2,8 +2,6 @@
 
 import Vue from 'vue';
 import Vuex from 'vuex';
-// это подключаем чтобы после перезагрузки страницы он сохранял состояние
-import createPersistedState from 'vuex-persistedstate';
 
 import auth from './storeAuth/store';
 import app from './storeApp/store';
@@ -34,8 +32,32 @@ export default new Vuex.Store({
       name: 'dark',
       settings: themes.dark,
     },
+    savingDashQueue: [],
+    readingDashQueue: [],
   },
   mutations: {
+    addSavingDashQueue(state, idDash) {
+      if (!state.savingDashQueue.includes(idDash)) {
+        state.savingDashQueue.push(idDash);
+      }
+    },
+    removeSavingDashQueue(state, idDash) {
+      const idx = state.savingDashQueue.indexOf(idDash);
+      if (idx !== -1) {
+        state.savingDashQueue.splice(idx, 1);
+      }
+    },
+    addReadingDashQueue(state, idDash) {
+      if (!state.readingDashQueue.includes(idDash)) {
+        state.readingDashQueue.push(idDash);
+      }
+    },
+    removeReadingDashQueue(state, idDash) {
+      const idx = state.readingDashQueue.indexOf(idDash);
+      if (idx !== -1) {
+        state.readingDashQueue.splice(idx, 1);
+      }
+    },
     /* метод для добавления реактивных свойств
      * payload - массив объектов {object, prop, value}
      * */
@@ -1114,6 +1136,52 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    saveDashToStore({ state, commit }, idDash) {
+      return new Promise((resolve) => {
+        if (state.savingDashQueue.includes(idDash)) {
+          resolve();
+        } else {
+          commit('addSavingDashQueue', idDash);
+          const worker = new Worker('/js/store-worker.js');
+          worker.postMessage({
+            type: 'saveDash',
+            id: idDash,
+            body: JSON.stringify(state[idDash]),
+          });
+          worker.onmessage = () => {
+            worker.terminate();
+            commit('removeSavingDashQueue', idDash);
+            resolve();
+          };
+        }
+      });
+    },
+    loadDashFromStore({ state, commit }, idDash) {
+      return new Promise((resolve, reject) => {
+        if (state.readingDashQueue.includes(idDash)) {
+          resolve('already reading');
+        } else {
+          commit('addReadingDashQueue', idDash);
+          const worker = new Worker('/js/store-worker.js');
+          worker.postMessage({
+            type: 'getDash',
+            id: idDash,
+          });
+          worker.onmessage = ({ data }) => {
+            worker.terminate();
+            commit('removeReadingDashQueue', idDash);
+            if (data) {
+              commit('setState', [{
+                object: state,
+                prop: idDash,
+                value: data,
+              }]);
+            }
+            resolve(data);
+          };
+        }
+      });
+    },
     // метод получающий данные из rest
     getDataApi({ state }, searchFrom) {
       // создаем произвольный хэш чтобы наши запросы не повторялись
@@ -1324,17 +1392,13 @@ export default new Vuex.Store({
               }
             }
             if (state[id].elements) {
-              state[id].elements.forEach((elem) => {
-                if (!state[id][elem].tab) {
-                  commit('setState', [
-                    {
-                      object: state[id][elem],
-                      prop: 'tab',
-                      value: 1,
-                    },
-                  ]);
-                }
-              });
+              commit('setState', state[id].elements
+                .filter((elem) => (!state[id][elem].tab))
+                .map((elem) => ({
+                  object: state[id][elem],
+                  prop: 'tab',
+                  value: 1,
+                })));
             }
             if (!state[id]?.tabList || state[id]?.tabList?.length === 0) {
               commit('setState', [
@@ -1363,17 +1427,16 @@ export default new Vuex.Store({
                 },
               ]);
             }
-            state[id].filters?.forEach((filter) => {
-              if (filter.idDash !== id) {
-                commit('setState', [
-                  {
-                    object: filter,
-                    prop: 'idDash',
-                    value: id,
-                  },
-                ]);
-              }
-            });
+
+            if (state[id].filters) {
+              commit('setState', state[id].filters
+                .filter((filter) => (filter.idDash !== id))
+                .map((filter) => ({
+                  object: filter,
+                  prop: 'idDash',
+                  value: id,
+                })));
+            }
 
             if (state[id].searches) {
               if (state[id].searches?.length > 0) {
@@ -1389,7 +1452,7 @@ export default new Vuex.Store({
                 // TODO: Временно
                 //  Нужно для замены строковых id источникка данных
                 //  элемента визуализации на числовой
-                if (state[id]?.elements?.length > 0) {
+                /* if (state[id]?.elements?.length > 0) {
                   state[id].elements.forEach((element) => {
                     if (typeof state[id][element]?.search === 'string') {
                       let searchValue = '';
@@ -1407,32 +1470,18 @@ export default new Vuex.Store({
                       }
                     }
                   });
-                }
+                } */
               }
-              state[id].searches.forEach((search) => {
-                if (
-                  search.parametrs?.isStartImmediately
-                  || search.parametrs.isStartImmediately === undefined
-                ) {
-                  if (search.status !== 'empty') {
-                    commit('setState', [
-                      {
-                        object: search,
-                        prop: 'status',
-                        value: 'empty',
-                      },
-                    ]);
-                  }
-                } else if (search.status !== 'stop') {
-                  commit('setState', [
-                    {
-                      object: search,
-                      prop: 'status',
-                      value: 'stop',
-                    },
-                  ]);
-                }
-              });
+              if (state[id].searches) {
+                commit('setState', state[id].searches.map((search) => ({
+                  object: search,
+                  prop: 'status',
+                  value: (search.parametrs?.isStartImmediately
+                    || search.parametrs.isStartImmediately === undefined)
+                    ? 'empty'
+                    : 'stop',
+                })));
+              }
             }
             resolve({ status: 'finish' });
             // }
@@ -2053,31 +2102,39 @@ export default new Vuex.Store({
     app,
   },
   plugins: [
-    createPersistedState({
-      key: 'dashes',
-      reducer: (obj) => Object.keys(obj).reduce((acc, item) => {
-        if (/^\d+$/.test(item)) {
-          acc[item] = obj[item];
-        }
-        return acc;
-      }, {}),
-      filter({ type }) {
-        // console.log('- mutation %c%s%c', 'color:yellow', type, 'color: inherit', payload);
-        if (['updateSearchStatus'].includes(type)) {
-          // console.log('- skip: %s', type);
-          return false;
-        }
-        return true;
-      },
-    }),
-    createPersistedState({
-      key: 'app',
-      reducer: (obj) => Object.keys(obj).reduce((acc, item) => {
-        if (!/^\d+$/.test(item)) {
-          acc[item] = obj[item];
-        }
-        return acc;
-      }, {}),
-    }),
+    (store) => {
+      const storage = localStorage;
+
+      // load store
+      const appData = JSON.parse(storage.getItem('app') || '{}');
+      store.commit('setState', Object.entries(appData)
+        .reduce((acc, [key, value]) => {
+          acc.push({
+            object: store.state,
+            prop: key,
+            value,
+          });
+          return acc;
+        }, []));
+
+      // watch by app state
+      store.watch(
+        (state) => ({
+          app: state.app,
+          auth: state.auth,
+          notify: state.notify,
+          theme: state.theme,
+          form: state.form,
+          logError: state.logError,
+          dataResearch: state.dataResearch,
+        }),
+        (val) => {
+          storage.setItem('app', JSON.stringify(val));
+        },
+        {
+          deep: true,
+        },
+      );
+    },
   ],
 });
