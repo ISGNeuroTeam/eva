@@ -1,5 +1,11 @@
 import {
-  Point, PolylineEdgeStyle, Rect, ShapeNodeStyle, DefaultLabelStyle, FreeNodePortLocationModel,
+  Point,
+  PolylineEdgeStyle,
+  Rect,
+  ShapeNodeStyle,
+  DefaultLabelStyle,
+  FreeNodePortLocationModel,
+  ImageNodeStyle,
 } from 'yfiles';
 import ElementTemplates from './elementTemplates.js';
 import VuejsNodeStyle from '@/js/classes/ConstructorSchemes/VueNodeStyle';
@@ -171,21 +177,42 @@ class ElementCreator {
         );
       } else {
         const { template } = this.elementTemplates[element.tag.dataType];
-        createdNode = this.graph.createNodeAt({
-          location: new Rect(
-            0,
-            0,
-            element.layout.width,
-            element.layout.height,
-          ),
-          style: new VuejsNodeStyle(template),
-          tag: {
-            ...this.elementTemplates[element.tag.dataType].dataRest,
-            ...element.tag,
-            fontFamily: ElementTemplates.fontFamily,
-            nodeId: element.tag.nodeId || element.hashCode(),
-          },
-        });
+        if (element.tag.dataType === 'data-type-3') {
+          const imagePath = element.tag.activeImage?.path || element.tag.defaultImagePath;
+          createdNode = this.graph.createNodeAt({
+            location: new Rect(
+              0,
+              0,
+              element.layout.width,
+              element.layout.height,
+            ),
+            style: imagePath
+              ? new ImageNodeStyle(imagePath)
+              : new VuejsNodeStyle(template),
+            tag: {
+              ...this.elementTemplates[element.tag.dataType].dataRest,
+              ...element.tag,
+              fontFamily: ElementTemplates.fontFamily,
+              nodeId: element.tag.nodeId || element.hashCode(),
+            },
+          });
+        } else {
+          createdNode = this.graph.createNodeAt({
+            location: new Rect(
+              0,
+              0,
+              element.layout.width,
+              element.layout.height,
+            ),
+            style: new VuejsNodeStyle(template),
+            tag: {
+              ...this.elementTemplates[element.tag.dataType].dataRest,
+              ...element.tag,
+              fontFamily: ElementTemplates.fontFamily,
+              nodeId: element.tag.nodeId || element.hashCode(),
+            },
+          });
+        }
       }
       const nodePosition = new Rect(
         element.layout.x,
