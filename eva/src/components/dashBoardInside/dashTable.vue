@@ -267,7 +267,9 @@ export default {
         }
         if (event.prop[0] === 'cellcolor') {
           items.forEach((item) => {
-            if (this[event.compare](item[event.column], event.row)) {
+            if (
+              this[event.compare](item[event.column], event.row)
+                || this[event.compare](item[event.column], item[event.row])) {
               if (!item.cellColor) {
                 item.cellColor = [];
               }

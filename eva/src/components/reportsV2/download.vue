@@ -2,7 +2,7 @@
   <div class="text-center">
     <v-dialog
       v-model="dialog"
-      width="500"
+      width="350"
     >
       <template v-slot:activator="{ on, attrs }">
         <v-btn
@@ -53,7 +53,7 @@
         </v-card-title>
 
         <v-card-text
-          class="card-text"
+          class="card-text d-flex justify-center"
           :style="{ background: theme.$secondary_bg, color: theme.$main_text }"
         >
           <template>
