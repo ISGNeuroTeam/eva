@@ -465,16 +465,18 @@ const templates = {
       fontSize: 16,
       id: '',
       value: 0,
-      imageLayout: null,
       templateType: 'template-3',
       // show if activeImage==='default'
       placeholder: 'Изображение',
       activeImage: '',
       defaultImage: '',
+      defaultImagePath: '',
+      imageLayout: null,
       imageList: [
         {
           value: 0,
           image: '',
+          path: '',
         },
       ],
       getActiveImage() {
