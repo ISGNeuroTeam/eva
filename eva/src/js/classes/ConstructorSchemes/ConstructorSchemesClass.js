@@ -668,9 +668,9 @@ class ConstructorSchemesClass {
     });
   }
 
-  async exportGraphToJSON(schemeId = 'scheme') {
+  async exportGraphToJSON(schemeId = 'scheme', savedGraphObject) {
     return new Promise((resolve) => {
-      const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(this.savedGraphObject))}`;
+      const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(savedGraphObject))}`;
       const downloadAnchorNode = document.createElement('a');
       downloadAnchorNode.setAttribute('href', dataStr);
       downloadAnchorNode.setAttribute('download', `${schemeId}.json`);
