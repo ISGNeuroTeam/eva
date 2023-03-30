@@ -1,3 +1,14 @@
+# [1.127.0] - 2023-03-30
+
+### Added
+- Constructor-schemes: added dynamic-image node
+- event "onDataCompare" added ability to compare cells with cells
+- Visualizations. Added the ability to download the result in xlsx
+
+### Fixed
+- Storage data quota exceeded
+- Constructor-schemes: incorrect save scheme to store
+
 # [1.126.0] - 2023-03-24
 
 ### Added
