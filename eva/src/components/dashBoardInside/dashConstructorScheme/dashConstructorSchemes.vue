@@ -776,10 +776,6 @@ export default {
       schemeIdForDelete: '',
       localActiveSchemeId: '',
       file: null,
-      // test
-      localSaveGraph: {
-        'default-scheme': [],
-      },
     };
   },
   computed: {
@@ -806,9 +802,6 @@ export default {
     },
     savedGraphObject() {
       const savedGraph = this.dashFromStore[this.idFrom]?.savedGraphObject;
-      if (this.localSaveGraph[this.localActiveSchemeId]?.length > 0) {
-        return this.localSaveGraph[this.localActiveSchemeId] || [];
-      }
       if (savedGraph) {
         return savedGraph[this.localActiveSchemeId] || [];
       }
@@ -1033,10 +1026,6 @@ export default {
       }
     }
   },
-  beforeDestroy() {
-    this.createSavedGraphObjectField();
-    this.saveGraphToStore();
-  },
   methods: {
     setActions() {
       this.$store.commit('setActions', {
@@ -1093,7 +1082,7 @@ export default {
         savedGraph: this.savedGraph,
         savedGraphObject: this.savedGraphObject,
         updateStoreCallback: this.updateSavedGraph,
-        updateStoreCallbackV2: this.localUpdateSavedGraphObject,
+        updateStoreCallbackV2: this.updateSavedGraphObject,
         toggleLoadingCallback: this.toggleLoading,
         isEdit: this.dashboardEditMode,
         isBridgesEnable: this.isBridgeEnable,
@@ -1237,11 +1226,6 @@ export default {
         }]);
       }
     },
-    createSavedGraphObjectFieldLocal() {
-      if (!this.localSaveGraph[this.activeSchemeId]) {
-        this.localSaveGraph[this.activeSchemeId] = [];
-      }
-    },
     clearSavedGraphObject() {
       this.$store.commit('setState', [{
         object: this.dashFromStore[this.idFrom].savedGraphObject,
@@ -1249,34 +1233,22 @@ export default {
         value: [],
       }]);
     },
-    localUpdateSavedGraphObject(data) {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-      }
-      this.timer = 500;
-      this.timeout = setTimeout(() => {
-        this.createSavedGraphObjectFieldLocal();
-        this.localSaveGraph[this.localActiveSchemeId] = data;
-      }, this.timer);
-    },
     updateSavedGraphObject(data) {
       if (this.timeout) {
         clearTimeout(this.timeout);
       }
       this.timer = 500;
       this.timeout = setTimeout(() => {
-        this.localUpdateSavedGraphObject(data);
+        this.createSavedGraphObjectField();
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.idFrom].savedGraphObject,
+          prop: this.localActiveSchemeId,
+          value: data,
+        }]);
+        if (this.dashFromStore[this.idFrom].savedGraph || this.dashFromStore.savedGraph) {
+          this.updateSavedGraph('');
+        }
       }, this.timer);
-    },
-    saveGraphToStore() {
-      this.$store.commit('setState', [{
-        object: this.dashFromStore[this.idFrom],
-        prop: 'savedGraphObject',
-        value: {
-          ...this.dashFromStore[this.idFrom].savedGraphObject,
-          ...this.localSaveGraph,
-        },
-      }]);
     },
     closeDataPanel() {
       this.dataPanel = false;
@@ -1391,7 +1363,8 @@ export default {
       }
     },
     exportJSON() {
-      this.constructorSchemes.exportGraphToJSON(`dash_${this.idDashFrom}_${this.idFrom}_${this.localActiveSchemeId}`);
+      const schemeId = `dash_${this.idDashFrom}_${this.idFrom}_${this.localActiveSchemeId}`;
+      this.constructorSchemes.exportGraphToJSON(schemeId, this.savedGraphObject);
     },
     importFrom(file) {
       this.clearSavedGraphObject();
