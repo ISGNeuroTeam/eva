@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Storage data quota exceeded
+- Constructor-schemes: incorrect save scheme to store
 
 ## [1.126.0]
 
