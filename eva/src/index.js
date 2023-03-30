@@ -75,6 +75,8 @@ Vue.component('modal-persistent', () => import('./components/modalPersistent.vue
 Vue.component('modal-create-search', () => import('./components/modalCreateSearch.vue'));
 // модальное окно настроект
 Vue.component('modal-settings', () => import('./components/modalSettings.vue'));
+// модальное окно скачивания
+Vue.component('modal-download', () => import('./components/modalDownload.vue'));
 // настройки системы
 Vue.component('theme-settings', () => import('./components/themeSettings.vue'));
 // настройки дашборда
