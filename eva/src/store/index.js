@@ -1321,6 +1321,7 @@ export default new Vuex.Store({
         const result = rest.getState(id, restAuth);
         result.then((stateFrom) => {
           if (stateFrom && stateFrom?.name) {
+            const dashBodyObj = JSON.parse(stateFrom?.body || '{}');
             if (!state[id]) {
               commit('setState', [
                 {
@@ -1334,7 +1335,7 @@ export default new Vuex.Store({
                   {
                     object: state,
                     prop: id,
-                    value: JSON.parse(stateFrom.body),
+                    value: dashBodyObj,
                   },
                 ]);
               }
@@ -1371,7 +1372,7 @@ export default new Vuex.Store({
                   {
                     object: state,
                     prop: id,
-                    value: JSON.parse(stateFrom.body),
+                    value: dashBodyObj,
                   },
                   {
                     object: state[id],
