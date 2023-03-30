@@ -488,6 +488,18 @@ export default {
     },
   },
   watch: {
+    dashFromStore: {
+      deep: true,
+      handler(dash) {
+        // не сохраняем даш на диск пока идет загрузка источников данных
+        if (!dash || dash.searches?.map((item) => item.status).filter((status) => status === 'pending').length) {
+          return;
+        }
+        this.$nextTick(() => {
+          this.saveDashToStore();
+        });
+      },
+    },
     'dashFromStore.elements.length': {
       handler(val, old) {
         if (val !== old) {
@@ -548,7 +560,16 @@ export default {
       }
     }
 
-    await this.checkAlreadyDash();
+    const data = await this.$store.dispatch('loadDashFromStore', this.idDash);
+    if (data) {
+      this.prepared = true;
+      this.alreadyDash = data;
+      this.$store.commit('changeDashboard', { data });
+      this.checkAlreadyDash();
+    } else {
+      await this.checkAlreadyDash();
+    }
+
     this.loadingDash = false;
     document.title = `EVA | ${this.dashFromStore?.name || '404'}`;
     if (this.$route.params.tabId) {
@@ -565,6 +586,14 @@ export default {
     this.updateTempSorting();
   },
   methods: {
+    saveDashToStore() {
+      clearTimeout(this.saveTO);
+      this.saveTO = setTimeout(() => {
+        if (!this.alreadyShow) {
+          this.$store.dispatch('saveDashToStore', this.idDash);
+        }
+      }, 750);
+    },
     updateTempSorting() {
       if (this.dashFromStore.elements?.reduce) {
         this.tempSorting = this.dashFromStore.elements
@@ -577,7 +606,6 @@ export default {
     },
     startSearches(searches) {
       if (searches?.length > 0) {
-
         const nextTick = this.$nextTick();
         searches.forEach((search) => {
           if (search.status === 'empty') {
@@ -768,18 +796,25 @@ export default {
     openSettings() {
       this.showSetting = !this.showSetting;
     },
-    updateDash() {
+    async updateDash() {
       this.$store.commit('updateDash', {
         dash: this.alreadyDash,
         modified: this.alreadyDash.modified,
       });
-      this.$store.dispatch(
+      await this.$store.dispatch('saveDashToStore', this.idDash);
+      await this.$store.dispatch(
         'auth/putLog',
         `Обновлен дашборд ${this.toHichName(this.alreadyDash?.name)} с id ${
           this.alreadyDash.id
         }`,
       );
       this.alreadyShow = false;
+
+      // перемонтирую компоненты чтоб обновить размеры и позиции
+      this.prepared = false;
+      this.$nextTick(() => {
+        this.prepared = true;
+      });
     },
     toHichName(name) {
       return name[0].toUpperCase() + name.slice(1);

@@ -360,7 +360,7 @@ export default {
         .json()
         .then((res) => {
           // переводим полученные данные из json в нормальный объект
-          data = res.data;
+          data = res.data.map((item) => ({ ...item, body: undefined }));
           restAuth.putLog(
             `Дашборды получены.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
           );

@@ -13,6 +13,9 @@ export default {
       state.userName = userName;
     },
     setEssence(state, data) {
+      if (data?.data?.body) {
+        delete data.data.body;
+      }
       state.essence = structuredClone(data);
     },
     dropEssence(state) {

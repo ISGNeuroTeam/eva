@@ -19,6 +19,10 @@ module.exports = {
           from: path.resolve(__dirname, 'src/workers/job-worker.js'),
           to: path.resolve(__dirname, 'dist/js/job-worker.js'),
         });
+        entries[0].push({
+          from: path.resolve(__dirname, 'src/workers/store-worker.js'),
+          to: path.resolve(__dirname, 'dist/js/store-worker.js'),
+        });
         return entries;
       });
 
