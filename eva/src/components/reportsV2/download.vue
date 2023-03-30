@@ -2,7 +2,7 @@
   <div class="text-center">
     <v-dialog
       v-model="dialog"
-      width="500"
+      width="350"
     >
       <template v-slot:activator="{ on, attrs }">
         <v-btn
@@ -53,7 +53,7 @@
         </v-card-title>
 
         <v-card-text
-          class="card-text"
+          class="card-text d-flex justify-center"
           :style="{ background: theme.$secondary_bg, color: theme.$main_text }"
         >
           <template>
@@ -102,7 +102,7 @@
 
 <script>
 import { mdiFileOutline, mdiDownload, mdiClose } from '@mdi/js';
-import { utils, writeFileXLSX } from 'xlsx';
+import { utils, writeFile } from 'xlsx';
 
 export default {
   props: {
@@ -145,7 +145,7 @@ export default {
       const workSheet = utils.json_to_sheet(this.data);
       const wb = utils.book_new();
       utils.book_append_sheet(wb, workSheet, 'data');
-      writeFileXLSX(wb, 'report.xlsx');
+      writeFile(wb, 'report.xlsx');
     },
   },
 };

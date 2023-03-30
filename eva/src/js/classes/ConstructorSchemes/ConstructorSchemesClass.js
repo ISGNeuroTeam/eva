@@ -668,9 +668,9 @@ class ConstructorSchemesClass {
     });
   }
 
-  async exportGraphToJSON(schemeId = 'scheme') {
+  async exportGraphToJSON(schemeId = 'scheme', savedGraphObject) {
     return new Promise((resolve) => {
-      const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(this.savedGraphObject))}`;
+      const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(savedGraphObject))}`;
       const downloadAnchorNode = document.createElement('a');
       downloadAnchorNode.setAttribute('href', dataStr);
       downloadAnchorNode.setAttribute('download', `${schemeId}.json`);
@@ -703,10 +703,20 @@ class ConstructorSchemesClass {
       if (node.tag.dataType || node?.tag[0] === 'i' || node?.tag === 'invisible') {
         if (node.tag.dataType !== 'image-node' && node?.tag?.dataType !== 'invisible') {
           node.tag = ConstructorSchemesClass.upgradeNodeTag(node);
-          this.graphComponent.graph.setStyle(
-            node,
-            new VuejsNodeStyle(this.elementTemplates[node.tag.dataType].template),
-          );
+          if (node.tag.dataType === 'data-type-3') {
+            const imagePath = node.tag.activeImage?.path || node.tag.defaultImagePath;
+            this.graphComponent.graph.setStyle(
+              node,
+              imagePath
+                ? new ImageNodeStyle(imagePath)
+                : new VuejsNodeStyle(this.elementTemplates[node.tag.dataType].template),
+            );
+          } else {
+            this.graphComponent.graph.setStyle(
+              node,
+              new VuejsNodeStyle(this.elementTemplates[node.tag.dataType].template),
+            );
+          }
         }
         this.updateImageNode(node);
       }
@@ -1701,6 +1711,11 @@ class ConstructorSchemesClass {
             valueColor: targetData?.value_color || null,
           };
         } else if (dataType === 'data-type-3') {
+          const targetData = updatedData.find((item) => item.TagName === node.tag.id);
+          node.tag = {
+            ...node.tag,
+            value: targetData.value || '-',
+          };
           this.updateDynamicImageNode(node);
         }
       });
@@ -1745,16 +1760,31 @@ class ConstructorSchemesClass {
         })),
       };
     } else if (dataType === 'data-type-3') {
-      updatedData = {
-        defaultImage: dataFromComponent.defaultImage,
-        activeImage: dataFromComponent.imageList
-          .find((item) => item.value === dataFromComponent.value),
-        id: dataFromComponent?.id,
-        value: this.getDataItemById(dataFromComponent.id)?.value
-            || dataFromComponent?.value
-            || '-',
-        imageList: dataFromComponent.imageList,
-      };
+      const mainImageFromNode = this.targetDataNode.tag.defaultImage;
+      const mainImageFromData = dataFromComponent.defaultImage;
+      const mainImageIsChange = mainImageFromNode !== mainImageFromData;
+      if (mainImageIsChange && mainImageFromNode) {
+        updatedData = {
+          imageLayout: null,
+          defaultImagePath: '',
+          defaultImage: dataFromComponent.defaultImage,
+          activeImage: '',
+          id: dataFromComponent?.id,
+          value: this.getDataItemById(dataFromComponent.id)?.value
+              || dataFromComponent?.value
+              || '-',
+          imageList: dataFromComponent.imageList,
+        };
+      } else {
+        updatedData = {
+          defaultImage: dataFromComponent.defaultImage,
+          id: dataFromComponent?.id,
+          value: this.getDataItemById(dataFromComponent.id)?.value
+              || dataFromComponent?.value
+              || '-',
+          imageList: dataFromComponent.imageList,
+        };
+      }
     } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
       updatedData = dataFromComponent;
     } else if (dataFromComponent.dataType === 'edge') {
@@ -1801,68 +1831,135 @@ class ConstructorSchemesClass {
     );
   }
 
-  updateDynamicImageNode(dynamicImageNode) {
-    const updatedNode = dynamicImageNode;
-    const GenerateIconsClass = new GenerateIcons(
+  updateDynamicImageNode(node) {
+    const updatedNodeTag = {};
+    const GenerateIconClass = new GenerateIcons(
       'dynamic-image',
       'dynamic-image-node',
     );
-    let generatedLayout = dynamicImageNode.tag.imageLayout;
-    let defaultImagePath = '';
-    if (!generatedLayout) {
-      const defaultImage = GenerateIconsClass.generateIconNodes([{
-        icon: dynamicImageNode.tag.defaultImage,
-      }]);
-      defaultImage.then((response) => {
+    let {
+      // Основные размеры изображения
+      imageLayout,
+      // Основное(по-умолчанию) изображение
+      // eslint-disable-next-line prefer-const
+      defaultImage,
+      // Полная ссылка на основное(по-умолчанию) изображение
+      defaultImagePath,
+    } = node.tag;
+    // Список изображений с полными ссылками
+    // Если это первое выбранное изображение или основное изображение заменили
+    if (!imageLayout) {
+      GenerateIconClass.generateIconNodes([{
+        icon: defaultImage,
+      }]).then((response) => {
         response.forEach((item) => {
-          generatedLayout = new Rect(
-            +dynamicImageNode.layout.x,
-            +dynamicImageNode.layout.y,
-            +item.layout.width,
-            +item.layout.height,
-          );
+          imageLayout = {
+            x: +node.layout.x,
+            y: +node.layout.y,
+            width: +item.layout.width,
+            height: +item.layout.height,
+          };
           defaultImagePath = item.icon.node.style.image;
           this.graphComponent.graph.setNodeLayout(
-            dynamicImageNode,
-            generatedLayout,
+            node,
+            new Rect(
+              +node.layout.x,
+              +node.layout.y,
+              +item.layout.width,
+              +item.layout.height,
+            ),
           );
+          updatedNodeTag.imageLayout = imageLayout;
+          updatedNodeTag.defaultImagePath = defaultImagePath;
+        });
+        this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath).then(() => {
+          node.tag = {
+            ...node.tag,
+            imageLayout,
+            defaultImage,
+            defaultImagePath,
+          };
+          this.saveAnObject();
         });
       });
+    } else {
+      this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath).then(() => {
+        this.saveAnObject();
+      });
     }
-    let imageList;
-    GenerateIconsClass.generateIconNodes(
-      dynamicImageNode.tag.imageList.map((item) => ({
-        ...item,
-        icon: item.image,
-      })),
-    ).then((response) => new Promise((resolve) => {
-      imageList = response.map((item) => ({
-        value: item.value,
-        image: item.icon?.node?.style?.image || '',
-      }));
-      resolve(imageList);
-    })).then((response) => new Promise((resolve) => {
-      const imageByData = response
-        .find((item) => item?.value === `${dynamicImageNode?.tag?.value}`);
-      const activeImage = imageByData?.image
-            || defaultImagePath;
-      resolve(activeImage);
-    })).then((response) => {
-      if (defaultImagePath) {
-        this.graphComponent.graph.setStyle(
-          dynamicImageNode,
-          new ImageNodeStyle(`${response}`),
-        );
-      }
-    })
+    return node;
+  }
+
+  updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath) {
+    let imageListFromIconClass = [];
+    // Список изображений из элемента(node)
+    const mappedImageListFromNode = node.tag.imageList.map((item) => ({
+      ...item,
+      icon: item.image,
+    }));
+    return GenerateIconClass.generateIconNodes(mappedImageListFromNode)
+      .then((response) => new Promise((resolve) => {
+        imageListFromIconClass = response.map((item) => ({
+          value: item.value,
+          image: item.image,
+          path: item.icon?.node?.style?.image || '',
+        }));
+        const activeImageFromNode = node.tag.activeImage;
+        const activeImageFromData = imageListFromIconClass
+          .find((el) => el.value === node.tag.value);
+        const activeImageIsChanged = activeImageFromData?.image !== activeImageFromNode?.image;
+        if (activeImageFromData) {
+          if (activeImageIsChanged) {
+            node.tag.activeImage = activeImageFromData;
+          }
+        }
+        resolve(activeImageFromData);
+      }))
+      .then((activeImage) => new Promise((resolve, reject) => {
+        if (activeImage) {
+          // determine the intrinsic aspect ratio of the image
+          const imageAspectRatio = ImageNodeStyle.getAspectRatio(activeImage.path);
+          imageAspectRatio.then((result) => {
+            const style = new ImageNodeStyle({
+              image: activeImage.path,
+              // always keep the intrinsic aspect ratio independent of the node's size
+              aspectRatio: result,
+            });
+            this.graphComponent.graph.setStyle(
+              node,
+              style,
+            );
+          });
+
+          resolve();
+        } else if (!activeImage && defaultImagePath) {
+          // determine the intrinsic aspect ratio of the image
+          const imageAspectRatio = ImageNodeStyle.getAspectRatio(defaultImagePath);
+          imageAspectRatio.then((result) => {
+            const style = new ImageNodeStyle({
+              image: defaultImagePath,
+              // always keep the intrinsic aspect ratio independent of the node's size
+              aspectRatio: result,
+            });
+            this.graphComponent.graph.setStyle(
+              node,
+              style,
+            );
+          });
+          resolve();
+        } else {
+          reject();
+        }
+      }))
       .catch(() => {
         // Если изображение не найдено на сервере или по какой-то причине не загрузилось
+        // Или по какой-то причине не загрузилось
+        // Или не указано в настройках элемента
         this.graphComponent.graph.setStyle(
-          dynamicImageNode,
+          node,
           new VuejsNodeStyle(this.elementTemplates['data-type-3'].template),
         );
       });
-    return updatedNode;
   }
 
   // Order commands

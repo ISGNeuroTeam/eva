@@ -2238,6 +2238,7 @@ export default {
         dash: { body: JSON.stringify(dash.dash), id: this.idDash },
         modified: dash.data.modified,
       });
+      this.$store.dispatch('saveDashToStore', this.idDash);
       this.$store.dispatch(
         'auth/putLog',
         `Обновлен дашборд ${this.toHichName(dash.data.name)} с id ${

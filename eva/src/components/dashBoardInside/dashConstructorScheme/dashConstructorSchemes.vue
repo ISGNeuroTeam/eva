@@ -1363,7 +1363,8 @@ export default {
       }
     },
     exportJSON() {
-      this.constructorSchemes.exportGraphToJSON(this.localActiveSchemeId);
+      const schemeId = `dash_${this.idDashFrom}_${this.idFrom}_${this.localActiveSchemeId}`;
+      this.constructorSchemes.exportGraphToJSON(schemeId, this.savedGraphObject);
     },
     importFrom(file) {
       this.clearSavedGraphObject();
