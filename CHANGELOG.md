@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
-- Constructor-schemes: incorrect export dynamic-image-node
+- Constructor-schemes: incorrect save scheme to store
 
 ## [1.126.0]
 
