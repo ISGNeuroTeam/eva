@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Constructor-schemes: added dynamic-image node
+- onDataCompare added ability to compare cells with cells
+- Visualizations. Added the ability to download the result in xlsx
 
 ### Changed
 
