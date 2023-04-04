@@ -626,7 +626,7 @@ export default {
       document
         .querySelector(`[data-id=${this.id}]`)
         .addEventListener('click', (event) => {
-          if (event.target.tagName.toLowerCase() === 'td') {
+          if (event.target.tagName.toLowerCase() === 'td' && this.getOptions?.selectRowColor) {
             if (event.target.parentElement.classList.contains('selected')) {
               event.target.parentElement.classList.remove('selected');
             } else {
