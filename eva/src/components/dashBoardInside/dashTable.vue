@@ -514,6 +514,11 @@ export default {
         this.filters[title].value = event;
       }
       this.filters = { ...this.filters };
+      const selected = document.querySelector(`[data-id=${this.id}]`)
+        .querySelector('.selected');
+      if (selected) {
+        selected.classList.remove('selected');
+      }
     },
     checkForNumeric(val) {
       function isNumber(n) {
