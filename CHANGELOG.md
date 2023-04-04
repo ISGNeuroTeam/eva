@@ -10,8 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- DatePicker intervals moves with date
 
 ### Fixed
+- showing selected type of interval after page refresh
 
 ## [1.127.0]
 
