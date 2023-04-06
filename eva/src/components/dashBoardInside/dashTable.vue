@@ -382,6 +382,14 @@ export default {
         this.props.message = 'Данные не отображаются из-за настроек';
       }
     },
+    'getOptions.selectRowColor': {
+      handler(val) {
+        if (!val) {
+          this.removeHover();
+        }
+      },
+      deep: true,
+    },
   },
   mounted() {
     this.$store.commit('setActions', {
@@ -514,6 +522,9 @@ export default {
         this.filters[title].value = event;
       }
       this.filters = { ...this.filters };
+      this.removeHover();
+    },
+    removeHover() {
       const selected = document.querySelector(`[data-id=${this.id}]`)
         .querySelector('.selected');
       if (selected) {
