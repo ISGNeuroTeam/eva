@@ -385,7 +385,7 @@ export default {
     'getOptions.selectRowColor': {
       handler(val) {
         if (!val) {
-          this.removeHover();
+          this.removeActiveClass();
         }
       },
       deep: true,
@@ -522,9 +522,9 @@ export default {
         this.filters[title].value = event;
       }
       this.filters = { ...this.filters };
-      this.removeHover();
+      this.removeActiveClass();
     },
-    removeHover() {
+    removeActiveClass() {
       const selected = document.querySelector(`[data-id=${this.id}]`)
         .querySelector('.selected');
       if (selected) {
