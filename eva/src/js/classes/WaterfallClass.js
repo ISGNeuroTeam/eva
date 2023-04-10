@@ -152,6 +152,34 @@ export default class WaterfallClass {
       .attr('y2', (d) => this.y(d.total))
       .attr('stroke', options.colorBarTotal)
       .attr('stroke-dasharray', '0 2 0');
+
+    barGroup.append('foreignObject')
+      .attr('x', this.x.bandwidth() - this.x.bandwidth() / 1.1)
+      .attr('y', (d, idx) => (idx % 2 === 0 ? this.y(d.total) - this.y(Math.abs(d.total)) / 3 : this.y(d.total) + this.y(Math.abs(d.total)) / 3))
+      .attr('font-size', '13')
+      .attr('height', (d) => `${this.y(Math.abs(d.value))}px`)
+      .attr('width', `${this.x.bandwidth()}px`)
+      .style('overflow', 'inherit')
+      .text((d) => (d?.comment || ''));
+
+    barGroup.append('line').filter((d, idx) => idx !== this.data.length - 1)
+      .attr('class', 'vertical')
+      .attr('x1', this.x.bandwidth() - this.x.bandwidth())
+      .attr('y1', this.y(0))
+      .attr('x2', this.x.bandwidth() - this.x.bandwidth())
+      .attr('y2', (d, idx) => idx % 2 === 0 ? this.y(d.total) - this.y(Math.abs(d.total)) / 2 : this.y(d.total) + this.y(Math.abs(d.total)) / 2)
+      .attr('stroke', ({ title: barTitle, value }) => {
+        if (this.options.barsOptions.length) {
+          const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
+          if (opts?.changeColor) {
+            return opts.color;
+          }
+        }
+        return value < 0 ? options.colorBarNegative : options.colorBarPositive;
+      })
+      .attr('stroke-dasharray', '1 4 0')
+      .attr('stroke-width', '3px')
+      .attr('stroke-opacity', (d) => (d?.comment ? '1' : '0'));
   }
 
   render() {
