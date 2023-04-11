@@ -18,6 +18,8 @@ export default class WaterfallClass {
     top: 20, right: 10, bottom: 30, left: 50,
   }
 
+  innerVertOffset = [0, 0];
+
   padding = 0.3
 
   svgContainer = null
@@ -31,6 +33,7 @@ export default class WaterfallClass {
     this.width = width;
     this.height = height;
     this.svgContainer = svgContainer;
+    this.innerVertOffset = [0, 0];
     this.createChart();
   }
 
@@ -43,7 +46,7 @@ export default class WaterfallClass {
     this.dataSet = list.reduce((acc, item, idx) => {
       item.value = +item.value;
       if (idx === 0) {
-        acc.push({ ...item, lastValue: 0, total: item.value });
+        acc.push({ ...item, lastTotal: 0, total: item.value });
         return acc;
       }
       if (item.isTotal) {
@@ -51,9 +54,16 @@ export default class WaterfallClass {
       }
       acc.push({
         ...item,
-        lastValue: acc[idx - 1].total,
+        lastTotal: acc[idx - 1].total,
         total: acc[idx - 1].total + item.value,
       });
+      if (acc[idx - 1].comment) {
+        // eslint-disable-next-line no-underscore-dangle
+        acc[idx - 1]._next = {
+          isTotal: acc[idx].isTotal,
+          total: acc[idx].total,
+        };
+      }
       return acc;
     }, []);
   }
@@ -72,7 +82,10 @@ export default class WaterfallClass {
     this.render();
   }
 
-  createChart() {
+  createChart(rerender = true) {
+    if (!rerender) {
+      this.svg.remove();
+    }
     const { margin, padding, options } = this;
     const { width, height } = this;
 
@@ -153,33 +166,176 @@ export default class WaterfallClass {
       .attr('stroke', options.colorBarTotal)
       .attr('stroke-dasharray', '0 2 0');
 
-    barGroup.append('foreignObject')
-      .attr('x', this.x.bandwidth() - this.x.bandwidth() / 1.1)
-      .attr('y', (d, idx) => (idx % 2 === 0 ? this.y(d.total) - this.y(Math.abs(d.total)) / 3 : this.y(d.total) + this.y(Math.abs(d.total)) / 3))
-      .attr('font-size', '13')
-      .attr('height', (d) => `${this.y(Math.abs(d.value))}px`)
-      .attr('width', `${this.x.bandwidth()}px`)
-      .style('overflow', 'inherit')
-      .text((d) => (d?.comment || ''));
+    if (this.data.filter((d) => d.comment).length) {
+      this.renderComments(barGroup);
 
-    barGroup.append('line').filter((d, idx) => idx !== this.data.length - 1)
+      // check comment cropped
+      const { y: yCtn, height: heightCtn } = this.svg.select('g.yAxis path.domain').node().getBBox();
+      this.innerVertOffset = this.svg.selectAll('rect.comment').nodes()
+        .map((el) => {
+          // eslint-disable-next-line no-shadow
+          const { y, height } = el.getBBox();
+          return [y - yCtn, heightCtn - (y + height)];
+        })
+        .reduce((acc, [top, bottom]) => {
+          if (top < acc[0]) acc[0] = top;
+          if (bottom < acc[1]) acc[1] = bottom;
+          return acc;
+        }, [0, 0])
+        .map((val) => 0 - val.toFixed(0));
+
+      if (this.innerVertOffset.join() !== '0,0' && rerender) {
+        this.createChart(false);
+        this.innerVertOffset = [0, 0];
+      }
+    }
+  }
+
+  renderComments(barGroup) {
+    const { options } = this;
+    const textVertOffset = 10;
+    const textAreaLeftOffset = this.x.bandwidth() * 0.1;
+    const bandwidth1 = 1.3;
+    const bandwidth2 = 2.3;
+    const dataWithComments = this.data.filter((d) => d.comment);
+    const barCommentParams = dataWithComments.map((d, idx) => {
+      if (d.comment) {
+        const elem = this.svg.append('foreignObject')
+          .attr('width', () => `${this.x.bandwidth() * (idx + 1 === dataWithComments.length ? bandwidth1 : bandwidth2)}px`)
+          .style('x', -1000)
+          .style('overflow', 'inherit')
+          .attr('font-size', '14')
+          .text(d.comment);
+
+        const elemText = this.svg.append('text')
+          .style('x', -1000)
+          .style('overflow', 'inherit')
+          .attr('font-size', '14')
+          .text(d.comment);
+
+        const result = {
+          height: elem.node().scrollHeight,
+          width: elemText.node().scrollWidth,
+        };
+        elem.remove();
+        elemText.remove();
+        return result;
+      }
+      return 0;
+    });
+    const getForTwoColumns = (idx) => barCommentParams[idx].width > this.x.bandwidth() * 1.2
+      && idx + 1 !== barCommentParams.length;
+
+    barGroup.filter((d) => d.comment).append('rect')
+      .attr('class', 'comment')
+      .attr('x', 0)
+      .attr('y', (d, idx) => {
+        const { _next } = d;
+        const points = [d.lastTotal, d.total];
+        if (getForTwoColumns(idx)) {
+          points.push(_next?.total);
+        }
+        if (d.isTotal || _next?.isTotal) {
+          points.push(0);
+        }
+        const [min, max] = d3.extent(points);
+        let pos = this.y(min);
+        if (idx % 2 === 0) {
+          pos = this.y(max) - barCommentParams[idx].height - textVertOffset;
+        } else {
+          pos += textVertOffset;
+        }
+        return pos;
+      })
+      .attr('width', (d, idx) => `${this.x.bandwidth() * ((getForTwoColumns(idx) ? bandwidth2 : bandwidth1) + 0.1)}px`)
+      .attr('height', (d, idx) => {
+        const opts = this.options.barsOptions.find(({ title }) => (title === d.title));
+        return !opts?.hideComment ? barCommentParams[idx].height : 0;
+      })
+      // .attr('fill', '#fff3')
+      .attr('fill', 'transparent');
+
+    barGroup.filter((d) => d.comment).append('foreignObject')
+      .attr('x', textAreaLeftOffset)
+      .attr('y', (d, idx) => {
+        const { _next } = d;
+        const points = [d.lastTotal, d.total];
+        if (getForTwoColumns(idx)) {
+          points.push(_next?.total);
+        }
+        if (d.isTotal || _next?.isTotal) {
+          points.push(0);
+        }
+        const [min, max] = d3.extent(points);
+        let pos = this.y(min);
+        if (idx % 2 === 0) {
+          pos = this.y(max) - barCommentParams[idx].height - textVertOffset;
+        } else {
+          pos += textVertOffset;
+        }
+        return pos;
+      })
+      .attr('width', (d, idx) => `${this.x.bandwidth() * (getForTwoColumns(idx) ? bandwidth2 : bandwidth1)}px`)
+      .attr('height', (d, idx) => `${barCommentParams[idx].height}px`)
+      .style('overflow', 'inherit')
+      .attr('font-size', '14')
+      .attr('text-anchor', 'bottom')
+      .text((d, idx) => {
+        const opts = this.options.barsOptions.find(({ title }) => (title === d.title));
+        return !opts?.hideComment ? d.comment : null;
+      });
+
+    barGroup.filter((d) => d.comment).append('line')
       .attr('class', 'vertical')
-      .attr('x1', this.x.bandwidth() - this.x.bandwidth())
-      .attr('y1', this.y(0))
-      .attr('x2', this.x.bandwidth() - this.x.bandwidth())
-      .attr('y2', (d, idx) => idx % 2 === 0 ? this.y(d.total) - this.y(Math.abs(d.total)) / 2 : this.y(d.total) + this.y(Math.abs(d.total)) / 2)
-      .attr('stroke', ({ title: barTitle, value }) => {
+      .attr('x1', 1)
+      .attr('x2', 1)
+      .attr('y2', (d, idx) => {
+        const { _next } = d;
+        const points = [d.lastTotal, d.total];
+        if (getForTwoColumns(idx)) {
+          points.push(_next?.total);
+        }
+        if (d.isTotal || _next?.isTotal) {
+          points.push(0);
+        }
+        const [min, max] = d3.extent(points);
+        let pos = this.y(min);
+        if (idx % 2 === 0) {
+          pos = this.y(max) - barCommentParams[idx].height - textVertOffset;
+        } else {
+          pos += barCommentParams[idx].height + textVertOffset;
+        }
+        return pos;
+      })
+      .attr('y1', (d, idx) => {
+        const points = [d.lastTotal, d.total];
+        if (d.isTotal) {
+          points.push(0);
+        }
+        const [min, max] = d3.extent(points);
+        let pos = this.y(min);
+        if (idx % 2 === 0) {
+          pos = this.y(max);
+        }
+        return pos;
+      })
+      .attr('stroke', ({ title: barTitle, value, isTotal }) => {
         if (this.options.barsOptions.length) {
           const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
+          if (opts?.hideComment) {
+            return 'transparent';
+          }
           if (opts?.changeColor) {
             return opts.color;
           }
         }
+        if (isTotal) {
+          return options.colorBarTotal;
+        }
         return value < 0 ? options.colorBarNegative : options.colorBarPositive;
       })
       .attr('stroke-dasharray', '1 4 0')
-      .attr('stroke-width', '3px')
-      .attr('stroke-opacity', (d) => (d?.comment ? '1' : '0'));
+      .attr('stroke-width', '2px');
   }
 
   render() {
@@ -244,11 +400,22 @@ export default class WaterfallClass {
 
     this.y = d3.scaleLinear()
       .domain(minMax)
-      .range([yHeight, 0]);
+      .range([yHeight - this.innerVertOffset[1], this.innerVertOffset[0]]);
 
     this.yAxis = this.svg
       .append('g')
+      .attr('class', 'yAxis')
       .call(d3.axisLeft(this.y));
+
+    if (this.innerVertOffset[1]) {
+      this.yAxis.append('line')
+        .attr('stroke-width', 1)
+        .attr('x1', 0.5)
+        .attr('y1', this.y(minMax[0]))
+        .attr('x2', 0.5)
+        .attr('y2', this.y(minMax[0]) + this.innerVertOffset[1])
+        .attr('stroke', 'currentColor');
+    }
   }
 
   createZeroLine() {
