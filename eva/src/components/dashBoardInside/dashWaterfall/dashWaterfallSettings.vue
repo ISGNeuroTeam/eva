@@ -181,7 +181,7 @@
                 :items="titles.filter(title => item.title === title
                   || !barsOptions.map(d => d.title).includes(title))"
                 class="field-profile"
-                label="Столбец"
+                :label="!titles.includes(item.title) ? `Столбец: ${item.title}` : 'Столбец'"
                 :style="{ color: theme.$main_text }"
                 outlined
                 hide-details
