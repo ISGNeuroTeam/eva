@@ -1,3 +1,17 @@
+# [1.128.0] - 2023-04-13
+
+### Added
+- Table component: added option "highlight selected row"
+- Display a comments on the waterfall chart
+- Added visualisation "risk-review"
+
+### Changed
+- DatePicker intervals moves with date
+
+### Fixed
+- showing selected type of interval after page refresh
+- Gauge labels overlap each other
+
 # [1.127.0] - 2023-03-30
 
 ### Added
