@@ -642,17 +642,19 @@ export default {
       document
         .querySelector(`[data-id=${this.id}]`)
         .addEventListener('click', (event) => {
-          if (event.target.tagName.toLowerCase() === 'td' && this.getOptions?.selectRowColor) {
-            if (event.target.parentElement.classList.contains('selected')) {
-              event.target.parentElement.classList.remove('selected');
-            } else {
-              event.target.parentElement.parentElement
-                .querySelectorAll('.selected')
-                .forEach((item) => {
-                  item.classList.remove('selected');
-                  // item.style = `background: transparent !important`;
-                });
-              event.target.parentElement.classList.add('selected');
+          if (event.target.tagName.toLowerCase() === 'td') {
+            if (this.getOptions?.selectRowColor) {
+              if (event.target.parentElement.classList.contains('selected')) {
+                event.target.parentElement.classList.remove('selected');
+              } else {
+                event.target.parentElement.parentElement
+                  .querySelectorAll('.selected')
+                  .forEach((item) => {
+                    item.classList.remove('selected');
+                    // item.style = `background: transparent !important`;
+                  });
+                event.target.parentElement.classList.add('selected');
+              }
             }
             const tokens = this.$store.state[this.idDash].tockens;
             tokens.forEach((token) => {
