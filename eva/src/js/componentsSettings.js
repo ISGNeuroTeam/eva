@@ -239,8 +239,8 @@ export default {
       height: 500,
     },
     riskReview: {
-      width: 930,
-      height: 850,
+      width: 1440,
+      height: 420,
     },
   },
   icons: {
@@ -456,6 +456,7 @@ export default {
     waterfall: [
     ],
     riskReview: [
+      'visibleResidualImpactPanel',
     ],
   },
   optionFields: [
@@ -1165,6 +1166,12 @@ export default {
       elem: 'code-editor',
       isFullWidth: true,
       importantExport: true,
+    },
+    {
+      option: 'visibleResidualImpactPanel',
+      description: 'Вкл/выкл отображение панели с остаточным влиянием',
+      elem: 'switch',
+      default: false,
     },
 
   ],

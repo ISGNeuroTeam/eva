@@ -1,57 +1,141 @@
 <template>
-  <div class="FGKRiskReview">
+  <div
+    class="FGKRiskReview"
+    :style="{
+      width: widthFrom,
+      height: heightFrom,
+    }"
+  >
     <div
       v-if="isDataError"
-      class="DataError"
+      class="FGKRiskReview__dataError"
     >
-      <span class="FontIcon name_infoCircleOutline Icon" />
       {{ errorMessage }}
     </div>
-
-    <template v-show="!isDataError">
-      <div
-        class="titles-container"
-        :style="titlesContainerStyle"
-      >
+    <div
+      v-show="!isDataError"
+      class="row fill-height align-stretch"
+    >
+      <div class="col-auto">
+        <div class="FGKRiskReview__col-title px-3">
+          {{ titleColText }}
+        </div>
         <div
-          v-for="(title, i) in titles"
-          :key="`t-${i}`"
-          class="bar-title"
-          :style="{
-            height: `${barHeight}px`,
-            marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
-          }"
-          v-text="title"
-        />
-      </div>
-
-      <div
-        ref="svgContainer"
-        class="svg-container"
-      />
-
-      <div class="legend-container">
-        <div
-          v-for="(part, i) in barParts"
-          :key="`legend-${i}`"
-          class="item"
+          class="titles-container px-3"
+          :style="titlesContainerStyle"
         >
           <div
-            class="mark"
-            :style="{ backgroundColor: part.fill }"
-          />
-          <div
-            class="text"
-            v-text="part.title"
+            v-for="(title, i) in titles"
+            :key="`t-${i}`"
+            class="bar-title"
+            :style="{
+              height: `${barHeight}px`,
+              marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
+            }"
+            v-text="title"
           />
         </div>
       </div>
-    </template>
+      <div class="col">
+        <div
+          ref="svgContainer"
+          class="svg-container px-3"
+        />
+      </div>
+      <div class="col-auto">
+        <div class="FGKRiskReview__col-title px-3">
+          {{ secondTitleColText }}
+        </div>
+        <div
+          class="titles-container titles-container--second px-3"
+          :style="titlesContainerStyle"
+        >
+          <div
+            v-for="(title, i) in secondTitles"
+            :key="`t-${i}`"
+            class="bar-title bar-title--second"
+            :style="{
+              height: `${barHeight}px`,
+              marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
+            }"
+            v-text="title"
+          />
+        </div>
+      </div>
+      <div
+        v-if="isVisibleResidualImpactPanel"
+        class="col-auto"
+      >
+        <div class="FGKRiskReview__col-title FGKRiskReview__col-title--residual px-3">
+          Остаточное влияние
+        </div>
+        <div
+          class="titles-container titles-container--residual px-3"
+          :style="titlesContainerStyle"
+        >
+          <div
+            v-for="(title, i) in residualEffectList"
+            :key="`t-${i}`"
+            class="bar-title bar-title--residual"
+            :style="{
+              height: `${barHeight}px`,
+              marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
+            }"
+            v-text="title"
+          />
+        </div>
+      </div>
+    </div>
+    <div
+      v-if="!isDataError"
+      class="FGKRiskReview__help-btn"
+    >
+      <v-tooltip
+        top
+        :nudge-top="5"
+        :color="theme.$accent_ui_color"
+      >
+        <template v-slot:activator="{ on }">
+          <button
+            v-on="on"
+          >
+            <v-icon
+              class="control-button edit-icon theme--dark"
+              :style="{ color: theme.$secondary_text }"
+            >
+              {{ iconHelp }}
+            </v-icon>
+          </button>
+        </template>
+        <div class="column pa-3">
+          <div
+            v-for="(part, i) in barParts"
+            :key="`legend-${i}`"
+            class="d-flex align-center"
+            :class="(i + 1) !== barParts.length ? 'mb-2' : ''"
+          >
+            <div
+              class="mr-2"
+              :style="{
+                backgroundColor: part.fill,
+                width: '15px',
+                height: '15px',
+              }"
+            />
+            <div
+              class="risk-review-legend-container__text"
+              v-text="part.title"
+            />
+          </div>
+        </div>
+      </v-tooltip>
+    </div>
   </div>
 </template>
 
 <script>
 import * as d3 from 'd3';
+import { mdiHelp } from '@mdi/js';
 import defaultBarParts from '../../js/defaultBarParts';
 
 export default {
@@ -90,8 +174,15 @@ export default {
       type: String,
       default: '',
     },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    },
   },
   data: () => ({
+    actions: [
+      { name: 'click', capture: [] },
+    ],
     /** Chart technical data. */
     isDataError: false,
     errorMessage: '',
@@ -106,12 +197,15 @@ export default {
     chartPaddingOuter: 0,
     /** Chart user config data. */
     titleColName: 'title',
+    secondTitleColName: 'second_title',
+    residualEffectField: 'ost',
     barParts: defaultBarParts,
+    iconHelp: mdiHelp,
   }),
   computed: {
     titlesContainerStyle() {
       const { chartPaddingOuter, marginY } = this;
-      return { paddingTop: `${chartPaddingOuter + marginY}px` };
+      return { paddingTop: `${(chartPaddingOuter - 24) + marginY}px` };
     },
     dataset() {
       if (this.dataRestFrom?.length > 0) {
@@ -125,6 +219,51 @@ export default {
       }
       return [];
     },
+    secondTitles() {
+      if (this.dataRestFrom?.length > 0) {
+        return this.dataRestFrom.map((ds) => ds[this.secondTitleColName]);
+      }
+      return [];
+    },
+    residualEffectList() {
+      if (this.dataRestFrom?.length > 0) {
+        return this.dataRestFrom.map((ds) => ds[this.residualEffectField]);
+      }
+      return [];
+    },
+    widthFrom() {
+      return `${this.sizeFrom?.width}px` || '100%';
+    },
+    heightFrom() {
+      if (this.sizeFrom?.height) {
+        return `${this.sizeFrom.height - 30}px` || '100%';
+      }
+      return '100%';
+    },
+    theme() {
+      return this.$store.getters.getTheme;
+    },
+    titleColText() {
+      if (this.dataRestFrom?.length > 0) {
+        return [...new Set(this.dataRestFrom.map((ds) => ds.title_col))][0];
+      }
+      return '';
+    },
+    secondTitleColText() {
+      if (this.dataRestFrom?.length > 0) {
+        return [...new Set(this.dataRestFrom.map((ds) => ds.second_title_col))][0];
+      }
+      return '';
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDashFrom];
+    },
+    optionsFromStore() {
+      return this.dashFromStore[this.idFrom].options;
+    },
+    isVisibleResidualImpactPanel() {
+      return this.optionsFromStore?.visibleResidualImpactPanel;
+    },
   },
   watch: {
     dataset: {
@@ -132,7 +271,16 @@ export default {
       handler(val) {
         if (val?.length > 0) {
           this.render();
+          this.updateActionCapture(val);
         }
+      },
+    },
+    sizeFrom: {
+      deep: true,
+      handler() {
+        this.$nextTick(() => {
+          this.render();
+        });
       },
     },
   },
@@ -143,10 +291,30 @@ export default {
     this.$nextTick(() => {
       this.dataAttr = attrs.find((attr) => attr.startsWith('data-'));
       this.render();
-      this.$root.$on('resize', this.onResize);
     });
   },
   methods: {
+    setActions() {
+      this.$store.commit('setActions', {
+        actions: structuredClone(this.actions),
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+    },
+    updateActionCapture(updatedData) {
+      if (updatedData?.length > 0) {
+        const fields = [];
+        updatedData.forEach((el) => {
+          fields.push(...Object.keys(el));
+        });
+        const capture = [...new Set(fields)];
+        this.actions = this.actions.map((action) => ({
+          ...action,
+          capture,
+        }));
+        this.setActions();
+      }
+    },
     setTitleColName(name = '') {
       this.titleColName = name;
       this.render();
@@ -170,21 +338,11 @@ export default {
       } else {
         this.setError('', false);
         this.$nextTick(() => {
-          // console.log('clearSvgContainer before');
           this.clearSvgContainer();
-          // console.log('clearSvgContainer after');
-          // console.log('prepareRenderData before');
           this.prepareRenderData();
-          // console.log('prepareRenderData after');
-          // console.log('createAxisX before');
           this.createAxisX();
-          // console.log('createAxisX after');
-          // console.log('createBars before');
           this.createBars();
-          // console.log('createBars after');
-          // console.log('createLines before');
           this.createLines();
-          // console.log('createLines after');
         });
       }
     },
@@ -193,6 +351,9 @@ export default {
       const { dataset, barParts } = this;
 
       if (dataset.length <= 0) {
+        if (this.loading) {
+          return { isValid: false, error: 'Загрузка' };
+        }
         return { isValid: false, error: 'Нет данных для построения' };
       }
 
@@ -349,8 +510,31 @@ export default {
             return isNaN(width) ? 0 : width;
           })
           .on('click', (event, d) => {
-            this.$root.publishEventClicked(d);
+            this.setTokens(event);
           });
+      }
+    },
+
+    setTokens(data) {
+      const { tockens: tokens } = this.$store.state[this.idDashFrom];
+      if (tokens) {
+        tokens.forEach(({
+          name,
+          action,
+          capture,
+          elem,
+        }) => {
+          if (elem === this.idFrom) {
+            if (action === 'click' && data[capture]) {
+              this.$store.commit('setTocken', {
+                token: { name, action, capture },
+                idDash: this.idDashFrom,
+                value: data[capture],
+                store: this.$store,
+              });
+            }
+          }
+        });
       }
     },
 
@@ -397,26 +581,6 @@ export default {
       }
     },
 
-    onResize() {
-      if (this.resizeTimeout) {
-        clearTimeout(this.resizeTimeout);
-      }
-      this.resizeTimeout = setTimeout(() => {
-        const {
-          offsetWidth,
-          classList,
-        } = this.$el;
-
-        if (offsetWidth < 600) {
-          classList.add('mobileLayout');
-        } else {
-          classList.remove('mobileLayout');
-        }
-        this.render();
-        this.resizeTimeout = null;
-      }, 50);
-    },
-
     getMaxCountChars() {
       let maxNumLength = 0;
 
@@ -436,102 +600,118 @@ export default {
 };
 </script>
 
-<style lang="sass" scoped>
-*
-  box-sizing: border-box
-  margin: 0
-  padding: 0
+<style lang="scss" scoped>
+.FGKRiskReview {
+  font-family: 'Proxima Nova', serif;
+  position: relative;
+  padding: 10px;
+  width: 100%;
+  & > * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-.FGKRiskReview
-  font-family: 'Proxima Nova', serif
-  position: relative
-  display: flex
-  gap: 10px
-  padding: 10px
-  width: 100%
-  min-height: 100%
+  &__help-btn {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+  }
 
-  .DataError
-    position: absolute
-    display: flex
-    width: 100%
-    height: 100%
-    align-items: center
-    justify-content: center
-    flex-direction: column
-    color: var(--text_secondary)
-    background-color: var(--background_main)
+  &__col-title {
+    color: var(--main_text);
+    font-weight: 500;
+    text-align: center;
+    font-size: 18px;
+  }
 
-    .Icon
-      color: var(--border_secondary)
-      font-size: 100px
-      margin-bottom: 8px
+  &__dataError {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--main_text);
+    background-color: var(--background_main);
+    .Icon {
+      color: var(--border_secondary);
+      font-size: 100px;
+      margin-bottom: 8px;
+    }
+  }
 
-  .titles-container
-    color: var(--text_main)
-    font-size: 15px
+  .titles-container {
+    color: var(--text_main);
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .bar-title {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: right;
+      line-height: 18px;
+      color: var(--main_text);
+      &--second {
+        justify-content: flex-start;
+        text-align: left;
+      }
+      &--residual {
+        justify-content: center;
+        text-align: center;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary_button);
+      }
+    }
+  }
 
-    .bar-title
-      display: flex
-      align-items: center
-      justify-content: flex-end
-      text-align: right
-      line-height: 18px
+  .svg-container {
+    width: 100%;
+    overflow: hidden;
+    height: 100%;
+    .content {
+      width: 100%;
+      height: 100%;
+    }
 
-  .legend-container
-    display: flex
-    flex-direction: column
-    justify-content: center
-    gap: 10px
+    .chart-back {
+      fill: var(--main_bg);
+    }
 
-    .item
-      display: flex
-      align-items: center
-      gap: 5px
-      color: var(--text_main)
-      font-size: 15px
+    .x-axis-tick-caption {
+      fill: var(--main_text);
+      font-size: 13px;
+      font-weight: 600;
+      text-anchor: middle;
+    }
 
-      .mark
-        flex-shrink: 0
-        min-width: 18px
-        height: 18px
+    .bar-text-caption {
+      font-size: 15px;
+      font-weight: 600;
+    }
+  }
 
-      .text
-        line-height: 18px
+  &.mobileLayout {
+    flex-wrap: wrap;
+    row-gap: 15px;
 
-  .svg-container
-    width: 100%
-    overflow: hidden
+    .titles-container {
+      max-width: calc(40% - 5px);
+    }
 
-    .content
-      width: 100%
-      height: 100%
+    .svg-container {
+      max-width: calc(60% - 5px);
+    }
 
-      .chart-back
-        fill: var(--main_bg)
-
-      .x-axis-tick-caption
-        fill: var(--main_text)
-        font-size: 13px
-        font-weight: 600
-        text-anchor: middle
-
-      .bar-text-caption
-        font-size: 15px
-        font-weight: 600
-
-  &.mobileLayout
-    flex-wrap: wrap
-    row-gap: 15px
-
-    .titles-container
-      max-width: calc(40% - 5px)
-
-    .svg-container
-      max-width: calc(60% - 5px)
-
-    .legend-container
-      align-items: flex-start
-      flex-direction: row
-      flex-wrap: wrap
+    .legend-container {
+      align-items: flex-start;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+}
 </style>

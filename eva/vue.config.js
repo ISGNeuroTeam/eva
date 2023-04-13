@@ -38,7 +38,6 @@ module.exports = {
     },
   },
   devServer: {
-    port: 5252,
     proxy: process.env.VUE_APP_PROXY,
     overlay: {
       warnings: false,
