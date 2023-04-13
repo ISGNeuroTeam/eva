@@ -143,6 +143,7 @@
                 v-model="range"
                 range
                 label="Диапазон дат"
+                :shortcut="shortcut"
                 :format="defaultFormat"
                 :formatted="dateTimeFormat"
                 :color="theme.$accent_ui_color"
@@ -231,6 +232,8 @@ export default {
       type: Array,
       default: function _default() {
         return [
+          { key: 'thisDay', label: 'текущий день', value: 'day' },
+          { key: 'lastDay', label: 'предыдущий день', value: '-day' },
           { key: 'thisWeek', label: 'текущая неделя', value: 'isoWeek' },
           { key: 'lastWeek', label: 'пред. неделя', value: '-isoWeek' },
           { key: 'last7Days', label: 'последние 7 дней', value: 7 },
@@ -240,7 +243,7 @@ export default {
           { key: 'thisYear', label: 'текущий год', value: 'year' },
           { key: 'lastYear', label: 'пред. год', value: '-year' },
         ];
-      },
+      },  
     },
     fullScreenMode: {
       type: Boolean,
@@ -296,6 +299,7 @@ export default {
       lastControlElement: null,
       defaultFormat: 'YYYY-MM-DD HH:mm',
       defaultFormatWithoutTime: 'YYYY-MM-DD',
+      shortcut: '',
     };
   },
   computed: {
@@ -387,6 +391,12 @@ export default {
       };
     },
   },
+  created(){
+    const data = this.getPickerDate;
+    if (data.range != null && data.range.hasOwnProperty('shortcut') ) {
+      this.shortcut = this.DTPickerCustomShortcuts.find(sc => sc.value === data.range.shortcut).key
+    }
+  },
   mounted() {
     this.$store.commit('setActions', {
       actions: this.actions,
@@ -423,11 +433,16 @@ export default {
       }
 
       if (data.range != null) {
+        if (data.range.hasOwnProperty('shortcut')) {
+          this.commitTokenValue()
+        } else { 
+          this.range = data.range;
+        }
+
         current = [
-          moment(data.range.start).format(this.dateTimeFormat),
-          moment(data.range.end).format(this.dateTimeFormat),
+          moment(this.range.start).format(this.dateTimeFormat),
+          moment(this.range.end).format(this.dateTimeFormat),
         ].join(' - ');
-        this.range = data.range;
       }
 
       if (data.startCus != null) {
@@ -622,6 +637,13 @@ export default {
         this.setTocken(this.lastControlElement);
       }
 
+      this.commitTokenValue()
+
+      this.showCurrent();
+      this.curDate = this.calcCurrentDate();
+      this.openHidden();
+    },
+    commitTokenValue(){
       const tockens = this.$store.state[this.idDash].tockens || {};
       let tocken = {};
 
@@ -633,6 +655,7 @@ export default {
           store: this.$store,
         });
       };
+
       Object.keys(tockens).forEach((i) => {
         tocken = {
           name: tockens[i].name,
@@ -647,10 +670,7 @@ export default {
           }
         }
       });
-      this.showCurrent();
-      this.curDate = this.calcCurrentDate();
-      this.openHidden();
-    },
+    }
   },
 };
 </script>
