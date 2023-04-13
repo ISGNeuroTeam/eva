@@ -1,3 +1,4 @@
 src/yfiles
 tests/
 src/tests
+src/components/dashBoardInside/dashGauge/gauge.js
