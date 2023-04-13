@@ -307,6 +307,7 @@ export default {
       'rowcolor',
       'columncolor',
       'cellcolor',
+      'selectRowColor',
       'lastResult',
       'titles',
     ],
@@ -731,6 +732,12 @@ export default {
       option: 'cellcolor',
       description: 'Выбрать цвет которым подсветится нужная ячейка',
       elem: 'text-field',
+    },
+    {
+      option: 'selectRowColor',
+      description: 'Подсвечивать выбранную строку',
+      elem: 'switch',
+      default: false,
     },
 
     // dashSingle, dashButton
