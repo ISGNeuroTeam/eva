@@ -41,7 +41,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { mdiSettings } from '@mdi/js';
-import { Gauge } from './gauge.min';
+import { Gauge } from './gauge.js';
 import DashGaugeSettings from './dashGaugeSettings';
 
 export default {
@@ -167,7 +167,7 @@ export default {
       return {
         angle: -0.1, // The span of the gauge arc
         lineWidth: 0.2, // The line thickness
-        radiusScale: 0.95, // Relative radius
+        radiusScale: 0.9, // Relative radius
         limitMax: true, // If false, max value increases automatically if value > maxValue
         limitMin: true, // If true, the min value of the gauge will be fixed
         generateGradient: true,
@@ -262,20 +262,11 @@ export default {
         this.value = valueData.value;
         this.gauge.setOptions(this.gaugeOptions);
         this.gauge.set(valueData.value);
-        this.clearArtifact();
       }
 
       // set metricName
       const dsMetricName = data.find(({ metricName }) => (['string', 'number'].includes(typeof metricName)));
       this.dsMetricName = dsMetricName ? dsMetricName.metricName : null;
-    },
-    // Убираем баг со стрелкой
-    clearArtifact() {
-      const { ctx } = this.gauge;
-      const { width, height } = this.gauge.canvas;
-      // ctx.fillStyle = "#f006";
-      // ctx.fillRect(0, 0, width * 0.31, height * 0.12);
-      ctx.clearRect(0, 0, width * 0.338, height * 0.138);
     },
     closeSettings() {
       this.isSettingsComponentOpen = false;
