@@ -86,6 +86,7 @@ export default {
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
     { name: 'Число', img: mdiNumeric, type: 'single' },
+    { name: 'Детализация рисков', img: mdiNumeric, type: 'riskReview' },
     {
       name: 'Спидометр',
       img: mdiGauge,
@@ -237,6 +238,10 @@ export default {
       width: 600,
       height: 500,
     },
+    riskReview: {
+      width: 1440,
+      height: 420,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -267,6 +272,7 @@ export default {
     frequencyGraph: mdiDotsHorizontal,
     gauge: mdiGauge,
     waterfall: mdiFinance,
+    riskReview: mdiFinance,
   },
   commonOptions: [
     'panelSettings',
@@ -321,7 +327,9 @@ export default {
       'timeOutputFormat',
       'hideTimeSelect',
     ],
-    graph: ['boxShadow'],
+    graph: [
+      'boxShadow',
+    ],
     single: [
       'subnumber',
       'color',
@@ -354,7 +362,9 @@ export default {
       'validationNumberRangeMax',
       'readOnly',
     ],
-    guntt: ['timeFormat'],
+    guntt: [
+      'timeFormat',
+    ],
     tile: [
       'visible',
       'level',
@@ -367,10 +377,17 @@ export default {
       'colNum',
       'rowHeight',
     ],
-    csvg: ['tooltip', 'backgroundImage'],
+    csvg: [
+      'tooltip',
+      'backgroundImage',
+    ],
     ygraph: [],
     bush: [],
-    map: ['osmserver', 'primitives', 'primitivesLibrary'],
+    map: [
+      'osmserver',
+      'primitives',
+      'primitivesLibrary',
+    ],
     heatmap: [
       'dataFormat',
       'x',
@@ -424,7 +441,13 @@ export default {
       'primitives',
       'primitivesLibrary',
     ],
-    dynamicForm: ['visible', 'level', 'pinned', 'formGenerator', 'formOptions'],
+    dynamicForm: [
+      'visible',
+      'level',
+      'pinned',
+      'formGenerator',
+      'formOptions',
+    ],
     frequencyGraph: [
       'groupMetric',
       'tooltipMetrics',
@@ -432,6 +455,9 @@ export default {
     gauge: [
     ],
     waterfall: [
+    ],
+    riskReview: [
+      'visibleResidualImpactPanel',
     ],
   },
   optionFields: [
@@ -1148,6 +1174,12 @@ export default {
       isFullWidth: true,
       importantExport: true,
     },
+    {
+      option: 'visibleResidualImpactPanel',
+      description: 'Вкл/выкл отображение панели с остаточным влиянием',
+      elem: 'switch',
+      default: false,
+    },
 
   ],
   reporstElements: [
@@ -1235,6 +1267,10 @@ export default {
     },
     waterfall: {
       tooltip: 'Водопад',
+      icon: mdiFinance,
+    },
+    riskReview: {
+      tooltip: 'Детализация рисков',
       icon: mdiFinance,
     },
   },

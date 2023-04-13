@@ -132,6 +132,8 @@ Vue.component('dash-tune', () => import('./components/dashBoardInside/dashTune.v
 Vue.component('dash-constructorSchemes', () => import('./components/dashBoardInside/dashConstructorScheme/dashConstructorSchemes.vue'));
 Vue.component('dash-constructor-schemes-settings', () => import('./components/dashBoardInside/dashConstructorScheme/dashConstructorSchemesSettings.vue'));
 Vue.component('dash-constructor-schemes-keymap', () => import('./components/dashBoardInside/dashConstructorScheme/dashConstructorSchemesKeymap.vue'));
+// компонент детализация рисков
+Vue.component('dash-riskReview', () => import('./components/dashBoardInside/dashRiskReview.vue'));
 // компонент Single Value
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
 // компонент Accumulators
