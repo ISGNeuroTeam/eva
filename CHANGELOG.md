@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.128.0]
+
+### Added
+- Table component: added option "highlight selected row"
+- Display a comments on the waterfall chart
+- Added visualisation "risk-review"
+
+### Changed
+- DatePicker intervals moves with date
+
+### Fixed
+- showing selected type of interval after page refresh
+- Gauge labels overlap each other 
+
 ## [1.127.0]
 
 ### Added

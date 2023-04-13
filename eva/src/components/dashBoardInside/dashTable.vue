@@ -382,6 +382,14 @@ export default {
         this.props.message = 'Данные не отображаются из-за настроек';
       }
     },
+    'getOptions.selectRowColor': {
+      handler(val) {
+        if (!val) {
+          this.removeActiveClass();
+        }
+      },
+      deep: true,
+    },
   },
   mounted() {
     this.$store.commit('setActions', {
@@ -514,6 +522,14 @@ export default {
         this.filters[title].value = event;
       }
       this.filters = { ...this.filters };
+      this.removeActiveClass();
+    },
+    removeActiveClass() {
+      const selected = document.querySelector(`[data-id=${this.id}]`)
+        .querySelector('.selected');
+      if (selected) {
+        selected.classList.remove('selected');
+      }
     },
     checkForNumeric(val) {
       function isNumber(n) {
@@ -627,16 +643,18 @@ export default {
         .querySelector(`[data-id=${this.id}]`)
         .addEventListener('click', (event) => {
           if (event.target.tagName.toLowerCase() === 'td') {
-            if (event.target.parentElement.classList.contains('selected')) {
-              event.target.parentElement.classList.remove('selected');
-            } else {
-              event.target.parentElement.parentElement
-                .querySelectorAll('.selected')
-                .forEach((item) => {
-                  item.classList.remove('selected');
-                  // item.style = `background: transparent !important`;
-                });
-              event.target.parentElement.classList.add('selected');
+            if (this.getOptions?.selectRowColor) {
+              if (event.target.parentElement.classList.contains('selected')) {
+                event.target.parentElement.classList.remove('selected');
+              } else {
+                event.target.parentElement.parentElement
+                  .querySelectorAll('.selected')
+                  .forEach((item) => {
+                    item.classList.remove('selected');
+                    // item.style = `background: transparent !important`;
+                  });
+                event.target.parentElement.classList.add('selected');
+              }
             }
             const tokens = this.$store.state[this.idDash].tockens;
             tokens.forEach((token) => {
