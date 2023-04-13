@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Table component: added option "highlight selected row"
 - Display a comments on the waterfall chart
 
 ### Changed
