@@ -181,7 +181,7 @@
                 :items="titles.filter(title => item.title === title
                   || !barsOptions.map(d => d.title).includes(title))"
                 class="field-profile"
-                label="Столбец"
+                :label="!titles.includes(item.title) ? `Столбец: ${item.title}` : 'Столбец'"
                 :style="{ color: theme.$main_text }"
                 outlined
                 hide-details
@@ -201,6 +201,16 @@
               <v-checkbox
                 v-model="item.changeColor"
                 label="Заменить цвет столбца"
+                persistent-placeholder
+                dense
+                outlined
+                hide-details
+                color="blue"
+                @update:color="isChanged = true"
+              />
+              <v-checkbox
+                v-model="item.hideComment"
+                label="Скрыть комментарий"
                 persistent-placeholder
                 dense
                 outlined
@@ -387,6 +397,7 @@ export default {
         title: '',
         newTitle: '',
         changeColor: false,
+        hideComment: false,
         color: '#FF0000',
       });
     },
@@ -396,8 +407,10 @@ export default {
       this.barsOptions.splice(idx, 1);
     },
 
-    checkTitleReplaceError({ title, newTitle, changeColor }) {
-      return (title === null || title === '') || (newTitle === '' && !changeColor);
+    checkTitleReplaceError({
+      title, newTitle, changeColor, hideComment,
+    }) {
+      return (title === null || title === '') || (newTitle === '' && !changeColor && !hideComment);
     },
   },
 };
