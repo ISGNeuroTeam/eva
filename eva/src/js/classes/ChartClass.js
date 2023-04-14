@@ -6,6 +6,7 @@ export default class ChartClass {
   options = {
     groupsTopOffset: 14,
     linesRegression: null,
+    numberFormat: false,
     xAxis: {
       type: 'time', // linear, time, log, point, band
       timeFormat: null, // %Y-%m-%d %H:%M:%S
@@ -224,6 +225,7 @@ export default class ChartClass {
     const {
       groupsTopOffset,
       yGroupLabel,
+      numberFormat = false,
     } = this.options;
     const { barplotType } = this.options.xAxis;
     const groupHeight = height - groupsTopOffset;
@@ -291,7 +293,8 @@ export default class ChartClass {
       yGroupItem
         .call(
           d3[`axis${axisPosition}`](this.y[metric.name])
-            .ticks(metric.ticks || Math.ceil(groupHeight / 30)),
+            .ticks(metric.ticks || Math.ceil(groupHeight / 30))
+            .tickFormat((val) => val.toLocaleString(numberFormat)),
         );
       className += ` axis-y-${metric.n}`;
     });
@@ -344,8 +347,8 @@ export default class ChartClass {
         .style('color', this.theme.$main_text)
         .call(
           d3[`axis${axisSide}`](this.y[metric.name])
-            .tickFormat((str) => (metric.unit ? `${str} ${metric.unit}` : str))
-            .ticks(metric.ticks || Math.ceil(groupHeight / 30)),
+            .ticks(metric.ticks || Math.ceil(groupHeight / 30))
+            .tickFormat((val) => val.toLocaleString(numberFormat) + (metric.unit ? ` ${metric.unit}` : '')),
         );
 
       if (metric.coloredYAxis) {
@@ -711,7 +714,10 @@ export default class ChartClass {
   }
 
   xTickFormat(d) {
-    const { xAxis } = this.options;
+    const {
+      xAxis,
+      numberFormat = false,
+    } = this.options;
     const { timeFormat, stringOX } = xAxis;
     let val = d;
     if ((xAxis.type === 'time') && !stringOX) {
@@ -720,7 +726,7 @@ export default class ChartClass {
       }
       return d3.timeFormat(timeFormat || '%Y-%m-%d %H:%M:%S')(val);
     }
-    return d;
+    return d.toLocaleString(numberFormat);
   }
 
   showTooltip() {
@@ -736,6 +742,9 @@ export default class ChartClass {
   }
 
   updateTooltip(d, metric, left, top, curMetricBold = true) {
+    const {
+      numberFormat,
+    } = this.options;
     this.tooltip
       .html(
         [
@@ -748,7 +757,7 @@ export default class ChartClass {
             }
             const fontWeight = (curMetricBold && metric.name === cur.name) ? 'bold' : 'regular';
             const title = cur.title || cur.name;
-            return `${prev}<div style="font-weight: ${fontWeight}">${title}: <span>${value}</span></div>`;
+            return `${prev}<div style="font-weight: ${fontWeight}">${title}: <span>${value.toLocaleString(numberFormat)}</span></div>`;
           }, `${this.xMetric}: ${this.xTickFormat(d[this.xMetric])}`),
       );
 
@@ -895,6 +904,7 @@ export default class ChartClass {
   }
 
   renderPeakTexts(chartGroup, metric, line) {
+    const { numberFormat = false } = this.options;
     const data = line.filter((d, i) => {
       if (metric.lastDot === '0' && line.length === i + 1) {
         return true;
@@ -921,7 +931,7 @@ export default class ChartClass {
       .attr('text-anchor', 'start') // middle
       .attr('fill', this.theme.$main_text)
       .attr('class', `metric metric-${metric.n}`)
-      .text((d) => ChartClass.valueToText(metric, d))
+      .text((d) => ChartClass.valueToText(metric, d, numberFormat))
       .attr('x', (d) => {
         let xPos = this.x(d[this.xMetric]);
         if (metric.type === 'barplot' && this.options.xAxis.barplotType === 'divided') {
@@ -1117,7 +1127,7 @@ export default class ChartClass {
   }
 
   addBarplots(num, groups, groupBarplotMetrics, groupHeight) {
-    const { groupsTopOffset } = this.options;
+    const { groupsTopOffset, numberFormat } = this.options;
     const { barplotType } = this.options.xAxis;
     const metricByKeys = this.metricByKeys();
     const chartGroup = this.svgGroups.select(`g.group-${num}-chart`);
@@ -1196,12 +1206,13 @@ export default class ChartClass {
             .attr('fill', 'var(--main_text)')
             .attr('stroke', 'var(--main_text)')
             .attr('stroke-width', 0)
-            .text(`${ChartClass.valueToText(d.metric, d.data)} ${d.metric.unit || ''}`);
+            .text(`${ChartClass.valueToText(d.metric, d.data, numberFormat)} ${d.metric.unit || ''}`);
         }
       });
   }
 
   addDividedBarplots(num, groups, subgroups, groupHeight) {
+    const { numberFormat = false } = this.options;
     const chartGroup = this.svgGroups.select(`g.group-${num}-chart`);
     const { groupsTopOffset } = this.options;
     const barWidth = this.bandX.bandwidth();
@@ -1294,7 +1305,7 @@ export default class ChartClass {
             .attr('pointer-events', 'none')
             .attr('text-anchor', 'middle')
             .attr('fill', this.darkText ? 'var(--main_bg)' : 'var(--main_text)')
-            .text(`${ChartClass.valueToText(d.metric, d.data)} ${d.metric.unit || ''}`);
+            .text(`${ChartClass.valueToText(d.metric, d.data, numberFormat)} ${d.metric.unit || ''}`);
         }
       });
   }
@@ -1303,25 +1314,6 @@ export default class ChartClass {
     if (this.onClickCb) {
       this.onClickCb(range);
     }
-  }
-
-  addBarplotPeakText() {
-    const metricByKeys = this.metricByKeys();
-    this.svgGroups
-      .selectAll('.barplot.metric rect')
-      .nodes()
-      .forEach((rect) => {
-        d3.select(rect.parentNode)
-          .append('text')
-          .attr('font-size', '11')
-          .attr('pointer-events', 'none')
-          .attr('text-anchor', 'start')
-          .attr('fill', 'var(--main_text)')
-          .attr('x', rect.x.baseVal.value)
-          .attr('y', rect.y.baseVal.value + 14)
-          // eslint-disable-next-line no-underscore-dangle
-          .text((_) => ChartClass.valueToText(metricByKeys[_.key], rect.__data__.data));
-      });
   }
 
   metricByKeys() {
@@ -1377,7 +1369,7 @@ export default class ChartClass {
     return ChartClass.mergeDeep(target, ...sources);
   }
 
-  static valueToText(metric, data) {
+  static valueToText(metric, data, numberFormat = false) {
     const captionKey = `_${metric.name}_caption`;
     const fieldName = (metric.peakTextData === 'caption' && data[captionKey] !== undefined)
       ? captionKey
@@ -1388,8 +1380,11 @@ export default class ChartClass {
     }
     const { zerosAfterDot } = metric;
     return (zerosAfterDot % 1 === 0 && zerosAfterDot >= 0 && zerosAfterDot <= 100)
-      ? Number.parseFloat(val).toFixed(zerosAfterDot ?? 2)
-      : val;
+      ? Number.parseFloat(val).toLocaleString(numberFormat, {
+        minimumFractionDigits: zerosAfterDot ?? 2,
+        maximumFractionDigits: zerosAfterDot ?? 2,
+      })
+      : val.toLocaleString(numberFormat);
   }
 
   static metricsToMetricsByGroup(metricsByGroup) {

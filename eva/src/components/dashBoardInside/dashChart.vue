@@ -73,6 +73,7 @@
 <script>
 import { mdiSettings } from '@mdi/js';
 import * as d3 from 'd3';
+import { mapGetters } from 'vuex';
 import ChartClass from '../../js/classes/ChartClass';
 import DashChartSettings from './dashChartSettings';
 
@@ -128,6 +129,9 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('app', [
+      'userSettings',
+    ]),
     id() {
       return this.idFrom;
     },
@@ -318,8 +322,10 @@ export default {
   methods: {
     createChart() {
       const { width, height } = this.box;
+      const { numberFormat = false } = this.userSettings;
       this.chart = new ChartClass(this.$refs.svgContainer, width, height, this.theme, {
         useGroups: !!this.options.useGroups,
+        numberFormat,
         xAxis: {
           type: 'time', // linear, time, - log, point, band
           timeFormat: '%d.%m.%y %H:%M',
