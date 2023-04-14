@@ -88,6 +88,7 @@ export default class WaterfallClass {
     }
     const { margin, padding, options } = this;
     const { width, height } = this;
+    const { numberFormat = false } = this.options;
 
     this.svg = d3.select(this.svgContainer)
       .attr('width', width)
@@ -155,7 +156,7 @@ export default class WaterfallClass {
       .attr('font-size', '13')
       .attr('text-anchor', 'middle')
       .attr('fill', options.colorText)
-      .text((d) => (d.isTotal ? d.total : d.value).toLocaleString('ru'));
+      .text((d) => (d.isTotal ? d.total : d.value).toLocaleString(numberFormat));
 
     barGroup.append('line').filter((d, idx) => idx !== this.data.length - 1)
       .attr('class', 'connector')
@@ -280,7 +281,7 @@ export default class WaterfallClass {
       .style('overflow', 'inherit')
       .attr('font-size', '14')
       .attr('text-anchor', 'bottom')
-      .text((d, idx) => {
+      .text((d) => {
         const opts = this.options.barsOptions.find(({ title }) => (title === d.title));
         return !opts?.hideComment ? d.comment : null;
       });
@@ -392,6 +393,7 @@ export default class WaterfallClass {
   }
 
   createYAxis() {
+    const { numberFormat = false } = this.options;
     const yHeight = this.height - this.margin.top - this.margin.bottom;
     const minMax = [
       d3.min(this.data, (d) => (d.total < 0 ? d.total : 0)) * 1.1,
@@ -405,7 +407,8 @@ export default class WaterfallClass {
     this.yAxis = this.svg
       .append('g')
       .attr('class', 'yAxis')
-      .call(d3.axisLeft(this.y));
+      .call(d3.axisLeft(this.y)
+        .tickFormat((val) => val.toLocaleString(numberFormat)));
 
     if (this.innerVertOffset[1]) {
       this.yAxis.append('line')
