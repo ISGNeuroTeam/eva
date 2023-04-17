@@ -1,136 +1,146 @@
 <template>
-  <div
-    class="FGKRiskReview"
-    :style="{
-      width: widthFrom,
-      height: heightFrom,
-    }"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
     <div
-      v-if="isDataError"
-      class="FGKRiskReview__dataError"
+      class="FGKRiskReview"
+      :style="{
+        ...customStyle,
+        'width': `${sizeFrom.width - 22}px`,
+        'height': `${sizeFrom.height - 10}px`,
+        background: isPanelBackHide ? 'transparent' : theme.$secondary_bg,
+        margin: '0 10px',
+      }"
+      :class="customClass"
+      v-bind="$attrs"
     >
-      {{ errorMessage }}
-    </div>
-    <div
-      v-show="!isDataError"
-      class="row fill-height align-stretch"
-    >
-      <div class="col-auto">
-        <div class="FGKRiskReview__col-title px-3">
-          {{ titleColText }}
-        </div>
-        <div
-          class="titles-container px-3"
-          :style="titlesContainerStyle"
-        >
-          <div
-            v-for="(title, i) in titles"
-            :key="`t-${i}`"
-            class="bar-title"
-            :style="{
-              height: `${barHeight}px`,
-              marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
-            }"
-            v-text="title"
-          />
-        </div>
-      </div>
-      <div class="col">
-        <div
-          ref="svgContainer"
-          class="svg-container px-3"
-        />
-      </div>
-      <div class="col-auto">
-        <div class="FGKRiskReview__col-title px-3">
-          {{ secondTitleColText }}
-        </div>
-        <div
-          class="titles-container titles-container--second px-3"
-          :style="titlesContainerStyle"
-        >
-          <div
-            v-for="(title, i) in secondTitles"
-            :key="`t-${i}`"
-            class="bar-title bar-title--second"
-            :style="{
-              height: `${barHeight}px`,
-              marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
-            }"
-            v-text="title"
-          />
-        </div>
+      <div
+        v-if="isDataError"
+        class="FGKRiskReview__dataError"
+      >
+        {{ errorMessage }}
       </div>
       <div
-        v-if="isVisibleResidualImpactPanel"
-        class="col-auto"
+        v-show="!isDataError"
+        class="row fill-height align-stretch"
       >
-        <div class="FGKRiskReview__col-title FGKRiskReview__col-title--residual px-3">
-          Остаточное влияние
-        </div>
-        <div
-          class="titles-container titles-container--residual px-3"
-          :style="titlesContainerStyle"
-        >
+        <div class="col-3">
+          <div class="FGKRiskReview__col-title px-3">
+            {{ leftTitle }}
+          </div>
           <div
-            v-for="(title, i) in residualEffectList"
-            :key="`t-${i}`"
-            class="bar-title bar-title--residual"
-            :style="{
-              height: `${barHeight}px`,
-              marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
-            }"
-            v-text="title"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      v-if="!isDataError"
-      class="FGKRiskReview__help-btn"
-    >
-      <v-tooltip
-        top
-        :nudge-top="5"
-        :color="theme.$accent_ui_color"
-      >
-        <template v-slot:activator="{ on }">
-          <button
-            v-on="on"
-          >
-            <v-icon
-              class="control-button edit-icon theme--dark"
-              :style="{ color: theme.$secondary_text }"
-            >
-              {{ iconHelp }}
-            </v-icon>
-          </button>
-        </template>
-        <div class="column pa-3">
-          <div
-            v-for="(part, i) in barParts"
-            :key="`legend-${i}`"
-            class="d-flex align-center"
-            :class="(i + 1) !== barParts.length ? 'mb-2' : ''"
+            class="titles-container px-3"
+            :style="titlesContainerStyle"
           >
             <div
-              class="mr-2"
+              v-for="(title, i) in titles"
+              :key="`t-${i}`"
+              class="bar-title"
               :style="{
-                backgroundColor: part.fill,
-                width: '15px',
-                height: '15px',
+                height: `${barHeight}px`,
+                marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
               }"
-            />
-            <div
-              class="risk-review-legend-container__text"
-              v-text="part.title"
+              v-text="title"
             />
           </div>
         </div>
-      </v-tooltip>
+        <div class="col">
+          <div
+            ref="svgContainer"
+            class="svg-container"
+          />
+        </div>
+        <div class="col-3">
+          <div class="FGKRiskReview__col-title px-3">
+            {{ rightTitle }}
+          </div>
+          <div
+            class="titles-container titles-container--second px-3"
+            :style="titlesContainerStyle"
+          >
+            <div
+              v-for="(title, i) in secondTitles"
+              :key="`t-${i}`"
+              class="bar-title bar-title--second"
+              :style="{
+                height: `${barHeight}px`,
+                marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
+              }"
+              v-text="title"
+            />
+          </div>
+        </div>
+        <div
+          v-if="isVisibleResidualImpactPanel"
+          class="col-2"
+        >
+          <div class="FGKRiskReview__col-title FGKRiskReview__col-title--residual">
+            Остаточное влияние
+          </div>
+          <div
+            class="titles-container titles-container--residual px-3"
+            :style="titlesContainerStyle"
+          >
+            <div
+              v-for="(title, i) in residualEffectList"
+              :key="`t-${i}`"
+              class="bar-title bar-title--residual"
+              :style="{
+                height: `${barHeight}px`,
+                marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
+              }"
+              v-text="title"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        v-if="!isDataError"
+        class="FGKRiskReview__help-btn"
+      >
+        <v-tooltip
+          top
+          :nudge-top="5"
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <button
+              v-on="on"
+            >
+              <v-icon
+                class="control-button edit-icon theme--dark"
+                :style="{ color: theme.$secondary_text }"
+              >
+                {{ iconHelp }}
+              </v-icon>
+            </button>
+          </template>
+          <div class="column pa-3">
+            <div
+              v-for="(part, i) in barParts"
+              :key="`legend-${i}`"
+              class="d-flex align-center"
+              :class="(i + 1) !== barParts.length ? 'mb-2' : ''"
+            >
+              <div
+                class="mr-2"
+                :style="{
+                  backgroundColor: part.fill,
+                  width: '15px',
+                  height: '15px',
+                }"
+              />
+              <div
+                class="risk-review-legend-container__text"
+                v-text="part.title"
+              />
+            </div>
+          </div>
+        </v-tooltip>
+      </div>
     </div>
-  </div>
+  </portal>
 </template>
 
 <script>
@@ -190,15 +200,20 @@ export default {
     svg: null,
     xScale: null,
     yScale: null,
-    marginX: 0,
+    marginX: 40,
     marginY: 0,
     barHeight: 0,
     chartPaddingInner: 0,
     chartPaddingOuter: 0,
     /** Chart user config data. */
-    titleColName: 'title',
-    secondTitleColName: 'second_title',
-    residualEffectField: 'ost',
+    titleColName: 'risk_name',
+    listColName: 'riskfactor_name',
+    listColValue: 'riskfactor_value',
+    secondListColName: 'measure_name',
+    secondListColValue: 'measure_value',
+    residualEffectField: 'residual',
+    leftTitle: 'Наименование риска',
+    rightTitle: 'Мероприятия по управлению риском',
     barParts: defaultBarParts,
     iconHelp: mdiHelp,
   }),
@@ -215,13 +230,32 @@ export default {
     },
     titles() {
       if (this.dataRestFrom?.length > 0) {
+        return this.dataRestFrom.map((elem) => this.getFormattedTitles(
+          elem,
+          {
+            titleColName: this.titleColName,
+            listColName: this.listColName,
+            listColValue: this.listColValue,
+          },
+        ));
+      }
+      return [];
+    },
+    formattedTitles() {
+      if (this.dataRestFrom?.length > 0) {
         return this.dataRestFrom.map((ds) => ds[this.titleColName]);
       }
       return [];
     },
     secondTitles() {
       if (this.dataRestFrom?.length > 0) {
-        return this.dataRestFrom.map((ds) => ds[this.secondTitleColName]);
+        return this.dataRestFrom.map((elem) => this.getFormattedTitles(
+          elem,
+          {
+            listColName: this.secondListColName,
+            listColValue: this.secondListColValue,
+          },
+        ));
       }
       return [];
     },
@@ -264,6 +298,9 @@ export default {
     isVisibleResidualImpactPanel() {
       return this.optionsFromStore?.visibleResidualImpactPanel;
     },
+    isPanelBackHide() {
+      return this.dashFromStore[this.idFrom].options?.panelBackHide || false;
+    },
   },
   watch: {
     dataset: {
@@ -278,10 +315,23 @@ export default {
     sizeFrom: {
       deep: true,
       handler() {
-        this.$nextTick(() => {
-          this.render();
-        });
+        if (!this.fullScreenMode) {
+          this.$nextTick(() => {
+            this.$nextTick(() => {
+              this.render();
+            });
+          });
+        }
       },
+    },
+    fullScreenMode(val) {
+      if (val) {
+        this.$nextTick(() => {
+          this.$nextTick(() => {
+            this.render();
+          });
+        });
+      }
     },
   },
   mounted() {
@@ -379,7 +429,6 @@ export default {
 
     prepareRenderData() {
       const { svgContainer } = this.$refs;
-
       this.svg = d3.select(svgContainer)
         .append('svg')
         .attr(this.dataAttr, '')
@@ -596,6 +645,41 @@ export default {
 
       return maxNumLength;
     },
+
+    getFormattedTitles(elem, {
+      titleColName = '',
+      listColName,
+      listColValue,
+    }) {
+      const result = {
+        list: [],
+      };
+      if (titleColName && elem[titleColName]) {
+        result.title = elem[titleColName];
+      }
+
+      Object.keys(elem).forEach((key) => {
+        if (key.includes(listColName) || key.includes(listColValue)) {
+          const fieldName = key.includes(listColName)
+            ? listColName
+            : listColValue;
+          const index = key.replace(`${fieldName}_`, '');
+          const listKey = key.includes(listColName)
+            ? 'title'
+            : 'value';
+          if (index) {
+            if (!result.list[index]) {
+              result.list[index] = {
+                [listKey]: elem[key],
+              };
+            } else {
+              result.list[index][listKey] = elem[key];
+            }
+          }
+        }
+      });
+      return result;
+    },
   },
 };
 </script>
@@ -634,7 +718,6 @@ export default {
     justify-content: center;
     flex-direction: column;
     color: var(--main_text);
-    background-color: var(--background_main);
     .Icon {
       color: var(--border_secondary);
       font-size: 100px;
@@ -679,7 +762,7 @@ export default {
     }
 
     .chart-back {
-      fill: var(--main_bg);
+      fill: transparent;
     }
 
     .x-axis-tick-caption {
