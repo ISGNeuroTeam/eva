@@ -462,6 +462,14 @@ export default {
       'rightTitle',
       'leftValueColor',
       'rightValueColor',
+      'fieldsGroup',
+      'titleColName',
+      'listColName',
+      'listColValue',
+      'secondTitleColName',
+      'secondListColName',
+      'secondListColValue',
+      'residualEffectField',
       'primitives',
       'primitivesLibrary',
     ],
@@ -701,12 +709,6 @@ export default {
       elem: 'switch',
       default: false,
     },
-    {
-      option: 'visibleResidualImpactPanel',
-      description: 'Вкл/выкл отображение панели с остаточным влиянием',
-      elem: 'switch',
-      default: false,
-    },
 
     // dashSingle
     {
@@ -883,32 +885,6 @@ export default {
         { value: '12', text: '12' },
       ],
       default: '1',
-    },
-    {
-      option: 'leftTitle',
-      elem: 'text-field',
-      description: 'Заголовок левого блока',
-      default: '',
-    },
-    {
-      option: 'rightTitle',
-      elem: 'text-field',
-      description: 'Заголовок правого блока',
-      default: '',
-    },
-    {
-      option: 'leftValueColor',
-      elem: 'text-field',
-      description: 'Цвет значения в левом столбце',
-      placeholder: 'red/#000000/rgb(255,255,255)',
-      default: '',
-    },
-    {
-      option: 'rightValueColor',
-      elem: 'text-field',
-      description: 'Цвет значения в правом столбце',
-      placeholder: 'red/#000000/rgb(255,255,255)',
-      default: '',
     },
     {
       option: 'tileStyle',
@@ -1189,6 +1165,96 @@ export default {
       default: false,
     },
 
+    // riskReview
+    {
+      option: 'visibleResidualImpactPanel',
+      description: 'Вкл/выкл отображение панели с остаточным влиянием',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'leftTitle',
+      elem: 'text-field',
+      description: 'Заголовок левого блока',
+      default: '',
+    },
+    {
+      option: 'rightTitle',
+      elem: 'text-field',
+      description: 'Заголовок правого блока',
+      default: '',
+    },
+    {
+      option: 'leftValueColor',
+      elem: 'text-field',
+      description: 'Цвет значения в левом столбце',
+      placeholder: 'red/#000000/rgb(255,255,255)',
+      default: '',
+    },
+    {
+      option: 'rightValueColor',
+      elem: 'text-field',
+      description: 'Цвет значения в правом столбце',
+      placeholder: 'red/#000000/rgb(255,255,255)',
+      default: '',
+    },
+
+    {
+      group: 'Настройка полей',
+      option: 'fieldsGroup',
+    },
+
+    {
+      optionGroup: 'fieldsGroup',
+      option: 'titleColName',
+      default: 'risk_name',
+      description: 'Имя поля в OTL для заголовка текстового блока(слева)',
+      elem: 'text-field',
+    },
+
+    {
+      optionGroup: 'fieldsGroup',
+      option: 'listColName',
+      default: 'riskfactor_name',
+      description: 'Имя поля в OTL для элемента списка в текстовом блоке(слева)',
+      elem: 'text-field',
+    },
+    {
+      optionGroup: 'fieldsGroup',
+      option: 'listColValue',
+      default: 'riskfactor_value',
+      description: 'Имя поля в OTL для значения в списке, внутри текстового блоке(слева)',
+      elem: 'text-field',
+    },
+    {
+      optionGroup: 'fieldsGroup',
+      option: 'secondTitleColName',
+      default: '',
+      description: 'Имя поля в OTL для заголовка текстового блока(справа)',
+      elem: 'text-field',
+    },
+    {
+      optionGroup: 'fieldsGroup',
+      option: 'secondListColName',
+      default: 'measure_name',
+      description: 'Имя поля в OTL для элемента списка в текстовом блоке(справа)',
+      elem: 'text-field',
+    },
+    {
+      optionGroup: 'fieldsGroup',
+      option: 'secondListColValue',
+      default: 'measure_value',
+      description: 'Имя поля в OTL для значения в списке, внутри текстового блоке(справа)',
+      elem: 'text-field',
+    },
+    {
+      optionGroup: 'fieldsGroup',
+      option: 'residualEffectField',
+      default: 'residual',
+      description: 'Имя поля в OTL для значения остаточного влияния',
+      elem: 'text-field',
+    },
+
     // fullWidthGroup
     {
       group: 'Библиотека примитивов',
@@ -1231,6 +1297,7 @@ export default {
     'constructorSchemes',
     'gauge',
     'waterfall',
+    'riskReview',
   ],
   reports: {
     table: {
@@ -1303,7 +1370,7 @@ export default {
     },
     riskReview: {
       tooltip: 'Детализация рисков',
-      icon: mdiFinance,
+      icon: mdiScaleBalance,
     },
   },
   excludes: {
