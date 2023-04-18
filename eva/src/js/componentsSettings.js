@@ -22,7 +22,7 @@ import {
   mdiGroup,
   mdiInboxMultipleOutline,
   mdiGauge,
-  mdiFinance,
+  mdiFinance, mdiScaleBalance,
 } from '@mdi/js';
 
 export default {
@@ -86,7 +86,7 @@ export default {
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
     { name: 'Число', img: mdiNumeric, type: 'single' },
-    { name: 'Детализация рисков', img: mdiNumeric, type: 'riskReview' },
+    { name: 'Детализация рисков', img: mdiScaleBalance, type: 'riskReview' },
     {
       name: 'Спидометр',
       img: mdiGauge,
@@ -272,7 +272,7 @@ export default {
     frequencyGraph: mdiDotsHorizontal,
     gauge: mdiGauge,
     waterfall: mdiFinance,
-    riskReview: mdiFinance,
+    riskReview: mdiScaleBalance,
   },
   commonOptions: [
     'panelSettings',
@@ -458,6 +458,12 @@ export default {
     ],
     riskReview: [
       'visibleResidualImpactPanel',
+      'leftTitle',
+      'rightTitle',
+      'leftValueColor',
+      'rightValueColor',
+      'primitives',
+      'primitivesLibrary',
     ],
   },
   optionFields: [
@@ -695,6 +701,12 @@ export default {
       elem: 'switch',
       default: false,
     },
+    {
+      option: 'visibleResidualImpactPanel',
+      description: 'Вкл/выкл отображение панели с остаточным влиянием',
+      elem: 'switch',
+      default: false,
+    },
 
     // dashSingle
     {
@@ -871,6 +883,32 @@ export default {
         { value: '12', text: '12' },
       ],
       default: '1',
+    },
+    {
+      option: 'leftTitle',
+      elem: 'text-field',
+      description: 'Заголовок левого блока',
+      default: '',
+    },
+    {
+      option: 'rightTitle',
+      elem: 'text-field',
+      description: 'Заголовок правого блока',
+      default: '',
+    },
+    {
+      option: 'leftValueColor',
+      elem: 'text-field',
+      description: 'Цвет значения в левом столбце',
+      placeholder: 'red/#000000/rgb(255,255,255)',
+      default: '',
+    },
+    {
+      option: 'rightValueColor',
+      elem: 'text-field',
+      description: 'Цвет значения в правом столбце',
+      placeholder: 'red/#000000/rgb(255,255,255)',
+      default: '',
     },
     {
       option: 'tileStyle',
@@ -1173,12 +1211,6 @@ export default {
       elem: 'code-editor',
       isFullWidth: true,
       importantExport: true,
-    },
-    {
-      option: 'visibleResidualImpactPanel',
-      description: 'Вкл/выкл отображение панели с остаточным влиянием',
-      elem: 'switch',
-      default: false,
     },
 
   ],

@@ -8,7 +8,7 @@
       :style="{
         ...customStyle,
         'width': `${sizeFrom.width - 22}px`,
-        'height': `${sizeFrom.height - 10}px`,
+        'height': `${sizeFrom.height - 60}px`,
         background: isPanelBackHide ? 'transparent' : theme.$secondary_bg,
         margin: '0 10px',
       }"
@@ -26,7 +26,10 @@
         class="row fill-height align-stretch"
       >
         <div class="col-3">
-          <div class="FGKRiskReview__col-title px-3">
+          <div
+            class="FGKRiskReview__col-title px-3"
+            :class="leftTitle ? '' : 'py-3'"
+          >
             {{ leftTitle }}
           </div>
           <div
@@ -42,7 +45,10 @@
                 marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
               }"
             >
-              <div class="bar-title">
+              <div
+                v-if="item.title"
+                class="bar-title"
+              >
                 {{ item.title }}:
               </div>
               <div class="bar-list">
@@ -51,12 +57,17 @@
                   :key="`left-${i}-${listIndex}`"
                   class="bar-list__item"
                 >
-                  {{ listItem.title }}
+                  {{ listIndex + 1 }}. {{ listItem.title }}
                   <span
                     v-if="listItem.value"
                     class="bar-list__value-text"
                   >
-                    (<span class="bar-list__value">{{ listItem.value }}</span>)
+                    (<span
+                      class="bar-list__value"
+                      :style="{
+                        color: valueColor,
+                      }"
+                    >{{ listItem.value >= 0 ? '+' : '-' }}{{ listItem.value }}</span>)
                   </span>
                 </div>
               </div>
@@ -70,7 +81,10 @@
           />
         </div>
         <div class="col-3">
-          <div class="FGKRiskReview__col-title px-3">
+          <div
+            class="FGKRiskReview__col-title px-3"
+            :class="leftTitle ? '' : 'py-3'"
+          >
             {{ rightTitle }}
           </div>
           <div
@@ -78,15 +92,41 @@
             :style="titlesContainerStyle"
           >
             <div
-              v-for="(title, i) in secondTitles"
+              v-for="(item, i) in secondTitles"
               :key="`t-${i}`"
-              class="bar-title bar-title--second"
+              class="FGKRiskReview__right-text"
               :style="{
                 height: `${barHeight}px`,
                 marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
               }"
-              v-text="title"
-            />
+            >
+              <div
+                v-if="item.title"
+                class="bar-title bar-title--second"
+              >
+                {{ item.title }}
+              </div>
+              <div class="bar-list bar-list--second">
+                <div
+                  v-for="(listItem, listIndex) in item.list"
+                  :key="`right-${i}-${listIndex}`"
+                  class="bar-list__item bar-list__item--second"
+                >
+                  {{ listIndex + 1 }}. {{ listItem.title }}
+                  <span
+                    v-if="listItem.value"
+                    class="bar-list__value-text bar-list__value-text--second"
+                  >
+                    (<span
+                      class="bar-list__value bar-list__value--second"
+                      :style="{
+                        color: secondValueColor,
+                      }"
+                    >{{ listItem.value >= 0 ? '+' : '-' }}{{ listItem.value }}</span>)
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div
@@ -120,7 +160,7 @@
         <v-tooltip
           top
           :nudge-top="5"
-          :color="theme.$accent_ui_color"
+          :color="theme.$secondary_bg"
         >
           <template v-slot:activator="{ on }">
             <button
@@ -128,7 +168,7 @@
             >
               <v-icon
                 class="control-button edit-icon theme--dark"
-                :style="{ color: theme.$secondary_text }"
+                :style="{ color: theme.$main_text }"
               >
                 {{ iconHelp }}
               </v-icon>
@@ -230,9 +270,6 @@ export default {
     secondListColName: 'measure_name',
     secondListColValue: 'measure_value',
     residualEffectField: 'residual',
-    leftTitle: 'Наименование риска',
-    rightTitle: 'Мероприятия по управлению риском',
-    barParts: defaultBarParts,
     iconHelp: mdiHelp,
   }),
   computed: {
@@ -295,18 +332,6 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
-    titleColText() {
-      if (this.dataRestFrom?.length > 0) {
-        return [...new Set(this.dataRestFrom.map((ds) => ds.title_col))][0];
-      }
-      return '';
-    },
-    secondTitleColText() {
-      if (this.dataRestFrom?.length > 0) {
-        return [...new Set(this.dataRestFrom.map((ds) => ds.second_title_col))][0];
-      }
-      return '';
-    },
     dashFromStore() {
       return this.$store.state[this.idDashFrom];
     },
@@ -318,6 +343,24 @@ export default {
     },
     isPanelBackHide() {
       return this.dashFromStore[this.idFrom].options?.panelBackHide || false;
+    },
+    barParts() {
+      if (this.optionsFromStore.primitivesLibrary) {
+        return JSON.parse(this.optionsFromStore.primitivesLibrary);
+      }
+      return [];
+    },
+    leftTitle() {
+      return this.optionsFromStore.leftTitle || '';
+    },
+    rightTitle() {
+      return this.optionsFromStore.rightTitle || '';
+    },
+    valueColor() {
+      return this.optionsFromStore.leftValueColor || this.theme.main_text;
+    },
+    secondValueColor() {
+      return this.optionsFromStore.rightValueColor || this.theme.main_text;
     },
   },
   watch: {
@@ -519,7 +562,7 @@ export default {
 
     createBars() {
       const {
-        xScale, yScale, barHeight, barParts,
+        xScale, yScale, barHeight, barParts, toDivide,
       } = this;
       const halfBarHeight = barHeight / 2;
 
@@ -553,7 +596,7 @@ export default {
               const yAttr = y + barHeight / 2;
               const anchor = xData >= 0 ? 'start' : 'end';
               this.svg.append('text')
-                .text(xData)
+                .text(Number(xData) >= 0 ? `+${toDivide(xData)}` : `-${toDivide(xData)}`)
                 .attr(this.dataAttr, '')
                 .attr('class', 'bar-text-caption')
                 .attr('fill', fill)
@@ -689,21 +732,19 @@ export default {
           if (index) {
             if (!result.list[index]) {
               result.list[index] = {
-                [listKey]: elem[key],
+                [listKey]: listKey === 'value' ? this.toDivide(elem[key]) : elem[key],
               };
             } else {
-              result.list[index][listKey] = elem[key];
+              result.list[index][listKey] = listKey === 'value' ? this.toDivide(elem[key]) : elem[key];
             }
           }
         }
       });
       return result;
     },
-    getListItemValue(item) {
-      if (item?.value) {
-        return `<span>(${item.value})</span>`;
-      }
-      return '';
+    toDivide(number) {
+      return number.toLocaleString()
+        .replace(',', ' ');
     },
   },
 };
@@ -783,6 +824,9 @@ export default {
     }
     .bar-list {
       color: var(--secondary_text);
+      &--second {
+        text-align: left;
+      }
       &__value {
         font-weight: bold;
       }
