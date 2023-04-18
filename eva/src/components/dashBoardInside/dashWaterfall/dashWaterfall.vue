@@ -76,6 +76,9 @@ export default {
     ...mapGetters({
       theme: 'getTheme',
     }),
+    ...mapGetters('app', [
+      'userSettings',
+    ]),
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idFrom];
     },
@@ -93,8 +96,10 @@ export default {
       return this.$store.state[this.idDashFrom].tockens || [];
     },
     chartOptions() {
+      const { numberFormat = false } = this.userSettings;
       return {
         ...this.options.chartOptions,
+        numberFormat,
         titles: this.dataRestFrom.map((row) => row.title),
       };
     },

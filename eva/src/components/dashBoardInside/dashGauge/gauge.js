@@ -70,11 +70,15 @@
   };
 
   formatNumber = function() {
-    var digits, num, value;
+    var digits, num, value, numberFormat;
     num = 1 <= arguments.length ? slice.call(arguments, 0) : [];
     value = num[0];
     digits = 0 || num[1];
-    return addCommas(value.toFixed(digits));
+    numberFormat = false || num[2];
+    return addCommas(value.toLocaleString(numberFormat, {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }));
   };
 
   mergeObjects = function(obj1, obj2) {
@@ -644,7 +648,7 @@
           if ((!this.options.limitMin || value >= this.minValue) && (!this.options.limitMax || value <= this.maxValue)) {
             rotationAngle = this.getAngle(value) - 3 * Math.PI / 2;
             this.ctx.rotate(rotationAngle);
-            const labelText = formatNumber(value, staticLabels.fractionDigits);
+            const labelText = formatNumber(value, staticLabels.fractionDigits, this.options.numberFormat);
 
             // если предыдущее число близко
             const progressiveMinDistance = 0.032 * (labelText.length + 1);

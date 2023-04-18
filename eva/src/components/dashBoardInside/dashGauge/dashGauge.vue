@@ -22,7 +22,7 @@
         :height="box.height > box.width ? box.width * .6 : box.height - 120"
       />
       <div class="gauge-value-text">
-        <span :style="`color: ${valueColor}`">{{ value | displayValue }}</span>
+        <span :style="`color: ${valueColor}`">{{ displayValue }}</span>
       </div>
       <div class="gauge-metric-text">
         <span>{{ options.metricName || dsMetricName }}</span>
@@ -47,11 +47,6 @@ import DashGaugeSettings from './dashGaugeSettings';
 export default {
   name: 'DashGauge',
   components: { DashGaugeSettings },
-  filters: {
-    displayValue(val) {
-      return (+val).toLocaleString('ru-RU');
-    },
-  },
   props: {
     sizeFrom: {
       type: Object,
@@ -107,6 +102,9 @@ export default {
     ...mapGetters({
       theme: 'getTheme',
     }),
+    ...mapGetters('app', [
+      'userSettings',
+    ]),
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idFrom];
     },
@@ -118,6 +116,10 @@ export default {
         height: Math.round(height),
         isSmall: width < smallSize || height < smallSize,
       };
+    },
+    displayValue() {
+      const { numberFormat = false } = this.userSettings;
+      return (this.value).toLocaleString(numberFormat);
     },
     valueColor() {
       const zone = this.staticZones.find(({ min, max }) => (this.value >= min && this.value < max));
@@ -164,6 +166,7 @@ export default {
       };
     },
     gaugeOptions() {
+      const { numberFormat = false } = this.userSettings;
       return {
         angle: -0.1, // The span of the gauge arc
         lineWidth: 0.2, // The line thickness
@@ -175,6 +178,7 @@ export default {
         pointer: this.pointer,
         staticZones: structuredClone(this.staticZones),
         staticLabels: this.box.isSmall ? null : structuredClone(this.staticLabels),
+        numberFormat,
       };
     },
   },
@@ -220,7 +224,7 @@ export default {
       this.gauge.maxValue = Math.max(...this.staticZones.map(({ max }) => (+max)));
     },
     resize() {
-      // из за специфической работы фулскрина
+      // из-за специфической работы фулскрина
       setTimeout(() => {
         this.initGauge();
       }, 10);
