@@ -1416,7 +1416,7 @@ export default {
 </style>
 <style lang="sass" scoped>
 .source-descr::v-deep
-  margin: 16px
+  margin: 8px 16px 0
   color: var(--main_text)
   text-align: left
   table

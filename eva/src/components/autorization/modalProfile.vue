@@ -61,31 +61,10 @@
             Изменить пароль
           </v-btn>
         </v-card-actions>
-        <div class="title">
-          Настройки TTL
-        </div>
-        <v-switch
-          v-model="userTtlEnabled"
-          label="Заменять TTL в запросах"
-          persistent-placeholder
-          dense
-          outlined
-          hide-details
-          @change="toggleIsChanged"
-        />
-        <v-text-field
-          v-model="userTtl"
-          label="TTL в секундах"
-          :color="theme.$accent_ui_color"
-          :style="{ color: theme.$main_text }"
-          :disabled="!userTtlEnabled"
-          class="field-profile"
-          outlined
-          persistent-placeholder
-          hide-details
-          @input="toggleIsChanged"
-          @change="onChangeTTL"
-        />
+        <user-settings
+          :fields="userSettings"
+          @change="onChangeUserSettingsForm"
+        ></user-settings>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -161,31 +140,10 @@
               />
             </v-col>
             <v-col>
-              <div class="title">
-                Настройки TTL
-              </div>
-              <v-switch
-                v-model="userTtlEnabled"
-                label="Заменять TTL в запросах"
-                persistent-placeholder
-                dense
-                outlined
-                hide-details
-                @change="toggleIsChanged"
-              />
-              <v-text-field
-                v-model="userTtl"
-                label="TTL в секундах"
-                :color="theme.$accent_ui_color"
-                :style="{ color: theme.$main_text }"
-                :disabled="!userTtlEnabled"
-                class="field-profile"
-                outlined
-                persistent-placeholder
-                hide-details
-                @input="toggleIsChanged"
-                @change="onChangeTTL"
-              />
+              <user-settings
+                :fields="userSettings"
+                @change="onChangeUserSettingsForm"
+              ></user-settings>
             </v-col>
           </v-row>
           <data-profile
@@ -352,8 +310,11 @@
 </template>
 
 <script>
+import UserSettings from './userSettings.vue';
+
 export default {
   name: 'ModalProfile',
+  components: { UserSettings },
   model: {
     prop: 'modalValue',
     event: 'updateModalValue',
@@ -438,8 +399,7 @@ export default {
       colorFrom: {},
       isChanged: false,
       homePage: '',
-      userTtlEnabled: false,
-      userTtl: '60',
+      userSettings: {},
     };
   },
   computed: {
@@ -549,12 +509,9 @@ export default {
         if (res.setting) {
           const {
             homePage = '',
-            userTtlEnabled = false,
-            userTtl = '60',
           } = res.setting;
           this.homePage = homePage;
-          this.userTtlEnabled = userTtlEnabled;
-          this.userTtl = userTtl;
+          this.userSettings = res.setting;
         }
       });
     }
@@ -751,9 +708,8 @@ export default {
                 user_id: this.userFrom.id || responseData.id[0],
                 setting: {
                   ...setting,
+                  ...this.userSettings,
                   homePage: this.homePage,
-                  userTtlEnabled: this.userTtlEnabled,
-                  userTtl: this.userTtl,
                 },
               }),
             );
@@ -779,8 +735,11 @@ export default {
     toggleIsChanged() {
       this.isChanged = true;
     },
-    onChangeTTL() {
-      this.userTtl = +this.userTtl.replace(/\D/ig, '') || 60;
+    onChangeUserSettingsForm(fields) {
+      this.toggleIsChanged();
+      Object.keys(fields).forEach((key) => {
+        this.userSettings[key] = fields[key];
+      });
     },
   },
 };
