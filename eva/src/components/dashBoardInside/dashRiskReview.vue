@@ -28,7 +28,9 @@
         <div class="col-3">
           <div
             class="FGKRiskReview__col-title px-3"
-            :class="leftTitle ? '' : 'py-3'"
+            :style="{
+              height: leftTitle ? 'auto' : '27px',
+            }"
           >
             {{ leftTitle }}
           </div>
@@ -67,7 +69,7 @@
                       :style="{
                         color: valueColor,
                       }"
-                    >{{ listItem.value >= 0 ? '+' : '-' }}{{ listItem.value }}</span>)
+                    >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
                   </span>
                 </div>
               </div>
@@ -83,7 +85,9 @@
         <div class="col-3">
           <div
             class="FGKRiskReview__col-title px-3"
-            :class="leftTitle ? '' : 'py-3'"
+            :style="{
+              height: rightTitle ? 'auto' : '27px',
+            }"
           >
             {{ rightTitle }}
           </div>
@@ -122,7 +126,7 @@
                       :style="{
                         color: secondValueColor,
                       }"
-                    >{{ listItem.value >= 0 ? '+' : '-' }}{{ listItem.value }}</span>)
+                    >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
                   </span>
                 </div>
               </div>
@@ -264,12 +268,6 @@ export default {
     chartPaddingInner: 0,
     chartPaddingOuter: 0,
     /** Chart user config data. */
-    titleColName: 'risk_name',
-    listColName: 'riskfactor_name',
-    listColValue: 'riskfactor_value',
-    secondListColName: 'measure_name',
-    secondListColValue: 'measure_value',
-    residualEffectField: 'residual',
     iconHelp: mdiHelp,
   }),
   computed: {
@@ -307,6 +305,7 @@ export default {
         return this.dataRestFrom.map((elem) => this.getFormattedTitles(
           elem,
           {
+            titleColName: this.secondTitleColName,
             listColName: this.secondListColName,
             listColValue: this.secondListColValue,
           },
@@ -351,16 +350,37 @@ export default {
       return [];
     },
     leftTitle() {
-      return this.optionsFromStore.leftTitle || '';
+      return this.optionsFromStore.leftTitle;
     },
     rightTitle() {
-      return this.optionsFromStore.rightTitle || '';
+      return this.optionsFromStore.rightTitle;
     },
     valueColor() {
       return this.optionsFromStore.leftValueColor || this.theme.main_text;
     },
     secondValueColor() {
       return this.optionsFromStore.rightValueColor || this.theme.main_text;
+    },
+    titleColName() {
+      return this.optionsFromStore.titleColName || '';
+    },
+    listColName() {
+      return this.optionsFromStore.listColName || '';
+    },
+    listColValue() {
+      return this.optionsFromStore.listColValue || '';
+    },
+    secondListColName() {
+      return this.optionsFromStore.secondListColName || '';
+    },
+    secondListColValue() {
+      return this.optionsFromStore.secondListColValue || '';
+    },
+    residualEffectField() {
+      return this.optionsFromStore.residualEffectField || '';
+    },
+    secondTitleColName() {
+      return this.optionsFromStore.secondTitleColName || '';
     },
   },
   watch: {
@@ -596,7 +616,7 @@ export default {
               const yAttr = y + barHeight / 2;
               const anchor = xData >= 0 ? 'start' : 'end';
               this.svg.append('text')
-                .text(Number(xData) >= 0 ? `+${toDivide(xData)}` : `-${toDivide(xData)}`)
+                .text(Number(xData) >= 0 ? `+${toDivide(xData)}` : toDivide(xData))
                 .attr(this.dataAttr, '')
                 .attr('class', 'bar-text-caption')
                 .attr('fill', fill)
@@ -792,7 +812,7 @@ export default {
     }
   }
 
-  &__left-text {
+  &__left-text, &__right-text {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -815,6 +835,8 @@ export default {
         text-align: left;
       }
       &--residual {
+        display: flex;
+        align-items: center;
         justify-content: center;
         text-align: center;
         font-size: 24px;
