@@ -34,15 +34,33 @@
             :style="titlesContainerStyle"
           >
             <div
-              v-for="(title, i) in titles"
+              v-for="(item, i) in titles"
               :key="`t-${i}`"
-              class="bar-title"
+              class="FGKRiskReview__left-text"
               :style="{
                 height: `${barHeight}px`,
                 marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
               }"
-              v-text="title"
-            />
+            >
+              <div class="bar-title">
+                {{ item.title }}:
+              </div>
+              <div class="bar-list">
+                <div
+                  v-for="(listItem, listIndex) in item.list"
+                  :key="`left-${i}-${listIndex}`"
+                  class="bar-list__item"
+                >
+                  {{ listItem.title }}
+                  <span
+                    v-if="listItem.value"
+                    class="bar-list__value-text"
+                  >
+                    (<span class="bar-list__value">{{ listItem.value }}</span>)
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="col">
@@ -667,6 +685,7 @@ export default {
           const listKey = key.includes(listColName)
             ? 'title'
             : 'value';
+          // const colorFrom = defaultBarParts.find((el) => el.id === );
           if (index) {
             if (!result.list[index]) {
               result.list[index] = {
@@ -679,6 +698,12 @@ export default {
         }
       });
       return result;
+    },
+    getListItemValue(item) {
+      if (item?.value) {
+        return `<span>(${item.value})</span>`;
+      }
+      return '';
     },
   },
 };
@@ -707,6 +732,7 @@ export default {
     font-weight: 500;
     text-align: center;
     font-size: 18px;
+    white-space: nowrap;
   }
 
   &__dataError {
@@ -725,17 +751,22 @@ export default {
     }
   }
 
+  &__left-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+  }
+
   .titles-container {
-    color: var(--text_main);
+    color: var(--main_text);
     font-size: 15px;
     display: flex;
     flex-direction: column;
     height: 100%;
     .bar-title {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      text-align: right;
+      font-weight: bold;
       line-height: 18px;
       color: var(--main_text);
       &--second {
@@ -748,6 +779,15 @@ export default {
         font-size: 24px;
         font-weight: 700;
         color: var(--primary_button);
+      }
+    }
+    .bar-list {
+      color: var(--secondary_text);
+      &__value {
+        font-weight: bold;
+      }
+      &__value-text {
+        white-space: nowrap;
       }
     }
   }
