@@ -206,13 +206,13 @@ export default class WaterfallClass {
           .style('x', -1000)
           .style('overflow', 'inherit')
           .attr('font-size', '14')
-          .text(d.comment);
+          .html(d.comment);
 
         const elemText = this.svg.append('text')
           .style('x', -1000)
           .style('overflow', 'inherit')
           .attr('font-size', '14')
-          .text(d.comment);
+          .html(d.comment);
 
         const result = {
           height: elem.node().scrollHeight,
@@ -281,9 +281,21 @@ export default class WaterfallClass {
       .style('overflow', 'inherit')
       .attr('font-size', '14')
       .attr('text-anchor', 'bottom')
-      .text((d) => {
+      .html((d) => {
         const opts = this.options.barsOptions.find(({ title }) => (title === d.title));
-        return !opts?.hideComment ? d.comment : null;
+        if (opts?.hideComment) {
+          return '';
+        }
+        let color;
+        if (opts?.changeColor) {
+          color = opts.color;
+        } else if (d.isTotal) {
+          color = options.colorBarTotal;
+        } else {
+          color = d.value < 0 ? this.options.colorBarNegative : this.options.colorBarPositive;
+        }
+        return d.comment
+          .replace(/(\(\s?[-+]?[\d\s.,]+\s?\))/g, `<tspan style="color: ${color}">$1</tspan>`);
       });
 
     barGroup.filter((d) => d.comment).append('line')
