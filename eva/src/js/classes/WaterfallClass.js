@@ -394,6 +394,20 @@ export default class WaterfallClass {
         return barTitle;
       });
 
+    const insertLinebreaks = (t, d, width) => {
+      const el = d3.select(t);
+      const p = d3.select(t.parentNode);
+      const text = p.append('foreignObject')
+        .attr('y', 5)
+        .attr('x', -width / 2)
+        .attr('width', width)
+        .append('xhtml:p')
+        .attr('style', 'word-wrap: break-word; text-align:center;')
+        .html(d);
+      d3.select(text.node().parentNode).attr('height', text.node().offsetHeight)
+      el.remove();
+    };
+
     if (this.options.xLabelRotate) {
       this.xAxis
         .selectAll('text')
@@ -401,6 +415,12 @@ export default class WaterfallClass {
         .attr('dx', '-.8em')
         .attr('dy', '.15em')
         .attr('transform', 'rotate(-20)');
+    } else {
+      const bandwidth = this.x.bandwidth();
+      this.svg.selectAll('g.xAxis g text')
+        .each(function (d) {
+          insertLinebreaks(this, d, bandwidth * 1.3);
+        });
     }
   }
 
