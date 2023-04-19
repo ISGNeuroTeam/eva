@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added division of numbers into digits for visualization "risk-review"
 - Added an icon for visualization "risk-review"
 - Added "+\-" to numbers in text blocks for visualization "risk-review"
+- Added the ability to build multiple signatures from a data source on the "ConstructorSchemes"
 
 
 ### Changed
