@@ -115,12 +115,12 @@ export default {
         + '#### Дополнительные поля:\n'
         + '- ```isTotal``` - Отобразить столбак суммы, булевый\n'
         + '#### Пример данных:\n'
-        + '| title | value | isTotal |\n'
-        + '| :--- | :---: | ---: |\n'
-        + '| Total 1 | 182527 | True |\n'
-        + '| Cost of Revenue | -84732 | |\n'
-        + '| Operating Expenses | -56571 | |\n'
-        + '| Total 2 | | True |\n',
+        + '| title | value | isTotal | comment |\n'
+        + '| :--- | :---: | :---: | ---: |\n'
+        + '| Total 1 | 182527 | True | text |\n'
+        + '| Cost of Revenue | -84732 | | text html |\n'
+        + '| Operating Expenses | -56571 | | |\n'
+        + '| Total 2 | | True | |\n',
     },
   ],
   size: {
