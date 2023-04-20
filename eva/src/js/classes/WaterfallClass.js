@@ -186,6 +186,7 @@ export default class WaterfallClass {
         .map((val) => 0 - val.toFixed(0));
 
       if (this.innerVertOffset.join() !== '0,0' && rerender) {
+        this.innerVertOffset[1] += 10;
         this.createChart(false);
         this.innerVertOffset = [0, 0];
       }
@@ -194,7 +195,7 @@ export default class WaterfallClass {
 
   renderComments(barGroup) {
     const { options } = this;
-    const textVertOffset = 10;
+    const textVertOffset = 5;
     const textAreaLeftOffset = this.x.bandwidth() * 0.1;
     const bandwidth1 = 1.3;
     const bandwidth2 = 2.3;
@@ -205,14 +206,15 @@ export default class WaterfallClass {
           .attr('width', () => `${this.x.bandwidth() * (idx + 1 === dataWithComments.length ? bandwidth1 : bandwidth2)}px`)
           .style('x', -1000)
           .style('overflow', 'inherit')
+          .style('line-height', 1.3)
           .attr('font-size', '14')
-          .text(d.comment);
+          .html(d.comment);
 
         const elemText = this.svg.append('text')
           .style('x', -1000)
           .style('overflow', 'inherit')
           .attr('font-size', '14')
-          .text(d.comment);
+          .html(d.comment);
 
         const result = {
           height: elem.node().scrollHeight,
@@ -280,10 +282,23 @@ export default class WaterfallClass {
       .attr('height', (d, idx) => `${barCommentParams[idx].height}px`)
       .style('overflow', 'inherit')
       .attr('font-size', '14')
+      .style('line-height', 1.3)
       .attr('text-anchor', 'bottom')
-      .text((d) => {
+      .html((d) => {
         const opts = this.options.barsOptions.find(({ title }) => (title === d.title));
-        return !opts?.hideComment ? d.comment : null;
+        if (opts?.hideComment) {
+          return '';
+        }
+        let color;
+        if (opts?.changeColor) {
+          color = opts.color;
+        } else if (d.isTotal) {
+          color = options.colorBarTotal;
+        } else {
+          color = d.value < 0 ? this.options.colorBarNegative : this.options.colorBarPositive;
+        }
+        return d.comment
+          .replace(/(\(\s?[-+]?[\d\s.,]+\s?\))/g, `<tspan style="color: ${color}">$1</tspan>`);
       });
 
     barGroup.filter((d) => d.comment).append('line')
@@ -382,6 +397,20 @@ export default class WaterfallClass {
         return barTitle;
       });
 
+    const insertLinebreaks = (t, d, width) => {
+      const el = d3.select(t);
+      const p = d3.select(t.parentNode);
+      const text = p.append('foreignObject')
+        .attr('y', 5)
+        .attr('x', -width / 2)
+        .attr('width', width)
+        .append('xhtml:p')
+        .attr('style', 'word-wrap: break-word; text-align:center;')
+        .html(d);
+      d3.select(text.node().parentNode).attr('height', text.node().offsetHeight);
+      el.remove();
+    };
+
     if (this.options.xLabelRotate) {
       this.xAxis
         .selectAll('text')
@@ -389,6 +418,12 @@ export default class WaterfallClass {
         .attr('dx', '-.8em')
         .attr('dy', '.15em')
         .attr('transform', 'rotate(-20)');
+    } else {
+      const bandwidth = this.x.bandwidth();
+      this.svg.selectAll('g.xAxis g text')
+        .each(function () {
+          insertLinebreaks(this, this.textContent, bandwidth * 1.3);
+        });
     }
   }
 
