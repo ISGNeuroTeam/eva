@@ -958,9 +958,11 @@ export default {
     dataForBuildScheme(value) {
       if (this.isAlwaysUpdateScheme && value?.length > 0) {
         this.constructorSchemes.buildSchemeFromSearch(
-          value,
-          this.minimumLastSegmentLength,
-          this.minimumEdgeToEdgeDistance,
+          {
+            dataFrom: value,
+            minimumEdgeToEdgeDistance: this.minimumEdgeToEdgeDistance,
+            minimumLastSegmentLength: this.minimumLastSegmentLength,
+          },
         );
       }
     },
