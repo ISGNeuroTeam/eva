@@ -186,6 +186,7 @@ export default class WaterfallClass {
         .map((val) => 0 - val.toFixed(0));
 
       if (this.innerVertOffset.join() !== '0,0' && rerender) {
+        this.innerVertOffset[1] += 10;
         this.createChart(false);
         this.innerVertOffset = [0, 0];
       }
@@ -194,7 +195,7 @@ export default class WaterfallClass {
 
   renderComments(barGroup) {
     const { options } = this;
-    const textVertOffset = 10;
+    const textVertOffset = 5;
     const textAreaLeftOffset = this.x.bandwidth() * 0.1;
     const bandwidth1 = 1.3;
     const bandwidth2 = 2.3;
@@ -205,6 +206,7 @@ export default class WaterfallClass {
           .attr('width', () => `${this.x.bandwidth() * (idx + 1 === dataWithComments.length ? bandwidth1 : bandwidth2)}px`)
           .style('x', -1000)
           .style('overflow', 'inherit')
+          .style('line-height', 1.3)
           .attr('font-size', '14')
           .html(d.comment);
 
@@ -280,6 +282,7 @@ export default class WaterfallClass {
       .attr('height', (d, idx) => `${barCommentParams[idx].height}px`)
       .style('overflow', 'inherit')
       .attr('font-size', '14')
+      .style('line-height', 1.3)
       .attr('text-anchor', 'bottom')
       .html((d) => {
         const opts = this.options.barsOptions.find(({ title }) => (title === d.title));
@@ -418,8 +421,8 @@ export default class WaterfallClass {
     } else {
       const bandwidth = this.x.bandwidth();
       this.svg.selectAll('g.xAxis g text')
-        .each(function (d) {
-          insertLinebreaks(this, d, bandwidth * 1.3);
+        .each(function () {
+          insertLinebreaks(this, this.textContent, bandwidth * 1.3);
         });
     }
   }
