@@ -1,3 +1,17 @@
+# [1.129.0] - 2023-04-19
+
+### Added
+- Added user setting: number formatting
+- Added options: "leftTitle", "rightTitle", "leftValueColor", "rightValueColor", "primitivesLibrary" for visualization "risk-review"
+- Added text formatting for visualization "risk-review"
+- Added division of numbers into digits for visualization "risk-review"
+- Added an icon for visualization "risk-review"
+- Added "+\-" to numbers in text blocks for visualization "risk-review"
+
+### Fixed
+- Fixed indention for text blocks in case of absence of column header for visualization "risk-review".
+- Fixed the size of the "risk-review" visualization
+
 # [1.128.0] - 2023-04-13
 
 ### Added
