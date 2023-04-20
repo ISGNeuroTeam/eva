@@ -407,7 +407,7 @@ export default class WaterfallClass {
         .append('xhtml:p')
         .attr('style', 'word-wrap: break-word; text-align:center;')
         .html(d);
-      d3.select(text.node().parentNode).attr('height', text.node().offsetHeight)
+      d3.select(text.node().parentNode).attr('height', text.node().offsetHeight);
       el.remove();
     };
 
