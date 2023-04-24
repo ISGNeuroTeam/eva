@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Waterfall: highlight numbers in comments
 - Waterfall: text wrapping on the x-axis
 - Added the ability to build multiple signatures from a data source on the "ConstructorSchemes"
+- Added auto-centered Map
+- Added centered Map by token
+- Added search by objects Map
 
 ### Changed
 
