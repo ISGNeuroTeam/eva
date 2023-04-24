@@ -1970,6 +1970,7 @@ export default new Vuex.Store({
       const lastEl = state[id]?.tabList?.find(
         (el) => el.id.toString() === event.event.tab,
       ) || 1;
+      await dispatch('saveDashToStore', id);
       if (!options?.openNewScreen) {
         if (!isTabMode) {
           event.route.push(`/dashboards/${id}`);
