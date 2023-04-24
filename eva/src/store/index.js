@@ -1876,8 +1876,8 @@ export default new Vuex.Store({
           itemValue = itemValue.replace(/\$/g, '');
           return {
             ...acc,
-            [k]: tockens.find((tockenDeep) => tockenDeep.name === itemValue)
-              .value,
+            [k]: tockens.find((tockenDeep) => tockenDeep?.name === itemValue)
+              ?.value,
           };
         }
         return {

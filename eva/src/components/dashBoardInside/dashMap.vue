@@ -30,7 +30,9 @@
           :map="map"
           :id-dash-from="idDashFrom"
           :id-element="idFrom"
+          :data-rest-from="dataRestFrom"
           @openSettingsModal="modalSettingsValue = true"
+          @searchUpdate="searchUpdate"
         />
       </div>
       <dash-map-user-settings-new
@@ -223,6 +225,13 @@ export default {
       }
       return OSM;
     },
+    getTargetElement() {
+      if (this.dashFromStore.options?.tokenByCenteredElement) {
+        const tokenName = this.dashFromStore.options?.tokenByCenteredElement;
+        return this.getTokens.find((token) => token.name === tokenName)?.value;
+      }
+      return '';
+    },
   },
   watch: {
     error(val) {
@@ -322,6 +331,15 @@ export default {
         this.updateOptions({ selectedLayer: val.tile || null });
       }
     },
+    getTargetElement(value) {
+      if (this.map) {
+        if (value) {
+          this.map.goToElement(this.dataRestFrom, value);
+        } else {
+          this.centerMap(this.dataRestFrom);
+        }
+      }
+    },
   },
   mounted() {
     if (this.$refs.map) {
@@ -407,7 +425,9 @@ export default {
     },
     updateTokenOnClickAction(value) {
       if (this.getTokens?.length) {
-        const filteredTokenKeys = structuredClone(this.getTokens).filter((token) => token.action === 'click');
+        const filteredTokenKeys = structuredClone(this.getTokens)
+          .filter((token) => token.action === 'click' && token.elem === this.idFrom);
+
         filteredTokenKeys.forEach((token) => {
           this.$store.commit('setTocken', {
             token,
@@ -505,16 +525,28 @@ export default {
               },
             });
             if (this.map) {
-              if (this.options.initialPoint) {
-                this.map.setView(
-                  this.getCurrentPosition,
-                  this.options.zoomLevel,
-                );
-              } else this.map.setView(this.map.startingPoint, this.options.zoomLevel);
+              this.centerMap(dataRest);
             }
           }
         }
       });
+    },
+    centerMap(dataRest, isAutoCenter = false) {
+      if (this.options.isAutoCenter || isAutoCenter) {
+        const centerPoint = MapClass
+          .getCenterPointFromData(dataRest.filter((el) => el.coordinates));
+        if (centerPoint) {
+          this.map.setView(
+            centerPoint,
+            this.options.zoomLevel,
+          );
+        }
+      } else if (this.options.initialPoint && !this.options.isAutoCenter) {
+        this.map.setView(
+          this.getCurrentPosition,
+          this.options.zoomLevel,
+        );
+      } else this.map.setView(this.map.startingPoint, this.options.zoomLevel);
     },
     deleteTitleByAttribute() {
       const leafletControlZoomOut = this.$refs.map.querySelector(
@@ -687,6 +719,17 @@ export default {
         );
       }
       return result;
+    },
+    searchUpdate(value) {
+      if (this.map) {
+        if (value) {
+          this.map.goToElement(this.dataRestFrom, value).then((response) => {
+            this.map.selectElement(response);
+          });
+        } else {
+          this.centerMap(this.dataRestFrom, true);
+        }
+      }
     },
   },
 };

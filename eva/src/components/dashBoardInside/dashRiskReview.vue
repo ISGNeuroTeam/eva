@@ -4,6 +4,8 @@
     :disabled="!fullScreenMode"
   >
     <div
+      v-if="toggleFullScreen"
+      ref="riskReview"
       class="FGKRiskReview"
       :style="{
         ...customStyle,
@@ -269,6 +271,7 @@ export default {
     chartPaddingOuter: 0,
     /** Chart user config data. */
     iconHelp: mdiHelp,
+    toggleFullScreen: true,
   }),
   computed: {
     titlesContainerStyle() {
@@ -399,17 +402,25 @@ export default {
         if (!this.fullScreenMode) {
           this.$nextTick(() => {
             this.$nextTick(() => {
-              this.render();
+              setTimeout(() => {
+                this.render();
+              }, 1000);
             });
           });
         }
       },
     },
     fullScreenMode(val) {
+      this.toggleFullScreen = false;
+      setTimeout(() => {
+        this.toggleFullScreen = true;
+      }, 200);
       if (val) {
         this.$nextTick(() => {
           this.$nextTick(() => {
-            this.render();
+            setTimeout(() => {
+              this.render();
+            }, 5000);
           });
         });
       }
@@ -432,6 +443,7 @@ export default {
         id: this.idFrom,
       });
     },
+
     updateActionCapture(updatedData) {
       if (updatedData?.length > 0) {
         const fields = [];
@@ -446,6 +458,7 @@ export default {
         this.setActions();
       }
     },
+
     setTitleColName(name = '') {
       this.titleColName = name;
       this.render();
@@ -762,6 +775,7 @@ export default {
       });
       return result;
     },
+
     toDivide(number) {
       return number.toLocaleString()
         .replace(',', ' ');
