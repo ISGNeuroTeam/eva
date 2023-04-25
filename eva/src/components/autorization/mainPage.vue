@@ -5,6 +5,18 @@
   >
     <header-top :inside="false" />
     <v-main>
+      <v-navigation-drawer
+        v-model="openTree"
+        absolute
+        bottom
+        temporary
+        :style="{ color: theme.$main_text, background: theme.$main_bg }"
+        class="nav-panel-drawer"
+      >
+        <navigation-tree-view
+          class="navigation-tree"
+        />
+      </v-navigation-drawer>
       <v-container class="main-container container-product">
         <div class="product-block">
           <v-card
@@ -66,13 +78,26 @@
 </template>
 
 <script>
+import NavigationTreeView from '../navigationTreeView.vue';
+
 export default {
+  components: {
+    NavigationTreeView,
+  },
   data() {
     return {};
   },
   computed: {
     theme() {
       return this.$store.getters.getTheme;
+    },
+    openTree: {
+      get() {
+        return this.$store.getters['app/isOpenTree'];
+      },
+      set(val) {
+        return this.$store.commit('app/setOpenTree', val);
+      },
     },
   },
   mounted() {

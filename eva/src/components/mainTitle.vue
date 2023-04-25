@@ -924,18 +924,3 @@ export default {
 <style lang="scss">
 @import '../sass/mainTitle.sass';
 </style>
-
-<style lang="sass" scoped>
-.nav-panel-drawer
-  position: fixed
-  z-index: 98
-  width: 320px !important
-  height: auto !important
-  top: 50px !important
-  bottom: 0 !important
-  max-height: 100%
-  min-width: 320px
-
-  .navigation-tree
-    margin-bottom: 16px
-</style>
