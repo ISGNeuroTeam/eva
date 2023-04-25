@@ -7,6 +7,18 @@
       inside
       @permissions="setPermissions"
     />
+    <v-navigation-drawer
+      v-model="openTree"
+      absolute
+      bottom
+      temporary
+      :style="{ color: theme.$main_text, background: theme.$main_bg }"
+      class="nav-panel-drawer"
+    >
+      <navigation-tree-view
+        class="navigation-tree"
+      />
+    </v-navigation-drawer>
     <v-content>
       <v-container class="main-container">
         <v-card class="card-aut-table">
@@ -152,8 +164,12 @@
 
 <script>
 import { mdiPencil, mdiPlus, mdiTrashCanOutline } from '@mdi/js';
+import NavigationTreeView from '../navigationTreeView.vue';
 
 export default {
+  components: {
+    NavigationTreeView,
+  },
   data() {
     return {
       user: {},
@@ -191,6 +207,14 @@ export default {
     },
     theme() {
       return this.$store.getters.getTheme;
+    },
+    openTree: {
+      get() {
+        return this.$store.getters['app/isOpenTree'];
+      },
+      set(val) {
+        return this.$store.commit('app/setOpenTree', val);
+      },
     },
   },
   mounted() {
