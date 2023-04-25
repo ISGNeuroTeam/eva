@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the ability to build multiple signatures from a data source on the "ConstructorSchemes"
 
 ### Changed
+- Multiselect: added setting "variant search"
 
 ### Fixed
 - Heatmap: events don't pass token values
