@@ -60,6 +60,7 @@
             :items="dataRestDeep"
             solo
             flat
+            :filter="onFilterItems"
             :multiple="multiple"
             :color="theme.$accent_ui_color"
             :style="{ color: theme.$main_text, fill: theme.$main_text }"
@@ -413,6 +414,14 @@ export default {
     }
   },
   methods: {
+    onFilterItems(item, queryText, itemText) {
+      const { searchMode = 'contains' } = this.getOptions; // contains, begin
+      const foundIdx = itemText.toLocaleLowerCase().indexOf(queryText.toLocaleLowerCase());
+      if (searchMode === 'begin') {
+        return foundIdx === 0;
+      }
+      return foundIdx > -1;
+    },
     updateActions(dataReady) {
       let data = [];
       if (dataReady.length > 0) {
