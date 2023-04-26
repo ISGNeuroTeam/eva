@@ -12,9 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Waterfall: highlight numbers in comments
 - Waterfall: text wrapping on the x-axis
 - Added the ability to build multiple signatures from a data source on the "ConstructorSchemes"
+- Multiselect: added setting "variant search"
+- Multiselect: if after entering the search in the multiline there is one option, then select it by entry
 
 ### Changed
-- Multiselect: added setting "variant search"
 
 ### Fixed
 - Heatmap: events don't pass token values
