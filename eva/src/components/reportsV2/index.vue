@@ -11,6 +11,18 @@
       <notifications style="z-index: 1" />
     </div>
     <v-main>
+      <v-navigation-drawer
+        v-model="openTree"
+        absolute
+        bottom
+        temporary
+        :style="{ color: theme.$main_text, background: theme.$main_bg }"
+        class="nav-panel-drawer"
+      >
+        <navigation-tree-view
+          class="navigation-tree"
+        />
+      </v-navigation-drawer>
       <div class="main-container container-report">
         <div
           ref="report"
@@ -116,6 +128,7 @@ import statistic from './statistic.vue';
 import visualisation from './visualisation.vue';
 import Interesting from './interesting.vue';
 import Notifications from '@/components/notifications';
+import NavigationTreeView from '../navigationTreeView.vue';
 
 export default {
   components: {
@@ -128,6 +141,7 @@ export default {
     download,
     report,
     Notifications,
+    NavigationTreeView,
   },
   data() {
     return {
@@ -215,6 +229,14 @@ export default {
       });
       this.setActiveElem('table');
       return this.$store.getters.getReportElement;
+    },
+    openTree: {
+      get() {
+        return this.$store.getters['app/isOpenTree'];
+      },
+      set(val) {
+        return this.$store.commit('app/setOpenTree', val);
+      },
     },
   },
   watch: {
