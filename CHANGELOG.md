@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Waterfall: text wrapping on the x-axis
 - Added the ability to build multiple signatures from a data source on the "ConstructorSchemes"
 - Added tree icon in header
+- Save theme in user settings
 
 ### Changed
 
