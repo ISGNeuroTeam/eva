@@ -56,6 +56,7 @@
           :class="{ select_show: select_show }"
         >
           <v-autocomplete
+            ref="multiselect"
             v-model="elemDeep[String(multiple)]"
             :items="dataRestDeep"
             solo
@@ -70,6 +71,7 @@
             @change="setTocken('change')"
             @click="setTocken('click')"
             @mouseover="setTocken('mouseover')"
+            @keydown.enter="onPressEnter"
           >
             <template v-slot:item="{ item, attrs, on }">
               <v-list-item
@@ -421,6 +423,16 @@ export default {
         return foundIdx === 0;
       }
       return foundIdx > -1;
+    },
+    // выбор из списка по enter если отфильтрован один вариант
+    onPressEnter() {
+      const {
+        isMenuActive,
+        filteredItems,
+      } = this.$refs.multiselect;
+      if (isMenuActive && filteredItems.length === 1) {
+        this.$refs.multiselect.selectItem(filteredItems[0]);
+      }
     },
     updateActions(dataReady) {
       let data = [];
