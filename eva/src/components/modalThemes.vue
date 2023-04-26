@@ -531,6 +531,7 @@ export default {
   },
   watch: {
     async select(selectedTheme) {
+      console.log({selectedTheme})
       this.$refs.modalPersistent.focusOnModal();
       if (selectedTheme !== 'dark' && selectedTheme !== 'light') {
         const response = await fetch(`/api/theme?themeName=${selectedTheme}`);
