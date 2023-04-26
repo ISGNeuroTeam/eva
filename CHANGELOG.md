@@ -13,11 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Waterfall: text wrapping on the x-axis
 - Added the ability to build multiple signatures from a data source on the "ConstructorSchemes"
 - Added tree icon in header
+- Added auto-centered Map
+- Added centered Map by token
+- Added search by objects Map
 
 ### Changed
 
 ### Fixed
 - Heatmap: events don't pass token values
+- Map: fixed incorrect update token with action "click"
 
 ## [1.129.0]
 
