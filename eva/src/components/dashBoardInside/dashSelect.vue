@@ -94,7 +94,7 @@
               </v-list-item>
             </template>
             <template
-              v-if="multiple"
+              v-if="multiple && ($refs.multiselect && !$refs.multiselect.lazySearch)"
               v-slot:prepend-item
             >
               <v-list-item
@@ -366,6 +366,14 @@ export default {
         this.setTocken();
       }
     },
+    'elemDeep.true': {
+      handler() {
+        this.updateSelectAllItem();
+      },
+    },
+    dataRestDeep() {
+      this.updateSelectAllItem();
+    },
     // Загрузился ИД для дефотла
     changedDataDefaultLoading(val, oldVal) {
       const {
@@ -407,15 +415,21 @@ export default {
       }
       if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
         this.elemDeep[String(this.multiple)] = selected.elemDeep;
-        this.chooseText = 'Очистить Все';
-        this.chooseIcon = 'eva-basic_checkbox_checked';
-      } else {
-        this.chooseText = 'Выбрать все';
-        this.chooseIcon = 'eva-basic_checkbox';
       }
     }
   },
   methods: {
+    updateSelectAllItem() {
+      if (this.multiple) {
+        if (this.elemDeep.true.length !== this.dataRestDeep.length) {
+          this.chooseText = 'Выбрать все';
+          this.chooseIcon = 'eva-basic_checkbox';
+        } else {
+          this.chooseText = 'Очистить все';
+          this.chooseIcon = 'eva-basic_checkbox_checked';
+        }
+      }
+    },
     onFilterItems(item, queryText, itemText) {
       const { searchMode = 'contains' } = this.getOptions; // contains, begin
       const foundIdx = itemText.toLocaleLowerCase().indexOf(queryText.toLocaleLowerCase());
@@ -484,7 +498,7 @@ export default {
       ) {
         this.openSelect();
       }
-      this.chooseText = 'Очистить Все';
+      this.chooseText = 'Очистить все';
       this.selectItems();
     },
     openSelect() {
@@ -494,12 +508,8 @@ export default {
     },
     selectItems() {
       if (this.chooseText === 'Выбрать все') {
-        this.chooseText = 'Очистить Все';
-        this.chooseIcon = 'eva-basic_checkbox_checked';
         this.elemDeep.true = [...this.topArray, ...Array.from(new Set(this.bottomArray))];
       } else {
-        this.chooseText = 'Выбрать все';
-        this.chooseIcon = 'eva-basic_checkbox';
         this.elemDeep.true = [];
       }
       this.setTocken();
@@ -514,20 +524,9 @@ export default {
           this.elemDeep.false = '';
         }
       }
-      let data = [...[], ...res];
-      data = data.filter((elem) => !selected.includes(elem));
-
-      function sorted(sortData) {
-        sortData = Number(sortData[0]) ? sortData.sort((a, b) => a - b) : sortData.sort();
-        return sortData;
-      }
-
-      this.topArray = sorted([...selected]);
-      this.bottomArray = sorted([...data]);
-
-      data = [...this.topArray, ...this.bottomArray];
-
-      return data;
+      this.topArray = selected;
+      this.bottomArray = res.filter((elem) => !selected.includes(elem));
+      return [...this.topArray, ...this.bottomArray];
     },
     setTocken(actionType = 'change') {
       if (this.loading !== false) {

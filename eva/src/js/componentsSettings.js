@@ -997,7 +997,7 @@ export default {
             value: 'contains',
           },
           {
-            text: 'Вхождение вначале строки',
+            text: 'Вхождение в начале строки',
             value: 'begin',
           },
         ];
