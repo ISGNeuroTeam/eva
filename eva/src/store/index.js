@@ -1138,6 +1138,9 @@ export default new Vuex.Store({
   actions: {
     saveDashToStore({ state, commit }, idDash) {
       return new Promise((resolve) => {
+        if (state.savingDashQueue === undefined) {
+          state.savingDashQueue = [];
+        }
         if (state.savingDashQueue.includes(idDash)) {
           resolve();
         } else {
@@ -1157,7 +1160,10 @@ export default new Vuex.Store({
       });
     },
     loadDashFromStore({ state, commit }, idDash) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
+        if (state.readingDashQueue === undefined) {
+          state.readingDashQueue = [];
+        }
         if (state.readingDashQueue.includes(idDash)) {
           resolve('already reading');
         } else {
@@ -1964,6 +1970,7 @@ export default new Vuex.Store({
       const lastEl = state[id]?.tabList?.find(
         (el) => el.id.toString() === event.event.tab,
       ) || 1;
+      await dispatch('saveDashToStore', id);
       if (!options?.openNewScreen) {
         if (!isTabMode) {
           event.route.push(`/dashboards/${id}`);

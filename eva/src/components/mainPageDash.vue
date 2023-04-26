@@ -2,6 +2,18 @@
   <v-app :style="{ background: theme.$secondary_bg }">
     <header-top @permissions="setPermissions" />
     <v-main>
+      <v-navigation-drawer
+        v-model="openTree"
+        absolute
+        bottom
+        temporary
+        :style="{ color: theme.$main_text, background: theme.$main_bg }"
+        class="nav-panel-drawer"
+      >
+        <navigation-tree-view
+          class="navigation-tree"
+        />
+      </v-navigation-drawer>
       <notifications style="z-index: 99" />
       <v-container class="main-container container-dash">
         <v-card
@@ -384,6 +396,14 @@ export default {
   computed: {
     theme() {
       return this.$store.getters.getTheme;
+    },
+    openTree: {
+      get() {
+        return this.$store.getters['app/isOpenTree'];
+      },
+      set(val) {
+        return this.$store.commit('app/setOpenTree', val);
+      },
     },
     tabsOrder: {
       get() {
