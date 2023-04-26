@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Heatmap: events don't pass token values
+- RiskReview: Fixed incorrect resizing when switching between "full screen", "modal" and "default mode"
 
 ## [1.129.0]
 
