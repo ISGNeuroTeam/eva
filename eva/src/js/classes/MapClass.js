@@ -259,11 +259,7 @@ class MapClass {
   }
 
   addLine(element, lib, pipelineData, callback) {
-    const latlngs = [];
-    element.coordinates.split(';').forEach((point) => {
-      const p = point.split(':');
-      latlngs[p[0] - 1] = p[1].split(',');
-    });
+    const latlngs = MapClass.getLatlngsLine(element);
     const line = L.polyline(latlngs, {
       color: lib.color,
       weight: lib.width,
@@ -301,19 +297,12 @@ class MapClass {
   }
 
   addPolygon(element, lib, callback) {
-    const latlngs = [];
-
-    element.coordinates.split(';').forEach((point) => {
-      const p = point.split(':');
-      if (p[1]) {
-        const p2 = p[1].split(',');
-        latlngs.push(p2);
-      }
-    });
+    const latlngs = MapClass.getLatlngsPolygon(element);
     const line = L.polygon(latlngs, {
       color: lib.color,
       weight: lib.width,
       opacity: lib.opacity,
+      id: element.ID,
     });
     const tooltip = L.tooltip({
       permanent: false,
@@ -659,6 +648,127 @@ class MapClass {
   scrollWheelZoom() {
     // eslint-disable-next-line no-underscore-dangle
     this.map.scrollWheelZoom._enabled = false;
+  }
+
+  // eslint-disable-next-line consistent-return
+  static getCenterPointFromData(dataRestFrom) {
+    try {
+      const result = [];
+      const elementTypes = MapClass.checkElementsType(dataRestFrom);
+      let markersCount = 0;
+      const sumPoints = dataRestFrom.reduce((acc, cur) => {
+        let x;
+        let y;
+        if (elementTypes.point && cur?.geometry_type?.toLowerCase() === 'point') {
+          markersCount += 1;
+          [x, y] = cur.coordinates.split(':')[1].split(',');
+        } else if (elementTypes.polygon && cur?.geometry_type?.toLowerCase() === 'polygon') {
+          markersCount += 1;
+          const latlngs = MapClass.getLatlngsPolygon(cur);
+          [x, y] = MapClass.getCentralLatlngs(latlngs);
+        } else if (elementTypes.line && cur?.geometry_type?.toLowerCase() === 'line') {
+          markersCount += 1;
+          const latlngs = MapClass.getLatlngsLine(cur);
+          [x, y] = MapClass.getCentralLatlngs(latlngs);
+        }
+        acc.x += Number(x);
+        acc.y += Number(y);
+        return acc;
+      }, {
+        x: 0,
+        y: 0,
+      });
+      result[0] = sumPoints.x / markersCount;
+      result[1] = sumPoints.y / markersCount;
+      return result;
+    } catch (e) {
+      console.error(new Error(e));
+    }
+  }
+
+  static checkElementsType(dataRestFrom) {
+    const elementTypes = {
+      point: false,
+      polygon: false,
+      line: false,
+    };
+    dataRestFrom.forEach((el) => {
+      if (el?.geometry_type?.toLowerCase() === 'point') elementTypes.point = true;
+      if (el?.geometry_type?.toLowerCase() === 'polygon') elementTypes.polygon = true;
+      if (el?.geometry_type?.toLowerCase() === 'line') elementTypes.line = true;
+    });
+    return elementTypes;
+  }
+
+  goToElement(dataFrom, elementId, zoomLevel) {
+    return new Promise((resolve, reject) => {
+      const findElement = dataFrom.find((element) => `${element.ID}` === `${elementId}`);
+      if (findElement) {
+        let coordinates = [];
+        if (findElement?.geometry_type?.toLowerCase() === 'point') {
+          const [x, y] = findElement.coordinates.split(':')[1].split(',');
+          coordinates = [Number(x), Number(y)];
+        } else if (findElement?.geometry_type?.toLowerCase() === 'polygon') {
+          const latlngs = MapClass.getLatlngsPolygon(findElement);
+          coordinates = MapClass.getCentralLatlngs(latlngs);
+        } else if (findElement?.geometry_type?.toLowerCase() === 'line') {
+          const latlngs = MapClass.getLatlngsLine(findElement);
+          coordinates = MapClass.getCentralLatlngs(latlngs);
+        }
+        if (coordinates[0] > 0 && coordinates[1] > 0) {
+          this.setView(coordinates, zoomLevel);
+          resolve(findElement, coordinates, zoomLevel);
+        } else {
+          console.log(findElement);
+          reject(new Error(`Incorrect coordinates in element ID:${elementId}`));
+        }
+      }
+    });
+  }
+
+  selectElement(element) {
+    this.map.eachLayer((layer) => {
+      layer.closeTooltip();
+      if (layer.options.id === element.ID) {
+        setTimeout(() => {
+          layer.openTooltip();
+        }, 250);
+      }
+    });
+  }
+
+  static getLatlngsPolygon(element) {
+    const latlngs = [];
+
+    element.coordinates.split(';').forEach((point) => {
+      const p = point.split(':');
+      if (p[1]) {
+        const p2 = p[1].split(',');
+        latlngs.push(p2);
+      }
+    });
+    return latlngs;
+  }
+
+  static getLatlngsLine(element) {
+    const latlngs = [];
+    element.coordinates.split(';').forEach((point) => {
+      const p = point.split(':');
+      latlngs[p[0] - 1] = p[1].split(',');
+    });
+    return latlngs;
+  }
+
+  static getCentralLatlngs(coordinates) {
+    const sumPoints = coordinates.reduce((acc, cur) => {
+      acc.x += Number(cur[0]);
+      acc.y += Number(cur[1]);
+      return acc;
+    }, {
+      x: 0,
+      y: 0,
+    });
+    return [sumPoints.x / coordinates.length, sumPoints.y / coordinates.length];
   }
 }
 
