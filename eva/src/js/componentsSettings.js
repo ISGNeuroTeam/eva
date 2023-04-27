@@ -115,12 +115,12 @@ export default {
         + '#### Дополнительные поля:\n'
         + '- ```isTotal``` - Отобразить столбак суммы, булевый\n'
         + '#### Пример данных:\n'
-        + '| title | value | isTotal |\n'
-        + '| :--- | :---: | ---: |\n'
-        + '| Total 1 | 182527 | True |\n'
-        + '| Cost of Revenue | -84732 | |\n'
-        + '| Operating Expenses | -56571 | |\n'
-        + '| Total 2 | | True |\n',
+        + '| title | value | isTotal | comment |\n'
+        + '| :--- | :---: | :---: | ---: |\n'
+        + '| Total 1 | 182527 | True | text |\n'
+        + '| Cost of Revenue | -84732 | | text html |\n'
+        + '| Operating Expenses | -56571 | | |\n'
+        + '| Total 2 | | True | |\n',
     },
   ],
   size: {
@@ -316,6 +316,7 @@ export default {
       'defaultSourceDataField',
       'defaultSourceDataUpdates',
       'resetValuesWhichAreNot',
+      'searchMode',
     ],
     picker: [
       'showLastTimeBlock',
@@ -383,6 +384,7 @@ export default {
     bush: [],
     map: [
       'osmserver',
+      'tokenByCenteredElement',
       'primitives',
       'primitivesLibrary',
     ],
@@ -667,6 +669,18 @@ export default {
       description:
         'Сервер для набора tile Пример:\nhttps://tile.openstreetmap.org/{z}/{x}/{y}.png',
       elem: 'text-field',
+    },
+    {
+      option: 'tokenByCenteredElement',
+      description: 'Элемент на который нужно центрировать карту',
+      elem: 'select',
+      items() {
+        if (this.$store.state[this.idDash]?.tockens?.length > 0) {
+          const tokens = structuredClone(this.$store.state[this.idDash].tockens);
+          return tokens.map((el) => el.name);
+        }
+        return [];
+      },
     },
 
     // datepicker
@@ -983,6 +997,24 @@ export default {
       description: 'Сбросить значения, если источник данных их не содержит',
       elem: 'switch',
       default: false,
+    },
+    {
+      option: 'searchMode',
+      description: 'Режим поиска в списке',
+      elem: 'select',
+      default: 'contains',
+      items() {
+        return [
+          {
+            text: 'По вхождению',
+            value: 'contains',
+          },
+          {
+            text: 'Вхождение в начале строки',
+            value: 'begin',
+          },
+        ];
+      },
     },
 
     // dashMap, dashPieChart

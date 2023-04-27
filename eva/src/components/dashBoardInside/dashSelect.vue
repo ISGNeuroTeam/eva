@@ -56,25 +56,28 @@
           :class="{ select_show: select_show }"
         >
           <v-autocomplete
+            ref="multiselect"
             v-model="elemDeep[String(multiple)]"
             :items="dataRestDeep"
             solo
             flat
+            :filter="onFilterItems"
             :multiple="multiple"
             :color="theme.$accent_ui_color"
             :style="{ color: theme.$main_text, fill: theme.$main_text }"
             hide-details
             class="select theme--dark"
             label="Значение"
-            @change="setTocken('change')"
-            @click="setTocken('click')"
-            @mouseover="setTocken('mouseover')"
+            @change="setTockenDelay('change')"
+            @click="setTockenDelay('click')"
+            @mouseover="setTockenDelay('mouseover')"
+            @keydown.enter="onPressEnter"
           >
             <template v-slot:item="{ item, attrs, on }">
               <v-list-item
                 ripple
                 v-on="on"
-                @click="setTocken('click')"
+                @click="setTockenDelay('click')"
               >
                 <v-list-item-action v-if="multiple">
                   <v-icon :color="theme.$main_text">
@@ -91,7 +94,7 @@
               </v-list-item>
             </template>
             <template
-              v-if="multiple"
+              v-if="multiple && ($refs.multiselect && !$refs.multiselect.lazySearch)"
               v-slot:prepend-item
             >
               <v-list-item
@@ -363,6 +366,14 @@ export default {
         this.setTocken();
       }
     },
+    'elemDeep.true': {
+      handler() {
+        this.updateSelectAllItem();
+      },
+    },
+    dataRestDeep() {
+      this.updateSelectAllItem();
+    },
     // Загрузился ИД для дефотла
     changedDataDefaultLoading(val, oldVal) {
       const {
@@ -404,15 +415,39 @@ export default {
       }
       if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
         this.elemDeep[String(this.multiple)] = selected.elemDeep;
-        this.chooseText = 'Очистить Все';
-        this.chooseIcon = 'eva-basic_checkbox_checked';
-      } else {
-        this.chooseText = 'Выбрать все';
-        this.chooseIcon = 'eva-basic_checkbox';
       }
     }
   },
   methods: {
+    updateSelectAllItem() {
+      if (this.multiple) {
+        if (this.elemDeep.true.length !== this.dataRestDeep.length) {
+          this.chooseText = 'Выбрать все';
+          this.chooseIcon = 'eva-basic_checkbox';
+        } else {
+          this.chooseText = 'Очистить все';
+          this.chooseIcon = 'eva-basic_checkbox_checked';
+        }
+      }
+    },
+    onFilterItems(item, queryText, itemText) {
+      const { searchMode = 'contains' } = this.getOptions; // contains, begin
+      const foundIdx = itemText.toLocaleLowerCase().indexOf(queryText.toLocaleLowerCase());
+      if (searchMode === 'begin') {
+        return foundIdx === 0;
+      }
+      return foundIdx > -1;
+    },
+    // выбор из списка по enter если отфильтрован один вариант
+    onPressEnter() {
+      const {
+        isMenuActive,
+        filteredItems,
+      } = this.$refs.multiselect;
+      if (isMenuActive && filteredItems.length === 1) {
+        this.$refs.multiselect.selectItem(filteredItems[0]);
+      }
+    },
     updateActions(dataReady) {
       let data = [];
       if (dataReady.length > 0) {
@@ -463,7 +498,7 @@ export default {
       ) {
         this.openSelect();
       }
-      this.chooseText = 'Очистить Все';
+      this.chooseText = 'Очистить все';
       this.selectItems();
     },
     openSelect() {
@@ -473,15 +508,11 @@ export default {
     },
     selectItems() {
       if (this.chooseText === 'Выбрать все') {
-        this.chooseText = 'Очистить Все';
-        this.chooseIcon = 'eva-basic_checkbox_checked';
         this.elemDeep.true = [...this.topArray, ...Array.from(new Set(this.bottomArray))];
       } else {
-        this.chooseText = 'Выбрать все';
-        this.chooseIcon = 'eva-basic_checkbox';
         this.elemDeep.true = [];
       }
-      this.setTocken();
+      this.setTockenDelay();
     },
     filterSelect(res, selected) {
       if (this.getOptions?.resetValuesWhichAreNot) {
@@ -493,20 +524,20 @@ export default {
           this.elemDeep.false = '';
         }
       }
-      let data = [...[], ...res];
-      data = data.filter((elem) => !selected.includes(elem));
-
-      function sorted(sortData) {
-        sortData = Number(sortData[0]) ? sortData.sort((a, b) => a - b) : sortData.sort();
-        return sortData;
+      this.topArray = selected;
+      this.bottomArray = res.filter((elem) => !selected.includes(elem));
+      return [...this.topArray, ...this.bottomArray];
+    },
+    setTockenDelay(actionType = 'change') {
+      const toKey = `_timeout_${actionType}`;
+      if (this[toKey]) {
+        clearTimeout(this[toKey]);
+        this[toKey] = null;
       }
-
-      this.topArray = sorted([...selected]);
-      this.bottomArray = sorted([...data]);
-
-      data = [...this.topArray, ...this.bottomArray];
-
-      return data;
+      this[toKey] = setTimeout(() => {
+        this.setTocken(actionType);
+        this[toKey] = null;
+      }, 200);
     },
     setTocken(actionType = 'change') {
       if (this.loading !== false) {

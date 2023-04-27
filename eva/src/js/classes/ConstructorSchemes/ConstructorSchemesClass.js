@@ -668,6 +668,7 @@ class ConstructorSchemesClass {
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this,default-param-last
   async exportGraphToJSON(schemeId = 'scheme', savedGraphObject) {
     return new Promise((resolve) => {
       const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(savedGraphObject))}`;
@@ -2245,7 +2246,6 @@ class ConstructorSchemesClass {
         .create(PortSide[edge.sourceNode.tag?.fromOtl?.source_port_constraint || 'ALL'], false));
     const edgeRouter = new EdgeRouter();
     // чтобы узлы не сливались
-    // TODO:Пока установлено временное значение, в дальнейшем вынести в настройки визуализации
     edgeRouter.defaultEdgeLayoutDescriptor
       .minimumEdgeToEdgeDistance = Number(minimumEdgeToEdgeDistance);
     edgeRouter.defaultEdgeLayoutDescriptor
@@ -2262,9 +2262,11 @@ class ConstructorSchemesClass {
   }
 
   buildSchemeFromSearch(
-    dataFrom,
-    minimumEdgeToEdgeDistance = 10,
-    minimumLastSegmentLength = 30,
+    {
+      dataFrom,
+      minimumEdgeToEdgeDistance = 10,
+      minimumLastSegmentLength = 30,
+    },
   ) {
     const descriptionNodeStyles = {
       tag: {
@@ -2276,7 +2278,7 @@ class ConstructorSchemesClass {
         borderType: 'solid',
         borderSize: 3,
         borderDashed: false,
-        fontSize: 30,
+        fontSize: 24,
         borderColor: Utils.generateColor(Color.from('#FFFFFF')),
         bgColor: Utils.generateColor(Color.from('rgba(60, 59, 69, 1)')),
         textColor: Utils.generateColor(Color.from('#FFFFFF')),
@@ -2298,19 +2300,23 @@ class ConstructorSchemesClass {
       defaultDescriptionStyles: descriptionNodeStyles,
     });
     generateElementFromSearch.generate().then((response) => {
-      const elementCreator = new ElementCreator({
-        graph: this.graphComponent.graph,
-        elements: response,
-      });
-      elementCreator.buildGraph().then(() => {
-        this.enableEdgeRouter({
-          minimumEdgeToEdgeDistance,
-          minimumLastSegmentLength,
+      if (response?.length > 0) {
+        const elementCreator = new ElementCreator({
+          graph: this.graphComponent.graph,
+          elements: response,
         });
-        this.fitGraphContent();
-        this.setDefaultElementsOrder();
-        this.saveAnObject();
-      });
+        elementCreator.buildGraph().then(() => {
+          this.enableEdgeRouter({
+            minimumEdgeToEdgeDistance,
+            minimumLastSegmentLength,
+          });
+          this.fitGraphContent();
+          this.setDefaultElementsOrder();
+          this.saveAnObject();
+        });
+      } else {
+        this.graphComponent.graph.clear();
+      }
     }).catch((e) => {
       console.error(e);
     });
