@@ -4,8 +4,6 @@
     :disabled="!fullScreenMode"
   >
     <div
-      v-if="toggleFullScreen"
-      ref="riskReview"
       class="FGKRiskReview"
       :style="{
         ...customStyle,
@@ -210,7 +208,6 @@
 <script>
 import * as d3 from 'd3';
 import { mdiHelp } from '@mdi/js';
-import defaultBarParts from '../../js/defaultBarParts';
 
 export default {
   name: 'RiskReview',
@@ -271,7 +268,6 @@ export default {
     chartPaddingOuter: 0,
     /** Chart user config data. */
     iconHelp: mdiHelp,
-    toggleFullScreen: true,
   }),
   computed: {
     titlesContainerStyle() {
@@ -399,31 +395,12 @@ export default {
     sizeFrom: {
       deep: true,
       handler() {
-        if (!this.fullScreenMode) {
-          this.$nextTick(() => {
-            this.$nextTick(() => {
-              setTimeout(() => {
-                this.render();
-              }, 1000);
-            });
-          });
-        }
-      },
-    },
-    fullScreenMode(val) {
-      this.toggleFullScreen = false;
-      setTimeout(() => {
-        this.toggleFullScreen = true;
-      }, 200);
-      if (val) {
         this.$nextTick(() => {
           this.$nextTick(() => {
-            setTimeout(() => {
-              this.render();
-            }, 5000);
+            this.render();
           });
         });
-      }
+      },
     },
   },
   mounted() {
@@ -555,7 +532,7 @@ export default {
 
       const padInner = 0.3;
       const padOuter = 0.7;
-      const height = svgContainer.offsetHeight - this.marginY * 2;
+      const height = (this.sizeFrom.height - 60) - this.marginY * 2;
 
       this.yScale = d3.scaleBand()
         .range([0, height])
