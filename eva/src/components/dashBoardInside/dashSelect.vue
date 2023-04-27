@@ -68,16 +68,16 @@
             hide-details
             class="select theme--dark"
             label="Значение"
-            @change="setTocken('change')"
-            @click="setTocken('click')"
-            @mouseover="setTocken('mouseover')"
+            @change="setTockenDelay('change')"
+            @click="setTockenDelay('click')"
+            @mouseover="setTockenDelay('mouseover')"
             @keydown.enter="onPressEnter"
           >
             <template v-slot:item="{ item, attrs, on }">
               <v-list-item
                 ripple
                 v-on="on"
-                @click="setTocken('click')"
+                @click="setTockenDelay('click')"
               >
                 <v-list-item-action v-if="multiple">
                   <v-icon :color="theme.$main_text">
@@ -512,7 +512,7 @@ export default {
       } else {
         this.elemDeep.true = [];
       }
-      this.setTocken();
+      this.setTockenDelay();
     },
     filterSelect(res, selected) {
       if (this.getOptions?.resetValuesWhichAreNot) {
@@ -527,6 +527,17 @@ export default {
       this.topArray = selected;
       this.bottomArray = res.filter((elem) => !selected.includes(elem));
       return [...this.topArray, ...this.bottomArray];
+    },
+    setTockenDelay(actionType = 'change') {
+      const toKey = `_timeout_${actionType}`;
+      if (this[toKey]) {
+        clearTimeout(this[toKey]);
+        this[toKey] = null;
+      }
+      this[toKey] = setTimeout(() => {
+        this.setTocken(actionType);
+        this[toKey] = null;
+      }, 200);
     },
     setTocken(actionType = 'change') {
       if (this.loading !== false) {
