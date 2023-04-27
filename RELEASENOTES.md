@@ -3,7 +3,7 @@
 ### Added
 - Waterfall: highlight numbers in comments
 - Waterfall: text wrapping on the x-axis
-- Added the ability to build multiple signatures from a data source on the "ConstructorSchemes"
+- Added the ability to build multiple description from a data source on the "ConstructorSchemes"
 - Multiselect: added setting "variant search"
 - Multiselect: if after entering the search in the multiline there is one option, then select it by entry
 - Added tree icon in header
