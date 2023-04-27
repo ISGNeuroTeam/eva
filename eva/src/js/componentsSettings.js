@@ -316,6 +316,7 @@ export default {
       'defaultSourceDataField',
       'defaultSourceDataUpdates',
       'resetValuesWhichAreNot',
+      'searchMode',
     ],
     picker: [
       'showLastTimeBlock',
@@ -996,6 +997,24 @@ export default {
       description: 'Сбросить значения, если источник данных их не содержит',
       elem: 'switch',
       default: false,
+    },
+    {
+      option: 'searchMode',
+      description: 'Режим поиска в списке',
+      elem: 'select',
+      default: 'contains',
+      items() {
+        return [
+          {
+            text: 'По вхождению',
+            value: 'contains',
+          },
+          {
+            text: 'Вхождение в начале строки',
+            value: 'begin',
+          },
+        ];
+      },
     },
 
     // dashMap, dashPieChart
