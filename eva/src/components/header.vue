@@ -18,6 +18,22 @@
         :color="theme.$accent_ui_color"
       >
         <template v-slot:activator="{ on }">
+          <v-icon
+            class="home"
+            :color="theme.$secondary_text"
+            v-on="on"
+            @click="$store.commit('app/toggleOpenTree')"
+          >
+            {{ iconTree }}
+          </v-icon>
+        </template>
+        <span>Дерево</span>
+      </v-tooltip>
+      <v-tooltip
+        bottom
+        :color="theme.$accent_ui_color"
+      >
+        <template v-slot:activator="{ on }">
           <router-link to="/main">
             <v-icon
               class="home"
@@ -175,6 +191,7 @@ import {
   mdiHomeVariantOutline,
   mdiScriptTextOutline,
   mdiCloudUpload,
+  mdiFileTree,
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
 import EvaLogo from '../images/eva-logo.svg';
@@ -204,6 +221,7 @@ export default {
       home: mdiHomeVariantOutline,
       undo: mdiUndoVariant,
       palete: mdiPalette,
+      iconTree: mdiFileTree,
       paleteShow: false,
       profileDropdownButtons: [
         {
@@ -259,6 +277,7 @@ export default {
   },
   mounted() {
     this.getCookie();
+    this.$store.commit('app/setOpenTree', false);
   },
   methods: {
     async getTheme() {

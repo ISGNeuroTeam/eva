@@ -384,6 +384,7 @@ export default {
     bush: [],
     map: [
       'osmserver',
+      'tokenByCenteredElement',
       'primitives',
       'primitivesLibrary',
     ],
@@ -668,6 +669,18 @@ export default {
       description:
         'Сервер для набора tile Пример:\nhttps://tile.openstreetmap.org/{z}/{x}/{y}.png',
       elem: 'text-field',
+    },
+    {
+      option: 'tokenByCenteredElement',
+      description: 'Элемент на который нужно центрировать карту',
+      elem: 'select',
+      items() {
+        if (this.$store.state[this.idDash]?.tockens?.length > 0) {
+          const tokens = structuredClone(this.$store.state[this.idDash].tockens);
+          return tokens.map((el) => el.name);
+        }
+        return [];
+      },
     },
 
     // datepicker
