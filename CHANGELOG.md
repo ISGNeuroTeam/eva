@@ -8,7 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added user setting: number formatting
+
+### Changed
+
+### Fixed
+
+## [1.130.0]
+
+### Added
 - Waterfall: highlight numbers in comments
 - Waterfall: text wrapping on the x-axis
 - Added the ability to build multiple signatures from a data source on the "ConstructorSchemes"
@@ -18,8 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added auto-centered Map
 - Added centered Map by token
 - Added search by objects Map
-
-### Changed
 
 ### Fixed
 - Heatmap: events don't pass token values
