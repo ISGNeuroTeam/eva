@@ -98,51 +98,66 @@
         <p>Начальная точка</p>
         <v-row>
           <v-col
-            cols="3"
-            style="padding-right: 0"
+            cols="12"
           >
-            <v-text-field
-              v-model="options.initialPoint.x"
-              outlined
-              dense
-              :dark="isDark"
-              type="number"
-              class="map-user-settings__input"
-              :style="`color: ${theme.$secondary_text} !important`"
-            >
-              <template v-slot:prepend>
-                <div>X:</div>
-              </template>
-            </v-text-field>
+            <v-checkbox
+              v-model="options.isAutoCenter"
+              hide-details
+              :class="options.isAutoCenter ? 'mb-5' : ''"
+              label="Авто-центрирование"
+            />
           </v-col>
-          <v-col
-            cols="3"
-            style="padding-right: 0"
-          >
-            <v-text-field
-              v-model="options.initialPoint.y"
-              outlined
-              dense
-              :dark="isDark"
-              type="number"
-              class="map-user-settings__input"
-              :style="`color: ${theme.$secondary_text} !important`"
+          <template v-if="!options.isAutoCenter">
+            <v-col
+              cols="3"
+              style="padding-right: 0"
             >
-              <template v-slot:prepend>
-                <div>Y:</div>
-              </template>
-            </v-text-field>
-          </v-col>
-          <v-col class="flex-grow-0">
-            <v-btn
-              small
-              color="primary"
-              class="mt-3"
-              @click="onClickChoosingCoordinates"
+              <v-text-field
+                v-model="options.initialPoint.x"
+                outlined
+                dense
+                :disabled="options.isAutoCenter"
+                :dark="isDark"
+                type="number"
+                class="map-user-settings__input"
+                :style="`color: ${theme.$secondary_text} !important`"
+              >
+                <template v-slot:prepend>
+                  <div>X:</div>
+                </template>
+              </v-text-field>
+            </v-col>
+            <v-col
+              cols="3"
+              style="padding-right: 0"
             >
-              Указать на карте
-            </v-btn>
-          </v-col>
+              <v-text-field
+                v-model="options.initialPoint.y"
+                outlined
+                dense
+                :dark="isDark"
+                :disabled="options.isAutoCenter"
+                type="number"
+                class="map-user-settings__input"
+                :style="`color: ${theme.$secondary_text} !important`"
+              >
+                <template v-slot:prepend>
+                  <div>Y:</div>
+                </template>
+              </v-text-field>
+            </v-col>
+            <v-col class="flex-grow-0">
+              <v-btn
+                small
+                color="primary"
+                class="mt-3"
+                :disabled="options.isAutoCenter"
+                @click="onClickChoosingCoordinates"
+              >
+                Указать на карте
+              </v-btn>
+            </v-col>
+          </template>
         </v-row>
 
         <p>Легенда карты</p>
@@ -215,6 +230,7 @@ export default {
         selectedLayer: null,
         zoomLevel: 10,
         zoomStep: 1,
+        isAutoCenter: false,
         initialPoint: {
           x: 59.242065955847735,
           y: 74.35169122692963,

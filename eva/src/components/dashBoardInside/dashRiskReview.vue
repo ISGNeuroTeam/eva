@@ -420,6 +420,7 @@ export default {
         id: this.idFrom,
       });
     },
+
     updateActionCapture(updatedData) {
       if (updatedData?.length > 0) {
         const fields = [];
@@ -434,6 +435,7 @@ export default {
         this.setActions();
       }
     },
+
     setTitleColName(name = '') {
       this.titleColName = name;
       this.render();
@@ -750,6 +752,7 @@ export default {
       });
       return result;
     },
+
     toDivide(number) {
       return number.toLocaleString()
         .replace(',', ' ');
