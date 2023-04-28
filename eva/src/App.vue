@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import Vue from 'vue';
+
 export default {
   name: 'App',
   computed: {
@@ -32,6 +34,9 @@ export default {
         }
       };
     };
+    if (Vue.$jwt.decode()) {
+      this.$store.dispatch('settingApp');
+    }
   },
   methods: {
     hexToRGB(h) {

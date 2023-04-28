@@ -531,7 +531,10 @@ export default {
   },
   watch: {
     async select(selectedTheme) {
-      console.log({selectedTheme})
+      this.$store.dispatch('setUserSettingsItem', {
+        key: 'theme',
+        value: selectedTheme,
+      });
       this.$refs.modalPersistent.focusOnModal();
       if (selectedTheme !== 'dark' && selectedTheme !== 'light') {
         const response = await fetch(`/api/theme?themeName=${selectedTheme}`);
