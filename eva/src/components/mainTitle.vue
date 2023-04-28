@@ -539,7 +539,6 @@ export default {
     },
   },
   async mounted() {
-    await this.$store.dispatch('app/getUserSettings');
     if (this.dashFromStore) {
       const isSettingsOpen = this.dashFromStore
         .modalSettings?.status;
