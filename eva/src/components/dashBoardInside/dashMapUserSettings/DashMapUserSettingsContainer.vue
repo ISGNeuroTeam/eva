@@ -5,6 +5,44 @@
       style="align-items: normal"
     >
       <v-row class="ma-0 justify-end">
+        <v-col
+          cols="4"
+          class="py-0"
+        >
+          <v-autocomplete
+            v-model="searchValue"
+            :style="{ color: theme.$main_text, 'pointer-events': 'auto' }"
+            :items="filteredDataRestFrom"
+            item-value="ID"
+            item-text="label"
+            label="Поиск"
+            dense
+            outlined
+            :color="theme.$main_text"
+            rounded
+            :background-color="theme.$secondary_bg"
+            :filter="searchElement"
+            clearable
+            @change="$emit('searchUpdate', searchValue)"
+            @click:clear.native="$emit('searchUpdate', '')"
+          >
+            <template v-slot:item="{ item, on }">
+              <v-list-item
+                ripple
+                v-on="on"
+              >
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ item.label }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
+                    {{ item.group }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
+        </v-col>
         <v-menu
           v-if="options.mode && options.mode[0] === 'Мониторинг'"
           v-model="toggleSelectPipeline"
@@ -17,12 +55,13 @@
             <div class="d-flex flex-column">
               <v-btn
                 rounded
-                :style="`
-                 background: ${theme.$secondary_bg};
-                 color: ${theme.$main_text};
-                 pointer-events: auto;
-                 margin-right: 30px
-                 `"
+                :style="{
+                  background: theme.$secondary_bg,
+                  color: theme.$main_text,
+                  'pointer-events': 'auto',
+                  'margin-right': '30px',
+                  height: '40px',
+                }"
                 class="med-btn"
                 v-on="menu"
                 @click="toggleSelectPipeline = !toggleSelectPipeline"
@@ -67,11 +106,13 @@
             <div class="d-flex flex-column">
               <v-btn
                 rounded
-                :style="`
-                   background: ${theme.$secondary_bg};
-                   color: ${theme.$main_text};
-                   pointer-events: auto;
-                   margin-right: 30px`"
+                :style="{
+                  background: theme.$secondary_bg,
+                  color: theme.$main_text,
+                  'pointer-events': 'auto',
+                  'margin-right': '30px',
+                  height: '40px',
+                }"
                 class="med-btn"
                 v-on="menu"
                 @click="toggleSelect = !toggleSelect"
@@ -112,12 +153,13 @@
             <div class="d-flex flex-column">
               <v-btn
                 rounded
-                :style="`
-               background: ${theme.$secondary_bg};
-               color: ${theme.$main_text};
-               pointer-events: auto;
-               margin-right: 30px
-               `"
+                :style="{
+                  background: theme.$secondary_bg,
+                  color: theme.$main_text,
+                  'pointer-events': 'auto',
+                  'margin-right': '30px',
+                  height: '40px',
+                }"
                 class="med-btn"
                 v-on="menu"
                 @click="toggleSelectLayer = !toggleSelectLayer"
@@ -369,6 +411,10 @@ export default {
       type: Object,
       required: true,
     },
+    dataRestFrom: {
+      type: Array,
+      default: () => ([]),
+    },
   },
   data() {
     return {
@@ -393,6 +439,7 @@ export default {
         search: '',
         nameLegend: 'Легенда',
       },
+      searchValue: '',
       localLayerList: [],
       toggleSelectLayer: false,
       toggleSelectPipeline: false,
@@ -417,6 +464,12 @@ export default {
     };
   },
   computed: {
+    filteredDataRestFrom() {
+      if (this.dataRestFrom?.length > 0) {
+        return this.dataRestFrom.filter((el) => el.coordinates);
+      }
+      return [];
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -615,6 +668,17 @@ export default {
 
     changePipeline(parameters) {
       this.map.options.pipelineParameters = parameters;
+    },
+    searchElement(data, str) {
+      const subStr = str.toLowerCase();
+      const fields = ['label', 'group', 'ID', 'type', 'geometry_type'];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const field of fields) {
+        if (data[field] && `${data[field]}`.toLowerCase().indexOf(subStr) !== -1) {
+          return true;
+        }
+      }
+      return false;
     },
   },
 };

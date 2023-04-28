@@ -1,3 +1,21 @@
+# [1.130.0] - 2023-04-27
+
+### Added
+- Waterfall: highlight numbers in comments
+- Waterfall: text wrapping on the x-axis
+- Added the ability to build multiple description from a data source on the "ConstructorSchemes"
+- Multiselect: added setting "variant search"
+- Multiselect: if after entering the search in the multiline there is one option, then select it by entry
+- Added tree icon in header
+- Added auto-centered Map
+- Added centered Map by token
+- Added search by objects Map
+
+### Fixed
+- Heatmap: events don't pass token values
+- Map: fixed incorrect update token with action "click"
+- RiskReview: Fixed incorrect resizing when switching between "full screen", "modal" and "default mode"
+
 # [1.129.0] - 2023-04-19
 
 ### Added

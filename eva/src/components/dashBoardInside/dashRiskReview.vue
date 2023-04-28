@@ -208,7 +208,6 @@
 <script>
 import * as d3 from 'd3';
 import { mdiHelp } from '@mdi/js';
-import defaultBarParts from '../../js/defaultBarParts';
 
 export default {
   name: 'RiskReview',
@@ -396,23 +395,12 @@ export default {
     sizeFrom: {
       deep: true,
       handler() {
-        if (!this.fullScreenMode) {
-          this.$nextTick(() => {
-            this.$nextTick(() => {
-              this.render();
-            });
-          });
-        }
-      },
-    },
-    fullScreenMode(val) {
-      if (val) {
         this.$nextTick(() => {
           this.$nextTick(() => {
             this.render();
           });
         });
-      }
+      },
     },
   },
   mounted() {
@@ -432,6 +420,7 @@ export default {
         id: this.idFrom,
       });
     },
+
     updateActionCapture(updatedData) {
       if (updatedData?.length > 0) {
         const fields = [];
@@ -446,6 +435,7 @@ export default {
         this.setActions();
       }
     },
+
     setTitleColName(name = '') {
       this.titleColName = name;
       this.render();
@@ -542,7 +532,7 @@ export default {
 
       const padInner = 0.3;
       const padOuter = 0.7;
-      const height = svgContainer.offsetHeight - this.marginY * 2;
+      const height = (this.sizeFrom.height - 60) - this.marginY * 2;
 
       this.yScale = d3.scaleBand()
         .range([0, height])
@@ -762,6 +752,7 @@ export default {
       });
       return result;
     },
+
     toDivide(number) {
       return number.toLocaleString()
         .replace(',', ' ');
