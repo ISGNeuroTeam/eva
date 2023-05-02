@@ -72,7 +72,7 @@ export default {
       }
     },
     focusOnModal() {
-      this.$refs.modalWithConfirm.focus();
+      this.$refs.modalWithConfirm?.focus();
     },
     closeOnOutside() {
       this.focusOnModal();
