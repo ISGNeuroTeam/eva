@@ -136,7 +136,8 @@ export default {
             this.$store.dispatch('app/loadRoles');
             return res;
           });
-          const { setting } = await this.$store.dispatch('getUserSettings', userId.id);
+          await this.$store.dispatch('settingApp');
+          const setting = this.$store.getters['app/userSettings'];
           const { redirect } = this.$route.query;
           if (setting && setting?.homePage && !redirect) {
             await this.$router.push({ path: '/dashboards', query: { home: setting.homePage } });
