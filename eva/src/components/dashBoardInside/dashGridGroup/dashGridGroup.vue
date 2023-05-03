@@ -71,8 +71,8 @@
               :search-rep="true"
               :data-report="true"
               :data-rest-from="(item.dataRest ? item.dataRest.data : [])"
-              :current-settings="settings"
-              :update-settings="updateSettings"
+              :current-settings="settings[item.visualizationId]"
+              :update-settings="(val) => updateSettings(val, item.visualizationId)"
               :data-mode-from="dataModeFrom"
               :loading="loading"
               :store-state-dash.sync="stateDash[item.i]"
@@ -189,6 +189,9 @@ export default {
         accumulators: {
           dash: 'accumulators',
           mainSettings: true,
+        },
+        dial: {
+          dash: 'dial',
         },
       }),
     },
@@ -336,6 +339,7 @@ export default {
         let y = 0;
         let maxRowH = 0;
         const list = new Map();
+        const settingsIds = [];
         this.dataRestFrom
           .forEach((item) => {
             const { colNum } = this;
@@ -354,6 +358,7 @@ export default {
             if (!vizOptions) {
               return;
             }
+            const visualizationId = `${item.visualization}-${this.idFrom}-${optionKey}-v1`;
             const params = {
               row: item,
               i: item.id,
@@ -362,11 +367,13 @@ export default {
               x,
               y,
               dash: `dash-${vizOptions.dash}`,
-              visualizationId: `${item.visualization}-${this.idFrom}-${optionKey}-v1`,
+              visualizationId,
               optionKey,
               dataRest,
               hasSettings: !!vizOptions.mainSettings,
             };
+            this.settings[visualizationId] = {};
+            settingsIds.push(visualizationId);
             if (+sizes[0] + x <= colNum) {
               x += +sizes[0];
             }
@@ -400,8 +407,8 @@ export default {
         xMetric,
       });
     },
-    updateSettings(val) {
-      this.settings = JSON.parse(JSON.stringify(val));
+    updateSettings(val, visualizationId) {
+      this.settings[visualizationId] = JSON.parse(JSON.stringify(val));
     },
     hideDS() {
       this.$store.commit('setSwitch', {
