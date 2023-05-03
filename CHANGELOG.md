@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - multiline does not work correctly with string values
+- dynamic visualizations: the same settings for the same type of visualizations
 
 ## [1.130.0]
 
@@ -801,6 +802,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a frame for the event window
 
 ### Fixed
+- dynamic visualizations: the same settings for the same type of visualizations
 
 - fixed selecting an object after changing dash setting
 - fixed token with an empty name
