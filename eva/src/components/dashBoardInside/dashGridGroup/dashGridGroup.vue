@@ -339,7 +339,6 @@ export default {
         let y = 0;
         let maxRowH = 0;
         const list = new Map();
-        const settingsIds = [];
         this.dataRestFrom
           .forEach((item) => {
             const { colNum } = this;
@@ -372,8 +371,7 @@ export default {
               dataRest,
               hasSettings: !!vizOptions.mainSettings,
             };
-            this.settings[visualizationId] = {};
-            settingsIds.push(visualizationId);
+            this.$set(this.settings, visualizationId, {});
             if (+sizes[0] + x <= colNum) {
               x += +sizes[0];
             }
