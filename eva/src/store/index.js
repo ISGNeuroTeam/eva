@@ -1136,6 +1136,21 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    settingApp({ state, dispatch, commit }) {
+      // eslint-disable-next-line no-shadow
+      return dispatch('app/getUserSettings', '').then((settings) => {
+        const { theme } = settings;
+        if (theme && theme !== state.theme?.name) {
+          if (theme !== 'dark' && theme !== 'light') {
+            fetch(`/api/theme?themeName=${theme}`).then((res) => res.json().then((data) => {
+              const content = JSON.parse(data?.content);
+              commit('setTheme', content);
+            }));
+          } else commit('setDefaultTheme', theme);
+        }
+        return settings;
+      });
+    },
     saveDashToStore({ state, commit }, idDash) {
       return new Promise((resolve) => {
         if (state.savingDashQueue === undefined) {
@@ -2057,8 +2072,18 @@ export default new Vuex.Store({
       }
       return response;
     },
-    setUserSettings(state, setting) {
+    setUserSettings({ commit }, setting) {
       return rest.setUserSettings(setting, restAuth);
+    },
+    async setUserSettingsItem({ dispatch }, { user = '', key, value }) {
+      const { setting } = await dispatch('getUserSettings', user);
+      return rest.setUserSettings(JSON.stringify({
+        user_id: user,
+        setting: {
+          ...setting,
+          [key]: value,
+        },
+      }), restAuth);
     },
   },
   getters: {

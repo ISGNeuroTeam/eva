@@ -702,17 +702,19 @@ export default {
         if (res.status === 200) {
           await res.json().then((responseData) => {
             const { setting } = this.$store.dispatch('getUserSettings', this.userFrom.id || responseData.id);
+            const newSettings = {
+              ...setting,
+              ...this.userSettings,
+              homePage: this.homePage,
+            };
             this.$store.dispatch(
               'setUserSettings',
               JSON.stringify({
                 user_id: this.userFrom.id || responseData.id[0],
-                setting: {
-                  ...setting,
-                  ...this.userSettings,
-                  homePage: this.homePage,
-                },
+                setting: newSettings,
               }),
             );
+            this.$store.commit('app/setUserSettings', newSettings);
           });
           if (this.userFrom.id === this.curUserId) {
             this.$store.commit('auth/setUserName', this.userData.username);
