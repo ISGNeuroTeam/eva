@@ -21,6 +21,7 @@ const defaultState = {
   userSettings: {
     userTtlEnabled: false,
     userTtl: '',
+    theme: null,
   },
 };
 
