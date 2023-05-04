@@ -8,9 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Save theme in user settings
 
 ### Changed
+
+### Fixed
+
+## [1.131.0]
+
+### Added
+- Save theme in user settings
 
 ### Fixed
 - multiline does not work correctly with string values
