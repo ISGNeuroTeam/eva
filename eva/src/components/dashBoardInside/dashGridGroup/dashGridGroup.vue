@@ -371,7 +371,9 @@ export default {
               dataRest,
               hasSettings: !!vizOptions.mainSettings,
             };
-            this.$set(this.settings, visualizationId, {});
+            if (!this.settings[visualizationId]) {
+              this.$set(this.settings, visualizationId, {});
+            }
             if (+sizes[0] + x <= colNum) {
               x += +sizes[0];
             }
