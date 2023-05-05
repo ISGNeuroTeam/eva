@@ -1,3 +1,11 @@
+# [1.131.0] - 2023-05-04
+
+### Added
+- Save theme in user settings
+
+### Fixed
+- multiline does not work correctly with string values
+
 # [1.130.0] - 2023-04-27
 
 ### Added
