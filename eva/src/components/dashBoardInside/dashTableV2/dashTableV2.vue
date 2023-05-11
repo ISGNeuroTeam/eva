@@ -88,8 +88,8 @@ export default {
       options: {
         frozenRows: 1,
         fixedColumns: ['_time'],
-        searchRow: false,
         selectable: false,
+        selectColumn: false,
         rowHeight: 40,
         paginationSizeSelector: [100, 500, 1000, true],
         paginationCounter: 'rows',
@@ -98,12 +98,28 @@ export default {
       columnOptions: {
         _time: {
           frozen: true,
+          headerMenu: false,
+          headerFilter: true,
         },
         a: {
           frozen: true,
+          headerMenu: false,
+          headerFilter: true,
         },
-        field_2: {
+        b: {
           frozen: true,
+          headerMenu: false,
+          headerFilter: true,
+        },
+        field_a: {
+          frozen: true,
+          headerMenu: false,
+          headerFilter: true,
+        },
+        field_b: {
+          frozen: false,
+          headerMenu: false,
+          headerFilter: true,
         },
       },
       actions: [
@@ -125,7 +141,7 @@ export default {
       return `calc(100% - ${offset}px)`;
     },
     columns() {
-      const defaultColumns = [
+      const defaultColumns = this.options.selectColumn ? [
         {
           title: 'Выделение',
           formatter: 'rowSelection',
@@ -138,7 +154,7 @@ export default {
             cell.getRow().toggleSelect();
           },
         },
-      ];
+      ] : [];
 
       if (this.columnOptions && !!Object.keys(this.columnOptions).length) {
         return Object.keys(this.searchSchema).reduce((acc, key) => {
@@ -150,13 +166,9 @@ export default {
             field: key,
             title: options?.title || key,
             frozen: options?.frozen || false,
-            // headerFilter: options?.headerFilter || false,
-            headerFilter: this.emptyHeaderFilter,
-            headerFilterFunc: 'like',
-            headerPopupIcon: (component) => this.getHeaderPopupIcon(component, key),
+            headerFilter: options?.headerFilter ? this.headerFilter : false,
             editor: options?.editor || false,
             headerMenu: options?.headerMenu ? this.headerMenu : false,
-            headerPopup: this.headerFilterPopup,
             cellClick: this.cellClickEvent,
           };
           if (options?.formatter) {
@@ -189,11 +201,7 @@ export default {
           title: key,
           // editor: this.searchSchema[key] === 'BOOLEAN' ? 'tickCross' : true,
           editor: false,
-          headerFilter: this.emptyHeaderFilter,
-          headerFilterFunc: 'like',
-          headerPopupIcon: (component) => this.getHeaderPopupIcon(component, key),
           headerMenu: this.headerMenu,
-          headerPopup: this.headerFilterPopup,
           cellClick: this.cellClickEvent,
         };
 
@@ -260,34 +268,71 @@ export default {
   },
   created() {
     this.createTable = throttle(this.createTable, 500);
+    this.setFilter = throttle(this.setFilter, 50);
   },
   methods: {
-    getHeaderPopupIcon(component, key) {
-      const headerPopupIcon = document.createElement('span');
-      headerPopupIcon.id = `${key}-popup-button`;
-      headerPopupIcon.innerHTML = 'test';
-      // this.$nextTick(() => {
-      //   const headerPopupIconContainer = component
-      //     .getElement()
-      //     .querySelector('.tabulator-header-popup-button');
-      //   headerPopupIconContainer.addEventListener('click', (e) => {
-      //     // e.preventDefault();
-      //     // e.stopPropagation();
-      //     // e.stopImmediatePropagation();
-      //     if (Object.keys(this.headerFilters)?.length > 0) {
-      //       Object.keys(this.headerFilters).forEach((field) => {
-      //         this.$set(this.headerFilters[field], 'isOpen', field === key);
-      //         if (field === key) {
-      //           const position = this.getPosition(e.target, 30);
-      //           this.$set(this.headerFilters[field], 'position', [position.x, position.y]);
-      //         } else {
-      //           this.$set(this.headerFilters[field], 'position', [0, 0]);
-      //         }
-      //       });
-      //     }
-      //   });
-      // });
-      return headerPopupIcon;
+    headerFilter(cell) {
+      const field = cell.getField();
+      const container = document.createElement('span');
+      container.classList.add('dash-table-v2-container__filter-container');
+      // create and style inputs
+      const select = document.createElement('select');
+      select.classList.add('dash-table-v2-container__filter-select');
+      ['', '>', '<', '=', '>=', '<=', '!='].forEach((item) => {
+        const option = document.createElement('option');
+        option.classList.add('dash-table-v2-container__filter-select-option');
+        option.setAttribute('value', item);
+        option.innerHTML = item;
+        select.appendChild(option);
+      });
+      select.setAttribute('placeholder', 'Знак');
+      select.style.padding = '4px';
+      select.style.boxSizing = 'border-box';
+
+      const textInput = document.createElement('input');
+      textInput.setAttribute('type', 'text');
+      textInput.classList.add('dash-table-v2-container__filter-input');
+      textInput.setAttribute('placeholder', 'Значение');
+
+      let selectValue = select.value;
+      let textValue = '';
+
+      select.addEventListener('change', (e) => {
+        if (e.target.value !== '') {
+          selectValue = e.target.value;
+          this.setFilter(field, selectValue, textValue);
+        } else {
+          textInput.value = '';
+          this.tabulator.clearFilter();
+        }
+      });
+      select.addEventListener('blur', (e) => {
+        if (e.target.value !== '') {
+          selectValue = e.target.value;
+          this.setFilter(field, selectValue, textValue);
+        } else {
+          textInput.value = '';
+          this.tabulator.clearFilter();
+        }
+      });
+
+      textInput.addEventListener('change', (e) => {
+        if (selectValue && e.target.value) {
+          textValue = e.target.value;
+          this.setFilter(field, selectValue, e.target.value);
+        }
+      });
+      textInput.addEventListener('keyup', (e) => {
+        if (selectValue && e.target.value) {
+          textValue = e.target.value;
+          this.setFilter(field, selectValue, e.target.value);
+        }
+      });
+
+      container.appendChild(select);
+      container.appendChild(textInput);
+
+      return container;
     },
     getPosition(el, offset = 0) {
       let xPosition = 0;
@@ -805,37 +850,11 @@ export default {
           return false;
       }
     },
-    headerFilterPopup(e, column, onRendered) {
-      const container = document.createElement('div');
-      onRendered(() => {
-        this.$nextTick(() => {
-          container.style.padding = '0';
-          container.style.borderColor = this.theme.$main_border;
-          container.style.backgroundColor = this.theme.$main_bg;
-          container.style.color = this.theme.$main_text;
-
-          const ComponentClass = Vue.extend(DashTableV2Filter);
-          const instance = new ComponentClass();
-
-          instance.dataFrom = this.headerFilters[column.getField()];
-          instance.buttonColor = this.theme.$accent_ui_color;
-          instance.borderColor = this.theme.$main_border;
-          instance.field = column.getField();
-
-          instance.$on('setFilter', this.setFilter);
-          instance.$on('clearFilter', this.clearFilter);
-
-          instance.$mount(); // pass nothing
-          container.appendChild(instance.$el);
-        });
-      });
-      return container;
-    },
     emptyHeaderFilter() {
       return document.createElement('div');
     },
-    setFilter(e) {
-      console.log(e);
+    setFilter(field, selectValue, textValue) {
+      this.tabulator.setFilter(field, selectValue, textValue);
     },
   },
 };
@@ -854,6 +873,40 @@ export default {
     font-weight: 700;
     line-height: 25px;
     padding-bottom: 8px;
+  }
+  &__filter-container {
+    display: grid;
+    grid-template-columns: 25% 75%;
+    gap: 5px;
+    padding: 0 8px 0 0;
+  }
+  &__filter-select {
+    border: 1px solid var(--main_border);
+    border-radius: 4px;
+    color: var(--main_text);
+    outline: none;
+    text-align: center;
+    cursor: pointer;
+  }
+  &__filter-select-option {
+    background-color: var(--main_bg);
+    color: var(--main_text);
+    outline: none;
+    border-left: 2px solid var(--main_border);
+    border-right: 2px solid var(--main_border);
+    cursor: pointer;
+    &:first-child {
+      border-top: 2px solid var(--main_border);
+    }
+    &:last-child {
+      border-bottom: 2px solid var(--main_border);
+    }
+  }
+  &__filter-input {
+    border: 1px solid var(--main_border);
+    border-radius: 4px;
+    color: var(--main_text);
+    outline: none;
   }
 }
 
@@ -890,7 +943,7 @@ export default {
       padding: 6px 6px;
       font-size: 13px;
       line-height: 1.23;
-      color: var(--main_bg);
+      color: var(--main_text);
       transition: border-color 0.3s, background-color 0.3s;
     }
   }
