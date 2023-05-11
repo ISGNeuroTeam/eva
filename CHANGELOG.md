@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added the dial visualization in gridGroup component
+- Multiselect: added the ability to pin selected values above the list
 
 ### Changed
+- Multiselect: sorting values in list
 - The scroll bar on the dashboard has become more convenient
 
 ### Fixed
