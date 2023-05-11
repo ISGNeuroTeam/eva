@@ -175,6 +175,10 @@ Vue.component('code-editor', () => import('./components/codeEditor.vue'));
 Vue.component('dash-gauge', () => import('./components/dashBoardInside/dashGauge/dashGauge'));
 // Водопад
 Vue.component('dash-waterfall', () => import('./components/dashBoardInside/dashWaterfall/dashWaterfall'));
+// Таблица v2
+Vue.component('dash-tableV2', () => import('./components/dashBoardInside/dashTableV2/dashTableV2.vue'));
+Vue.component('dash-tableV2-control', () => import('./components/dashBoardInside/dashTableV2/dashTableV2Control.vue'));
+Vue.component('dash-tableV2-filter', () => import('./components/dashBoardInside/dashTableV2/dashTableV2Filter.vue'));
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {

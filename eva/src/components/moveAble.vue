@@ -30,6 +30,7 @@
       :data-elem-from="id"
       :loading="loading"
       :search-data="searchData"
+      :search-schema="searchSchema"
       :data-source-id="dataSourceId"
       :data-sources="dataSources"
       @SetOpacity="changeOpacity($event)"
@@ -80,6 +81,10 @@ export default {
       default: '',
     },
     dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
+    searchSchema: {
       type: Object,
       default: () => ({}),
     },

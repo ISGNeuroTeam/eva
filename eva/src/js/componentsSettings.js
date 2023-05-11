@@ -122,6 +122,24 @@ export default {
         + '| Operating Expenses | -56571 | | |\n'
         + '| Total 2 | | True | |\n',
     },
+    {
+      name: 'Таблица v2',
+      img: mdiTableLarge,
+      type: 'tableV2',
+      dataSourceDescription:
+        '#### Обязательные поля:\n'
+        + '- ```title``` - Название столбца, строка\n'
+        + '- ```value``` - Значение столбца, число\n'
+        + '#### Дополнительные поля:\n'
+        + '- ```isTotal``` - Отобразить столбак суммы, булевый\n'
+        + '#### Пример данных:\n'
+        + '| title | value | isTotal | comment |\n'
+        + '| :--- | :---: | :---: | ---: |\n'
+        + '| Total 1 | 182527 | True | text |\n'
+        + '| Cost of Revenue | -84732 | | text html |\n'
+        + '| Operating Expenses | -56571 | | |\n'
+        + '| Total 2 | | True | |\n',
+    },
   ],
   size: {
     picker: {
@@ -141,6 +159,10 @@ export default {
       height: 600,
     },
     table: {
+      width: 500,
+      height: 480,
+    },
+    tableV2: {
       width: 500,
       height: 480,
     },
@@ -243,6 +265,7 @@ export default {
   },
   icons: {
     table: mdiTableLarge,
+    tableV2: mdiTableLarge,
     multiLine: mdiChartMultiline,
     gridGroup: mdiGroup,
     piechart: mdiChartPie,
@@ -301,6 +324,15 @@ export default {
       'pieType',
     ],
     table: [
+      'boxShadow',
+      'rowcolor',
+      'columncolor',
+      'cellcolor',
+      'selectRowColor',
+      'lastResult',
+      'titles',
+    ],
+    tableV2: [
       'boxShadow',
       'rowcolor',
       'columncolor',
@@ -1312,6 +1344,7 @@ export default {
   ],
   reporstElements: [
     'table',
+    'tableV2',
     'multiLine',
     'piechart',
     'guntt',
@@ -1331,6 +1364,10 @@ export default {
   ],
   reports: {
     table: {
+      tooltip: 'Таблица',
+      icon: mdiTableLarge,
+    },
+    tableV2: {
       tooltip: 'Таблица',
       icon: mdiTableLarge,
     },
