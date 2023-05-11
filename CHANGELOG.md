@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the dial visualization in gridGroup component
 
 ### Changed
+- The scroll bar on the dashboard has become more convenient
 
 ### Fixed
 - dynamic visualizations: the same settings for the same type of visualizations
