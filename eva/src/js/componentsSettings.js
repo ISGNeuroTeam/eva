@@ -47,7 +47,8 @@ export default {
         + '- **singlevalue** - Показатели\n'
         + '- **piechart** - Круговая диаграмма\n'
         + '- **tile** - Плитка\n'
-        + '- **accumulators** - Накопитель',
+        + '- **accumulators** - Накопитель\n'
+        + '- **dial** - Круговая шкала',
     },
     { name: 'Круговая диаграмма', img: mdiChartPie, type: 'piechart' },
     {
@@ -317,6 +318,7 @@ export default {
       'defaultSourceDataUpdates',
       'resetValuesWhichAreNot',
       'searchMode',
+      'selectedValuesAbove',
     ],
     picker: [
       'showLastTimeBlock',
@@ -995,6 +997,12 @@ export default {
     {
       option: 'resetValuesWhichAreNot',
       description: 'Сбросить значения, если источник данных их не содержит',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'selectedValuesAbove',
+      description: 'Выбранные значения закрепить сверху',
       elem: 'switch',
       default: false,
     },
