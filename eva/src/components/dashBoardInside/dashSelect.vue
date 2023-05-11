@@ -97,11 +97,13 @@
               v-if="multiple && ($refs.multiselect && !$refs.multiselect.lazySearch)"
               v-slot:prepend-item
             >
-              <v-list-item
-                ripple
+              <v-row
+                v-ripple
+                class="px-4 py-3 primary--text"
+                style="cursor:pointer;"
                 @click="selectItems"
               >
-                <v-list-item-action>
+                <v-col class="flex-grow-0">
                   <v-icon
                     :color="
                       elemDeep[String(multiple)].length > 0
@@ -111,14 +113,13 @@
                   >
                     {{ chooseIcon }}
                   </v-icon>
-                </v-list-item-action>
-                <v-list-item-content>
-                  <v-list-item-title>
+                </v-col>
+                <v-col>
+                  <div class="pl-2">
                     {{ chooseText }}
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-              <v-divider class="mt-2" />
+                  </div>
+                </v-col>
+              </v-row>
             </template>
           </v-autocomplete>
         </div>
@@ -200,8 +201,6 @@ export default {
         true: [],
         false: '',
       },
-      topArray: [],
-      bottomArray: [],
       open: true,
       source_show: true,
       select_show: false,
@@ -508,13 +507,13 @@ export default {
     },
     selectItems() {
       if (this.chooseText === 'Выбрать все') {
-        this.elemDeep.true = [...this.topArray, ...Array.from(new Set(this.bottomArray))];
+        this.elemDeep.true = [...this.dataRestDeep];
       } else {
         this.elemDeep.true = [];
       }
       this.setTockenDelay();
     },
-    filterSelect(res, selected) {
+    filterSelect(items, selected) {
       if (this.getOptions?.resetValuesWhichAreNot) {
         const existsItems = this.dataReady.map((item) => item[this.elem]);
         selected = selected.filter((elem) => !!existsItems.includes(elem));
@@ -524,9 +523,10 @@ export default {
           this.elemDeep.false = '';
         }
       }
-      this.topArray = selected;
-      this.bottomArray = res.filter((elem) => !selected.includes(elem));
-      return [...this.topArray, ...this.bottomArray];
+      if (this.getOptions?.selectedValuesAbove) {
+        return [...selected, ...items.filter((elem) => !selected.includes(elem))];
+      }
+      return items;
     },
     setTockenDelay(actionType = 'change') {
       const toKey = `_timeout_${actionType}`;
