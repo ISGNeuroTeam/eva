@@ -1,3 +1,16 @@
+# [1.132.0] - 2023-05-11
+
+### Added
+- Added the dial visualization in gridGroup component
+- Multiselect: added the ability to pin selected values above the list
+
+### Changed
+- Multiselect: sorting values in list
+- The scroll bar on the dashboard has become more convenient
+
+### Fixed
+- Dynamic visualizations: the same settings for the same type of visualizations
+
 # [1.131.0] - 2023-05-04
 
 ### Added
