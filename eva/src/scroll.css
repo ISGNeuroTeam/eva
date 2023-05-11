@@ -1,15 +1,17 @@
 *::-webkit-scrollbar {
-  width: 5px;
+  width: 10px;
 }
 
 *::-webkit-scrollbar-track {
   background: #333333;
+  background: var(--scroll_bg);
 }
 .v-navigation-drawer__content::-webkit-scrollbar-track {
   background-color: transparent
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: #c1c1c1;
-  border-radius: 15px;
+  background-color: #8d8d8d;
+  background-color: var(--scroll_thumb);
+  border-radius: 5px;
 }

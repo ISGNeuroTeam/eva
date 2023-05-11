@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Multiselect: sorting values in list
+- The scroll bar on the dashboard has become more convenient
 
 ### Fixed
 - dynamic visualizations: the same settings for the same type of visualizations
