@@ -556,6 +556,7 @@
         :id-from="element"
         :id-dash-from="idDash"
         :data-rest-from="searchData"
+        :search-schema="searchSchema"
         :data-mode-from="dataMode"
         :data-sources="dataSources"
         :loading="loading"
@@ -664,6 +665,10 @@ export default {
       default: 500,
     },
     dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
+    searchSchema: {
       type: Object,
       default: () => ({}),
     },

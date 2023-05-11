@@ -30,6 +30,7 @@ export default {
             data,
             log = [],
             notifications = [],
+            schema,
           } = event.data;
           if (log.length) {
             log.forEach(([time, msg]) => restAuth.putLog(`[worker] ${msg}`, time));
@@ -42,7 +43,7 @@ export default {
             // console.log('[notifications]', notifications)
             this.store.commit('notify/addNotifications', notifications);
           }
-          return resolve(data || []);
+          return resolve({ data, schema } || []);
         };
       }));
     }
