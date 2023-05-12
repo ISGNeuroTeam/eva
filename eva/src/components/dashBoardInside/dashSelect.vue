@@ -275,7 +275,7 @@ export default {
         res = this.filterSelect(res, this.multiple ? this.elemDeep.true : [this.elemDeep.false]);
       }
 
-      return res;
+      return [...new Set(res)];
     },
     dashFromStore() {
       return this.$store.state[this.idDash][this.id];
@@ -538,7 +538,7 @@ export default {
       this[toKey] = setTimeout(() => {
         this.setTocken(actionType);
         this[toKey] = null;
-      }, 200);
+      }, 500);
     },
     setTocken(actionType = 'change') {
       if (this.loading !== false) {
