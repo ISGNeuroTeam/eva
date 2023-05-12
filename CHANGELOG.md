@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Multiselect: the query in the filter is cleared after pressing Enter
 
 ## [1.132.0]
 

@@ -446,6 +446,7 @@ export default {
       if (isMenuActive && filteredItems.length === 1) {
         this.$refs.multiselect.selectItem(filteredItems[0]);
       }
+      this.$refs.multiselect.lazySearch = '';
     },
     updateActions(dataReady) {
       let data = [];
