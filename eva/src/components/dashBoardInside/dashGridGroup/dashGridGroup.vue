@@ -20,7 +20,7 @@
         :style="`height: ${box.height}px; overflow: auto;`"
       >
         <grid-layout
-          :layout.sync="dashes"
+          :layout.sync="components"
           :col-num="colNum"
           :row-height="rowHeight"
           :is-draggable="false"
@@ -31,7 +31,7 @@
           :use-css-transforms="false"
         >
           <grid-item
-            v-for="item in dashes"
+            v-for="item in components"
             :key="item.i"
             class="grid-widget"
             :x="item.x"
@@ -333,51 +333,52 @@ export default {
       }
       return null;
     },
-    dashes: {
+    components: {
       get() {
-        let x = 0;
-        let y = 0;
+        let l = 0;
+        let t = 0;
         let maxRowH = 0;
         const list = new Map();
+        const { colNum } = this;
         this.dataRestFrom
           .forEach((item) => {
-            const { colNum } = this;
-            const sizes = item.size.split(',');
-            if (maxRowH < +sizes[1]) {
-              maxRowH = +sizes[1];
-            }
-            if (+sizes[0] + x > colNum) {
-              x = 0;
-              y += maxRowH;
-              maxRowH = 0;
-            }
-            const dataRest = this.dataSourcesBySid.find((obj) => obj.sid === item.source);
             const optionKey = item.option_key || item.id;
+            const visualizationId = `${item.visualization}-${this.idFrom}-${optionKey}-v1`;
+            const [itemW, itemH] = item.size.split(',').map((str) => +str);
+            if (maxRowH < itemH) {
+              maxRowH = itemH;
+            }
+            if (l + itemW > colNum) {
+              l = 0;
+            }
             const vizOptions = this.vizOptions[item.visualization.toLowerCase()];
             if (!vizOptions) {
               return;
             }
-            const visualizationId = `${item.visualization}-${this.idFrom}-${optionKey}-v1`;
             const params = {
               row: item,
               i: item.id,
-              w: +sizes[0],
-              h: +sizes[1],
-              x,
-              y,
+              w: itemW,
+              h: itemH,
+              x: l,
+              y: t,
               dash: `dash-${vizOptions.dash}`,
               visualizationId,
               optionKey,
-              dataRest,
+              dataRest: this.dataSourcesBySid.find((obj) => obj.sid === item.source),
               hasSettings: !!vizOptions.mainSettings,
             };
             if (!this.settings[visualizationId]) {
               this.$set(this.settings, visualizationId, {});
             }
-            if (+sizes[0] + x <= colNum) {
-              x += +sizes[0];
-            }
             list.set(item.id, params);
+            if (l + itemW <= colNum) {
+              l += itemW;
+            }
+            if (l + itemW > colNum) {
+              t += maxRowH;
+              maxRowH = 0;
+            }
           });
         return [...list.values()];
       },

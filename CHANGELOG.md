@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- GridGroup: When using zoom, there is an offset for the multiline
 
 ## [1.132.0]
 
