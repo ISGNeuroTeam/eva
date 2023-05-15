@@ -446,6 +446,9 @@ export default {
 .dash-grid-group
   text-align: left
   margin: 2px
+  ::v-deep
+    .single-value-container
+      height: 100% !important
 
 .grid-widget
   overflow: auto
