@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiselect: the query in the filter is cleared after pressing Enter
 - Multiselect: Hangs when changing values on heavy dashboards
 - Default value of textArea not set
+- GridGroup: When using zoom, there is an offset for the multiline
 
 ## [1.132.0]
 
