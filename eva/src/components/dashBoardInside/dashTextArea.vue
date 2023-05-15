@@ -169,6 +169,28 @@ export default {
     textAreaValue(val) {
       this.textarea = this.replaceLineWrapForTextarea(val);
     },
+    dataSources: {
+      deep: true,
+      handler(val) {
+        const {
+          defaultFromSourceData = null,
+          defaultSourceDataUpdates = false,
+        } = this.dashFromStore.options;
+        if (defaultFromSourceData !== null && defaultSourceDataUpdates) {
+          const {
+            loading,
+            data,
+          } = val[defaultFromSourceData];
+          if (!loading && data.length) {
+            const defaultValue = this.getDefaultValue();
+            if (defaultValue !== null) {
+              this.textarea = this.replaceLineWrapForTextarea(`${defaultValue}`);
+            }
+            this.setTockenBlur();
+          }
+        }
+      },
+    },
     'dashFromStore.options.validationType': {
       immediate: true,
       handler(val) {
