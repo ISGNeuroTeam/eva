@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added position sticky by first column and header-row
 
 ### Changed
 
@@ -16,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiselect: Hangs when changing values on heavy dashboards
 - Default value of textArea not set
 - GridGroup: When using zoom, there is an offset for the multiline
+- Heatmap: Fixed incorrect x\y scroll inside visualisation
 
 ## [1.132.0]
 
