@@ -5,7 +5,6 @@ import './scss/globalStyles.scss';
 
 // Подключаем кастомный мконочный шрифт
 import './fonts/eva-iconfont/style.css';
-
 // import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
 import PortalVue from 'portal-vue';
 import AsyncComputed from 'vue-async-computed';
@@ -16,6 +15,7 @@ import VueDraggableResizable from 'vue-draggable-resizable';
 import VueCtkDateTimePicker from 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.common.js';
 // подключаем файл с настройками хранилища Vuex
 import moment from 'moment';
+import * as XLSX from './js/utils/xlsx.full.min';
 import store from './store/index';
 // подключаем файл с настройками хранилища Vuex (формы)
 // import storeForm from './store/storeForm/index';
@@ -31,6 +31,7 @@ import screenshot from './plugins/screenshot';
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 import App from './App.vue';
 
+window.XLSX = XLSX;
 Vue.use(PortalVue);
 // подключаем библиотеку для перемещения и изменения размеров dashboard
 Vue.use(AsyncComputed);
@@ -178,7 +179,6 @@ Vue.component('dash-waterfall', () => import('./components/dashBoardInside/dashW
 // Таблица v2
 Vue.component('dash-tableV2', () => import('./components/dashBoardInside/dashTableV2/dashTableV2.vue'));
 Vue.component('dash-tableV2-control', () => import('./components/dashBoardInside/dashTableV2/dashTableV2Control.vue'));
-Vue.component('dash-tableV2-filter', () => import('./components/dashBoardInside/dashTableV2/dashTableV2Filter.vue'));
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {

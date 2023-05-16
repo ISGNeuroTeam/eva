@@ -1,47 +1,135 @@
 <template>
-  <div
-    :id="idFrom"
-    class="dash-table-v2-container"
-    style="height: calc(100% - 28px)"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
     <div
-      v-if="title"
-      class="title"
-      v-text="title"
-    />
-    <dash-tableV2-control
-      v-if="activeButtons.length > 0"
-      :write-status="writeStatus"
-      :active-buttons="activeButtons"
-      @action="execute"
-    />
-    <div :style="`height: ${tableHeight}`">
+      :id="idFrom"
+      class="dash-table-v2-container"
+      :style="{
+        ...customStyle,
+        height: sizeFrom.height - 42 + 'px',
+      }"
+      :class="customClass"
+      v-bind="$attrs"
+    >
       <div
-        ref="table"
-        class="editable-table"
+        v-if="title"
+        class="title"
+        v-text="title"
       />
+      <dash-tableV2-control
+        v-if="activeButtons.length > 0"
+        :write-status="writeStatus"
+        :active-buttons="activeButtons"
+        @action="execute"
+      />
+      <div :style="`height: ${tableHeight}`">
+        <div
+          v-if="fullScreenMode"
+          :ref="idFrom"
+          class="editable-table"
+        />
+        <div
+          v-else
+          :ref="idFrom"
+          class="editable-table"
+        />
+      </div>
+      <v-dialog
+        v-model="isDownloadModal"
+        width="350"
+      >
+        <v-card class="report-card">
+          <v-card-title
+            class="card-title justify-space-between"
+            :style="{ background: theme.$main_bg, color: theme.$main_text }"
+          >
+            <div>
+              <v-icon
+                :style="{ color: theme.$main_text }"
+                class="download-icon"
+              >
+                {{ mdiDownload }}
+              </v-icon>
+              Отчет
+            </div>
+            <div>
+              <v-btn
+                icon
+                :color="theme.$main_text"
+                @click="isDownloadModal = false"
+              >
+                <v-icon>{{ mdiClose }}</v-icon>
+              </v-btn>
+            </div>
+          </v-card-title>
+
+          <v-card-text
+            class="card-text pt-4 d-flex justify-center"
+            :style="{ background: theme.$secondary_bg, color: theme.$main_text }"
+          >
+            <div class="row align-stretch">
+              <div
+                v-for="(item, index) in downloadFiles"
+                :key="index"
+                class="col-6"
+              >
+                <v-btn
+                  small
+                  text
+                  :color="theme.$main_text"
+                  class="d-flex align-center"
+                  @click="execute(index)"
+                >
+                  <v-icon :color="theme.$main_text">
+                    {{ mdiDownload }}
+                  </v-icon>
+                  <span>
+                    Скачать {{ item }}
+                  </span>
+                </v-btn>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </div>
-  </div>
+  </portal>
 </template>
 
 <script>
 import { TabulatorFull as Tabulator } from 'tabulator-tables';
 import {
   mdiFilter,
+  mdiDownload,
+  mdiClose,
 } from '@mdi/js';
-import Vue from 'vue';
 import { throttle } from '@/js/utils/throttle';
-import DashTableV2Filter from './dashTableV2Filter.vue';
 
-const colorFixed = function (cell, formatterParams, onRendered) {
+const colorFixed = function (cell) {
   cell.getElement().style.backgroundColor = this.sanitizeHTML(cell.getValue());
 
   return '&nbsp;';
 };
 
+// const tabulatorInstance = null;
+
 export default {
   name: 'DashTableV2',
   props: {
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
+    },
     title: {
       type: String,
       default: '',
@@ -74,11 +162,17 @@ export default {
       type: String,
       default: '',
     },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
       mdiFilter,
-      tabulator: null, // variable to hold your table
+      mdiDownload,
+      mdiClose,
+      // tabulator: null, // variable to hold your table
       tableData: [],
       isLoadFromFile: false,
       activeButtons: [],
@@ -86,59 +180,57 @@ export default {
       test: false,
       // TODO: Перенести в настройки через библиотеку примитивов
       options: {
-        frozenRows: 1,
+        frozenRows: false,
         fixedColumns: ['_time'],
         selectable: false,
         selectColumn: false,
-        rowHeight: 40,
         paginationSizeSelector: [100, 500, 1000, true],
         paginationCounter: 'rows',
         movableColumns: true,
-      },
-      columnOptions: {
-        _time: {
-          frozen: true,
-          headerMenu: false,
-          headerFilter: true,
-        },
-        a: {
-          frozen: true,
-          headerMenu: false,
-          headerFilter: true,
-        },
-        b: {
-          frozen: true,
-          headerMenu: false,
-          headerFilter: true,
-        },
-        field_a: {
-          frozen: true,
-          headerMenu: false,
-          headerFilter: true,
-        },
-        field_b: {
-          frozen: false,
-          headerMenu: false,
-          headerFilter: true,
-        },
+        defaultFilterAllColumns: true,
       },
       actions: [
         { name: 'click', capture: [] },
         { name: 'mouseover', capture: [] },
       ],
+      isDownloadModal: false,
+      downloadFiles: {
+        downloadCSV: 'CSV',
+        downloadJSON: 'JSON',
+        downloadXLSX: 'XLSX',
+        downloadHTML: 'HTML',
+      },
     };
   },
   computed: {
+    elementId() {
+      return this.fullScreenMode ? `fullScreen${this.idFrom}` : this.idFrom;
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idFrom];
     },
+    getOptions() {
+      return this.dashFromStore.options;
+    },
     tableHeight() {
       let offset = this.activeButtons?.length > 0 ? 38 : 0;
       offset += this.title ? 33 : 0;
       return `calc(100% - ${offset}px)`;
+    },
+    columnOptions() {
+      const columnOptions = {};
+      Object.keys(this.searchSchema).forEach((column) => {
+        columnOptions[column] = {
+          headerFilter: this.defaultFilterAllColumns,
+          headerMenu: true,
+          frozen: this.frozenColumns.includes(column),
+          visible: this.visibleColumns.includes(column),
+        };
+      });
+      return columnOptions;
     },
     columns() {
       const defaultColumns = this.options.selectColumn ? [
@@ -166,10 +258,18 @@ export default {
             field: key,
             title: options?.title || key,
             frozen: options?.frozen || false,
-            headerFilter: options?.headerFilter ? this.headerFilter : false,
+            visible: typeof options.visible !== 'undefined'
+              ? options.visible
+              : true,
+            headerFilter: options?.headerFilter
+              ? this.headerFilter
+              : false,
             editor: options?.editor || false,
             headerMenu: options?.headerMenu ? this.headerMenu : false,
             cellClick: this.cellClickEvent,
+            minWidth: options?.headerFilter
+              ? options?.minWidth || 150
+              : options?.minWidth || 80,
           };
           if (options?.formatter) {
             if (options?.formatter === 'color') {
@@ -202,6 +302,9 @@ export default {
           // editor: this.searchSchema[key] === 'BOOLEAN' ? 'tickCross' : true,
           editor: false,
           headerMenu: this.headerMenu,
+          headerFilter: this.options.defaultFilterAllColumns
+            ? this.headerFilter
+            : false,
           cellClick: this.cellClickEvent,
         };
 
@@ -227,6 +330,22 @@ export default {
       return this.$store.state[this.idDashFrom].tockens
         .filter((el) => el.elem === this.idFrom) || [];
     },
+    // options
+    frozenColumns() {
+      return this.getOptions.frozenColumns || [];
+    },
+    visibleColumns() {
+      return this.getOptions.titles || [];
+    },
+    selectableRow() {
+      return this.getOptions.selectableRow || false;
+    },
+    movableColumns() {
+      return this.getOptions.movableColumns || false;
+    },
+    defaultFilterAllColumns() {
+      return this.getOptions.defaultFilterAllColumns || false;
+    },
   },
   watch: {
     searchSchema: {
@@ -241,7 +360,13 @@ export default {
         if (val?.length > 0 && this.searchSchema) {
           if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
             this.$nextTick(() => {
-              this.createTable();
+              this.$nextTick(() => {
+                if (this.tabulator) {
+                  this.tabulator.redraw();
+                } else {
+                  this.createTable();
+                }
+              });
             });
           }
           this.updateDataInTable(val);
@@ -256,79 +381,91 @@ export default {
       },
       deep: true,
     },
+    fullScreenMode() {
+      this.redrawTable();
+    },
+    frozenColumns() {
+      this.redrawTable();
+    },
+    visibleColumns() {
+      this.updateColumnDefinition();
+    },
+    selectableRow() {
+      this.redrawTable();
+    },
+    movableColumns() {
+      this.redrawTable();
+    },
+    defaultFilterAllColumns() {
+      this.updateColumnDefinition();
+    },
   },
   mounted() {
     if (this.dataRestFrom?.length > 0) {
-      this.$nextTick(() => {
-        this.setAction(this.searchSchema);
-        this.redrawTable();
-        this.createHeaderFilters();
-      });
+      this.setAction(this.searchSchema);
+      this.redrawTable();
+      this.createHeaderFilters();
     }
   },
   created() {
     this.createTable = throttle(this.createTable, 500);
     this.setFilter = throttle(this.setFilter, 50);
   },
+  beforeDestroy() {
+    this.destroyTable();
+  },
   methods: {
+    openDownloadModal() {
+      this.isDownloadModal = true;
+    },
     headerFilter(cell) {
       const field = cell.getField();
       const container = document.createElement('span');
       container.classList.add('dash-table-v2-container__filter-container');
-      // create and style inputs
+
+      // create and style select element
       const select = document.createElement('select');
       select.classList.add('dash-table-v2-container__filter-select');
       ['', '>', '<', '=', '>=', '<=', '!='].forEach((item) => {
         const option = document.createElement('option');
         option.classList.add('dash-table-v2-container__filter-select-option');
-        option.setAttribute('value', item);
-        option.innerHTML = item;
+        option.value = item;
+        option.textContent = item;
         select.appendChild(option);
       });
-      select.setAttribute('placeholder', 'Знак');
+      select.placeholder = 'Знак';
       select.style.padding = '4px';
       select.style.boxSizing = 'border-box';
 
+      // create and style text input element
       const textInput = document.createElement('input');
-      textInput.setAttribute('type', 'text');
+      textInput.type = 'text';
       textInput.classList.add('dash-table-v2-container__filter-input');
-      textInput.setAttribute('placeholder', 'Значение');
+      textInput.placeholder = 'Значение';
 
-      let selectValue = select.value;
+      let selectValue = '';
       let textValue = '';
 
-      select.addEventListener('change', (e) => {
-        if (e.target.value !== '') {
-          selectValue = e.target.value;
+      const setFilter = () => {
+        if (selectValue && textValue) {
           this.setFilter(field, selectValue, textValue);
         } else {
-          textInput.value = '';
           this.tabulator.clearFilter();
         }
-      });
-      select.addEventListener('blur', (e) => {
-        if (e.target.value !== '') {
-          selectValue = e.target.value;
-          this.setFilter(field, selectValue, textValue);
-        } else {
-          textInput.value = '';
-          this.tabulator.clearFilter();
-        }
+      };
+
+      // add event listeners
+      select.addEventListener('change', () => {
+        selectValue = select.value;
+        setFilter();
       });
 
-      textInput.addEventListener('change', (e) => {
-        if (selectValue && e.target.value) {
-          textValue = e.target.value;
-          this.setFilter(field, selectValue, e.target.value);
-        }
-      });
-      textInput.addEventListener('keyup', (e) => {
-        if (selectValue && e.target.value) {
-          textValue = e.target.value;
-          this.setFilter(field, selectValue, e.target.value);
-        }
+      textInput.addEventListener('input', () => {
+        textValue = textInput.value;
+        setFilter();
       });
 
+      // append elements to container
       container.appendChild(select);
       container.appendChild(textInput);
 
@@ -428,17 +565,18 @@ export default {
       this.tableData = structuredClone(data);
       this.isLoadFromFile = false;
       if (this.tabulator) {
-        // const newColumns =
-        // this.tabulator.setColumns(this.columns);
         setTimeout(() => {
-          // this.tabulator.updateColumnDefinition(this.columns);
           this.tabulator.setData(this.dataRestFrom);
         }, 100);
       }
     },
     redrawTable() {
-      this.createTable();
-      this.updateDataInTable(this.dataRestFrom);
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          this.createTable();
+          this.updateDataInTable(this.dataRestFrom);
+        });
+      });
     },
     async updateColumnDefinition() {
       if (this.tabulator && Object.keys(this.dataRestFrom).length > 0) {
@@ -470,23 +608,24 @@ export default {
         this.tabulator.destroy();
         this.tabulator = null;
       }
-      this.tabulator = new Tabulator(this.$refs.table, {
+      this.tabulator = new Tabulator(this.$refs[this.idFrom], {
         addRowPos: 'top',
         placeholder: 'No Data Available', // display message to user on empty table
         popupContainer: `#${this.idFrom}`,
         maxHeight: '100%',
         height: '100%',
         layout: 'fitDataFill',
-        // frozenRows: 2,
-        rowHeight: 48,
-        selectable: 1,
+        frozenRows: this.options.frozenRows,
+        // rowHeight: this.options.rowHeight,
+        selectable: this.selectableRow ? 1 : false,
         rowFormatter: this.rowFormatter,
         persistence: {
-          columns: ['width', 'visible'],
+          columns: ['width', 'frozen', 'visible'],
+          sort: true,
         },
         persistenceID: this.idFrom,
         data: this.tableData, // link data to table
-        reactiveData: true, // enable data reactivity
+        reactiveData: false, // enable data reactivity
 
         // define table columns
         autoColumns: this.isLoadFromFile,
@@ -506,13 +645,11 @@ export default {
         // },
 
         columns: this.columns,
-
         pagination: 'local',
         paginationSize: true,
-        paginationSizeSelector: [100, 500, 1000, true],
-        paginationCounter: 'rows',
-        movableColumns: true,
-
+        paginationSizeSelector: this.options.paginationSizeSelector,
+        paginationCounter: this.options.paginationCounter,
+        movableColumns: this.movableColumns,
         // history
         history: true,
         persistenceWriterFunc: this.persistenceWriterFunc,
@@ -527,18 +664,23 @@ export default {
       for (const column of columns) {
         // create checkbox element using font awesome icons
         const icon = document.createElement('span');
-        icon.classList.add('FontIcon');
-        icon.classList.add(column.isVisible() ? 'name_check' : 'name_closeBig');
+        icon.style.fontSize = '20px';
+        // icon.classList.add('FontIcon');
+        icon.classList.add('eva-basic_check_big');
+        icon.classList.add(column.isVisible() ? 'eva-basic_checkbox_checked' : 'eva-basic_checkbox');
 
         // build label
         const label = document.createElement('span');
+        label.style.display = 'inline-flex';
+        label.style.alignItems = 'center';
+        label.style.gap = '5px';
         const title = document.createElement('span');
 
         title.textContent = ` ${column.getDefinition().title}`;
 
         label.appendChild(icon);
         label.appendChild(title);
-
+        const { toggleVisibleColumns } = this;
         // create menu item
         menu.push({
           label,
@@ -547,27 +689,37 @@ export default {
             e.stopPropagation();
 
             const visibleColumns = columns.filter((item) => item.isVisible()).length;
-
             if (visibleColumns > 1) {
               // toggle current column visibility
               column.toggle();
             } else if (visibleColumns === 1 && !column.isVisible()) {
               column.toggle();
             }
-
             // change menu item icon
             if (column.isVisible()) {
-              icon.classList.remove('name_closeBig');
-              icon.classList.add('name_check');
+              icon.classList.remove('eva-basic_checkbox');
+              icon.classList.add('eva-basic_checkbox_checked');
             } else {
-              icon.classList.remove('name_check');
-              icon.classList.add('name_closeBig');
+              icon.classList.remove('eva-basic_checkbox_checked');
+              icon.classList.add('eva-basic_checkbox');
             }
+            toggleVisibleColumns(column.getField());
           },
         });
       }
 
       return menu;
+    },
+    toggleVisibleColumns(column) {
+      const isVisible = this.visibleColumns.indexOf(column) !== -1;
+      const updatedValue = isVisible
+        ? this.visibleColumns.filter((el) => el !== column)
+        : [...this.visibleColumns, column];
+      this.$store.commit('setState', [{
+        object: this.getOptions,
+        prop: 'titles',
+        value: updatedValue,
+      }]);
     },
     cellClickEvent(e, { _cell: cell }) {
       // For token\click-event
@@ -672,6 +824,7 @@ export default {
         });
     },
     execute(action) {
+      this.isDownloadModal = false;
       this[action]();
     },
     getDataFromTable() {
@@ -680,12 +833,11 @@ export default {
     destroyTable() {
       if (this.tabulator) {
         this.tabulator.destroy();
+        this.tabulator = null;
       }
     },
     persistenceWriterFunc(id, type, data) {
       if (data?.length > 0 && this.dataRestFrom?.length > 0) {
-        // console.log('persistenceWriterFunc', data);
-        // console.log('persistenceWriterFunc store', this.dashFromStore.tableOptions[`${id}-${type}`]);
         if (!this.dashFromStore?.tableOptions) {
           this.$store.commit('setState', [{
             object: this.dashFromStore,
@@ -700,18 +852,21 @@ export default {
             value: [],
           }]);
         }
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.tableOptions,
-          prop: `${id}-${type}`,
-          value: structuredClone(data),
-        }]);
+        const dataFromStore = this.dashFromStore.tableOptions[`${id}-${type}`];
+        if (JSON.stringify(dataFromStore) !== JSON.stringify(data)) {
+          this.$store.commit('setState', [{
+            object: this.dashFromStore.tableOptions,
+            prop: `${id}-${type}`,
+            value: structuredClone(data),
+          }]);
+        }
       }
     },
     persistenceReaderFunc(id, type) {
-      // console.log('persistenceReaderFunc', this.dashFromStore?.tableOptions);
-      if (this.dashFromStore?.tableOptions && this.dashFromStore.tableOptions[`${id}-${type}`]
-          && this.dashFromStore.tableOptions[`${id}-${type}`].length > 0) {
-        return structuredClone(this.dashFromStore.tableOptions[`${id}-${type}`]);
+      const { tableOptions } = this.dashFromStore;
+      if (tableOptions && tableOptions[`${id}-${type}`]
+          && tableOptions[`${id}-${type}`].length > 0) {
+        return structuredClone(tableOptions[`${id}-${type}`]);
       }
       return false;
     },
@@ -775,68 +930,57 @@ export default {
         over: '>',
         less: '<',
       };
-      if (this.tabulator) {
-        const rows = this.tabulator.rowManager.getRows();
-        if (rows) {
-          rows.forEach((row) => {
-            if (row.getCells()) {
-              let eventType;
-              let targetCell;
-              let firstValue;
-              let secondValue;
-              let color;
-              let compare;
-              let cellElement;
-              row.getCells().forEach((cell) => {
-                this.events.forEach((event) => {
-                  console.log(event);
-                  if (event.prop[0] === 'cellcolor') {
-                    [eventType] = event.prop;
-                    compare = compareEval[event.compare];
-                    [color] = event.value;
-                    if (event.column === cell.column.getField()) {
-                      targetCell = cell.element;
-                      cellElement = cell;
-                      firstValue = cell.getValue();
-                    }
-                    if (this.searchSchema[event.row]) {
-                      if (event.row === cell.column.getField()) {
-                        secondValue = cell.getValue();
-                      }
-                    } else {
-                      secondValue = event.row;
-                    }
-                    // console.group();
-                    // console.log('event', event);
-                    // console.log('compare', compare);
-                    // console.log('cell', cell);
-                    // console.log('cell_name', cell.column.getField());
-                    // console.log('cell_value', cell.getValue());
-                    // console.log('cell_element', cell.getElement());
-                    // console.groupEnd();
-                  }
-                });
-              });
-              if (eventType && eventType === 'cellcolor') {
-                console.log('targetCell', targetCell);
-                const comparisonResult = this.getComparisonResult(compare, {
-                  val: firstValue,
-                  secondVal: secondValue,
-                });
-                if (comparisonResult && color) {
-                  targetCell.style.backgroundColor = color;
-                  cellElement.element = targetCell;
-                  // console.log([...document
-                  //   .getElementById(this.idFrom)
-                  //   .querySelectorAll('[tabulator-field=a]')]
-                  //   .filter((el) => el.classList.contains('tabulator-cell')
-                  //   && el.innerHTML === '1'));
-                }
-              }
-            }
-          });
+
+      if (!this.tabulator?.rowManager?.getRows()) {
+        return;
+      }
+      // eslint-disable-next-line no-restricted-syntax
+      for (const row of this.tabulator.rowManager.getRows()) {
+        if (!row.getCells()) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        // eslint-disable-next-line no-restricted-syntax
+        for (const cell of row.getCells()) {
+          const field = cell.column.getField();
+          const event = this.findEvent(field);
+
+          if (!event) {
+            // eslint-disable-next-line no-continue
+            continue;
+          }
+
+          const [eventType, compare, color, secondValue] = event.prop;
+
+          if (eventType !== 'cellcolor') {
+            // eslint-disable-next-line no-continue
+            continue;
+          }
+
+          const targetCell = cell.element;
+          const firstValue = cell.getValue();
+          const comparisonResult = this.getComparisonResult(
+            compareEval[compare],
+            { val: firstValue, secondVal: secondValue },
+          );
+
+          if (comparisonResult && color) {
+            targetCell.style.backgroundColor = color;
+            cell.element = targetCell;
+          }
         }
       }
+    },
+    findEvent(field) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const event of this.events) {
+        if (event.prop[0] === 'cellcolor' && event.column === field) {
+          return event;
+        }
+      }
+
+      return null;
     },
     getComparisonResult(compare, { val, secondVal }) {
       switch (compare) {
@@ -910,7 +1054,7 @@ export default {
   }
 }
 
-/*Theme the Tabulator element*/
+/*Theme the this.tabulator element*/
 .editable-table {
   *::-webkit-scrollbar {
     width: 10px;
@@ -1054,19 +1198,20 @@ export default {
   }
 
 }
-//.tabulator-menu.tabulator-popup-container {
-//  & > .tabulator-menu-item {
-//    color: var(--main_text)!important;
-//    background-color: var(--main_bg)!important;
-//    transition: all 0.3s ease-in-out;
-//
-//    &:hover {
-//      background-color: var(--primary_button)!important;
-//      color: var(--main_bg)!important;
-//    }
-//
-//  }
-//
-//}
+.tabulator-menu.tabulator-popup-container {
+  max-height: 180px;
+  & > .tabulator-menu-item {
+    color: var(--main_text)!important;
+    background-color: var(--main_bg)!important;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+      background-color: var(--primary_button)!important;
+      color: var(--main_bg)!important;
+    }
+
+  }
+
+}
 
 </style>

@@ -1179,6 +1179,9 @@ export default {
     getSelectedTableTitles() {
       return this.elementFromStore?.selectedTableTitles;
     },
+    frozenColumns() {
+      return this.elementFromStore?.frozenColumns;
+    },
     getMetricsMulti() {
       if (!this.elementFromStore.metrics) {
         this.$store.commit('setState', [{
@@ -1719,6 +1722,16 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
+              } else if (item === 'frozenColumns') {
+                let val = options[item];
+                if (!val) {
+                  // old settings
+                  const oldVal = this.frozenColumns;
+                  if (oldVal) {
+                    val = oldVal;
+                  }
+                }
+                localOptions[item] = val || [];
               } else if (
                 item === 'ListDS'
                   || item === 'ListTokens'
@@ -1750,6 +1763,9 @@ export default {
                   }
                 }
               } else {
+                console.log(options[item]);
+                console.log(options);
+                console.log(item);
                 localOptions[item] = options[item]
                 !== null
                 && typeof options[item]

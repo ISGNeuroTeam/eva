@@ -126,19 +126,6 @@ export default {
       name: 'Таблица v2',
       img: mdiTableLarge,
       type: 'tableV2',
-      dataSourceDescription:
-        '#### Обязательные поля:\n'
-        + '- ```title``` - Название столбца, строка\n'
-        + '- ```value``` - Значение столбца, число\n'
-        + '#### Дополнительные поля:\n'
-        + '- ```isTotal``` - Отобразить столбак суммы, булевый\n'
-        + '#### Пример данных:\n'
-        + '| title | value | isTotal | comment |\n'
-        + '| :--- | :---: | :---: | ---: |\n'
-        + '| Total 1 | 182527 | True | text |\n'
-        + '| Cost of Revenue | -84732 | | text html |\n'
-        + '| Operating Expenses | -56571 | | |\n'
-        + '| Total 2 | | True | |\n',
     },
   ],
   size: {
@@ -325,21 +312,19 @@ export default {
     ],
     table: [
       'boxShadow',
-      'rowcolor',
-      'columncolor',
-      'cellcolor',
-      'selectRowColor',
+      'selectableRow',
       'lastResult',
       'titles',
     ],
     tableV2: [
       'boxShadow',
-      'rowcolor',
-      'columncolor',
-      'cellcolor',
-      'selectRowColor',
+      'tableOptions',
+      'selectableRow',
       'lastResult',
+      'movableColumns',
+      'defaultFilterAllColumns',
       'titles',
+      'frozenColumns',
     ],
     select: [
       'boxShadow',
@@ -777,25 +762,60 @@ export default {
 
     // dashTable
     {
-      option: 'rowcolor',
-      description: 'Выбрать цвет которым подсветится нужная строка',
-      elem: 'text-field',
+      group: 'Настройки таблицы',
+      option: 'tableOptions',
     },
     {
-      option: 'columncolor',
-      description: 'Выбрать цвет которым подсветится нужный столбец',
-      elem: 'text-field',
-    },
-    {
-      option: 'cellcolor',
-      description: 'Выбрать цвет которым подсветится нужная ячейка',
-      elem: 'text-field',
-    },
-    {
-      option: 'selectRowColor',
+      option: 'selectableRow',
+      optionGroup: 'tableOptions',
       description: 'Подсвечивать выбранную строку',
       elem: 'switch',
       default: false,
+    },
+    {
+      option: 'movableColumns',
+      optionGroup: 'tableOptions',
+      description: 'Возможность двигать столбцы',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'defaultFilterAllColumns',
+      optionGroup: 'tableOptions',
+      description: 'Вкл/выкл фильтры столбцов(по-умолчанию)',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'titles',
+      optionGroup: 'tableOptions',
+      description: 'Столбцы для отображения',
+      elem: 'select-checkbox',
+      items() {
+        // this is modalSettings context
+        const storeElement = this.$store.state[this.idDash][this.element];
+        const savedTitles = storeElement?.options?.titles || [];
+        const curTitles = storeElement?.availableTableTitles || [];
+        return structuredClone([...new Set([...savedTitles, ...curTitles])]);
+      },
+      default: '',
+    },
+    {
+      option: 'frozenColumns',
+      optionGroup: 'tableOptions',
+      description: 'Закрепленные столбцы',
+      elem: 'select-checkbox',
+      items() {
+        // this is modalSettings context
+        const storeElement = this.$store.state[this.idDash][this.element];
+        const savedTitles = storeElement?.options?.frozenColumns || [];
+        const curTitles = storeElement?.availableTableTitles || [];
+        console.log('curTitles', curTitles);
+        console.log('savedTitles', savedTitles);
+        console.log('sum', [...new Set([...savedTitles, ...curTitles])]);
+        return structuredClone([...new Set([...savedTitles, ...curTitles])]);
+      },
+      default: '',
     },
 
     // dashSingle, dashButton
@@ -817,21 +837,6 @@ export default {
       option: 'name',
       description: 'Выбрать название кнопки',
       elem: 'text-field',
-    },
-
-    // dashTable
-    {
-      option: 'titles',
-      description: 'Столбцы для отображения',
-      elem: 'checkbox-list',
-      items() {
-        // this is modalSettings context
-        const storeElement = this.$store.state[this.idDash][this.element];
-        const savedTitles = storeElement?.options?.titles || [];
-        const curTitles = storeElement?.availableTableTitles || [];
-        return new Set([...savedTitles, ...curTitles]);
-      },
-      default: [],
     },
 
     // dashHeatMap, (maybe dashTable, dashTable)

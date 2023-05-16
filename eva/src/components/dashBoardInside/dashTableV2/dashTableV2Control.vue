@@ -1,5 +1,6 @@
 <template>
   <div class="Buttons">
+    <!--upload-->
     <v-tooltip
       v-if="getButtonVisibleStatus('upload')"
       bottom
@@ -19,6 +20,7 @@
       </template>
       <span>Write to server</span>
     </v-tooltip>
+    <!--addRow-->
     <v-tooltip
       v-if="getButtonVisibleStatus('addRow')"
       bottom
@@ -38,6 +40,7 @@
       </template>
       <span>Add new row</span>
     </v-tooltip>
+    <!--deleteRow-->
     <v-tooltip
       v-if="getButtonVisibleStatus('deleteRow')"
       bottom
@@ -57,6 +60,7 @@
       </template>
       <span>Delete selected rows</span>
     </v-tooltip>
+    <!--undo-->
     <v-tooltip
       v-if="getButtonVisibleStatus('undo')"
       bottom
@@ -76,6 +80,7 @@
       </template>
       <span>Undo</span>
     </v-tooltip>
+    <!--redo-->
     <v-tooltip
       v-if="getButtonVisibleStatus('redo')"
       bottom
@@ -95,120 +100,35 @@
       </template>
       <span>Redo</span>
     </v-tooltip>
-
-    <!--    <span class="ButtonsSeparator" />
-
-    <base-dropdown
-      v-if="false"
+    <v-menu
+      v-if="getButtonVisibleStatus('download')"
       class="listDropDownWrapper"
     >
-      <div slot="toggle-btn">
-        <base-tooltip
-          content="Load from local file"
-          placement="bottom"
-        >
-          <base-icon-button>
-            <span
-              v-if="!loadListIsActive"
-              class="FontIcon size_md"
-              :class="loadArrowIcon"
-              @click="openLoadFileList"
-            />
-            <span
-              v-else
-              class="FontIcon size_md"
-              :class="loadArrowIcon"
-              @click="loadListIsActive = false"
-            />
-          </base-icon-button>
-        </base-tooltip>
-
-        <div
-          v-if="loadListIsActive"
-          class="Select"
-        >
-          <ul
-            v-click-outside="openLoadFileList"
-            class="Menu"
+      <template v-slot:activator="{ on }">
+        <div class="d-flex">
+          <v-icon
+            :style="{ color: theme.$secondary_text }"
+            v-on="on"
           >
-            <li
-              v-for="(item, index) in this.loadFiles"
-              :key="index"
-
-              class="Item"
-              @click="loadFile(index)"
-            >
-              {{ item }}
-            </li>
-          </ul>
+            {{ mdiDownload }}
+          </v-icon>
         </div>
+      </template>
+      <div class="Select">
+        <ul class="Menu">
+          <li
+            v-for="(item, index) in downloadFiles"
+            :key="index"
+
+            class="Item"
+            @click="downloadFile(index)"
+          >
+            {{ item }}
+          </li>
+        </ul>
       </div>
       <span slot="icon-arrow" />
-    </base-dropdown>
-
-    <base-dropdown class="listDropDownWrapper">
-      <div slot="toggle-btn">
-        <base-tooltip
-          content="Download file"
-          placement="bottom"
-        >
-          <base-icon-button>
-            <span
-              v-if="!downloadListIsActive"
-              class="FontIcon size_md"
-              :class="downloadArrowIcon"
-              @click="openDownloadFileList"
-            />
-            <span
-              v-else
-              class="FontIcon size_md"
-              :class="downloadArrowIcon"
-              @click="downloadListIsActive = false"
-            />
-          </base-icon-button>
-        </base-tooltip>
-
-        <div
-          v-if="downloadListIsActive"
-          class="Select"
-        >
-          <ul
-            v-click-outside="closeDownloadFileList"
-            class="Menu"
-          >
-            <li
-              v-for="(item, index) in this.downloadFiles"
-              :key="index"
-
-              class="Item"
-              @click="downloadFile(index)"
-            >
-              {{ item }}
-            </li>
-          </ul>
-        </div>
-      </div>
-      <span slot="icon-arrow" />
-    </base-dropdown>
-
-    <span class="ButtonsSeparator" />
-    <base-tooltip
-      content="Undo"
-      placement="bottom"
-    >
-      <base-icon-button @click="$emit('action', 'undo')">
-        <span class="FontIcon name_undo" />
-      </base-icon-button>
-    </base-tooltip>
-
-    <base-tooltip
-      content="Redo"
-      placement="bottom"
-    >
-      <base-icon-button @click="$emit('action', 'redo')">
-        <span class="FontIcon name_redo" />
-      </base-icon-button>
-    </base-tooltip>-->
+    </v-menu>
   </div>
 </template>
 
@@ -217,6 +137,7 @@ import {
   mdiUpload,
   mdiTableRowPlusAfter,
   mdiDelete,
+  mdiDownload,
 } from '@mdi/js';
 
 export default {
@@ -236,6 +157,7 @@ export default {
     mdiUpload,
     mdiTableRowPlusAfter,
     mdiDelete,
+    mdiDownload,
     downloadListIsActive: false,
     downloadFiles: {
       downloadCSV: 'CSV',
@@ -310,7 +232,7 @@ export default {
 
 <style lang="scss" scoped>
 .Buttons {
-  padding: 0 10px 10px;
+  padding: 0;
   display: flex;
   flex-wrap: wrap;
   column-gap: 4px;
@@ -326,15 +248,10 @@ export default {
 }
 
 .Select {
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
   min-width: 160px;
   width: 249px;
   display: inline-block;
   vertical-align: middle;
-  z-index: 1;
 
   .Menu {
     border: 1px solid var(--border);
