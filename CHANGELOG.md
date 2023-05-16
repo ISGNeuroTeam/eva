@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Problem with SingleValue Initialization in GridGroup component
 - GridGroup: When using zoom, there is an offset for the multiline
 - Single value has a checkbox that adds free space instead of the component header
 

@@ -378,7 +378,10 @@ export default {
       }
     },
     receivedSettings(newValue) {
-      const newSettings = structuredClone(newValue);
+      const newSettings = structuredClone({
+        metricOptions: [],
+        ...newValue,
+      });
       // TODO: метрики приходят без id это вызывает кучу ошибок в консоли!!!!
       this.$set(
         this,
