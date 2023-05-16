@@ -12,6 +12,10 @@ $dash-loading-height: 3px
   .heatmap-table
     height: 100%
     background-color: var(--main_bg)
+    *::-webkit-scrollbar
+      width: 10px
+      height: 10px
+
 
     .table-th
       color: var(--main_text)
@@ -26,6 +30,14 @@ $dash-loading-height: 3px
 
               &:hover
                 color: var(--main_text) !important
+    &__relative-row
+      position: relative
+    &__sticky-column
+      position: sticky
+      left: 0
+      right: 0
+      z-index: 3
+      border-right: 1px solid var(--main_border)
 
   tbody
     tr
