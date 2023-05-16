@@ -1015,7 +1015,6 @@ export default {
     updateSettings(localSettings) {
       this.settings = JSON.parse(JSON.stringify(localSettings));
     },
-
     // изменяем имя элемнета
     editName(props) {
       props.edit = true;
@@ -1115,10 +1114,16 @@ export default {
       this.$emit('SetOpacity', opacity);
       this.$emit('SetLevel', level);
     },
+
     exportDataCSV() {
-      const searchId = this.$store.state[this.idDash][this.element].search;
-      this.$emit('downloadData', searchId);
+      if (this.element.includes('tableV2')) {
+        this.$refs.screenCard.openDownloadModal();
+      } else {
+        const searchId = this.$store.state[this.idDash][this.element].search;
+        this.$emit('downloadData', searchId);
+      }
     },
+
     getData(searchID) {
       // асинхронная функция для получения даных с реста
       let db = null;
