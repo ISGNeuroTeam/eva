@@ -1763,9 +1763,6 @@ export default {
                   }
                 }
               } else {
-                console.log(options[item]);
-                console.log(options);
-                console.log(item);
                 localOptions[item] = options[item]
                 !== null
                 && typeof options[item]

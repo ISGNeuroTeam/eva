@@ -322,8 +322,8 @@ export default {
       'selectableRow',
       'lastResult',
       'movableColumns',
+      'saveMovedColumnPosition',
       'defaultFilterAllColumns',
-      'titles',
       'frozenColumns',
     ],
     select: [
@@ -780,26 +780,34 @@ export default {
       default: true,
     },
     {
+      relation: ['movableColumns'],
+      option: 'saveMovedColumnPosition',
+      optionGroup: 'tableOptions',
+      description: 'Сохранять позицию колонок',
+      elem: 'switch',
+      default: false,
+    },
+    {
       option: 'defaultFilterAllColumns',
       optionGroup: 'tableOptions',
       description: 'Вкл/выкл фильтры столбцов(по-умолчанию)',
       elem: 'switch',
       default: true,
     },
-    {
-      option: 'titles',
-      optionGroup: 'tableOptions',
-      description: 'Столбцы для отображения',
-      elem: 'select-checkbox',
-      items() {
-        // this is modalSettings context
-        const storeElement = this.$store.state[this.idDash][this.element];
-        const savedTitles = storeElement?.options?.titles || [];
-        const curTitles = storeElement?.availableTableTitles || [];
-        return structuredClone([...new Set([...savedTitles, ...curTitles])]);
-      },
-      default: '',
-    },
+    // {
+    //   option: 'titles',
+    //   optionGroup: 'tableOptions',
+    //   description: 'Столбцы для отображения',
+    //   elem: 'select-checkbox',
+    //   items() {
+    //     // this is modalSettings context
+    //     const storeElement = this.$store.state[this.idDash][this.element];
+    //     const savedTitles = storeElement?.options?.titles || [];
+    //     const curTitles = storeElement?.availableTableTitles || [];
+    //     return structuredClone([...new Set([...savedTitles, ...curTitles])]);
+    //   },
+    //   default: '',
+    // },
     {
       option: 'frozenColumns',
       optionGroup: 'tableOptions',
@@ -810,9 +818,6 @@ export default {
         const storeElement = this.$store.state[this.idDash][this.element];
         const savedTitles = storeElement?.options?.frozenColumns || [];
         const curTitles = storeElement?.availableTableTitles || [];
-        console.log('curTitles', curTitles);
-        console.log('savedTitles', savedTitles);
-        console.log('sum', [...new Set([...savedTitles, ...curTitles])]);
         return structuredClone([...new Set([...savedTitles, ...curTitles])]);
       },
       default: '',

@@ -8,7 +8,8 @@
       class="dash-table-v2-container"
       :style="{
         ...customStyle,
-        height: sizeFrom.height - 42 + 'px',
+        height: Math.round(sizeFrom.height) - 42 + 'px',
+        width: Math.round(sizeFrom.width - 4) + 'px',
       }"
       :class="customClass"
       v-bind="$attrs"
@@ -107,13 +108,113 @@ import {
 } from '@mdi/js';
 import { throttle } from '@/js/utils/throttle';
 
+// eslint-disable-next-line func-names
 const colorFixed = function (cell) {
   cell.getElement().style.backgroundColor = this.sanitizeHTML(cell.getValue());
 
   return '&nbsp;';
 };
 
-// const tabulatorInstance = null;
+// eslint-disable-next-line func-names
+const headerFilter = function (cell, onRendered, success, cancel /* editorParams */) {
+  // const field = cell.getField();
+  const container = document.createElement('span');
+  container.classList.add('dash-table-v2-container__filter-container');
+
+  // create and style select element
+  const select = document.createElement('select');
+  select.classList.add('dash-table-v2-container__filter-select');
+  ['', '>', '<', '=', '>=', '<=', '!='].forEach((item) => {
+    const option = document.createElement('option');
+    option.classList.add('dash-table-v2-container__filter-select-option');
+    option.value = item;
+    option.textContent = item;
+    select.appendChild(option);
+  });
+  select.placeholder = 'Знак';
+  select.style.padding = '4px';
+  select.style.boxSizing = 'border-box';
+
+  // create and style text input element
+  const textInput = document.createElement('input');
+  textInput.type = 'text';
+  textInput.classList.add('dash-table-v2-container__filter-input');
+  textInput.placeholder = 'Значение';
+
+  let selectValue = '';
+  let textValue = '';
+
+  function buildValues() {
+    success({
+      selectValue,
+      textValue,
+    });
+  }
+
+  function keypress(e) {
+    if (e.keyCode === 13) {
+      buildValues();
+    }
+
+    if (e.keyCode === 27) {
+      cancel();
+    }
+  }
+
+  function updateTextValue(value) {
+    textValue = Number.isNaN(+value) ? value : +value;
+  }
+
+  // add event listeners
+  select.addEventListener('change', (e) => {
+    selectValue = e.target.value;
+    if (textValue !== '') {
+      buildValues();
+    }
+  });
+  select.addEventListener('keydown', (e) => {
+    selectValue = e.target.value;
+    if (textValue !== '') {
+      keypress(e);
+    }
+  });
+
+  textInput.addEventListener('input', (e) => {
+    updateTextValue(e.target.value);
+    buildValues();
+  });
+
+  textInput.addEventListener('keydown', (e) => {
+    updateTextValue(e.target.value);
+    keypress(e);
+  });
+
+  // append elements to container
+  container.appendChild(select);
+  container.appendChild(textInput);
+
+  return container;
+};
+
+// eslint-disable-next-line func-names
+const headerFilterFn = function (headerValue, rowValue /* rowData, */ /* filterParams */) {
+  const compare = headerValue.selectValue;
+  const filterValue = headerValue.textValue;
+  switch (compare) {
+    case '>':
+      return rowValue > filterValue;
+    case '<':
+      return rowValue < filterValue;
+    case '=':
+      return rowValue === filterValue;
+    case '>=':
+      return rowValue >= filterValue;
+    case '<=':
+      return rowValue <= filterValue;
+    default:
+      return true;
+  }
+};
 
 export default {
   name: 'DashTableV2',
@@ -138,10 +239,6 @@ export default {
       type: Array,
       default: () => ([]),
     },
-    // columns: {
-    //   type: Array,
-    //   default: () => ([])
-    // },
     idFrom: {
       type: String,
       required: true,
@@ -154,10 +251,6 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    // columnOptions: {
-    //   type: Object,
-    //   default: () => ({}),
-    // },
     writeStatus: {
       type: String,
       default: '',
@@ -203,8 +296,11 @@ export default {
     };
   },
   computed: {
-    elementId() {
-      return this.fullScreenMode ? `fullScreen${this.idFrom}` : this.idFrom;
+    isEdit() {
+      return this.$store.state[this.idDashFrom].editMode;
+    },
+    fields() {
+      return this.getOptions.fieldList || [];
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -227,96 +323,86 @@ export default {
           headerFilter: this.defaultFilterAllColumns,
           headerMenu: true,
           frozen: this.frozenColumns.includes(column),
-          visible: this.visibleColumns.includes(column),
         };
       });
       return columnOptions;
     },
     columns() {
-      const defaultColumns = this.options.selectColumn ? [
-        {
-          title: 'Выделение',
-          formatter: 'rowSelection',
-          titleFormatter: 'rowSelection',
-          width: 50,
-          hozAlign: 'center',
-          headerHozAlign: 'center',
-          headerSort: false,
-          cellClick(e, cell) {
-            cell.getRow().toggleSelect();
+      const defaultColumns = this.options.selectColumn
+        ? [
+          {
+            title: 'Выделение',
+            formatter: 'rowSelection',
+            titleFormatter: 'rowSelection',
+            width: 50,
+            hozAlign: 'center',
+            headerHozAlign: 'center',
+            headerSort: false,
+            cellClick(e, cell) {
+              cell.getRow().toggleSelect();
+            },
           },
-        },
-      ] : [];
+        ]
+        : [];
 
-      if (this.columnOptions && !!Object.keys(this.columnOptions).length) {
-        return Object.keys(this.searchSchema).reduce((acc, key) => {
+      if (this.columnOptions && Object.keys(this.columnOptions).length) {
+        return this.fields.reduce((acc, key) => {
           if (key === '_columnOptions') {
             return acc;
           }
+
           const options = this.columnOptions[key];
           const column = {
             field: key,
             title: options?.title || key,
+            resizable: 'header',
             frozen: options?.frozen || false,
-            visible: typeof options.visible !== 'undefined'
-              ? options.visible
-              : true,
-            headerFilter: options?.headerFilter
-              ? this.headerFilter
-              : false,
+            headerFilter: options?.headerFilter ? headerFilter : false,
+            headerFilterLiveFilter: false,
+            headerFilterFunc: this.options.defaultFilterAllColumns ? headerFilterFn : false,
             editor: options?.editor || false,
-            headerMenu: options?.headerMenu ? this.headerMenu : false,
+            headerMenu: options?.headerMenu && this.isEdit ? this.headerMenu : false,
             cellClick: this.cellClickEvent,
-            minWidth: options?.headerFilter
-              ? options?.minWidth || 150
-              : options?.minWidth || 80,
+            minWidth: options?.minWidth || (options?.headerFilter ? 150 : 80),
           };
+
           if (options?.formatter) {
-            if (options?.formatter === 'color') {
-              column.formatter = colorFixed;
-            } else {
-              column.formatter = options?.formatter;
-            }
+            column.formatter = options.formatter === 'color' ? colorFixed : options.formatter;
           }
+
           if (options?.formatter === 'tickCross') {
             column.headerFilterParams = { tristate: true };
-            column.headerFilterEmptyCheck = function (value) {
-              return value === null;
-            };
+            column.headerFilterEmptyCheck = (value) => value === null;
           }
-          if (options?.editor === 'list' && options?.editorParams) {
+
+          if (options?.editor === 'list' && options.editorParams) {
             column.editorParams = options.editorParams;
             column.headerFilter = 'input';
           }
-          return [
-            ...acc,
-            column,
-          ];
+
+          return [...acc, column];
         }, defaultColumns);
       }
 
-      return Object.keys(this.searchSchema).reduce((acc, key) => {
+      return this.fields.reduce((acc, key) => {
         const column = {
           field: key,
           title: key,
-          // editor: this.searchSchema[key] === 'BOOLEAN' ? 'tickCross' : true,
-          editor: false,
-          headerMenu: this.headerMenu,
-          headerFilter: this.options.defaultFilterAllColumns
-            ? this.headerFilter
-            : false,
+          resizable: 'header',
+          editor: this.searchSchema[key] === 'BOOLEAN' ? 'tickCross' : true,
+          headerMenu: this.isEdit ? this.headerMenu : false,
+          headerFilter: this.options.defaultFilterAllColumns ? headerFilter : false,
+          headerFilterFunc: this.options.defaultFilterAllColumns ? headerFilterFn : false,
           cellClick: this.cellClickEvent,
         };
 
         if (this.searchSchema[key] === 'BOOLEAN') {
           column.formatter = 'tickCross';
           column.headerFilterParams = { tristate: true };
-          column.headerFilterEmptyCheck = function (value) { return value === null; };
+          column.headerFilterEmptyCheck = (value) => value === null;
         }
-        return [
-          ...acc,
-          column,
-        ];
+
+        return [...acc, column];
       }, defaultColumns);
     },
     events() {
@@ -338,20 +424,32 @@ export default {
       return this.getOptions.titles || [];
     },
     selectableRow() {
-      return this.getOptions.selectableRow || false;
+      return !!this.getOptions.selectableRow;
     },
     movableColumns() {
-      return this.getOptions.movableColumns || false;
+      if (this.isEdit) {
+        return this.getOptions.movableColumns || false;
+      }
+      return false;
     },
     defaultFilterAllColumns() {
-      return this.getOptions.defaultFilterAllColumns || false;
+      return !!this.getOptions.defaultFilterAllColumns;
+    },
+    saveMovedColumnPosition() {
+      return !!this.getOptions.saveMovedColumnPosition;
     },
   },
   watch: {
     searchSchema: {
-      handler(val) {
-        this.createHeaderFilters();
-        this.setAction(val);
+      handler(value) {
+        if (Object.keys(value)?.length > 0) {
+          const isUpdatedValue = this.fields?.length > 0 && this.saveMovedColumnPosition
+            ? this.checkFieldList(Object.keys(value), structuredClone(this.fields))
+            : true;
+          if (isUpdatedValue) {
+            this.updateFieldListInStore(Object.keys(value));
+          }
+        }
       },
       deep: true,
     },
@@ -361,11 +459,7 @@ export default {
           if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
             this.$nextTick(() => {
               this.$nextTick(() => {
-                if (this.tabulator) {
-                  this.tabulator.redraw();
-                } else {
-                  this.createTable();
-                }
+                this.createTable();
               });
             });
           }
@@ -381,95 +475,64 @@ export default {
       },
       deep: true,
     },
-    fullScreenMode() {
-      this.redrawTable();
+    fullScreenMode(val, oldVal) {
+      if (val !== oldVal) {
+        this.redrawTable();
+      }
     },
-    frozenColumns() {
-      this.redrawTable();
+    frozenColumns: {
+      handler(val, oldVal) {
+        if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+          // this.redrawTable();
+          this.tabulator.redraw();
+        }
+      },
+      deep: true,
     },
-    visibleColumns() {
-      this.updateColumnDefinition();
+    selectableRow(val, oldVal) {
+      if (val !== oldVal) {
+        this.redrawTable();
+      }
     },
-    selectableRow() {
-      this.redrawTable();
+    movableColumns(val, oldVal) {
+      if (val !== oldVal) {
+        this.redrawTable();
+      }
     },
-    movableColumns() {
-      this.redrawTable();
+    saveMovedColumnPosition(val, oldVal) {
+      if (val !== oldVal) {
+        this.redrawTable();
+      }
     },
-    defaultFilterAllColumns() {
-      this.updateColumnDefinition();
+    defaultFilterAllColumns(val, oldVal) {
+      if (val !== oldVal) {
+        this.updateColumnDefinition();
+      }
     },
   },
   mounted() {
     if (this.dataRestFrom?.length > 0) {
       this.setAction(this.searchSchema);
-      this.redrawTable();
-      this.createHeaderFilters();
+      this.redrawTable(true);
     }
   },
   created() {
     this.createTable = throttle(this.createTable, 500);
-    this.setFilter = throttle(this.setFilter, 50);
+    this.redrawTable = throttle(this.redrawTable, 500);
+    this.persistenceWriterFunc = throttle(this.persistenceWriterFunc, 500);
+    this.persistenceReaderFunc = throttle(this.persistenceReaderFunc, 500);
   },
   beforeDestroy() {
     this.destroyTable();
   },
   methods: {
+    checkFieldList(arr, oldArr) {
+      const sortedOldArr = [...oldArr].sort().join(',');
+      const sortedArr = [...arr].sort().join(',');
+      return sortedArr !== sortedOldArr;
+    },
     openDownloadModal() {
       this.isDownloadModal = true;
-    },
-    headerFilter(cell) {
-      const field = cell.getField();
-      const container = document.createElement('span');
-      container.classList.add('dash-table-v2-container__filter-container');
-
-      // create and style select element
-      const select = document.createElement('select');
-      select.classList.add('dash-table-v2-container__filter-select');
-      ['', '>', '<', '=', '>=', '<=', '!='].forEach((item) => {
-        const option = document.createElement('option');
-        option.classList.add('dash-table-v2-container__filter-select-option');
-        option.value = item;
-        option.textContent = item;
-        select.appendChild(option);
-      });
-      select.placeholder = 'Знак';
-      select.style.padding = '4px';
-      select.style.boxSizing = 'border-box';
-
-      // create and style text input element
-      const textInput = document.createElement('input');
-      textInput.type = 'text';
-      textInput.classList.add('dash-table-v2-container__filter-input');
-      textInput.placeholder = 'Значение';
-
-      let selectValue = '';
-      let textValue = '';
-
-      const setFilter = () => {
-        if (selectValue && textValue) {
-          this.setFilter(field, selectValue, textValue);
-        } else {
-          this.tabulator.clearFilter();
-        }
-      };
-
-      // add event listeners
-      select.addEventListener('change', () => {
-        selectValue = select.value;
-        setFilter();
-      });
-
-      textInput.addEventListener('input', () => {
-        textValue = textInput.value;
-        setFilter();
-      });
-
-      // append elements to container
-      container.appendChild(select);
-      container.appendChild(textInput);
-
-      return container;
     },
     getPosition(el, offset = 0) {
       let xPosition = 0;
@@ -494,24 +557,6 @@ export default {
         x: xPosition,
         y: yPosition - offset,
       };
-    },
-    closePopup() {
-      document.addEventListener('click', () => {
-        const result = structuredClone(this.headerFilters);
-        Object.keys(result).forEach((key) => {
-          result[key].isOpen = false;
-        });
-        this.headerFilters = result;
-      });
-    },
-    createHeaderFilters() {
-      const result = {};
-      Object.keys(this.searchSchema).forEach((key) => {
-        result[key] = {
-          isOpen: false,
-        };
-      });
-      this.headerFilters = result;
     },
     rowFormatter(row) {
       this.events.forEach((event) => {
@@ -570,9 +615,10 @@ export default {
         }, 100);
       }
     },
-    redrawTable() {
+    redrawTable(isFullRedraw) {
       this.$nextTick(() => {
         this.$nextTick(() => {
+          this.updateColumnDefinition();
           this.createTable();
           this.updateDataInTable(this.dataRestFrom);
         });
@@ -582,14 +628,15 @@ export default {
       if (this.tabulator && Object.keys(this.dataRestFrom).length > 0) {
         const tabulatorColumns = this.tabulator.getColumns();
         const columnDefinition = this.columns.reduce((acc, col) => {
-          if (!col.field) {
+          const colField = col.field;
+          // eslint-disable-next-line no-underscore-dangle
+          const tCol = tabulatorColumns.find((item) => item?._column.field === colField);
+          if (!colField || !tCol) {
             return [
               ...acc,
               col,
             ];
           }
-          // eslint-disable-next-line no-underscore-dangle
-          const tCol = tabulatorColumns.find((item) => item?._column.field === col.field);
           return [
             ...acc,
             {
@@ -619,9 +666,11 @@ export default {
         // rowHeight: this.options.rowHeight,
         selectable: this.selectableRow ? 1 : false,
         rowFormatter: this.rowFormatter,
+        renderVerticalBuffer: 50,
         persistence: {
           columns: ['width', 'frozen', 'visible'],
           sort: true,
+          filter: true,
         },
         persistenceID: this.idFrom,
         data: this.tableData, // link data to table
@@ -629,21 +678,6 @@ export default {
 
         // define table columns
         autoColumns: this.isLoadFromFile,
-
-        // autoColumnsDefinitions: (definitions) => {
-        //   definitions.forEach((column) => {
-        //     column.headerFilter = true; // add header filter to every column
-        //     column.editor = 'input';
-        //     column.headerMenu = this.headerMenu;
-        //   });
-        //
-        //   // eslint-disable-next-line max-len
-        //   // definitions.push({ title: 'Выделение', formatter:"rowSelection", titleFormatter:"rowSelection", hozAlign:"center", headerHozAlign:"center", headerSort:false, cellClick:function(e, cell){
-        //   //     cell.getRow().toggleSelect();
-        //   //   }},)
-        //   return definitions;
-        // },
-
         columns: this.columns,
         pagination: 'local',
         paginationSize: true,
@@ -655,6 +689,29 @@ export default {
         persistenceWriterFunc: this.persistenceWriterFunc,
         persistenceReaderFunc: this.persistenceReaderFunc,
       });
+      this.tabulator.on('columnVisibilityChanged', (/* column, visible */) => {
+        // TODO: Добавить переключение видимых колонок с сохранением в store
+      });
+      this.tabulator.on('columnMoved', (column, columns) => {
+        if (this.saveMovedColumnPosition) {
+          const fields = columns.map((el) => el.getField());
+          this.updateFieldListInStore(fields);
+        }
+      });
+    },
+    updateFieldListInStore(fieldList) {
+      if (!this.fields) {
+        this.$store.commit('setState', [{
+          object: this.getOptions,
+          prop: 'fieldList',
+          value: [],
+        }]);
+      }
+      this.$store.commit('setState', [{
+        object: this.getOptions,
+        prop: 'fieldList',
+        value: fieldList,
+      }]);
     },
     headerMenu() {
       const menu = [];
@@ -680,7 +737,7 @@ export default {
 
         label.appendChild(icon);
         label.appendChild(title);
-        const { toggleVisibleColumns } = this;
+        // const { toggleVisibleColumns } = this;
         // create menu item
         menu.push({
           label,
@@ -703,7 +760,7 @@ export default {
               icon.classList.remove('eva-basic_checkbox_checked');
               icon.classList.add('eva-basic_checkbox');
             }
-            toggleVisibleColumns(column.getField());
+            // toggleVisibleColumns(column.getField());
           },
         });
       }
@@ -994,12 +1051,6 @@ export default {
           return false;
       }
     },
-    emptyHeaderFilter() {
-      return document.createElement('div');
-    },
-    setFilter(field, selectValue, textValue) {
-      this.tabulator.setFilter(field, selectValue, textValue);
-    },
   },
 };
 </script>
@@ -1060,28 +1111,45 @@ export default {
     width: 10px;
     height: 10px;
   }
-  background-color: var(--main_bg)!important;
+  *::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: var(--secondary_text);
+  }
+
+  *::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    background-color: var(--secondary_bg) !important;
+  }
+
+  *::-webkit-scrollbar-corner {
+    background-color: var(--secondary_bg);
+  }
+
+  background-color: transparent!important;
   border: none;
   border-radius: 4px;
-
   /*Theme the header*/
   .tabulator-header {
-    background: var(--main_bg)!important;
+    background: transparent!important;
     color: var(--main_text)!important;
     border-color: var(--main_border) !important;
 
     /*Allow column header names to wrap lines*/
     .tabulator-col,
     .tabulator-col-row-handle {
-      background: var(--main_bg)!important;
+      background: transparent!important;
       white-space: normal;
     }
     .tabulator-col {
       border-color: var(--main_border) !important;
+      &.tabulator-frozen {
+        background-color: var(--main_bg) !important;
+      }
     }
 
     .tabulator-header-filter input {
-      background-color: var(--main_bg);
+      background-color: transparent;
       border: 1px solid var(--main_border);
       border-radius: 4.44px;
       padding: 6px 6px;
@@ -1094,7 +1162,7 @@ export default {
 
   .tabulator-row{
     color: var(--main_text)!important;
-    background-color: var(--main_bg);
+    background-color: transparent;
     transition: background-color .3s, color .3s;
     border-bottom: 1px solid var(--main_border);
     &.on-data-compare-color {
@@ -1103,7 +1171,7 @@ export default {
 
     /*Color even rows*/
     &:nth-child(even) {
-      background-color: var(--main_bg)!important;
+      background-color: transparent!important;
       &.on-data-compare-color {
         background-color: transparent;
       }
@@ -1112,17 +1180,27 @@ export default {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      transition: background-color .3s;
+      &.tabulator-frozen {
+        background-color: var(--main_bg)!important;
+      }
+    }
+    &:hover {
+      background-color: var(--main_text) !important;
+      cursor: pointer;
+      color: var(--main_bg) !important;
+      .tabulator-cell {
+        background-color: var(--main_text) !important;
+      }
     }
     &.tabulator-selectable {
-      &:hover {
-        background-color: var(--main_text) !important;
-        cursor: pointer;
-        color: var(--main_bg) !important;
-      }
       &.tabulator-selected {
         background-color: var(--main_text) !important;
         cursor: pointer;
         color: var(--main_bg) !important;
+        .tabulator-cell {
+          background-color: var(--main_text) !important;
+        }
       }
     }
   }
@@ -1131,7 +1209,7 @@ export default {
     border-color: var(--main_border) !important;
   }
   .tabulator-footer {
-    background: var(--main_bg)!important;
+    background: transparent !important;
     border-top: 1px solid var(--main_border)!important;
     color: var(--main_text)!important;
 
@@ -1154,7 +1232,7 @@ export default {
 
       .option {
         cursor: pointer;
-        background-color: var(--main_bg);
+        background-color: transparent;
         border-top: 1px solid var(--main_border);
         color: var(--secondary_text);
       }
@@ -1166,21 +1244,80 @@ export default {
 
     .tabulator-page {
       font-size: 11px;
-      padding: 4px 13px;
-      border-radius: 4.66px;
+      padding: 2px 13px;
+      border-radius: 4px;
       transition: background-color 0.3s;
-      color: var(--main_bg);
-      background-color: var(--primary_button);
-      border: none;
+      color: var(--main_text);
+      background-color: var(--main_bg);
+      border: 1px solid var(--main_text);
+      opacity: 1!important;
+      height: 22px;
+      position: relative;
 
       &:hover {
-        background-color: var(--primary_button)!important;
-        color: var(--main_bg)!important;
+        background-color: var(--main_text) !important;
+        color: var(--main_bg) !important;
+        &[data-page="prev"],
+        &[data-page="next"],
+        &[data-page="last"],
+        &[data-page="first"] {
+          color: transparent !important;
+          &:before {
+            color: var(--main_bg) !important;
+          }
+        }
       }
-
-      &.active {
-        color: var(--background_main)!important;
-        background-color: var(--primary_button)!important;
+      &.active
+      {
+        color: var(--main_text) !important;
+        background-color: var(--secondary_bg)!important;
+      }
+      &[data-page="prev"],
+      &[data-page="next"],
+      &[data-page="last"],
+      &[data-page="first"] {
+        color: transparent !important;
+       &:before {
+         font-family: 'eva-icons' !important;
+         speak: never;
+         font-style: normal;
+         font-weight: normal;
+         font-variant: normal;
+         text-transform: none;
+         line-height: 1;
+         /* Better Font Rendering =========== */
+         -webkit-font-smoothing: antialiased;
+         -moz-osx-font-smoothing: grayscale;
+         position: absolute;
+         left: 50%;
+         top: 50%;
+         transform: translate(-50%, -50%);
+         width: 15px;
+         height: 15px;
+         font-size: 15px;
+         color: var(--main_text);
+         transition: color .3s;
+       }
+      }
+      &[data-page="first"] {
+        &:before {
+          content: "\e919";
+        }
+      }
+      &[data-page="last"] {
+        &:before {
+          content: "\e91a";
+        }
+      }
+      &[data-page="next"] {
+        &:before {
+          content: "\e90e";
+        }
+      }
+      &[data-page="prev"] {
+        &:before {
+          content: "\e90d";
+        }
       }
     }
   }
@@ -1200,13 +1337,15 @@ export default {
 }
 .tabulator-menu.tabulator-popup-container {
   max-height: 180px;
+  text-align: left;
+  border-radius: 2px;
   & > .tabulator-menu-item {
     color: var(--main_text)!important;
     background-color: var(--main_bg)!important;
     transition: all 0.3s ease-in-out;
 
     &:hover {
-      background-color: var(--primary_button)!important;
+      background-color: var(--main_text)!important;
       color: var(--main_bg)!important;
     }
 
