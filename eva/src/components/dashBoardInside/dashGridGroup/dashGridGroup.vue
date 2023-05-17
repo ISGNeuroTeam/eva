@@ -398,7 +398,7 @@ export default {
   },
   methods: {
     setRange({ range }, item) {
-      const { xMetric = '_time' } = this.$store.state[this.idDash][item.visualizationId].options.xAxis;
+      const { xMetric = '_time' } = this.$store.state[this.idDash][item.visualizationId].options?.xAxis || {};
       this.$emit('SetRange', {
         range,
         elem: {
