@@ -8,12 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.133.0]
+
+### Added
 - Added user setting to switch from "Designing Dashboards" directly to the dashboard tree
 - Added visualization "Table v2"
 - Replaced "Table" visualization with "Table v2".
 - Added position sticky by first column and header-row
-
-### Changed
 
 ### Fixed
 - Problem with SingleValue Initialization in GridGroup component
@@ -29,7 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added the dial visualization in gridGroup component
 - Multiselect: added the ability to pin selected values above the list
-
 
 ### Changed
 - Multiselect: sorting values in list
