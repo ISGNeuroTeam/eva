@@ -398,7 +398,7 @@ export default {
   },
   methods: {
     setRange({ range }, item) {
-      const { xMetric = '_time' } = this.$store.state[this.idDash][item.visualizationId].options.xAxis;
+      const { xMetric = '_time' } = this.$store.state[this.idDash][item.visualizationId].options?.xAxis || {};
       this.$emit('SetRange', {
         range,
         elem: {
@@ -446,6 +446,9 @@ export default {
 .dash-grid-group
   text-align: left
   margin: 2px
+  ::v-deep
+    .single-value-container
+      height: 100% !important
 
 .grid-widget
   overflow: auto

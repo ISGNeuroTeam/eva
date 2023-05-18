@@ -279,7 +279,7 @@ export default {
           this.setVisual(
             this.currentSettings.metricOptions?.length > 0
               ? this.currentSettings.metricOptions
-              : options.settings?.metricOptions,
+              : options.settings?.metricOptions || [],
             isNew,
           );
         }

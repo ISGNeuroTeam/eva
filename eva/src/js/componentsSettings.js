@@ -563,6 +563,7 @@ export default {
       option: 'visible',
       description: 'Показывает / скрывает элемент',
       elem: 'switch',
+      default: true,
     },
     {
       option: 'pinned',
