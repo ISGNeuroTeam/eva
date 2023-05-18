@@ -435,7 +435,10 @@ export default {
       return false;
     },
     defaultFilterAllColumns() {
-      return this.getOptions?.defaultFilterAllColumns || true;
+      if (this.idDashFrom === 'reports') {
+        return true;
+      }
+      return this.getOptions?.defaultFilterAllColumns || false;
     },
     saveMovedColumnPosition() {
       return !!this.getOptions?.saveMovedColumnPosition;
