@@ -300,7 +300,7 @@ export default {
       return this.$store.state[this.idDashFrom].editMode;
     },
     fields() {
-      return this.getOptions.fieldList || [];
+      return this.getOptions?.fieldList || [];
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -344,9 +344,9 @@ export default {
           },
         ]
         : [];
-
+      const fields = this.idDashFrom === 'reports' ? Object.keys(this.searchSchema) : this.fields;
       if (this.columnOptions && Object.keys(this.columnOptions).length) {
-        return this.fields.reduce((acc, key) => {
+        return fields.reduce((acc, key) => {
           if (key === '_columnOptions') {
             return acc;
           }
@@ -384,7 +384,7 @@ export default {
         }, defaultColumns);
       }
 
-      return this.fields.reduce((acc, key) => {
+      return fields.reduce((acc, key) => {
         const column = {
           field: key,
           title: key,
@@ -418,31 +418,31 @@ export default {
     },
     // options
     frozenColumns() {
-      return this.getOptions.frozenColumns || [];
+      return this.getOptions?.frozenColumns || [];
     },
     visibleColumns() {
-      return this.getOptions.titles || [];
+      return this.getOptions?.titles || [];
     },
     selectableRow() {
-      return !!this.getOptions.selectableRow;
+      return !!this.getOptions?.selectableRow;
     },
     movableColumns() {
       if (this.isEdit) {
-        return this.getOptions.movableColumns || false;
+        return this.getOptions?.movableColumns || false;
       }
       return false;
     },
     defaultFilterAllColumns() {
-      return !!this.getOptions.defaultFilterAllColumns;
+      return this.getOptions?.defaultFilterAllColumns || true;
     },
     saveMovedColumnPosition() {
-      return !!this.getOptions.saveMovedColumnPosition;
+      return !!this.getOptions?.saveMovedColumnPosition;
     },
   },
   watch: {
     searchSchema: {
       handler(value) {
-        if (Object.keys(value)?.length > 0) {
+        if (Object.keys(value)?.length > 0 && this.idDashFrom !== 'reports') {
           const isUpdatedValue = this.fields?.length > 0 && this.saveMovedColumnPosition
             ? this.checkFieldList(Object.keys(value), structuredClone(this.fields))
             : true;
