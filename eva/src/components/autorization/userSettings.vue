@@ -39,6 +39,21 @@
       :style="{ color: theme.$main_text }"
       @input="$emit('isChanged', true)"
     />
+
+    <div class="title">
+      Настройки навигации
+    </div>
+    <v-select
+      v-model="settings.startNavTab"
+      :items="startNavTabItems"
+      label="Порядок вкладок навигации"
+      hide-details
+      class="field-profile"
+      outlined
+      dense
+      :style="{ color: theme.$main_text }"
+      @input="$emit('isChanged', true)"
+    />
     <!--<v-row>
       <v-col>
         <pre>{{ fields }}</pre>
@@ -68,6 +83,7 @@ export default {
         userTtlEnabled: false,
         userTtl: 60,
         numberFormat: false,
+        startNavTab: null,
       },
       numberFormatItems: [
         { value: false, text: `${numberFormatExample.toLocaleString()} - Автоматический` },
@@ -75,6 +91,10 @@ export default {
           text: numberFormatExample.toLocaleString(value),
           value,
         })),
+      ],
+      startNavTabItems: [
+        { text: 'Группы/Дашборды/Дерево (Default)', value: null },
+        { text: 'Дерево/Группы/Дашборды', value: 'tree' },
       ],
     };
   },
