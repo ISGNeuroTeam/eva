@@ -1188,7 +1188,7 @@ export default {
       justify-content: center;
       transition: background-color .3s;
       &.tabulator-frozen {
-        background-color: var(--main_bg)!important;
+        background-color: var(--main_bg);
       }
     }
     &:hover {
