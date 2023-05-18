@@ -4,7 +4,11 @@
     :disabled="!fullScreenMode"
   >
     <div
-      :style="customStyle"
+      :style="{
+        ...customStyle,
+        width: widthFrom,
+        height: heightFrom,
+      }"
       :class="customClass"
       v-bind="$attrs"
       class="heatmap-container px-0"
@@ -17,8 +21,8 @@
       >
         <template v-slot:default>
           <thead>
-            <tr>
-              <th class="table-th" />
+            <tr class="heatmap-table__relative-row">
+              <th class="table-th heatmap-table__sticky-column" />
               <th
                 v-for="(y, index) in filteredY"
                 :key="index"
@@ -32,9 +36,10 @@
             <tr
               v-for="x in filteredX"
               :key="x"
+              class="heatmap-table__relative-row"
             >
               <td
-                class="text-left"
+                class="text-left heatmap-table__sticky-column"
                 @click="onClickTd(x)"
               >
                 <v-menu
@@ -68,7 +73,7 @@
               </td>
 
               <td
-                v-for="y in filteredY"
+                v-for="(y) in filteredY"
                 :key="y"
                 class="pa-0"
                 @click="onClickTd(x, y)"
@@ -136,6 +141,10 @@ export default {
       type: String,
       default: '',
     },
+    sizeFrom: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data: () => ({
     x: new Set(),
@@ -173,7 +182,6 @@ export default {
     filteredData() {
       return this.updateData && this.data;
     },
-
     filteredY() {
       const temp = Array.from(this.y);
       if (this.yFieldFormat === 'Строка') {
@@ -185,7 +193,6 @@ export default {
       }
       return this.updateData && temp;
     },
-
     filteredX() {
       const temp = Array.from(this.x);
       if (this.xFieldFormat === 'Строка') {
@@ -197,13 +204,18 @@ export default {
       }
       return this.updateData && temp;
     },
-
     actions() {
       let capture = [];
       if (this.dataRestFrom && this.dataRestFrom[0]) {
         capture = Object.keys(this.dataRestFrom[0]);
       }
       return this.defaultActions.map((action) => ({ ...action, capture }));
+    },
+    heightFrom() {
+      return this.sizeFrom?.height ? `${this.sizeFrom.height - 42}px` : '100%';
+    },
+    widthFrom() {
+      return this.sizeFrom?.width ? `${this.sizeFrom.width - 4}px` : '100%';
     },
   },
   watch: {
