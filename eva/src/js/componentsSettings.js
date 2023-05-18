@@ -82,7 +82,11 @@ export default {
     { name: 'Плитка', img: mdiViewGrid, type: 'tile' },
     { name: 'Показатели', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
-    { name: 'Таблица(old)', img: mdiTableLarge, type: 'tableOld' },
+    {
+      name: 'Таблица',
+      img: mdiTableLarge,
+      type: 'table',
+    },
     { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
@@ -123,11 +127,7 @@ export default {
         + '| Operating Expenses | -56571 | | |\n'
         + '| Total 2 | | True | |\n',
     },
-    {
-      name: 'Таблица',
-      img: mdiTableLarge,
-      type: 'table',
-    },
+    { name: 'Таблица (old)', img: mdiTableLarge, type: 'tableOld' },
   ],
   size: {
     picker: {
