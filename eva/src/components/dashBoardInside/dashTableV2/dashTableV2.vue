@@ -522,6 +522,9 @@ export default {
   },
   mounted() {
     if (this.dataRestFrom?.length > 0) {
+      if (this.fields?.length === 0 && Object.keys(this.searchSchema)?.length > 0) {
+        this.updateFieldListInStore(Object.keys(this.searchSchema));
+      }
       this.setAction(this.searchSchema);
       this.redrawTable(true);
     }
