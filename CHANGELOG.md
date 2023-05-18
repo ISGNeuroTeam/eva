@@ -8,11 +8,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Visualisation "tableV2"
-
+- Added user setting to switch from "Designing Dashboards" directly to the dashboard tree
+- Added visualization "Table v2"
+- Replaced "Table" visualization with "Table v2".
+  
 ### Changed
 
 ### Fixed
+- Multiselect: the query in the filter is cleared after pressing Enter
+- Multiselect: Hangs when changing values on heavy dashboards
+- Default value of textArea not set
+- GridGroup: When using zoom, there is an offset for the multiline
+
+## [1.132.0]
+
+### Added
+- Added the dial visualization in gridGroup component
+- Multiselect: added the ability to pin selected values above the list
+
+
+### Changed
+- Multiselect: sorting values in list
+- The scroll bar on the dashboard has become more convenient
+
+### Fixed
+- dynamic visualizations: the same settings for the same type of visualizations
+
+## [1.131.0]
+
+### Added
+- Save theme in user settings
+
+### Fixed
+- multiline does not work correctly with string values
 
 ## [1.130.0]
 

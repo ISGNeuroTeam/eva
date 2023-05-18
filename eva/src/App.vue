@@ -5,9 +5,18 @@
 </template>
 
 <script>
+import Vue from 'vue';
+
 export default {
   name: 'App',
   computed: {
+    cssBodyVariables() {
+      const currentTheme = this.$store.getters.getTheme;
+      return [
+        `--scroll_bg: ${currentTheme.$main_bg}`,
+        `--scroll_thumb: ${currentTheme.$secondary_text}`,
+      ].join(';');
+    },
     cssVariables() {
       const currentTheme = this.$store.getters.getTheme;
       const styleObject = {};
@@ -22,7 +31,13 @@ export default {
       return styleObject;
     },
   },
+  watch: {
+    cssBodyVariables(val) {
+      document.body.style = val;
+    },
+  },
   mounted() {
+    document.body.style = this.cssBodyVariables;
     // TODO: временный костыль
     // Синхронизация логаута на всех вкладках браузера
     window.onload = () => {
@@ -32,6 +47,9 @@ export default {
         }
       };
     };
+    if (Vue.$jwt.decode()) {
+      this.$store.dispatch('settingApp');
+    }
   },
   methods: {
     hexToRGB(h) {

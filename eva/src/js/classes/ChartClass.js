@@ -308,8 +308,8 @@ export default class ChartClass {
 
       const extendMetrics = linearMetrics.filter(({ yAxisLink }) => yAxisLink === metric.name);
 
-      let min = d3.min(this.data, (d) => d[metric.name]);
-      let max = d3.max(this.data, (d) => d[metric.name]);
+      let min = d3.min(this.data, (d) => (typeof d[metric.name] === 'string' ? +d[metric.name] : d[metric.name]));
+      let max = d3.max(this.data, (d) => (typeof d[metric.name] === 'string' ? +d[metric.name] : d[metric.name]));
       let addClassName = '';
       extendMetrics.forEach((item) => {
         const minExt = d3.min(this.data, (d) => d[item.name]);
@@ -757,7 +757,7 @@ export default class ChartClass {
             }
             const fontWeight = (curMetricBold && metric.name === cur.name) ? 'bold' : 'regular';
             const title = cur.title || cur.name;
-            return `${prev}<div style="font-weight: ${fontWeight}">${title}: <span>${value.toLocaleString(numberFormat)}</span></div>`;
+            return `${prev}<div style="font-weight: ${fontWeight}">${title}: <span>${`${value}`.toLocaleString(numberFormat)}</span></div>`;
           }, `${this.xMetric}: ${this.xTickFormat(d[this.xMetric])}`),
       );
 

@@ -85,7 +85,7 @@ Vue.component('dash-settings', () => import('./components/dashSettings.vue'));
 // настройки темы
 Vue.component('modal-themes', () => import('./components/modalThemes.vue'));
 // элемент таблицы
-Vue.component('dash-table', () => import('./components/dashBoardInside/dashTable.vue'));
+Vue.component('dash-table-old', () => import('./components/dashBoardInside/dashTable.vue'));
 // элемент диаграммы ганта
 Vue.component('dash-guntt', () => import('./components/dashBoardInside/dashGuntt.vue'));
 // элемент графа
@@ -177,8 +177,8 @@ Vue.component('dash-gauge', () => import('./components/dashBoardInside/dashGauge
 // Водопад
 Vue.component('dash-waterfall', () => import('./components/dashBoardInside/dashWaterfall/dashWaterfall'));
 // Таблица v2
-Vue.component('dash-tableV2', () => import('./components/dashBoardInside/dashTableV2/dashTableV2.vue'));
-Vue.component('dash-tableV2-control', () => import('./components/dashBoardInside/dashTableV2/dashTableV2Control.vue'));
+Vue.component('dash-table', () => import('./components/dashBoardInside/dashTableV2/dashTableV2.vue'));
+Vue.component('dash-table-control', () => import('./components/dashBoardInside/dashTableV2/dashTableV2Control.vue'));
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {
