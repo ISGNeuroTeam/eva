@@ -89,6 +89,7 @@
             :horizontal-cell="horizontalCell"
             :vertical-cell="verticalCell"
             :search-data="getElementData(elem)"
+            :search-schema="getElementSchema(elem)"
             :data-source-id="elem.search"
             :data-sources="dataObject"
             :loading="checkLoading(elem)"
@@ -628,8 +629,8 @@ export default {
     },
     getData(search) {
       this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
-        .then((res) => {
-          if (res?.length === 0) {
+        .then(({ data, schema }) => {
+          if (data?.length === 0) {
             this.$store.commit('setState', [{
               object: this.$store.state,
               prop: 'logError',
@@ -640,12 +641,15 @@ export default {
             idDash: this.idDash,
             sid: search.sid,
             id: search.id,
-            status: res.length ? 'downloaded' : 'nodata',
+            status: data.length ? 'downloaded' : 'nodata',
           });
-          this.$set(this.dataObject[search.id], 'data', res);
+          this.$set(this.dataObject[search.id], 'data', data);
           this.$set(this.dataObject[search.id], 'loading', false);
-          this.$set(this.dataObjectConst[search.id], 'data', res);
+          this.$set(this.dataObject[search.id], 'schema', schema);
+
+          this.$set(this.dataObjectConst[search.id], 'data', data);
           this.$set(this.dataObjectConst[search.id], 'loading', false);
+          this.$set(this.dataObjectConst[search.id], 'schema', schema);
         });
     },
     getElementSourceId(searchId) {
@@ -722,6 +726,10 @@ export default {
     getElementData(elem) {
       if (this.getSearchName(elem) === '') return [];
       return this.dataObject[elem.search]?.data;
+    },
+    getElementSchema(elem) {
+      if (this.getSearchName(elem) === '') return {};
+      return this.dataObject[elem.search]?.schema;
     },
     clickTab(tabID) {
       if (!this.tabEditMode) {

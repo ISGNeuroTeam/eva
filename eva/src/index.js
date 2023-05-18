@@ -5,7 +5,6 @@ import './scss/globalStyles.scss';
 
 // Подключаем кастомный мконочный шрифт
 import './fonts/eva-iconfont/style.css';
-
 // import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
 import PortalVue from 'portal-vue';
 import AsyncComputed from 'vue-async-computed';
@@ -16,6 +15,7 @@ import VueDraggableResizable from 'vue-draggable-resizable';
 import VueCtkDateTimePicker from 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.common.js';
 // подключаем файл с настройками хранилища Vuex
 import moment from 'moment';
+import * as XLSX from './js/utils/xlsx.full.min';
 import store from './store/index';
 // подключаем файл с настройками хранилища Vuex (формы)
 // import storeForm from './store/storeForm/index';
@@ -31,6 +31,7 @@ import screenshot from './plugins/screenshot';
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 import App from './App.vue';
 
+window.XLSX = XLSX;
 Vue.use(PortalVue);
 // подключаем библиотеку для перемещения и изменения размеров dashboard
 Vue.use(AsyncComputed);
@@ -84,7 +85,7 @@ Vue.component('dash-settings', () => import('./components/dashSettings.vue'));
 // настройки темы
 Vue.component('modal-themes', () => import('./components/modalThemes.vue'));
 // элемент таблицы
-Vue.component('dash-table', () => import('./components/dashBoardInside/dashTable.vue'));
+Vue.component('dash-table-old', () => import('./components/dashBoardInside/dashTable.vue'));
 // элемент диаграммы ганта
 Vue.component('dash-guntt', () => import('./components/dashBoardInside/dashGuntt.vue'));
 // элемент графа
@@ -175,6 +176,9 @@ Vue.component('code-editor', () => import('./components/codeEditor.vue'));
 Vue.component('dash-gauge', () => import('./components/dashBoardInside/dashGauge/dashGauge'));
 // Водопад
 Vue.component('dash-waterfall', () => import('./components/dashBoardInside/dashWaterfall/dashWaterfall'));
+// Таблица v2
+Vue.component('dash-table', () => import('./components/dashBoardInside/dashTableV2/dashTableV2.vue'));
+Vue.component('dash-table-control', () => import('./components/dashBoardInside/dashTableV2/dashTableV2Control.vue'));
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {

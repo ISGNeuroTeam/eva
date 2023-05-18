@@ -159,7 +159,7 @@ onmessage = async (event) => {
       new Date(),
       `Данные из запроса ${searchFrom.sid} получены успешно.&nbsp;&nbsp;status: ${dataResponse.status}&nbsp;&nbsp;url: ${dataResponse.url}`,
     ]);
-
+    let schema = null;
     const allData = new Promise((resolve) => {
       dataResponse.json().then(async (res) => {
         if (res.status === 'success') {
@@ -170,10 +170,9 @@ onmessage = async (event) => {
             }:&nbsp;&nbsp;${res.data_urls.join(' ; ')}`,
           ]);
 
-          let shema = null;
           const promise = res.data_urls.map((item, i) => {
             if (item.indexOf('SCHEMA') !== -1) {
-              shema = i;
+              schema = i;
             }
             return fetch(`/${item}`, { cache: 'no-store' });
           });
@@ -183,8 +182,8 @@ onmessage = async (event) => {
           const dataProm = resultProm
             .map((prom, i) => new Promise((resultPromResolve) => {
               prom.text().then((dataitself) => {
-                if (shema === i) {
-                  shema = dataitself;
+                if (schema === i) {
+                  schema = dataitself;
                 }
                 const resultData = [];
                 // все это потому что там не совсем json,
@@ -211,11 +210,11 @@ onmessage = async (event) => {
             }
           });
 
-          if (shema != null && shema !== '') {
+          if (schema != null && schema !== '') {
             const keys = [];
             const values = [];
             try {
-              shema
+              schema
                 .replace('``', '＂')
                 .match(/`([^`]+)`\s(\w+(\([\d,]+)?)[^,]/g)
                 .forEach((str) => {
@@ -224,7 +223,7 @@ onmessage = async (event) => {
                   values.push(value);
                 });
             } catch (err) {
-              console.warn(`%cНе удалось прочитать схему данных! _SCHEMA: %c${shema}`, 'font-weight: bold', 'font-weight: normal');
+              console.warn(`%cНе удалось прочитать схему данных! _SCHEMA: %c${schema}`, 'font-weight: bold', 'font-weight: normal');
               console.error(err);
               notifications.push({
                 id: 'schema-error-reading',
@@ -234,14 +233,14 @@ onmessage = async (event) => {
               });
             }
 
-            shema = {};
+            schema = {};
             keys.forEach((item, i) => {
-              shema[item] = values[i];
+              schema[item] = values[i];
             });
 
             resolveData.forEach((item, i) => {
               const resolveDataItemKeys = Object.keys(item);
-              Object.keys(shema).forEach((itemSchem) => {
+              Object.keys(schema).forEach((itemSchem) => {
                 if (!resolveDataItemKeys.includes(itemSchem)) {
                   resolveData[i][itemSchem] = null;
                 }
@@ -272,6 +271,7 @@ onmessage = async (event) => {
       data: await allData,
       log,
       notifications,
+      schema,
     });
   });
 };
