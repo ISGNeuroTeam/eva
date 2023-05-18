@@ -23,6 +23,7 @@ import {
   mdiInboxMultipleOutline,
   mdiGauge,
   mdiFinance, mdiScaleBalance,
+  mdiTableLargePlus,
 } from '@mdi/js';
 
 export default {
@@ -84,7 +85,7 @@ export default {
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
     {
       name: 'Таблица',
-      img: mdiTableLarge,
+      img: mdiTableLargePlus,
       type: 'table',
     },
     { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
@@ -252,7 +253,7 @@ export default {
     },
   },
   icons: {
-    table: mdiTableLarge,
+    table: mdiTableLargePlus,
     tableOld: mdiTableLarge,
     multiLine: mdiChartMultiline,
     gridGroup: mdiGroup,
@@ -1381,12 +1382,12 @@ export default {
     'riskReview',
   ],
   reports: {
-    tableOld: {
-      tooltip: 'Таблица(old)',
-      icon: mdiTableLarge,
-    },
     table: {
       tooltip: 'Таблица',
+      icon: mdiTableLargePlus,
+    },
+    tableOld: {
+      tooltip: 'Таблица(old)',
       icon: mdiTableLarge,
     },
     multiLine: {
