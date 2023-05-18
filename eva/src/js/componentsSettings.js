@@ -82,7 +82,7 @@ export default {
     { name: 'Плитка', img: mdiViewGrid, type: 'tile' },
     { name: 'Показатели', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
-    // { name: 'Таблица', img: mdiTableLarge, type: 'table' },
+    { name: 'Таблица(old)', img: mdiTableLarge, type: 'tableOld' },
     { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
@@ -150,7 +150,7 @@ export default {
       width: 500,
       height: 480,
     },
-    tableV2: {
+    tableOld: {
       width: 500,
       height: 480,
     },
@@ -253,7 +253,7 @@ export default {
   },
   icons: {
     table: mdiTableLarge,
-    tableV2: mdiTableLarge,
+    tableOld: mdiTableLarge,
     multiLine: mdiChartMultiline,
     gridGroup: mdiGroup,
     piechart: mdiChartPie,
@@ -311,12 +311,12 @@ export default {
       'piechartSettings',
       'pieType',
     ],
-    // table: [
-    //   'boxShadow',
-    //   'selectableRow',
-    //   'lastResult',
-    //   'titles',
-    // ],
+    tableOld: [
+      'boxShadow',
+      'selectableRow',
+      'lastResult',
+      'titles',
+    ],
     table: [
       'boxShadow',
       'tableOptions',
@@ -1380,10 +1380,10 @@ export default {
     'riskReview',
   ],
   reports: {
-    // table: {
-    //   tooltip: 'Таблица',
-    //   icon: mdiTableLarge,
-    // },
+    tableOld: {
+      tooltip: 'Таблица(old)',
+      icon: mdiTableLarge,
+    },
     table: {
       tooltip: 'Таблица',
       icon: mdiTableLarge,
