@@ -211,6 +211,8 @@ const headerFilterFn = function (headerValue, rowValue /* rowData, */ /* filterP
       return rowValue >= filterValue;
     case '<=':
       return rowValue <= filterValue;
+    case '!=':
+      return rowValue !== filterValue;
     default:
       return true;
   }
