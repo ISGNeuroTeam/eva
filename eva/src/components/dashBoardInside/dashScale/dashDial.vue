@@ -199,7 +199,7 @@ export default {
       if (!this.idFrom) {
         return [];
       }
-      if (!this.dashFromStore.options) {
+      if (!this.dashFromStore?.options) {
         this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDashFrom });
       }
       if (!this.dashFromStore?.options.settings) {
@@ -555,7 +555,7 @@ export default {
           return acc;
         }, []);
 
-      this.$set(this, 'metricList', { ...newMetricList });
+      this.$set(this, 'metricList', newMetricList);
 
       this.$set(this, 'providedSettings', { ...newSettings });
 

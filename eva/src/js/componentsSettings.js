@@ -47,7 +47,8 @@ export default {
         + '- **singlevalue** - Показатели\n'
         + '- **piechart** - Круговая диаграмма\n'
         + '- **tile** - Плитка\n'
-        + '- **accumulators** - Накопитель',
+        + '- **accumulators** - Накопитель\n'
+        + '- **dial** - Круговая шкала',
     },
     { name: 'Круговая диаграмма', img: mdiChartPie, type: 'piechart' },
     {
@@ -81,7 +82,7 @@ export default {
     { name: 'Плитка', img: mdiViewGrid, type: 'tile' },
     { name: 'Показатели', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
-    { name: 'Таблица', img: mdiTableLarge, type: 'table' },
+    // { name: 'Таблица', img: mdiTableLarge, type: 'table' },
     { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
@@ -123,9 +124,9 @@ export default {
         + '| Total 2 | | True | |\n',
     },
     {
-      name: 'Таблица v2',
+      name: 'Таблица',
       img: mdiTableLarge,
-      type: 'tableV2',
+      type: 'table',
     },
   ],
   size: {
@@ -310,13 +311,13 @@ export default {
       'piechartSettings',
       'pieType',
     ],
+    // table: [
+    //   'boxShadow',
+    //   'selectableRow',
+    //   'lastResult',
+    //   'titles',
+    // ],
     table: [
-      'boxShadow',
-      'selectableRow',
-      'lastResult',
-      'titles',
-    ],
-    tableV2: [
       'boxShadow',
       'tableOptions',
       'selectableRow',
@@ -334,6 +335,7 @@ export default {
       'defaultSourceDataUpdates',
       'resetValuesWhichAreNot',
       'searchMode',
+      'selectedValuesAbove',
     ],
     picker: [
       'showLastTimeBlock',
@@ -760,7 +762,7 @@ export default {
       placeholder: '60',
     },
 
-    // dashTable
+    // dashTableV2
     {
       group: 'Настройки таблицы',
       option: 'tableOptions',
@@ -1037,6 +1039,12 @@ export default {
     {
       option: 'resetValuesWhichAreNot',
       description: 'Сбросить значения, если источник данных их не содержит',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'selectedValuesAbove',
+      description: 'Выбранные значения закрепить сверху',
       elem: 'switch',
       default: false,
     },
@@ -1354,7 +1362,6 @@ export default {
   ],
   reporstElements: [
     'table',
-    'tableV2',
     'multiLine',
     'piechart',
     'guntt',
@@ -1373,11 +1380,11 @@ export default {
     'riskReview',
   ],
   reports: {
+    // table: {
+    //   tooltip: 'Таблица',
+    //   icon: mdiTableLarge,
+    // },
     table: {
-      tooltip: 'Таблица',
-      icon: mdiTableLarge,
-    },
-    tableV2: {
       tooltip: 'Таблица',
       icon: mdiTableLarge,
     },

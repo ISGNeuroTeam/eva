@@ -19,7 +19,7 @@
         class="title"
         v-text="title"
       />
-      <dash-tableV2-control
+      <dash-table-control
         v-if="activeButtons.length > 0"
         :write-status="writeStatus"
         :active-buttons="activeButtons"
@@ -509,6 +509,14 @@ export default {
         this.updateColumnDefinition();
       }
     },
+    isEdit() {
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          this.createTable();
+          this.updateDataInTable(this.dataRestFrom);
+        });
+      });
+    },
   },
   mounted() {
     if (this.dataRestFrom?.length > 0) {
@@ -519,8 +527,6 @@ export default {
   created() {
     this.createTable = throttle(this.createTable, 500);
     this.redrawTable = throttle(this.redrawTable, 500);
-    this.persistenceWriterFunc = throttle(this.persistenceWriterFunc, 500);
-    this.persistenceReaderFunc = throttle(this.persistenceReaderFunc, 500);
   },
   beforeDestroy() {
     this.destroyTable();
