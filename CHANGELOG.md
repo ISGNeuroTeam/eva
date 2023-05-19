@@ -8,10 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added user setting to switch from "Designing Dashboards" directly to the dashboard tree
-- Added position sticky by first column and header-row
 
 ### Changed
+
+### Fixed
+
+## [1.133.0]
+
+### Added
+- Added user setting to switch from "Designing Dashboards" directly to the dashboard tree
+- Added position sticky by first column and header-row
 
 ### Fixed
 - Problem with SingleValue Initialization in GridGroup component
