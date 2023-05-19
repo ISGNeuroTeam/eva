@@ -1,4 +1,4 @@
-# [1.133.0] - 2023-05-19
+# [1.133.1] - 2023-05-19
 
 ### Added
 - Added user setting to switch from "Designing Dashboards" directly to the dashboard tree
