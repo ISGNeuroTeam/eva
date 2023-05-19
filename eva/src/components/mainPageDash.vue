@@ -29,23 +29,12 @@
             >
               <v-tabs-slider />
               <v-tab
-                href="#tab-1"
-                @click="openTabGroups"
+                v-for="item in tabsHeader"
+                :href="item.href"
+                :disabled="item.disabled"
+                @click="item.cb"
               >
-                Группы
-              </v-tab>
-              <v-tab
-                href="#tab-2"
-                :disabled="disabledTab"
-                @click="openTabGroup"
-              >
-                Дашборды
-              </v-tab>
-              <v-tab
-                href="#tab-3"
-                @click="openTabTree"
-              >
-                Дерево
+                {{ item.text }}
               </v-tab>
               <v-tab-item
                 value="tab-1"
@@ -359,8 +348,9 @@ export default {
     NavigationTreeView,
   },
   data() {
+    const { startNavTab } = this.$store.getters['app/userSettings'];
     return {
-      tab: 'tab-1',
+      tab: startNavTab === 'tree' ? 'tab-3' : 'tab-1',
       disabledTab: true,
       trash: mdiTrashCanOutline,
       plus: mdiPlus,
@@ -394,6 +384,25 @@ export default {
     };
   },
   computed: {
+    tabsHeader() {
+      const tabTree = { text: 'Дерево', href: '#tab-3', cb: this.openTabTree };
+      const tabsGroupAndDashes = [
+        { text: 'Группы', href: '#tab-1', cb: this.openTabGroups },
+        {
+          text: 'Дашборды',
+          href: '#tab-2',
+          cb: this.openTabGroup,
+          disabled: this.disabledTab,
+        },
+      ];
+
+      const { startNavTab } = this.$store.getters['app/userSettings'];
+      if (startNavTab === 'tree') {
+        return [tabTree, ...tabsGroupAndDashes];
+      }
+
+      return [...tabsGroupAndDashes, tabTree];
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
