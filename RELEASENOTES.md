@@ -1,3 +1,18 @@
+# [1.133.0] - 2023-05-19
+
+### Added
+- Added user setting to switch from "Designing Dashboards" directly to the dashboard tree
+- HeatMap: Added position sticky by first column and header-row
+
+### Fixed
+- Problem with SingleValue Initialization in GridGroup component
+- Single value has a checkbox that adds free space instead of the component header
+- Multiselect: the query in the filter is cleared after pressing Enter
+- Multiselect: Hangs when changing values on heavy dashboards
+- Default value of textArea not set
+- GridGroup: When using zoom, there is an offset for the multiline
+- Heatmap: Fixed incorrect x\y scroll inside visualisation
+
 # [1.132.0] - 2023-05-11
 
 ### Added
