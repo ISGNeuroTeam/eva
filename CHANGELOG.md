@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-## [1.133.0]
+## [1.133.1]
 
 ### Added
 - Added user setting to switch from "Designing Dashboards" directly to the dashboard tree
