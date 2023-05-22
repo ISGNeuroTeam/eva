@@ -88,6 +88,10 @@ export default {
         { color: '#cccccc', min: 0, max: 100 },
       ]),
     },
+    updateSettings: {
+      type: Function,
+      required: true,
+    },
   },
   data() {
     return {
@@ -278,6 +282,7 @@ export default {
     saveSettings(options) {
       this.closeSettings();
       this.saveOptions({ ...options });
+      if (this.updateSettings) this.updateSettings(options);
     },
   },
 };
