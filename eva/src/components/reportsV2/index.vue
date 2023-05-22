@@ -52,7 +52,7 @@
               <v-tab>Визуализация</v-tab>
             </v-tabs>
             <div class="d-flex">
-              <report :length="data.length" />
+              <report :length="dataLength" />
               <download :data="data" />
             </div>
           </div>
@@ -206,6 +206,9 @@ export default {
   },
   computed: {
     ...mapGetters('dataResearch', ['getTimeline']),
+    dataLength() {
+      return this.data.length;
+    },
     theme() {
       return this.$store.getters.getTheme;
     },

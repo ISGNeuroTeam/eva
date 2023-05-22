@@ -641,7 +641,7 @@ export default {
             idDash: this.idDash,
             sid: search.sid,
             id: search.id,
-            status: data.length ? 'downloaded' : 'nodata',
+            status: data?.length ? 'downloaded' : 'nodata',
           });
           this.$set(this.dataObject[search.id], 'data', data);
           this.$set(this.dataObject[search.id], 'loading', false);
