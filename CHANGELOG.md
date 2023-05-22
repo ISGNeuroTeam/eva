@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- table-v2: fixed save filters by toggle fullscreen-mode
+- table-v2: fixed incorrect sorting number values
+- table-v2: fixed the pagination block
 
 ## [1.133.0]
 

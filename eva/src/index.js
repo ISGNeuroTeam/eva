@@ -85,7 +85,7 @@ Vue.component('dash-settings', () => import('./components/dashSettings.vue'));
 // настройки темы
 Vue.component('modal-themes', () => import('./components/modalThemes.vue'));
 // элемент таблицы
-Vue.component('dash-table-old', () => import('./components/dashBoardInside/dashTable.vue'));
+Vue.component('dash-tableOld', () => import('./components/dashBoardInside/dashTable.vue'));
 // элемент диаграммы ганта
 Vue.component('dash-guntt', () => import('./components/dashBoardInside/dashGuntt.vue'));
 // элемент графа

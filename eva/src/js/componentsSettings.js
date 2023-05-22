@@ -781,7 +781,7 @@ export default {
       optionGroup: 'tableOptions',
       description: 'Возможность двигать столбцы',
       elem: 'switch',
-      default: true,
+      default: false,
     },
     {
       relation: ['movableColumns'],
@@ -796,7 +796,7 @@ export default {
       optionGroup: 'tableOptions',
       description: 'Вкл/выкл фильтры столбцов(по-умолчанию)',
       elem: 'switch',
-      default: true,
+      default: false,
     },
     // {
     //   option: 'titles',
@@ -1364,6 +1364,7 @@ export default {
   ],
   reporstElements: [
     'table',
+    'tableOld',
     'multiLine',
     'piechart',
     'guntt',
