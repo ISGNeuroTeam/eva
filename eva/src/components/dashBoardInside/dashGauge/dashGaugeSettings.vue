@@ -207,6 +207,7 @@ export default {
   },
   methods: {
     save() {
+      this.isChanged = false;
       this.zones = this.zones
         .filter((item) => !this.checkZoneError(item))
         .map(({ color, min, max }) => ({ color: `${color}`, min: +min, max: +max }))
