@@ -1,12 +1,8 @@
-# [1.133.0] - 2023-05-18
+# [1.133.1] - 2023-05-19
 
 ### Added
 - Added user setting to switch from "Designing Dashboards" directly to the dashboard tree
-- Added visualization "Table v2"
 - HeatMap: Added position sticky by first column and header-row
-
-### Changed
-- Replaced "Table" visualization with "Table v2".
 
 ### Fixed
 - Problem with SingleValue Initialization in GridGroup component

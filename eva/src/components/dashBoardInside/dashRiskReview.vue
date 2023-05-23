@@ -158,7 +158,7 @@
         </div>
       </div>
       <div
-        v-if="!isDataError"
+        v-if="!isDataError && !hideLegend"
         class="FGKRiskReview__help-btn"
       >
         <v-tooltip
@@ -380,6 +380,9 @@ export default {
     },
     secondTitleColName() {
       return this.optionsFromStore.secondTitleColName || '';
+    },
+    hideLegend() {
+      return this.optionsFromStore?.hideLegend;
     },
   },
   watch: {

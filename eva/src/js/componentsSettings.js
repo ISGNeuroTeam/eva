@@ -49,7 +49,8 @@ export default {
         + '- **piechart** - Круговая диаграмма\n'
         + '- **tile** - Плитка\n'
         + '- **accumulators** - Накопитель\n'
-        + '- **dial** - Круговая шкала',
+        + '- **dial** - Круговая шкала'
+        + '- **gauge** - Спидометр',
     },
     { name: 'Круговая диаграмма', img: mdiChartPie, type: 'piechart' },
     {
@@ -492,6 +493,7 @@ export default {
       'residualEffectField',
       'primitives',
       'primitivesLibrary',
+      'hideLegend',
     ],
   },
   optionFields: [
@@ -1251,6 +1253,12 @@ export default {
     {
       option: 'visibleResidualImpactPanel',
       description: 'Вкл/выкл отображение панели с остаточным влиянием',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'hideLegend',
+      description: 'Скрыть легенду',
       elem: 'switch',
       default: false,
     },

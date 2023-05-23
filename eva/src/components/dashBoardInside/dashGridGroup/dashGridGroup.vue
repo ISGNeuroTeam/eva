@@ -193,6 +193,9 @@ export default {
         dial: {
           dash: 'dial',
         },
+        gauge: {
+          dash: 'gauge',
+        },
       }),
     },
   },
@@ -339,7 +342,13 @@ export default {
         let t = 0;
         let maxRowH = 0;
         const list = new Map();
-        const { colNum } = this;
+        const { colNum, idDash } = this;
+        this.dashItemOptions = this.dataRestFrom.reduce((obj, item) => {
+          const optionKey = item.option_key || item.id;
+          const visualizationId = `${item.visualization}-${this.idFrom}-${optionKey}-v1`;
+          obj[item.id] = this.$store.state[idDash][visualizationId]?.options;
+          return obj;
+        }, {});
         this.dataRestFrom
           .forEach((item) => {
             const optionKey = item.option_key || item.id;
@@ -449,6 +458,12 @@ export default {
   ::v-deep
     .single-value-container
       height: 100% !important
+    .gauge
+      min-height: 170px
+      .options-icon
+        color: var(--secondary_text) !important
+        top: 12px
+        right: 12px
 
 .grid-widget
   overflow: auto
