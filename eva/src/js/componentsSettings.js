@@ -48,7 +48,8 @@ export default {
         + '- **piechart** - Круговая диаграмма\n'
         + '- **tile** - Плитка\n'
         + '- **accumulators** - Накопитель\n'
-        + '- **dial** - Круговая шкала',
+        + '- **dial** - Круговая шкала'
+        + '- **gauge** - Спидометр',
     },
     { name: 'Круговая диаграмма', img: mdiChartPie, type: 'piechart' },
     {
