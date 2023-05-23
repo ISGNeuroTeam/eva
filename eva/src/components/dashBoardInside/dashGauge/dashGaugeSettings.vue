@@ -231,7 +231,7 @@ export default {
     },
 
     close() {
-      this.isChanged = true;
+      this.isChanged = false;
       this.$emit('close');
     },
 
