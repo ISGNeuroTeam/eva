@@ -231,6 +231,7 @@ export default {
     },
 
     close() {
+      this.isChanged = true;
       this.$emit('close');
     },
 
