@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- The names of the dashboards are now not fully displayed
 
 ## [1.133.1]
 
