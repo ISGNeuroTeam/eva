@@ -115,6 +115,7 @@
           height: getOptions ? getOptions.heightTile : ''
         }"
         :time-format-from="getTimeFormatFrom"
+        :search-schema="schema"
         :search-rep="true"
         :tooltip-from="tooltipSvg"
         :should-get="shouldGet"
@@ -156,6 +157,10 @@ export default {
     shouldGet: {
       type: Boolean,
       required: true,
+    },
+    schema: {
+      type: Object,
+      default: () => ({}),
     },
     tooltipOpenDelay: {
       type: Number,

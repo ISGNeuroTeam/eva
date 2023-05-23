@@ -23,6 +23,7 @@ import {
   mdiInboxMultipleOutline,
   mdiGauge,
   mdiFinance, mdiScaleBalance,
+  mdiTableLargePlus,
 } from '@mdi/js';
 
 export default {
@@ -48,7 +49,8 @@ export default {
         + '- **piechart** - Круговая диаграмма\n'
         + '- **tile** - Плитка\n'
         + '- **accumulators** - Накопитель\n'
-        + '- **dial** - Круговая шкала',
+        + '- **dial** - Круговая шкала'
+        + '- **gauge** - Спидометр',
     },
     { name: 'Круговая диаграмма', img: mdiChartPie, type: 'piechart' },
     {
@@ -82,7 +84,11 @@ export default {
     { name: 'Плитка', img: mdiViewGrid, type: 'tile' },
     { name: 'Показатели', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
-    { name: 'Таблица', img: mdiTableLarge, type: 'table' },
+    {
+      name: 'Таблица',
+      img: mdiTableLargePlus,
+      type: 'table',
+    },
     { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
@@ -123,6 +129,7 @@ export default {
         + '| Operating Expenses | -56571 | | |\n'
         + '| Total 2 | | True | |\n',
     },
+    { name: 'Таблица (old)', img: mdiTableLarge, type: 'tableOld' },
   ],
   size: {
     picker: {
@@ -142,6 +149,10 @@ export default {
       height: 600,
     },
     table: {
+      width: 500,
+      height: 480,
+    },
+    tableOld: {
       width: 500,
       height: 480,
     },
@@ -243,7 +254,8 @@ export default {
     },
   },
   icons: {
-    table: mdiTableLarge,
+    table: mdiTableLargePlus,
+    tableOld: mdiTableLarge,
     multiLine: mdiChartMultiline,
     gridGroup: mdiGroup,
     piechart: mdiChartPie,
@@ -301,14 +313,21 @@ export default {
       'piechartSettings',
       'pieType',
     ],
-    table: [
+    tableOld: [
       'boxShadow',
-      'rowcolor',
-      'columncolor',
-      'cellcolor',
-      'selectRowColor',
+      'selectableRow',
       'lastResult',
       'titles',
+    ],
+    table: [
+      'boxShadow',
+      'tableOptions',
+      'selectableRow',
+      'lastResult',
+      'movableColumns',
+      'saveMovedColumnPosition',
+      'defaultFilterAllColumns',
+      'frozenColumns',
     ],
     select: [
       'boxShadow',
@@ -474,6 +493,7 @@ export default {
       'residualEffectField',
       'primitives',
       'primitivesLibrary',
+      'hideLegend',
     ],
   },
   optionFields: [
@@ -746,27 +766,67 @@ export default {
       placeholder: '60',
     },
 
-    // dashTable
+    // dashTableV2
     {
-      option: 'rowcolor',
-      description: 'Выбрать цвет которым подсветится нужная строка',
-      elem: 'text-field',
+      group: 'Настройки таблицы',
+      option: 'tableOptions',
     },
     {
-      option: 'columncolor',
-      description: 'Выбрать цвет которым подсветится нужный столбец',
-      elem: 'text-field',
-    },
-    {
-      option: 'cellcolor',
-      description: 'Выбрать цвет которым подсветится нужная ячейка',
-      elem: 'text-field',
-    },
-    {
-      option: 'selectRowColor',
+      option: 'selectableRow',
+      optionGroup: 'tableOptions',
       description: 'Подсвечивать выбранную строку',
       elem: 'switch',
       default: false,
+    },
+    {
+      option: 'movableColumns',
+      optionGroup: 'tableOptions',
+      description: 'Возможность двигать столбцы',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      relation: ['movableColumns'],
+      option: 'saveMovedColumnPosition',
+      optionGroup: 'tableOptions',
+      description: 'Сохранять позицию колонок',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'defaultFilterAllColumns',
+      optionGroup: 'tableOptions',
+      description: 'Вкл/выкл фильтры столбцов(по-умолчанию)',
+      elem: 'switch',
+      default: false,
+    },
+    // {
+    //   option: 'titles',
+    //   optionGroup: 'tableOptions',
+    //   description: 'Столбцы для отображения',
+    //   elem: 'select-checkbox',
+    //   items() {
+    //     // this is modalSettings context
+    //     const storeElement = this.$store.state[this.idDash][this.element];
+    //     const savedTitles = storeElement?.options?.titles || [];
+    //     const curTitles = storeElement?.availableTableTitles || [];
+    //     return structuredClone([...new Set([...savedTitles, ...curTitles])]);
+    //   },
+    //   default: '',
+    // },
+    {
+      option: 'frozenColumns',
+      optionGroup: 'tableOptions',
+      description: 'Закрепленные столбцы',
+      elem: 'select-checkbox',
+      items() {
+        // this is modalSettings context
+        const storeElement = this.$store.state[this.idDash][this.element];
+        const savedTitles = storeElement?.options?.frozenColumns || [];
+        const curTitles = storeElement?.availableTableTitles || [];
+        return structuredClone([...new Set([...savedTitles, ...curTitles])]);
+      },
+      default: '',
     },
 
     // dashSingle, dashButton
@@ -788,21 +848,6 @@ export default {
       option: 'name',
       description: 'Выбрать название кнопки',
       elem: 'text-field',
-    },
-
-    // dashTable
-    {
-      option: 'titles',
-      description: 'Столбцы для отображения',
-      elem: 'checkbox-list',
-      items() {
-        // this is modalSettings context
-        const storeElement = this.$store.state[this.idDash][this.element];
-        const savedTitles = storeElement?.options?.titles || [];
-        const curTitles = storeElement?.availableTableTitles || [];
-        return new Set([...savedTitles, ...curTitles]);
-      },
-      default: [],
     },
 
     // dashHeatMap, (maybe dashTable, dashTable)
@@ -1212,6 +1257,12 @@ export default {
       default: false,
     },
     {
+      option: 'hideLegend',
+      description: 'Скрыть легенду',
+      elem: 'switch',
+      default: false,
+    },
+    {
       option: 'leftTitle',
       elem: 'text-field',
       description: 'Заголовок левого блока',
@@ -1321,6 +1372,7 @@ export default {
   ],
   reporstElements: [
     'table',
+    'tableOld',
     'multiLine',
     'piechart',
     'guntt',
@@ -1341,6 +1393,10 @@ export default {
   reports: {
     table: {
       tooltip: 'Таблица',
+      icon: mdiTableLargePlus,
+    },
+    tableOld: {
+      tooltip: 'Таблица(old)',
       icon: mdiTableLarge,
     },
     multiLine: {

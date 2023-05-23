@@ -121,7 +121,7 @@
                         class="group-text"
                         :title="group.name"
                       >
-                        {{ checkName(group.name) }}
+                        {{ checkName(group.name, 64) }}
                       </p>
                     </v-card-text>
                   </v-card>
@@ -243,7 +243,7 @@
                         class="group-text"
                         :title="dash.name"
                       >
-                        {{ checkName(dash.name) }}
+                        {{ checkName(dash.name, 64) }}
                       </p>
                     </v-card-text>
                   </v-card>
@@ -718,10 +718,10 @@ export default {
         this.$route.query.home = '';
       }
     },
-    checkName(name) {
+    checkName(name, len = 12) {
       let newName = name;
-      if (name.length > 12) {
-        newName = `${name.slice(0, 12)}...`;
+      if (name.length > len) {
+        newName = `${name.slice(0, len)}...`;
       }
       return newName;
     },

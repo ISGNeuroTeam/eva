@@ -15,6 +15,7 @@
         height: height,
         width: size.width,
       }"
+      :search-schema="schema"
       :time-format-from="''"
       :size-tile-from="{ width: '', height: '' }"
       :search-rep="true"
@@ -34,6 +35,10 @@ export default {
     data: {
       type: Array,
       default: () => ([]),
+    },
+    schema: {
+      type: Object,
+      default: () => ({}),
     },
     size: {
       type: Object,

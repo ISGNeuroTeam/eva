@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.134.0]
+
+### Added
+- Added visualization "Table v2"
+- Replaced "Table" visualization with "Table v2".
+- Added visualization Gauge in gridGroup component
+- Ability to hide legend in Risk Review
+
+### Fixed
+- The names of the dashboards are now not fully displayed
+- table-v2: fixed save filters by toggle fullscreen-mode
+- table-v2: fixed incorrect sorting number values
+- table-v2: fixed the pagination block
+
 ## [1.133.1]
 
 ### Added
