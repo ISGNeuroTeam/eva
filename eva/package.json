@@ -1,6 +1,6 @@
 {
   "name": "eva",
-  "version": "1.133.1",
+  "version": "1.134.0",
   "description": "Evolution Visualization Application",
   "author": "Fred",
   "license": "ISC",
@@ -83,6 +83,7 @@
     "portal-vue": "2.1.7",
     "sass-loader": "8.0.0",
     "system": "2.0.1",
+    "tabulator-tables": "5.4.4",
     "vue": "2.6.14",
     "vue-async-computed": "3.9.0",
     "vue-cli-plugin-vuetify": "2.4.5",

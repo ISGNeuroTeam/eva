@@ -52,7 +52,7 @@
               <v-tab>Визуализация</v-tab>
             </v-tabs>
             <div class="d-flex">
-              <report :length="data.length" />
+              <report :length="dataLength" />
               <download :data="data" />
             </div>
           </div>
@@ -87,6 +87,8 @@
               v-if="tab === 1"
               class="statistic component-block"
               :data="data"
+              :search="search"
+              :schema="schema"
               :size="size"
             />
           </keep-alive>
@@ -98,6 +100,7 @@
               :should-get="shouldGet"
               :loading="loading"
               :search="search"
+              :schema="schema"
               :data-page-from="page"
             />
           </keep-alive>
@@ -162,6 +165,7 @@ export default {
       loading: false,
       rows: [],
       data: [],
+      schema: null,
       test: [],
       statistic: [],
       showStatistic: false,
@@ -202,6 +206,9 @@ export default {
   },
   computed: {
     ...mapGetters('dataResearch', ['getTimeline']),
+    dataLength() {
+      return this.data.length;
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -292,6 +299,7 @@ export default {
         this.rows = [];
         if (event.data.data.length !== 0) {
           this.shema = event.data.shema;
+          this.$set(this, 'schema', event.data.shema);
           // this.data = event.data.data;
           this.$set(this, 'data', event.data.data);
 

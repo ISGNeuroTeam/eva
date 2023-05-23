@@ -2,3 +2,4 @@ src/yfiles
 tests/
 src/tests
 src/components/dashBoardInside/dashGauge/gauge.js
+src/js/utils/xlsx.full.min.js
