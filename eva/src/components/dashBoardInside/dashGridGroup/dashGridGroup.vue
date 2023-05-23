@@ -458,6 +458,12 @@ export default {
   ::v-deep
     .single-value-container
       height: 100% !important
+    .gauge
+      min-height: 170px
+      .options-icon
+        color: var(--secondary_text) !important
+        top: 12px
+        right: 12px
 
 .grid-widget
   overflow: auto
