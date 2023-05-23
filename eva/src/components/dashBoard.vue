@@ -1116,7 +1116,7 @@ export default {
     },
 
     exportDataCSV() {
-      if (this.element.includes('tableV2')) {
+      if (this.element.includes('table')) {
         this.$refs.screenCard.openDownloadModal();
       } else {
         const searchId = this.$store.state[this.idDash][this.element].search;

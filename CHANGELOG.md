@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - The names of the dashboards are now not fully displayed
+- table-v2: fixed save filters by toggle fullscreen-mode
+- table-v2: fixed incorrect sorting number values
+- table-v2: fixed the pagination block
 
 ## [1.133.1]
 

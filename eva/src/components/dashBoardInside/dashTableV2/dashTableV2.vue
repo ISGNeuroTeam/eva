@@ -14,18 +14,17 @@
       :class="customClass"
       v-bind="$attrs"
     >
-      <div
-        v-if="title"
-        class="title"
-        v-text="title"
-      />
       <dash-table-control
         v-if="activeButtons.length > 0"
+        v-show="!isLoading && isValidSchema"
         :write-status="writeStatus"
         :active-buttons="activeButtons"
         @action="execute"
       />
-      <div :style="`height: ${tableHeight}`">
+      <div
+        v-show="!isLoading && isValidSchema"
+        :style="`height: ${tableHeight}`"
+      >
         <div
           v-if="fullScreenMode"
           :ref="idFrom"
@@ -36,6 +35,19 @@
           :ref="idFrom"
           class="editable-table"
         />
+      </div>
+
+      <div
+        v-if="isLoading"
+        class="pa-5"
+      >
+        Загрузка...
+      </div>
+      <div
+        v-if="!isValidSchema && !isLoading"
+        class="pa-5"
+      >
+        Данные не отображаются из-за настроек
       </div>
       <v-dialog
         v-model="isDownloadModal"
@@ -116,15 +128,51 @@ const colorFixed = function (cell) {
 };
 
 // eslint-disable-next-line func-names
-const headerFilter = function (cell, onRendered, success, cancel /* editorParams */) {
-  // const field = cell.getField();
+const headerFilterFn = function (headerValue, rowValue) {
+  const vueComponent = this;
+  const compare = headerValue.selectValue;
+  const filterValue = typeof rowValue === 'string'
+    ? headerValue.textValue
+    : parseFloat(headerValue.textValue);
+  let result = true;
+  if (compare === '>') {
+    result = rowValue > filterValue;
+  } else if (compare === '<') {
+    result = rowValue < filterValue;
+  } else if (compare === '=') {
+    result = rowValue === filterValue;
+  } else if (compare === '>=') {
+    result = rowValue >= filterValue;
+  } else if (compare === '<=') {
+    result = rowValue <= filterValue;
+  } else if (compare === '!=') {
+    result = rowValue !== filterValue;
+  } else {
+    result = true;
+  }
+  vueComponent.updateTable();
+  return result;
+};
+
+// eslint-disable-next-line func-names
+const headerFilter = function (cell, onRendered, success, cancel/* , editorParams */) {
+  const vueComponent = this;
+  const filterId = vueComponent.persistenceFilterId;
+  const field = cell.getField();
+  const elementId = `${filterId}-${field}`;
+
   const container = document.createElement('span');
+  container.id = elementId;
   container.classList.add('dash-table-v2-container__filter-container');
 
   // create and style select element
   const select = document.createElement('select');
+  select.id = `${elementId}-select`;
   select.classList.add('dash-table-v2-container__filter-select');
-  ['', '>', '<', '=', '>=', '<=', '!='].forEach((item) => {
+  const filters = vueComponent.searchSchema[field] === 'STRING'
+    ? ['', '>', '<', '=', '==', '>=', '<=', '!=']
+    : ['', '>', '<', '=', '>=', '<=', '!='];
+  filters.forEach((item) => {
     const option = document.createElement('option');
     option.classList.add('dash-table-v2-container__filter-select-option');
     option.value = item;
@@ -137,6 +185,7 @@ const headerFilter = function (cell, onRendered, success, cancel /* editorParams
 
   // create and style text input element
   const textInput = document.createElement('input');
+  textInput.id = `${elementId}-textInput`;
   textInput.type = 'text';
   textInput.classList.add('dash-table-v2-container__filter-input');
   textInput.placeholder = 'Значение';
@@ -145,48 +194,41 @@ const headerFilter = function (cell, onRendered, success, cancel /* editorParams
   let textValue = '';
 
   function buildValues() {
-    success({
-      selectValue,
-      textValue,
-    });
-  }
-
-  function keypress(e) {
-    if (e.keyCode === 13) {
-      buildValues();
-    }
-
-    if (e.keyCode === 27) {
-      cancel();
-    }
+    vueComponent.persistenceFilterWriter(
+      filterId,
+      field,
+      {
+        filterType: {
+          el: select.id,
+          value: selectValue,
+        },
+        filterValue: {
+          el: textInput.id,
+          value: textValue,
+        },
+      },
+    );
   }
 
   function updateTextValue(value) {
-    textValue = Number.isNaN(+value) ? value : +value;
+    if (value !== '') {
+      textValue = Number.isNaN(+value) ? value : +value;
+    } else {
+      textValue = value;
+    }
   }
 
   // add event listeners
   select.addEventListener('change', (e) => {
     selectValue = e.target.value;
-    if (textValue !== '') {
-      buildValues();
-    }
-  });
-  select.addEventListener('keydown', (e) => {
-    selectValue = e.target.value;
-    if (textValue !== '') {
-      keypress(e);
-    }
+    updateTextValue(textInput?.value);
+    buildValues();
   });
 
   textInput.addEventListener('input', (e) => {
     updateTextValue(e.target.value);
+    selectValue = select.value;
     buildValues();
-  });
-
-  textInput.addEventListener('keydown', (e) => {
-    updateTextValue(e.target.value);
-    keypress(e);
   });
 
   // append elements to container
@@ -197,29 +239,24 @@ const headerFilter = function (cell, onRendered, success, cancel /* editorParams
 };
 
 // eslint-disable-next-line func-names
-const headerFilterFn = function (headerValue, rowValue /* rowData, */ /* filterParams */) {
-  const compare = headerValue.selectValue;
-  const filterValue = headerValue.textValue;
-  switch (compare) {
-    case '>':
-      return rowValue > filterValue;
-    case '<':
-      return rowValue < filterValue;
-    case '=':
-      return rowValue === filterValue;
-    case '>=':
-      return rowValue >= filterValue;
-    case '<=':
-      return rowValue <= filterValue;
-    default:
-      return true;
-  }
+const sorterFn = function (a, b/* , aRow, bRow, column, dir, sorterParams */) {
+  // a, b - the two values being compared
+  // aRow, bRow - the row components for the values being compared
+  // (useful if you need to access additional fields in the row data for the sort)
+  // column - the column component for the column being sorted
+  // dir - the direction of the sort ("asc" or "desc")
+  // sorterParams - sorterParams object from column definition array
+  return a - b; // you must return the difference between the two values
 };
 
 export default {
   name: 'DashTableV2',
   props: {
     fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    loading: {
       type: Boolean,
       default: false,
     },
@@ -287,12 +324,15 @@ export default {
         { name: 'mouseover', capture: [] },
       ],
       isDownloadModal: false,
+      isLoading: false,
       downloadFiles: {
         downloadCSV: 'CSV',
         downloadJSON: 'JSON',
         downloadXLSX: 'XLSX',
         downloadHTML: 'HTML',
       },
+      filters: [],
+      sorters: [],
     };
   },
   computed: {
@@ -300,7 +340,10 @@ export default {
       return this.$store.state[this.idDashFrom].editMode;
     },
     fields() {
-      return this.getOptions?.fieldList || [];
+      if (this.isValidSchema) {
+        return this.getOptions?.fieldList || [];
+      }
+      return [];
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -318,13 +361,15 @@ export default {
     },
     columnOptions() {
       const columnOptions = {};
-      Object.keys(this.searchSchema).forEach((column) => {
-        columnOptions[column] = {
-          headerFilter: this.defaultFilterAllColumns,
-          headerMenu: true,
-          frozen: this.frozenColumns.includes(column),
-        };
-      });
+      if (this.isValidSchema) {
+        Object.keys(this.searchSchema).forEach((column) => {
+          columnOptions[column] = {
+            headerFilter: this.defaultFilterAllColumns,
+            headerMenu: true,
+            frozen: this.frozenColumns.includes(column),
+          };
+        });
+      }
       return columnOptions;
     },
     columns() {
@@ -357,10 +402,16 @@ export default {
             title: options?.title || key,
             resizable: 'header',
             frozen: options?.frozen || false,
-            headerFilter: options?.headerFilter ? headerFilter : false,
+            headerFilter: options?.headerFilter ? headerFilter.bind(this) : false,
             headerFilterLiveFilter: false,
-            headerFilterFunc: this.options.defaultFilterAllColumns ? headerFilterFn : false,
             editor: options?.editor || false,
+            // TODO: Временное решение, заменить в будущем на параметр из OTL
+            sorter: this.searchSchema[key] === 'STRING' ? 'string' : sorterFn,
+            headerSortTristate: true,
+            sorterParams: this.searchSchema[key] === 'STRING' ? {
+              locale: true,
+              alignEmptyValues: 'top',
+            } : false,
             headerMenu: options?.headerMenu && this.isEdit ? this.headerMenu : false,
             cellClick: this.cellClickEvent,
             minWidth: options?.minWidth || (options?.headerFilter ? 150 : 80),
@@ -391,8 +442,14 @@ export default {
           resizable: 'header',
           editor: this.searchSchema[key] === 'BOOLEAN' ? 'tickCross' : true,
           headerMenu: this.isEdit ? this.headerMenu : false,
-          headerFilter: this.options.defaultFilterAllColumns ? headerFilter : false,
-          headerFilterFunc: this.options.defaultFilterAllColumns ? headerFilterFn : false,
+          sorter: this.searchSchema[key] === 'STRING' ? 'string' : sorterFn,
+          headerSortTristate: true,
+          sorterParams: this.searchSchema[key] === 'STRING' ? {
+            locale: true,
+            alignEmptyValues: 'top',
+          } : false,
+          headerFilter: this.options.defaultFilterAllColumns ? headerFilter.bind(this) : false,
+          // headerFilterFunc: this.options.defaultFilterAllColumns ? headerFilterFn : false,
           cellClick: this.cellClickEvent,
         };
 
@@ -433,10 +490,22 @@ export default {
       return false;
     },
     defaultFilterAllColumns() {
-      return this.getOptions?.defaultFilterAllColumns || true;
+      if (this.idDashFrom === 'reports') {
+        return true;
+      }
+      return this.getOptions?.defaultFilterAllColumns || false;
     },
     saveMovedColumnPosition() {
       return !!this.getOptions?.saveMovedColumnPosition;
+    },
+    isValidSchema() {
+      if (this.searchSchema) {
+        return Object.keys(this.searchSchema)?.length > 0;
+      }
+      return false;
+    },
+    persistenceFilterId() {
+      return `tabulator-${this.idFrom}-filters`;
     },
   },
   watch: {
@@ -447,6 +516,7 @@ export default {
             ? this.checkFieldList(Object.keys(value), structuredClone(this.fields))
             : true;
           if (isUpdatedValue) {
+            this.clearPersistenceFilter();
             this.updateFieldListInStore(Object.keys(value));
           }
         }
@@ -455,7 +525,7 @@ export default {
     },
     dataRestFrom: {
       handler(val, oldVal) {
-        if (val?.length > 0 && this.searchSchema) {
+        if (this.isValidSchema) {
           if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
             this.$nextTick(() => {
               this.$nextTick(() => {
@@ -464,6 +534,7 @@ export default {
             });
           }
           this.updateDataInTable(val);
+          this.updateColumnDefinition();
           this.onDataCompare();
         }
       },
@@ -517,16 +588,29 @@ export default {
         });
       });
     },
+    loading(val) {
+      if (!val) {
+        this.redrawTable();
+      } else {
+        this.isLoading = val;
+      }
+    },
   },
   mounted() {
-    if (this.dataRestFrom?.length > 0) {
+    if (this.isValidSchema) {
       this.setAction(this.searchSchema);
-      this.redrawTable(true);
+      this.redrawTable();
+      if (this.idDashFrom !== 'reports') {
+        if (this.checkFieldList(this.fields, Object.keys(this.searchSchema))) {
+          this.updateFieldListInStore(Object.keys(this.searchSchema));
+        }
+      }
     }
   },
   created() {
     this.createTable = throttle(this.createTable, 500);
-    this.redrawTable = throttle(this.redrawTable, 500);
+    this.redrawTable = throttle(this.redrawTable, 100);
+    this.updateTable = throttle(this.updateTable, 100);
   },
   beforeDestroy() {
     this.destroyTable();
@@ -621,17 +705,19 @@ export default {
         }, 100);
       }
     },
-    redrawTable(isFullRedraw) {
+    updateTable() {
+      this.tabulator.redraw();
+    },
+    redrawTable() {
       this.$nextTick(() => {
         this.$nextTick(() => {
-          this.updateColumnDefinition();
           this.createTable();
           this.updateDataInTable(this.dataRestFrom);
         });
       });
     },
     async updateColumnDefinition() {
-      if (this.tabulator && Object.keys(this.dataRestFrom).length > 0) {
+      if (this.tabulator && this.isValidSchema) {
         const tabulatorColumns = this.tabulator.getColumns();
         const columnDefinition = this.columns.reduce((acc, col) => {
           const colField = col.field;
@@ -663,7 +749,7 @@ export default {
       }
       this.tabulator = new Tabulator(this.$refs[this.idFrom], {
         addRowPos: 'top',
-        placeholder: 'No Data Available', // display message to user on empty table
+        placeholder: 'Данные не отображаются из-за настроек', // display message to user on empty table
         popupContainer: `#${this.idFrom}`,
         maxHeight: '100%',
         height: '100%',
@@ -676,7 +762,27 @@ export default {
         persistence: {
           columns: ['width', 'frozen', 'visible'],
           sort: true,
-          filter: true,
+        },
+        langs: {
+          default: {
+            data: {
+              loading: 'Загрузка', // data loader text
+              error: 'Ошибка', // data error text
+            },
+            pagination: {
+              page_size: 'Строк на странице', // label for the page size select element
+              page_title: '', // tooltip text for the numeric page button, appears in front of the page number (eg. "Show Page" will result in a tool tip of "Show Page 1" on the page 1 button)
+              first: '', // text for the first page button
+              first_title: 'Первая', // tooltip text for the first page button
+              last: '',
+              last_title: 'Последняя',
+              prev: '',
+              prev_title: 'Предыдущая',
+              next: '',
+              next_title: 'Следующая',
+              all: 'Все',
+            },
+          },
         },
         persistenceID: this.idFrom,
         data: this.tableData, // link data to table
@@ -686,9 +792,12 @@ export default {
         autoColumns: this.isLoadFromFile,
         columns: this.columns,
         pagination: 'local',
+        paginationCounter(pageSize, currentRow, currentPage, totalRows, totalPages) {
+          return `${currentRow}-${pageSize} из ${totalRows}`;
+        },
         paginationSize: true,
         paginationSizeSelector: this.options.paginationSizeSelector,
-        paginationCounter: this.options.paginationCounter,
+        // paginationCounter: this.options.paginationCounter,
         movableColumns: this.movableColumns,
         // history
         history: true,
@@ -702,6 +811,23 @@ export default {
         if (this.saveMovedColumnPosition) {
           const fields = columns.map((el) => el.getField());
           this.updateFieldListInStore(fields);
+        }
+      });
+      this.tabulator.on('tableBuilt', () => {
+        setTimeout(() => {
+          this.isLoading = false;
+          if (this.checkFieldList(this.fields, Object.keys(this.searchSchema))) {
+            this.clearPersistenceFilter();
+          } else {
+            this.persistenceFilterReader();
+          }
+        }, 500);
+      });
+      this.tabulator.on('dataSorted', (sorters, rows) => {
+        // sorters - array of the sorters currently applied
+        // rows - array of row components in their new order
+        if (sorters?.length === 0) {
+          this.sorters = [];
         }
       });
     },
@@ -899,33 +1025,134 @@ export default {
         this.tabulator = null;
       }
     },
+    getElementFromTable(selector) {
+      return this.$refs.idFrom.querySelector(selector);
+    },
+    persistenceFilterWriter(id, field, data) {
+      if (this.isValidSchema) {
+        // Список фильтров без текущего
+        const filters = structuredClone(this.filters)
+          .filter((filter) => filter.field !== field);
+        const type = data?.filterType?.value;
+        const value = data?.filterValue?.value;
+        if (type && value.toString()) {
+          filters.push({
+            field,
+            data,
+          });
+          this.setFilter(field, type, value);
+        } else {
+          this.tabulator.clearFilter();
+          filters.forEach((filter) => {
+            this.setFilter(
+              filter.field,
+              filter.data.filterType.value,
+              filter.data.filterValue.value,
+            );
+          });
+        }
+        this.filters = filters;
+      }
+    },
+    persistenceFilterReader() {
+      if (this.defaultFilterAllColumns && this.filters?.length > 0) {
+        this.filters.forEach((el) => {
+          const { field } = el;
+          const type = el.data.filterType.value;
+          const { value } = el.data.filterValue;
+          const selectId = el.data.filterType.el;
+          const textInputId = el.data.filterValue.el;
+          this.setFilter(
+            field,
+            type,
+            value,
+          );
+          const select = document.querySelector(`#${selectId}`);
+          const textInput = document.querySelector(`#${textInputId}`);
+          select.value = type;
+          textInput.value = value;
+        });
+      }
+    },
+    clearPersistenceFilter() {
+      if (this.dashFromStore?.tableOptions
+          && this.dashFromStore.tableOptions[this.persistenceFilterId]) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.tableOptions,
+          prop: this.persistenceFilterId,
+          value: {},
+        }]);
+      }
+    },
+    setFilter(field, type, value) {
+      const filterTypes = {
+        '>': '>',
+        '<': '<',
+        '=': typeof value === 'string' ? 'like' : '=',
+        '==': '=',
+        '>=': '>=',
+        '<=': '<=',
+        '!=': '!=',
+      };
+      if (this.filters?.length > 0) {
+        const filters = this.tabulator.getFilters();
+        filters.forEach((filter) => {
+          if (filter.field === field) {
+            this.removeFilter(field, filter.type, filter.value);
+          }
+        });
+
+        this.tabulator.addFilter(field, typeof value === 'string' ? filterTypes[type] : type, value);
+      } else {
+        this.tabulator.addFilter(field, typeof value === 'string' ? filterTypes[type] : type, value);
+      }
+    },
+    removeFilter(field, type, value) {
+      this.tabulator.removeFilter(field, type, value);
+    },
+    deleteFieldsFromObject(object, fields) {
+      const result = {};
+      Object.keys(object).forEach((key) => {
+        if (!fields.includes(key)) {
+          result[key] = object[key];
+        }
+      });
+      return result;
+    },
     persistenceWriterFunc(id, type, data) {
-      if (data?.length > 0 && this.dataRestFrom?.length > 0) {
-        if (!this.dashFromStore?.tableOptions) {
-          this.$store.commit('setState', [{
-            object: this.dashFromStore,
-            prop: 'tableOptions',
-            value: {},
-          }]);
-        }
-        if (!this.dashFromStore.tableOptions[`${id}-${type}`]) {
-          this.$store.commit('setState', [{
-            object: this.dashFromStore.tableOptions,
-            prop: `${id}-${type}`,
-            value: [],
-          }]);
-        }
-        const dataFromStore = this.dashFromStore.tableOptions[`${id}-${type}`];
-        if (JSON.stringify(dataFromStore) !== JSON.stringify(data)) {
-          this.$store.commit('setState', [{
-            object: this.dashFromStore.tableOptions,
-            prop: `${id}-${type}`,
-            value: structuredClone(data),
-          }]);
+      if (data?.length > 0 && this.isValidSchema) {
+        if (type !== 'sort') {
+          if (!this.dashFromStore?.tableOptions) {
+            this.$store.commit('setState', [{
+              object: this.dashFromStore,
+              prop: 'tableOptions',
+              value: {},
+            }]);
+          }
+          if (!this.dashFromStore.tableOptions[`${id}-${type}`]) {
+            this.$store.commit('setState', [{
+              object: this.dashFromStore.tableOptions,
+              prop: `${id}-${type}`,
+              value: [],
+            }]);
+          }
+          const dataFromStore = this.dashFromStore.tableOptions[`${id}-${type}`];
+          if (JSON.stringify(dataFromStore) !== JSON.stringify(data)) {
+            this.$store.commit('setState', [{
+              object: this.dashFromStore.tableOptions,
+              prop: `${id}-${type}`,
+              value: structuredClone(data),
+            }]);
+          }
+        } else {
+          this.sorters = data;
         }
       }
     },
     persistenceReaderFunc(id, type) {
+      if (type === 'sort') {
+        return this.sorters;
+      }
       const { tableOptions } = this.dashFromStore;
       if (tableOptions && tableOptions[`${id}-${type}`]
           && tableOptions[`${id}-${type}`].length > 0) {
@@ -1188,7 +1415,7 @@ export default {
       justify-content: center;
       transition: background-color .3s;
       &.tabulator-frozen {
-        background-color: var(--main_bg)!important;
+        background-color: var(--main_bg);
       }
     }
     &:hover {
@@ -1220,6 +1447,9 @@ export default {
     color: var(--main_text)!important;
 
     .tabulator-paginator {
+      align-items: center;
+      display: flex;
+      justify-content: flex-end;
       color: var(--main_text)!important;
     }
 
@@ -1273,8 +1503,7 @@ export default {
           }
         }
       }
-      &.active
-      {
+      &.active {
         color: var(--main_text) !important;
         background-color: var(--secondary_bg)!important;
       }
@@ -1283,6 +1512,8 @@ export default {
       &[data-page="last"],
       &[data-page="first"] {
         color: transparent !important;
+        padding: 0 4px;
+        width: 32px;
        &:before {
          font-family: 'eva-icons' !important;
          speak: never;
@@ -1305,25 +1536,17 @@ export default {
          transition: color .3s;
        }
       }
-      &[data-page="first"] {
-        &:before {
-          content: "\e919";
-        }
+      &[data-page="first"]:before {
+        content: "\e919";
       }
-      &[data-page="last"] {
-        &:before {
-          content: "\e91a";
-        }
+      &[data-page="last"]:before {
+        content: "\e91a";
       }
-      &[data-page="next"] {
-        &:before {
-          content: "\e90e";
-        }
+      &[data-page="next"]:before {
+        content: "\e90e";
       }
-      &[data-page="prev"] {
-        &:before {
-          content: "\e90d";
-        }
+      &[data-page="prev"]:before {
+        content: "\e90d";
       }
     }
   }
