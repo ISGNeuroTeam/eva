@@ -314,7 +314,8 @@ export default {
         fixedColumns: ['_time'],
         selectable: false,
         selectColumn: false,
-        paginationSizeSelector: [100, 500, 1000, true],
+        paginationSize: 100,
+        paginationSizeSelector: [10, 50, 100, 500, 1000, true],
         paginationCounter: 'rows',
         movableColumns: true,
         defaultFilterAllColumns: true,
@@ -336,6 +337,10 @@ export default {
     };
   },
   computed: {
+    pageSize() {
+      return this.dashFromStore?.tableOptions?.pageSize
+          || this.options.paginationSize;
+    },
     isEdit() {
       return this.$store.state[this.idDashFrom].editMode;
     },
@@ -795,7 +800,7 @@ export default {
         paginationCounter(pageSize, currentRow, currentPage, totalRows, totalPages) {
           return `${currentRow}-${pageSize} из ${totalRows}`;
         },
-        paginationSize: true,
+        paginationSize: this.pageSize,
         paginationSizeSelector: this.options.paginationSizeSelector,
         // paginationCounter: this.options.paginationCounter,
         movableColumns: this.movableColumns,
@@ -816,6 +821,7 @@ export default {
       this.tabulator.on('tableBuilt', () => {
         setTimeout(() => {
           this.isLoading = false;
+          this.setDefaultPagination();
           if (this.checkFieldList(this.fields, Object.keys(this.searchSchema))) {
             this.clearPersistenceFilter();
           } else {
@@ -829,6 +835,10 @@ export default {
         if (sorters?.length === 0) {
           this.sorters = [];
         }
+      });
+      this.tabulator.on('pageSizeChanged', (pagesize) => {
+        // pagesize - the number of rows per page
+        this.changeDefaultPagination(pagesize);
       });
     },
     updateFieldListInStore(fieldList) {
@@ -1283,6 +1293,16 @@ export default {
         default:
           return false;
       }
+    },
+    setDefaultPagination() {
+      this.tabulator.setPageSize(this.pageSize);
+    },
+    changeDefaultPagination(pageSize) {
+      this.$store.commit('setState', [{
+        object: this.dashFromStore.tableOptions,
+        prop: 'pageSize',
+        value: pageSize,
+      }]);
     },
   },
 };
