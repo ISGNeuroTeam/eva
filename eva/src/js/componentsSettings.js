@@ -23,6 +23,7 @@ import {
   mdiInboxMultipleOutline,
   mdiGauge,
   mdiFinance, mdiScaleBalance,
+  mdiTableLargePlus,
 } from '@mdi/js';
 
 export default {
@@ -83,7 +84,11 @@ export default {
     { name: 'Плитка', img: mdiViewGrid, type: 'tile' },
     { name: 'Показатели', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
-    { name: 'Таблица(old)', img: mdiTableLarge, type: 'tableOld' },
+    {
+      name: 'Таблица',
+      img: mdiTableLargePlus,
+      type: 'table',
+    },
     { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
@@ -124,11 +129,7 @@ export default {
         + '| Operating Expenses | -56571 | | |\n'
         + '| Total 2 | | True | |\n',
     },
-    {
-      name: 'Таблица',
-      img: mdiTableLarge,
-      type: 'table',
-    },
+    { name: 'Таблица (old)', img: mdiTableLarge, type: 'tableOld' },
   ],
   size: {
     picker: {
@@ -253,7 +254,7 @@ export default {
     },
   },
   icons: {
-    table: mdiTableLarge,
+    table: mdiTableLargePlus,
     tableOld: mdiTableLarge,
     multiLine: mdiChartMultiline,
     gridGroup: mdiGroup,
@@ -782,7 +783,7 @@ export default {
       optionGroup: 'tableOptions',
       description: 'Возможность двигать столбцы',
       elem: 'switch',
-      default: true,
+      default: false,
     },
     {
       relation: ['movableColumns'],
@@ -797,7 +798,7 @@ export default {
       optionGroup: 'tableOptions',
       description: 'Вкл/выкл фильтры столбцов(по-умолчанию)',
       elem: 'switch',
-      default: true,
+      default: false,
     },
     // {
     //   option: 'titles',
@@ -1371,6 +1372,7 @@ export default {
   ],
   reporstElements: [
     'table',
+    'tableOld',
     'multiLine',
     'piechart',
     'guntt',
@@ -1389,12 +1391,12 @@ export default {
     'riskReview',
   ],
   reports: {
-    tableOld: {
-      tooltip: 'Таблица(old)',
-      icon: mdiTableLarge,
-    },
     table: {
       tooltip: 'Таблица',
+      icon: mdiTableLargePlus,
+    },
+    tableOld: {
+      tooltip: 'Таблица(old)',
       icon: mdiTableLarge,
     },
     multiLine: {
