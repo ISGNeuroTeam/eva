@@ -1,3 +1,8 @@
+# [1.134.1] - 2023-05-24
+
+### Fixed
+- Processing point in table field name
+
 # [1.134.0] - 2023-05-23
 
 ### Added
