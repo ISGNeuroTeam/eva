@@ -436,6 +436,7 @@ export default {
             column.headerFilter = 'input';
           }
 
+          console.log(acc);
           return [...acc, column];
         }, defaultColumns);
       }
@@ -463,7 +464,6 @@ export default {
           column.headerFilterParams = { tristate: true };
           column.headerFilterEmptyCheck = (value) => value === null;
         }
-
         return [...acc, column];
       }, defaultColumns);
     },
@@ -760,6 +760,7 @@ export default {
         height: '100%',
         layout: 'fitDataFill',
         frozenRows: this.options.frozenRows,
+        nestedFieldSeparator: '|',
         // rowHeight: this.options.rowHeight,
         selectable: this.selectableRow ? 1 : false,
         rowFormatter: this.rowFormatter,
