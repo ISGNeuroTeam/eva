@@ -436,7 +436,6 @@ export default {
             column.headerFilter = 'input';
           }
 
-          console.log(acc);
           return [...acc, column];
         }, defaultColumns);
       }
