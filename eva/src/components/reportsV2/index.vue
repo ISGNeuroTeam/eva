@@ -260,7 +260,7 @@ export default {
     this.$store.commit('createReportSearch');
   },
   mounted() {
-    document.title = 'EVA | Исследование данных';
+    this.$root.$emit('setDocumentTitle', 'Исследование данных');
     this.$set(this, 'search', JSON.parse(JSON.stringify(this.$store.getters.getReportSearch)));
     if (this.search.original_otl !== '') {
       this.$store.commit('setShould', {

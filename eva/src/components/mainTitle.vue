@@ -571,7 +571,7 @@ export default {
     }
 
     this.loadingDash = false;
-    document.title = `EVA | ${this.dashFromStore?.name || '404'}`;
+    this.$root.$emit('setDocumentTitle', this.dashFromStore?.name || '404');
     if (this.$route.params.tabId) {
       this.clickTab(Number(this.$route.params.tabId));
     }
@@ -595,7 +595,7 @@ export default {
       }, 750);
     },
     updateTempSorting() {
-      if (this.dashFromStore.elements?.reduce) {
+      if (this.dashFromStore?.elements?.reduce) {
         this.tempSorting = this.dashFromStore.elements
           .reduce((acc, elem) => {
             const { options = {} } = this.dashFromStore[elem];
