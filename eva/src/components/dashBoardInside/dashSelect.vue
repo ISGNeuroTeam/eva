@@ -445,8 +445,14 @@ export default {
       } = this.$refs.multiselect;
       if (isMenuActive && filteredItems.length === 1) {
         this.$refs.multiselect.selectItem(filteredItems[0]);
+        this.$refs.multiselect.lazySearch = '';
+      } else if (filteredItems.length > 1) {
+        const idxFind = filteredItems.findIndex((val) => val === this.$refs.multiselect.lazySearch);
+        if (idxFind > -1) {
+          this.$refs.multiselect.selectItem(filteredItems[idxFind]);
+          this.$refs.multiselect.lazySearch = '';
+        }
       }
-      this.$refs.multiselect.lazySearch = '';
     },
     updateActions(dataReady) {
       let data = [];

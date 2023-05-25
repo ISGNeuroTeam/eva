@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- applying the filtered value by Enter in the select component if it matches the query
 
 ### Changed
 
