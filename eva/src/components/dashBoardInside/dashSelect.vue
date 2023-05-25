@@ -443,15 +443,23 @@ export default {
         isMenuActive,
         filteredItems,
       } = this.$refs.multiselect;
+      let closeMenu = false;
       if (isMenuActive && filteredItems.length === 1) {
         this.$refs.multiselect.selectItem(filteredItems[0]);
         this.$refs.multiselect.lazySearch = '';
+        closeMenu = true;
       } else if (filteredItems.length > 1) {
         const idxFind = filteredItems.findIndex((val) => val === this.$refs.multiselect.lazySearch);
         if (idxFind > -1) {
           this.$refs.multiselect.selectItem(filteredItems[idxFind]);
           this.$refs.multiselect.lazySearch = '';
+          closeMenu = true;
         }
+      }
+      if (closeMenu && !this.multiple) {
+        this.$nextTick(() => {
+          this.$refs.multiselect.isMenuActive = false;
+        });
       }
     },
     updateActions(dataReady) {
