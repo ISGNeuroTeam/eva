@@ -105,30 +105,32 @@
               }"
             >
               <div
-                v-if="item.title"
+                v-if="item && item.title"
                 class="bar-title bar-title--second"
               >
                 {{ item.title }}
               </div>
               <div class="bar-list bar-list--second">
-                <div
-                  v-for="(listItem, listIndex) in item.list"
-                  :key="`right-${i}-${listIndex}`"
-                  class="bar-list__item bar-list__item--second"
-                >
-                  {{ listIndex + 1 }}. {{ listItem.title }}
-                  <span
-                    v-if="listItem.value"
-                    class="bar-list__value-text bar-list__value-text--second"
+                <template v-for="(listItem, listIndex) in item.list">
+                  <div
+                    v-if="listItem && listItem.title"
+                    :key="`right-${i}-${listIndex}`"
+                    class="bar-list__item bar-list__item--second"
                   >
-                    (<span
-                      class="bar-list__value bar-list__value--second"
-                      :style="{
-                        color: secondValueColor,
-                      }"
-                    >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
-                  </span>
-                </div>
+                    {{ listIndex + 1 }}. {{ listItem.title }}
+                    <span
+                      v-if="listItem.value"
+                      class="bar-list__value-text bar-list__value-text--second"
+                    >
+                      (<span
+                        class="bar-list__value bar-list__value--second"
+                        :style="{
+                          color: secondValueColor,
+                        }"
+                      >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
+                    </span>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
@@ -523,6 +525,7 @@ export default {
       this.barParts.forEach((part) => {
         this.dataset.forEach((ds) => {
           extent.push(ds[part.id]);
+          extent.push(ds[part.idStart] + ds[part.id]);
         });
       });
 
@@ -581,13 +584,15 @@ export default {
 
       // eslint-disable-next-line no-restricted-syntax
       for (const part of barParts) {
-        const { id, type } = part;
+        const {
+          id, idStart, type, textPosY, textPosX, textColor, textOffset = 10,
+        } = part;
 
         // eslint-disable-next-line no-continue
         if (type !== 'bar') continue;
 
         const {
-          fill = 'var(--text_secondary)',
+          fill = 'var(--secondary_text)',
           isTitleShow = false,
           isFullHeight = true,
         } = part;
@@ -598,28 +603,42 @@ export default {
           .data(this.dataset)
           .enter()
           .append('rect')
-          .attr('x', (d) => xScale(Math.min(0, d[id])))
+          .attr('x', (d) => {
+            const startX = idStart ? d[idStart] : 0;
+            return xScale(Math.min(startX, d[id] + startX));
+          })
           .attr('y', (d, i) => {
             const y = yScale(i);
 
             if (isTitleShow) {
               const xData = d[id];
-              const x = xScale(xData);
-              const xAttr = xData >= 0 ? x + 10 : x - 10;
+              const textPositionsX = {
+                default: idStart ? xData + d[idStart] : xData,
+                center: idStart ? xData + (d[idStart] / 2) : xData / 2,
+              };
+              const x = textPosX
+                ? xScale(textPositionsX[textPosX])
+                : xScale(textPositionsX.default);
+              const xAttr = xData >= 0 ? x + +textOffset : x - +textOffset;
               const yAttr = y + barHeight / 2;
               const anchor = xData >= 0 ? 'start' : 'end';
               this.svg.append('text')
                 .text(Number(xData) >= 0 ? `+${toDivide(xData)}` : toDivide(xData))
                 .attr(this.dataAttr, '')
                 .attr('class', 'bar-text-caption')
-                .attr('fill', fill)
+                .attr('fill', textColor || fill)
                 .attr('text-anchor', anchor)
                 .attr('x', xAttr)
                 .attr('y', yAttr)
               // eslint-disable-next-line func-names
                 .attr('dy', function () {
                   const textHeight = this.getBBox().height;
-                  return textHeight / 3;
+                  const textPositionsY = {
+                    top: textHeight - (textHeight * 3),
+                    bottom: textHeight * 2.5,
+                    center: textHeight / 3,
+                  };
+                  return textPosY ? textPositionsY[textPosY] : textHeight / 3;
                 });
             }
 
@@ -628,7 +647,8 @@ export default {
           .attr('fill', fill)
           .attr('height', height)
           .attr('width', (d) => {
-            const width = Math.abs(xScale(d[id]) - xScale(0));
+            const start = idStart ? d[idStart] : 0;
+            const width = Math.abs(xScale(d[id] + start) - xScale(start));
             // eslint-disable-next-line no-restricted-globals
             return isNaN(width) ? 0 : width;
           })
@@ -741,12 +761,17 @@ export default {
           const listKey = key.includes(listColName)
             ? 'title'
             : 'value';
-          // const colorFrom = defaultBarParts.find((el) => el.id === );
-          if (index) {
+          if (index && elem[key]) {
             if (!result.list[index]) {
-              result.list[index] = {
-                [listKey]: listKey === 'value' ? this.toDivide(elem[key]) : elem[key],
-              };
+              if ((!result.list[index - 1] && index > 0)) {
+                result.list[index - 1] = {
+                  [listKey]: listKey === 'value' ? this.toDivide(elem[key]) : elem[key],
+                };
+              } else {
+                result.list[index] = {
+                  [listKey]: listKey === 'value' ? this.toDivide(elem[key]) : elem[key],
+                };
+              }
             } else {
               result.list[index][listKey] = listKey === 'value' ? this.toDivide(elem[key]) : elem[key];
             }
