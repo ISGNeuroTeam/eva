@@ -499,7 +499,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch('app/getUserSettings');
-    document.title = 'EVA | Исследование данных';
+    this.$root.$emit('setDocumentTitle', 'Исследование данных');
     if (this.search.original_otl !== '') {
       this.$store.commit('setShould', {
         idDash: 'reports',
