@@ -98,7 +98,7 @@ export default {
         userTtl: 60,
         numberFormat: false,
         startNavTab: null,
-        decimalPlacesLimits: 4,
+        decimalPlacesLimits: 10,
       },
       numberFormatItems: [
         { value: false, text: `${numberFormatExample.toLocaleString()} - Автоматический` },
