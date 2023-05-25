@@ -366,12 +366,25 @@ export default {
     },
     columnOptions() {
       const columnOptions = {};
+      const {
+        numberFormat,
+        decimalPlacesLimits,
+      } = this.$store.getters['app/userSettings'];
       if (this.isValidSchema) {
         Object.keys(this.searchSchema).forEach((column) => {
           columnOptions[column] = {
             headerFilter: this.defaultFilterAllColumns,
             headerMenu: true,
             frozen: this.frozenColumns.includes(column),
+            formatter: (this.enableDecimalPlacesLimits) ? (cell) => {
+              const num = cell.getValue();
+              if (typeof num === 'number') {
+                return num.toLocaleString(numberFormat, {
+                  maximumFractionDigits: decimalPlacesLimits || 10,
+                });
+              }
+              return num;
+            } : undefined,
           };
         });
       }
@@ -480,6 +493,9 @@ export default {
     // options
     frozenColumns() {
       return this.getOptions?.frozenColumns || [];
+    },
+    enableDecimalPlacesLimits() {
+      return this.getOptions?.enableDecimalPlacesLimits;
     },
     visibleColumns() {
       return this.getOptions?.titles || [];
