@@ -72,6 +72,7 @@
             @click="setTockenDelay('click')"
             @mouseover="setTockenDelay('mouseover')"
             @keydown.enter="onPressEnter"
+            @keydown.backspace="onPressBackspace"
           >
             <template v-slot:item="{ item, attrs, on }">
               <v-list-item
@@ -437,6 +438,13 @@ export default {
       }
       return foundIdx > -1;
     },
+    onPressBackspace() {
+      if (this.multiple) {
+        setTimeout(() => {
+          this.$refs.multiselect.$refs.menu.listIndex = -1;
+        }, 10);
+      }
+    },
     // выбор из списка по enter если отфильтрован один вариант
     onPressEnter() {
       const {
@@ -445,8 +453,20 @@ export default {
       } = this.$refs.multiselect;
       if (isMenuActive && filteredItems.length === 1) {
         this.$refs.multiselect.selectItem(filteredItems[0]);
+        this.$refs.multiselect.lazySearch = '';
+        if (this.multiple) {
+          this.$refs.multiselect.$refs.menu.listIndex = -1;
+        }
+      } else if (filteredItems.length > 1) {
+        const idxFind = filteredItems.findIndex((val) => val === this.$refs.multiselect.lazySearch);
+        if (idxFind > -1) {
+          this.$refs.multiselect.selectItem(filteredItems[idxFind]);
+          this.$refs.multiselect.lazySearch = '';
+          if (this.multiple) {
+            this.$refs.multiselect.$refs.menu.listIndex = -1;
+          }
+        }
       }
-      this.$refs.multiselect.lazySearch = '';
     },
     updateActions(dataReady) {
       let data = [];

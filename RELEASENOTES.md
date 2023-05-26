@@ -1,3 +1,24 @@
+# [1.135.0] - 2023-05-26
+
+### Added
+- Main setting: decimal places limits
+- Multiselect: Applying the filtered value by Enter if it matches the query
+- Risk-review: 
+  - Setting idStart (starting point for line drawing)
+  - Setting textPosY (vertical text position: center\top\bottom)
+  - Setting textPosX (horizontal text position: center\default)
+  - Setting textOffset (horizontal text offset from line), textColor
+- Table-v2:
+  - Event ctrlClick\click
+  - Decimal Limit Setting
+
+### Changed
+- Updated logic for changing the title of the browser tab
+
+### Fixed
+- Risk-review: Fixed incorrect processing of empty values for captions
+- User settings are not saved unless navigation settings are changed
+
 # [1.134.1] - 2023-05-24
 
 ### Fixed
