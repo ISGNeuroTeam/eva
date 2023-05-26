@@ -17,6 +17,7 @@
 
 ### Fixed
 - Risk-review: Fixed incorrect processing of empty values for captions
+- User settings are not saved unless navigation settings are changed
 
 # [1.134.1] - 2023-05-24
 
