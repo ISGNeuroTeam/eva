@@ -1325,7 +1325,7 @@ export default {
     exit() {
       this.$store.dispatch('auth/logout');
       this.$store.dispatch('app/resetState');
-      document.title = 'EVA';
+      this.$root.$emit('setDocumentTitle', null);
     },
     openThemeModal() {
       this.paleteShow = !this.paleteShow;

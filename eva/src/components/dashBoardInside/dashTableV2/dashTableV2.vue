@@ -366,12 +366,25 @@ export default {
     },
     columnOptions() {
       const columnOptions = {};
+      const {
+        numberFormat,
+        decimalPlacesLimits,
+      } = this.$store.getters['app/userSettings'];
       if (this.isValidSchema) {
         Object.keys(this.searchSchema).forEach((column) => {
           columnOptions[column] = {
             headerFilter: this.defaultFilterAllColumns,
             headerMenu: true,
             frozen: this.frozenColumns.includes(column),
+            formatter: (this.enableDecimalPlacesLimits) ? (cell) => {
+              const num = cell.getValue();
+              if (typeof num === 'number') {
+                return num.toLocaleString(numberFormat, {
+                  maximumFractionDigits: decimalPlacesLimits || 10,
+                });
+              }
+              return num;
+            } : undefined,
           };
         });
       }
@@ -481,6 +494,9 @@ export default {
     frozenColumns() {
       return this.getOptions?.frozenColumns || [];
     },
+    enableDecimalPlacesLimits() {
+      return this.getOptions?.enableDecimalPlacesLimits;
+    },
     visibleColumns() {
       return this.getOptions?.titles || [];
     },
@@ -537,8 +553,8 @@ export default {
               });
             });
           }
-          this.updateDataInTable(val);
-          this.updateColumnDefinition();
+          // this.updateDataInTable(val);
+          // this.updateColumnDefinition();
           this.onDataCompare();
         }
       },
@@ -588,7 +604,7 @@ export default {
       this.$nextTick(() => {
         this.$nextTick(() => {
           this.createTable();
-          this.updateDataInTable(this.dataRestFrom);
+          // this.updateDataInTable(this.dataRestFrom);
         });
       });
     },
@@ -763,7 +779,7 @@ export default {
         // rowHeight: this.options.rowHeight,
         selectable: this.selectableRow ? 1 : false,
         rowFormatter: this.rowFormatter,
-        renderVerticalBuffer: 50,
+        // renderHorizontal: 'virtual', // enable horizontal virtual DOM
         persistence: {
           columns: ['width', 'frozen', 'visible'],
           sort: true,
@@ -933,6 +949,12 @@ export default {
         allCellInRow,
       };
       this.setToken('click', data);
+      // onclick\onCtrlClick
+      this.setEvent({
+        event: e.ctrlKey ? 'onctrlclick' : 'onclick',
+        partElement: 'empty',
+      });
+
       // For edit
       // if (e instanceof FocusEvent) {
       //   const column = cell.column.field;
@@ -941,6 +963,30 @@ export default {
       //
       //   this.$emit('cellClick', { row, column, value });
       // }
+    },
+    setEvent(eventData) {
+      const events = this.getEvents({
+        event: eventData.event,
+        partelement: eventData.partElement,
+      });
+      if (events?.length > 0) {
+        events.forEach((item) => {
+          if (item.action === 'set') {
+            this.$store.commit('letEventSet', {
+              events,
+              idDash: this.idDashFrom,
+            });
+          } else if (item.action === 'go') {
+            this.$store.dispatch('letEventGo', {
+              event: item,
+              id: this.idFrom,
+              idDash: this.idDashFrom,
+              route: this.$router,
+              store: this.$store,
+            });
+          }
+        });
+      }
     },
     writeData() {
       this.tableData = this.tabulator.getData();
