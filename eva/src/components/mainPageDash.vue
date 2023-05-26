@@ -487,7 +487,7 @@ export default {
       }
     });
 
-    document.title = 'EVA | Конструирование дашбордов';
+    this.$root.$emit('setDocumentTitle', 'Конструирование дашбордов');
     this.loadSettings();
   },
   methods: {

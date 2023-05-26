@@ -39,6 +39,20 @@
       :style="{ color: theme.$main_text }"
       @input="$emit('isChanged', true)"
     />
+    <v-text-field
+      v-model="settings.decimalPlacesLimits"
+      :min="1"
+      :max="12"
+      label="Число десятичных знаков"
+      type="number"
+      hide-details
+      class="field-profile"
+      outlined
+      dense
+      :style="{ color: theme.$main_text }"
+      @input="$emit('isChanged', true)"
+      @change="onChangeDecimalPlacesLimits"
+    />
 
     <div class="title">
       Настройки навигации
@@ -84,6 +98,7 @@ export default {
         userTtl: 60,
         numberFormat: false,
         startNavTab: null,
+        decimalPlacesLimits: 10,
       },
       numberFormatItems: [
         { value: false, text: `${numberFormatExample.toLocaleString()} - Автоматический` },
@@ -126,6 +141,13 @@ export default {
     onChangeTTL() {
       this.settings.userTtl = +this.settings.userTtl.replace(/\D/ig, '')
         || this.defaultSettings.userTtl;
+    },
+    onChangeDecimalPlacesLimits() {
+      let decimalPlacesLimits = +this.settings.decimalPlacesLimits.replace(/\D/ig, '')
+        || this.defaultSettings.decimalPlacesLimits;
+      if (decimalPlacesLimits > 12) decimalPlacesLimits = 12;
+      if (decimalPlacesLimits < 1) decimalPlacesLimits = 1;
+      this.settings.decimalPlacesLimits = decimalPlacesLimits;
     },
   },
 };
