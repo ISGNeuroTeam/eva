@@ -101,7 +101,7 @@ export default {
     },
   },
   mounted() {
-    document.title = 'EVA';
+    this.$root.$emit('setDocumentTitle', null);
   },
   methods: {
     openDash() {
