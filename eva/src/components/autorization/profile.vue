@@ -164,12 +164,8 @@
 
 <script>
 import { mdiPencil, mdiPlus, mdiTrashCanOutline } from '@mdi/js';
-import NavigationTreeView from '../navigationTreeView.vue';
 
 export default {
-  components: {
-    NavigationTreeView,
-  },
   data() {
     return {
       user: {},

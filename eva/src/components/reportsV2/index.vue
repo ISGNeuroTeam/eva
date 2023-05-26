@@ -131,7 +131,6 @@ import statistic from './statistic.vue';
 import visualisation from './visualisation.vue';
 import Interesting from './interesting.vue';
 import Notifications from '@/components/notifications';
-import NavigationTreeView from '../navigationTreeView.vue';
 
 export default {
   components: {
@@ -144,7 +143,6 @@ export default {
     download,
     report,
     Notifications,
-    NavigationTreeView,
   },
   data() {
     return {

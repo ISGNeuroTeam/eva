@@ -78,12 +78,7 @@
 </template>
 
 <script>
-import NavigationTreeView from '../navigationTreeView.vue';
-
 export default {
-  components: {
-    NavigationTreeView,
-  },
   data() {
     return {};
   },
