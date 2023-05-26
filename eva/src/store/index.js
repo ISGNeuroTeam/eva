@@ -2064,7 +2064,8 @@ export default new Vuex.Store({
       response.setting = response.setting
         .replaceAll("'", '"')
         .replaceAll('True', 'true')
-        .replaceAll('False', 'false');
+        .replaceAll('False', 'false')
+        .replaceAll('None', 'null');
       try {
         response.setting = JSON.parse(response.setting);
       } catch (e) {

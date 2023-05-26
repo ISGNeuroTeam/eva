@@ -13,6 +13,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.135.0]
+
+### Added
+- applying the filtered value by Enter in the select component if it matches the query
+- Main setting: decimal places limits
+- Table: added option to limit decimal places
+- Risk-review: Added settings: idStart (starting point for line drawing), textPosY (vertical text position: center\top\bottom), textPosX (horizontal text position: center\default), textOffset (horizontal text offset from line), textColor
+- Table-v2: Added ctrlClick\click event
+
+### Changed
+- Updated logic for changing the title of the browser tab
+
+### Fixed
+- Risk-review: Fixed incorrect processing of empty values for captions
+
 ## [1.134.1]
 
 ### Fixed

@@ -328,6 +328,7 @@ export default {
       'saveMovedColumnPosition',
       'defaultFilterAllColumns',
       'frozenColumns',
+      'enableDecimalPlacesLimits',
     ],
     select: [
       'boxShadow',
@@ -797,6 +798,13 @@ export default {
       option: 'defaultFilterAllColumns',
       optionGroup: 'tableOptions',
       description: 'Вкл/выкл фильтры столбцов(по-умолчанию)',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'enableDecimalPlacesLimits',
+      optionGroup: 'tableOptions',
+      description: 'Ограничение десятичных знаков',
       elem: 'switch',
       default: false,
     },
