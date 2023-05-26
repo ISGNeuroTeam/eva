@@ -160,10 +160,12 @@ export default {
       response.setting = response.setting
         .replaceAll("'", '"')
         .replaceAll('True', 'true')
-        .replaceAll('False', 'false');
+        .replaceAll('False', 'false')
+        .replaceAll('None', 'null');
       try {
         response.setting = JSON.parse(response.setting);
       } catch (err) {
+        console.error(err);
         response.setting = {};
       }
       commit('setUserSettings', response.setting);

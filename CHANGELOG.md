@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Main setting: decimal places limits
+- Table: added option to limit decimal places
 - Risk-review: Added settings: idStart (starting point for line drawing), textPosY (vertical text position: center\top\bottom), textPosX (horizontal text position: center\default), textOffset (horizontal text offset from line), textColor
 - Table-v2: Added ctrlClick\click event
 
