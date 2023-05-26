@@ -677,7 +677,7 @@ export default {
               event: 'onclick',
               partelement: 'row',
             });
-            if (events.length !== 0) {
+            if (events?.length > 0) {
               events.forEach((item) => {
                 if (item.action === 'set') {
                   this.$store.commit('letEventSet', {
