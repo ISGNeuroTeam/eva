@@ -9,6 +9,11 @@ import Vue from 'vue';
 
 export default {
   name: 'App',
+  data() {
+    return {
+      startDocumentTitle: null,
+    };
+  },
   computed: {
     cssBodyVariables() {
       const currentTheme = this.$store.getters.getTheme;
@@ -37,6 +42,11 @@ export default {
     },
   },
   mounted() {
+    this.startDocumentTitle = document.title;
+    this.$root.$on('setDocumentTitle', (text) => {
+      const { startDocumentTitle } = this;
+      document.title = text ? `${startDocumentTitle} | ${text}` : startDocumentTitle;
+    });
     document.body.style = this.cssBodyVariables;
     // TODO: временный костыль
     // Синхронизация логаута на всех вкладках браузера
