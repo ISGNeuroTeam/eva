@@ -383,7 +383,7 @@ export default {
     async updateTree(lazy = false) {
       const open = [...this.treeOpenItems];
       open.forEach((treeId) => {
-        const { vnode = null } = this.$refs.tree.nodes[treeId] || {};
+        const { vnode = null } = this.$refs.tree?.nodes[treeId] || {};
         if (vnode) {
           vnode.isOpen = false;
           vnode.isLoaded = false;
@@ -392,12 +392,12 @@ export default {
       await this.loadSettings(lazy);
       await this.loadGroups(lazy);
       open.forEach((treeId) => {
-        const { vnode = null } = this.$refs.tree.nodes[treeId] || {};
+        const { vnode = null } = this.$refs.tree?.nodes[treeId] || {};
         if (vnode) {
           vnode.isOpen = false;
           vnode.isLoaded = false;
         }
-        this.$refs.tree.updateOpen(treeId, true);
+        this.$refs.tree?.updateOpen(treeId, true);
       });
     },
     filterFunction(obj, text, nameProp) {
@@ -448,7 +448,7 @@ export default {
           editable: true,
         },
       });
-      this.$refs.tree.updateOpen(item.treeId, true);
+      this.$refs.tree?.updateOpen(item.treeId, true);
       this.$refs.tree.updateVnodeState(item.treeId);
     },
     onClickSaveCategory(event, item) {

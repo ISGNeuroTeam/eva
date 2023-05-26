@@ -317,7 +317,7 @@ export default {
     exit() {
       this.$store.dispatch('auth/logout');
       this.$store.dispatch('app/resetState');
-      document.title = 'EVA';
+      this.$root.$emit('setDocumentTitle', null);
     },
     edit() {
       this.$router.push('/profile');
