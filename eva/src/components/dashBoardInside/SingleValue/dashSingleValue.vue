@@ -61,7 +61,7 @@
             />
           </span>
           <span
-            v-if="metric.value"
+            v-if="!isNaN(metric.value) && metric.value !== ''"
             class="metric-value"
             :class="`color-${metric.color}`"
             style="
@@ -112,7 +112,7 @@ export default {
   components: { SingleValueSettings },
   filters: {
     filterNumber: (value, options) => {
-      if (!value) return '';
+      if (Number.isNaN(value) || `${value}` === '') return '';
       if (!options?.numberPerDigit) return value;
       const numberOfDigits = (num) => Number(num).toLocaleString('ru-RU');
       if (value.match(/^-?\d+$/)) {
