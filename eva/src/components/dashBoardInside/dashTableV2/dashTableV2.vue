@@ -128,34 +128,7 @@ const colorFixed = function (cell) {
 };
 
 // eslint-disable-next-line func-names
-const headerFilterFn = function (headerValue, rowValue) {
-  const vueComponent = this;
-  const compare = headerValue.selectValue;
-  const filterValue = typeof rowValue === 'string'
-    ? headerValue.textValue
-    : parseFloat(headerValue.textValue);
-  let result = true;
-  if (compare === '>') {
-    result = rowValue > filterValue;
-  } else if (compare === '<') {
-    result = rowValue < filterValue;
-  } else if (compare === '=') {
-    result = rowValue === filterValue;
-  } else if (compare === '>=') {
-    result = rowValue >= filterValue;
-  } else if (compare === '<=') {
-    result = rowValue <= filterValue;
-  } else if (compare === '!=') {
-    result = rowValue !== filterValue;
-  } else {
-    result = true;
-  }
-  vueComponent.updateTable();
-  return result;
-};
-
-// eslint-disable-next-line func-names
-const headerFilter = function (cell, onRendered, success, cancel/* , editorParams */) {
+const headerFilter = function (cell/* , onRendered, success, cancel , editorParams */) {
   const vueComponent = this;
   const filterId = vueComponent.persistenceFilterId;
   const field = cell.getField();
@@ -334,9 +307,14 @@ export default {
       },
       filters: [],
       sorters: [],
+      timeout: null,
+      timer: 0,
     };
   },
   computed: {
+    isResized() {
+      return this.dashFromStore.tableOptions.columnResized;
+    },
     pageSize() {
       return this.dashFromStore?.tableOptions?.pageSize
           || this.options.paginationSize;
@@ -391,6 +369,9 @@ export default {
       return columnOptions;
     },
     columns() {
+      const columnsFromStore = this.idDashFrom !== 'reports' && this.dashFromStore?.tableOptions
+        ? this.dashFromStore.tableOptions[`tabulator-${this.idFrom}-columns`]
+        : [];
       const defaultColumns = this.options.selectColumn
         ? [
           {
@@ -408,76 +389,73 @@ export default {
         ]
         : [];
       const fields = this.idDashFrom === 'reports' ? Object.keys(this.searchSchema) : this.fields;
-      if (this.columnOptions && Object.keys(this.columnOptions).length) {
-        return fields.reduce((acc, key) => {
-          if (key === '_columnOptions') {
-            return acc;
-          }
 
-          const options = this.columnOptions[key];
-          const column = {
-            field: key,
-            title: options?.title || key,
-            resizable: 'header',
-            frozen: options?.frozen || false,
-            headerFilter: options?.headerFilter ? headerFilter.bind(this) : false,
-            headerFilterLiveFilter: false,
-            editor: options?.editor || false,
-            // TODO: Временное решение, заменить в будущем на параметр из OTL
-            sorter: this.searchSchema[key] === 'STRING' ? 'string' : sorterFn,
-            headerSortTristate: true,
-            sorterParams: this.searchSchema[key] === 'STRING' ? {
-              locale: true,
-              alignEmptyValues: 'top',
-            } : false,
-            headerMenu: options?.headerMenu && this.isEdit ? this.headerMenu : false,
-            cellClick: this.cellClickEvent,
-            minWidth: options?.minWidth || (options?.headerFilter ? 150 : 80),
-          };
-
-          if (options?.formatter) {
-            column.formatter = options.formatter === 'color' ? colorFixed : options.formatter;
-          }
-
-          if (options?.formatter === 'tickCross') {
-            column.headerFilterParams = { tristate: true };
-            column.headerFilterEmptyCheck = (value) => value === null;
-          }
-
-          if (options?.editor === 'list' && options.editorParams) {
-            column.editorParams = options.editorParams;
-            column.headerFilter = 'input';
-          }
-
-          return [...acc, column];
-        }, defaultColumns);
-      }
-
-      return fields.reduce((acc, key) => {
-        const column = {
+      const processColumn = (key, options, columnFromStore) => {
+        let column = {
           field: key,
-          title: key,
+          title: options?.title || key,
           resizable: 'header',
-          editor: this.searchSchema[key] === 'BOOLEAN' ? 'tickCross' : true,
-          headerMenu: this.isEdit ? this.headerMenu : false,
+          frozen: options?.frozen || false,
+          headerFilter: options?.headerFilter ? headerFilter.bind(this) : false,
+          headerFilterLiveFilter: false,
+          editor: options?.editor || false,
           sorter: this.searchSchema[key] === 'STRING' ? 'string' : sorterFn,
           headerSortTristate: true,
           sorterParams: this.searchSchema[key] === 'STRING' ? {
             locale: true,
             alignEmptyValues: 'top',
           } : false,
-          headerFilter: this.options.defaultFilterAllColumns ? headerFilter.bind(this) : false,
-          // headerFilterFunc: this.options.defaultFilterAllColumns ? headerFilterFn : false,
+          headerMenu: options?.headerMenu && this.isEdit ? this.headerMenu : false,
           cellClick: this.cellClickEvent,
+          minWidth: options?.minWidth || (options?.headerFilter ? 150 : 80),
         };
 
-        if (this.searchSchema[key] === 'BOOLEAN') {
-          column.formatter = 'tickCross';
+        if (options?.formatter) {
+          column.formatter = options.formatter === 'color' ? colorFixed : options.formatter;
+        }
+
+        if (options?.formatter === 'tickCross') {
           column.headerFilterParams = { tristate: true };
           column.headerFilterEmptyCheck = (value) => value === null;
         }
-        return [...acc, column];
-      }, defaultColumns);
+
+        if (options?.editor === 'list' && options.editorParams) {
+          column.editorParams = options.editorParams;
+          column.headerFilter = 'input';
+        }
+
+        if (columnFromStore !== undefined) {
+          column = {
+            ...columnFromStore,
+            ...column,
+          };
+        }
+
+        return column;
+      };
+
+      const generateColumns = (acc, key) => {
+        if (key === '_columnOptions') {
+          return acc;
+        }
+
+        const options = this.columnOptions[key];
+        const columnFromStore = columnsFromStore?.find((el) => el.field === key);
+
+        return [...acc, processColumn(key, options, columnFromStore)];
+      };
+
+      const generateDefaultColumns = (acc, key) => {
+        const columnFromStore = columnsFromStore?.find((el) => el.field === key);
+
+        return [...acc, processColumn(key, null, columnFromStore)];
+      };
+
+      if (this.columnOptions && Object.keys(this.columnOptions).length) {
+        return fields.reduce(generateColumns, defaultColumns);
+      }
+
+      return fields.reduce(generateDefaultColumns, defaultColumns);
     },
     events() {
       return this.getEvents({
@@ -532,10 +510,15 @@ export default {
     searchSchema: {
       handler(value) {
         if (Object.keys(value)?.length > 0 && this.idDashFrom !== 'reports') {
-          const isUpdatedValue = this.fields?.length > 0 && this.saveMovedColumnPosition
+          const isUpdatedValue = this.fields?.length > 0
             ? this.checkFieldList(Object.keys(value), structuredClone(this.fields))
             : true;
           if (isUpdatedValue) {
+            this.$store.commit('setState', [{
+              object: this.dashFromStore.tableOptions,
+              prop: 'columnResized',
+              value: false,
+            }]);
             this.clearPersistenceFilter();
             this.updateFieldListInStore(Object.keys(value));
           }
@@ -544,17 +527,9 @@ export default {
       deep: true,
     },
     dataRestFrom: {
-      handler(val, oldVal) {
+      handler(val) {
         if (this.isValidSchema) {
-          if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
-            this.$nextTick(() => {
-              this.$nextTick(() => {
-                this.createTable();
-              });
-            });
-          }
-          // this.updateDataInTable(val);
-          // this.updateColumnDefinition();
+          this.updateDataInTable(val);
           this.onDataCompare();
         }
       },
@@ -566,6 +541,14 @@ export default {
       },
       deep: true,
     },
+    columns: {
+      handler(val, oldVal) {
+        if (this.tabulator && (JSON.stringify(val) !== JSON.stringify(oldVal))) {
+          this.tabulator.redraw();
+        }
+      },
+      deep: true,
+    },
     fullScreenMode(val, oldVal) {
       if (val !== oldVal) {
         this.redrawTable();
@@ -574,7 +557,6 @@ export default {
     frozenColumns: {
       handler(val, oldVal) {
         if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
-          // this.redrawTable();
           this.tabulator.redraw();
         }
       },
@@ -604,7 +586,6 @@ export default {
       this.$nextTick(() => {
         this.$nextTick(() => {
           this.createTable();
-          // this.updateDataInTable(this.dataRestFrom);
         });
       });
     },
@@ -628,6 +609,8 @@ export default {
     }
   },
   created() {
+    this.createFieldInStore('tableOptions', {});
+    this.createFieldInStore('columnResized', false, 'tableOptions');
     this.createTable = throttle(this.createTable, 500);
     this.redrawTable = throttle(this.redrawTable, 100);
     this.updateTable = throttle(this.updateTable, 100);
@@ -773,14 +756,13 @@ export default {
         popupContainer: `#${this.idFrom}`,
         maxHeight: '100%',
         height: '100%',
-        layout: 'fitDataFill',
+        layout: 'fitDataStretch',
+        layoutColumnsOnNewData: true,
         frozenRows: this.options.frozenRows,
         nestedFieldSeparator: '|',
-        // rowHeight: this.options.rowHeight,
         selectable: this.selectableRow ? 1 : false,
         rowFormatter: this.rowFormatter,
-        // renderHorizontal: 'virtual', // enable horizontal virtual DOM
-        persistence: {
+        persistence: this.idDashFrom === 'reports' ? false : {
           columns: ['width', 'frozen', 'visible'],
           sort: true,
         },
@@ -813,7 +795,7 @@ export default {
         autoColumns: this.isLoadFromFile,
         columns: this.columns,
         pagination: 'local',
-        paginationCounter(pageSize, currentRow, currentPage, totalRows, totalPages) {
+        paginationCounter(pageSize, currentRow, currentPage, totalRows/* , totalPages */) {
           return `${currentRow}-${pageSize} из ${totalRows}`;
         },
         paginationSize: this.pageSize,
@@ -825,8 +807,15 @@ export default {
         persistenceWriterFunc: this.persistenceWriterFunc,
         persistenceReaderFunc: this.persistenceReaderFunc,
       });
-      this.tabulator.on('columnVisibilityChanged', (/* column, visible */) => {
-        // TODO: Добавить переключение видимых колонок с сохранением в store
+      this.tabulator.on('columnResized', () => {
+        // column - column component of the resized column
+        if (this.idDashFrom !== 'reports') {
+          this.$store.commit('setState', [{
+            object: this.dashFromStore.tableOptions,
+            prop: 'columnResized',
+            value: true,
+          }]);
+        }
       });
       this.tabulator.on('columnMoved', (column, columns) => {
         if (this.saveMovedColumnPosition) {
@@ -845,16 +834,16 @@ export default {
           }
         }, 500);
       });
-      this.tabulator.on('dataSorted', (sorters, rows) => {
+      this.tabulator.on('dataSorted', (sorters/* , rows */) => {
         // sorters - array of the sorters currently applied
         // rows - array of row components in their new order
         if (sorters?.length === 0) {
           this.sorters = [];
         }
       });
-      this.tabulator.on('pageSizeChanged', (pagesize) => {
-        // pagesize - the number of rows per page
-        this.changeDefaultPagination(pagesize);
+      this.tabulator.on('pageSizeChanged', (pageSize) => {
+        // pageSize - the number of rows per page
+        this.changeDefaultPagination(pageSize);
       });
     },
     updateFieldListInStore(fieldList) {
@@ -895,7 +884,6 @@ export default {
 
         label.appendChild(icon);
         label.appendChild(title);
-        // const { toggleVisibleColumns } = this;
         // create menu item
         menu.push({
           label,
@@ -918,23 +906,11 @@ export default {
               icon.classList.remove('eva-basic_checkbox_checked');
               icon.classList.add('eva-basic_checkbox');
             }
-            // toggleVisibleColumns(column.getField());
           },
         });
       }
 
       return menu;
-    },
-    toggleVisibleColumns(column) {
-      const isVisible = this.visibleColumns.indexOf(column) !== -1;
-      const updatedValue = isVisible
-        ? this.visibleColumns.filter((el) => el !== column)
-        : [...this.visibleColumns, column];
-      this.$store.commit('setState', [{
-        object: this.getOptions,
-        prop: 'titles',
-        value: updatedValue,
-      }]);
     },
     cellClickEvent(e, { _cell: cell }) {
       // For token\click-event
@@ -956,6 +932,7 @@ export default {
       });
 
       // For edit
+      // TODO: Временно закомменчено
       // if (e instanceof FocusEvent) {
       //   const column = cell.column.field;
       //   const { value } = cell;
@@ -1081,9 +1058,6 @@ export default {
         this.tabulator = null;
       }
     },
-    getElementFromTable(selector) {
-      return this.$refs.idFrom.querySelector(selector);
-    },
     persistenceFilterWriter(id, field, data) {
       if (this.isValidSchema) {
         // Список фильтров без текущего
@@ -1131,8 +1105,7 @@ export default {
       }
     },
     clearPersistenceFilter() {
-      if (this.dashFromStore?.tableOptions
-          && this.dashFromStore.tableOptions[this.persistenceFilterId]) {
+      if (this.dashFromStore.tableOptions[this.persistenceFilterId]) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.tableOptions,
           prop: this.persistenceFilterId,
@@ -1166,45 +1139,6 @@ export default {
     removeFilter(field, type, value) {
       this.tabulator.removeFilter(field, type, value);
     },
-    deleteFieldsFromObject(object, fields) {
-      const result = {};
-      Object.keys(object).forEach((key) => {
-        if (!fields.includes(key)) {
-          result[key] = object[key];
-        }
-      });
-      return result;
-    },
-    persistenceWriterFunc(id, type, data) {
-      if (data?.length > 0 && this.isValidSchema) {
-        if (type !== 'sort') {
-          if (!this.dashFromStore?.tableOptions) {
-            this.$store.commit('setState', [{
-              object: this.dashFromStore,
-              prop: 'tableOptions',
-              value: {},
-            }]);
-          }
-          if (!this.dashFromStore.tableOptions[`${id}-${type}`]) {
-            this.$store.commit('setState', [{
-              object: this.dashFromStore.tableOptions,
-              prop: `${id}-${type}`,
-              value: [],
-            }]);
-          }
-          const dataFromStore = this.dashFromStore.tableOptions[`${id}-${type}`];
-          if (JSON.stringify(dataFromStore) !== JSON.stringify(data)) {
-            this.$store.commit('setState', [{
-              object: this.dashFromStore.tableOptions,
-              prop: `${id}-${type}`,
-              value: structuredClone(data),
-            }]);
-          }
-        } else {
-          this.sorters = data;
-        }
-      }
-    },
     persistenceReaderFunc(id, type) {
       if (type === 'sort') {
         return this.sorters;
@@ -1215,6 +1149,42 @@ export default {
         return structuredClone(tableOptions[`${id}-${type}`]);
       }
       return false;
+    },
+    persistenceWriterFunc(id, type, data) {
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+      }
+      this.timer = 500;
+      this.timeout = setTimeout(() => {
+        if (data?.length > 0 && this.isValidSchema) {
+          if (type !== 'sort') {
+            this.createFieldInStore(
+              `${id}-${type}`,
+              [],
+              'tableOptions',
+            );
+            const dataFromStore = this.dashFromStore.tableOptions[`${id}-${type}`];
+            if (JSON.stringify(dataFromStore) !== JSON.stringify(data)) {
+              this.$store.commit('setState', [{
+                object: this.dashFromStore.tableOptions,
+                prop: `${id}-${type}`,
+                value: structuredClone(data.map((el) => {
+                  if (this.isResized) {
+                    return el;
+                  }
+                  return {
+                    field: el.field,
+                    frozen: el.frozen,
+                    visible: el.visible,
+                  };
+                })),
+              }]);
+            }
+          } else {
+            this.sorters = data;
+          }
+        }
+      }, this.timer);
     },
     getEvents({ event, partelement }) {
       let result = [];
@@ -1350,6 +1320,21 @@ export default {
         value: pageSize,
       }]);
     },
+    createFieldInStore(fieldName, defaultValue, parentField) {
+      if (parentField && this.dashFromStore[parentField][fieldName] === undefined) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[parentField],
+          prop: fieldName,
+          value: defaultValue,
+        }]);
+      } else if (this.dashFromStore[fieldName] === undefined) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: fieldName,
+          value: defaultValue,
+        }]);
+      }
+    },
   },
 };
 </script>
@@ -1460,6 +1445,8 @@ export default {
   }
 
   .tabulator-row{
+    display: flex;
+    align-items: stretch !important;
     color: var(--main_text)!important;
     background-color: transparent;
     transition: background-color .3s, color .3s;
@@ -1477,9 +1464,13 @@ export default {
     }
     .tabulator-cell {
       display: inline-flex;
+      flex: 1 1 auto;
       align-items: center;
+      text-align: center;
       justify-content: center;
       transition: background-color .3s;
+      height: auto !important;
+      white-space: normal;
       &.tabulator-frozen {
         background-color: var(--main_bg);
       }
