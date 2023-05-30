@@ -7,8 +7,7 @@
     <v-main>
       <v-navigation-drawer
         v-model="openTree"
-        absolute
-        bottom
+        fixed
         temporary
         :style="{ color: theme.$main_text, background: theme.$main_bg }"
         class="nav-panel-drawer"
