@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- The scroll on the dashboard hangs if you open a large tree
 
 ## [1.135.0]
 

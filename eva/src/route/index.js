@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueJWT from 'vuejs-jwt';
+import mainTitle from '../components/mainTitle.vue';
 
 Vue.use(VueRouter);
 Vue.use(VueJWT, { storage: 'cookie', keyName: 'eva_token' });
@@ -57,7 +58,7 @@ const routes = [
   {
     name: 'Дашборд',
     path: '/dashboards/:id(\\d+)', // если страница дашборда
-    component: () => import('../components/mainTitle.vue'),
+    component: mainTitle,
     props: true,
     meta: {
       requiresAuth: true,
@@ -67,7 +68,7 @@ const routes = [
   {
     name: 'Дашборд tab',
     path: '/dashboards/:id/:tabId', // если страница дашборда
-    component: () => import('../components/mainTitle.vue'),
+    component: mainTitle,
     props: true,
     meta: {
       requiresAuth: true,
