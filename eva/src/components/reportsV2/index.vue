@@ -13,8 +13,7 @@
     <v-main>
       <v-navigation-drawer
         v-model="openTree"
-        absolute
-        bottom
+        fixed
         temporary
         :style="{ color: theme.$main_text, background: theme.$main_bg }"
         class="nav-panel-drawer"
@@ -131,7 +130,6 @@ import statistic from './statistic.vue';
 import visualisation from './visualisation.vue';
 import Interesting from './interesting.vue';
 import Notifications from '@/components/notifications';
-import NavigationTreeView from '../navigationTreeView.vue';
 
 export default {
   components: {
@@ -144,7 +142,6 @@ export default {
     download,
     report,
     Notifications,
-    NavigationTreeView,
   },
   data() {
     return {

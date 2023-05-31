@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import './fonts.css';
 import './scroll.css';
+import './sass/main.sass';
 import './scss/globalStyles.scss';
 
 // Подключаем кастомный мконочный шрифт
@@ -17,10 +18,6 @@ import VueCtkDateTimePicker from 'vue-ctk-date-time-picker/dist/vue-ctk-date-tim
 import moment from 'moment';
 import * as XLSX from './js/utils/xlsx.full.min';
 import store from './store/index';
-// подключаем файл с настройками хранилища Vuex (формы)
-// import storeForm from './store/storeForm/index';
-// подключаем файл с настройками хранилища Vuex (авторизация)
-// import storeAuth from './store/storeAuth/index';
 // подключаем визуальную библиотеку Vuetify для красивого отображения элемнетов
 import vuetify from './plugins/vuetify';
 // подключаем файл с настройками адресации между компонентами
@@ -41,49 +38,47 @@ Vue.component('vue-draggable-resizable', VueDraggableResizable);
 Vue.component('DTPicker', VueCtkDateTimePicker);
 
 // далее объявляем компоненты так как потом будем их вызывать в html коде
-Vue.component('app', () => import('./App.vue'));
+Vue.component('app', require('./App.vue').default);
 // верхняя панель на странице
-Vue.component('header-top', () => import('./components/header.vue'));
+Vue.component('header-top', require('./components/header.vue').default);
 // верхняя панель на странице
-Vue.component('footer-bottom', () => import('./components/footer.vue'));
-// главная страница с приветствием и выбором разных дашбордов
-// Vue.component('main-page', () => import('./components/mainPage.vue'))
-// страница самого дашборда с разными элементами
-// Vue.component('main-title', () => import('./components/mainTitle.vue'))
+Vue.component('footer-bottom', require('./components/footer.vue').default);
 // обертка элемнета для drag-and-drop
-Vue.component('move-able', () => import('./components/moveAble.vue'));
+Vue.component('move-able', require('./components/moveAble.vue').default);
 // сам элемент
-Vue.component('dash-board', () => import('./components/dashBoard.vue'));
+Vue.component('dash-board', require('./components/dashBoard.vue').default);
 // верхняя панель дашборда с разными инструментами
-Vue.component('dash-panel-bord', () => import('./components/dashPanelBoard.vue'));
+Vue.component('dash-panel-bord', require('./components/dashPanelBoard.vue').default);
 // модальное окно для удаления чего-либо
-Vue.component('modal-delete', () => import('./components/modalDelete.vue'));
+Vue.component('modal-delete', require('./components/modalDelete.vue').default);
 // модальное окно для удаления групп и дашбордов
-Vue.component('modal-delete-main', () => import('./components/modalDeleteFromMain.vue'));
+Vue.component('modal-delete-main', require('./components/modalDeleteFromMain.vue').default);
 // модальное окно для выбора search
-Vue.component('modal-search', () => import('./components/modalSearch.vue'));
+Vue.component('modal-search', require('./components/modalSearch.vue').default);
 // модальное окно для создания нового дашборда
 Vue.component('modal-create', () => import('./components/modalCreate.vue'));
 // модальное окно для создания нового дашборда
-Vue.component('modal-schedule', () => import('./components/modalScheduler.vue'));
+Vue.component('modal-schedule', require('./components/modalScheduler.vue').default);
 // модальное окно для импорта и экспорта
-Vue.component('modal-exim', () => import('./components/modalExim.vue'));
+Vue.component('modal-exim', require('./components/modalExim.vue').default);
 // модальное окно для подтверждения закрытия другого модального окна
-Vue.component('modal-confirm', () => import('./components/modalConfirm.vue'));
+Vue.component('modal-confirm', require('./components/modalConfirm.vue').default);
 // модальное окно с подтверждением закрытия
-Vue.component('modal-persistent', () => import('./components/modalPersistent.vue'));
+Vue.component('modal-persistent', require('./components/modalPersistent.vue').default);
 // модальное окно с источниками данных
-Vue.component('modal-create-search', () => import('./components/modalCreateSearch.vue'));
+Vue.component('modal-create-search', require('./components/modalCreateSearch.vue').default);
 // модальное окно настроект
-Vue.component('modal-settings', () => import('./components/modalSettings.vue'));
+Vue.component('modal-settings', require('./components/modalSettings.vue').default);
 // модальное окно скачивания
-Vue.component('modal-download', () => import('./components/modalDownload.vue'));
+Vue.component('modal-download', require('./components/modalDownload.vue').default);
 // настройки системы
-Vue.component('theme-settings', () => import('./components/themeSettings.vue'));
+Vue.component('theme-settings', require('./components/themeSettings.vue').default);
 // настройки дашборда
-Vue.component('dash-settings', () => import('./components/dashSettings.vue'));
+Vue.component('dash-settings', require('./components/dashSettings.vue').default);
 // настройки темы
-Vue.component('modal-themes', () => import('./components/modalThemes.vue'));
+Vue.component('modal-themes', require('./components/modalThemes.vue').default);
+Vue.component('navigation-tree-view', require('./components/navigationTreeView.vue').default);
+Vue.component('modal-visualisation', require('./components/modalVisualisation.vue').default);
 // элемент таблицы
 Vue.component('dash-tableOld', () => import('./components/dashBoardInside/dashTable.vue'));
 // элемент диаграммы ганта
@@ -100,7 +95,7 @@ Vue.component(
   () => import('./components/dashBoardInside/dashGridGroup/dashGridGroup.vue'),
 );
 // элемент селект
-Vue.component('dash-select', () => import('./components/dashBoardInside/dashSelect.vue'));
+Vue.component('dash-select', require('./components/dashBoardInside/dashSelect.vue').default);
 // элемент выбора даты и времени
 Vue.component('dash-picker', () => import('./components/dashBoardInside/dashDTPicker.vue'));
 // элемент вывода числа
@@ -108,9 +103,9 @@ Vue.component('dash-single', () => import('./components/dashBoardInside/dashSing
 // элумент круговой шкалы
 Vue.component('dash-dial', () => import('./components/dashBoardInside/dashScale/dashDial.vue'));
 // элемент кнопки
-Vue.component('dash-button', () => import('./components/dashBoardInside/dashButton.vue'));
+Vue.component('dash-button', require('./components/dashBoardInside/dashButton.vue').default);
 // элемент текстового поля
-Vue.component('dash-textarea', () => import('./components/dashBoardInside/dashTextArea.vue'));
+Vue.component('dash-textarea', require('./components/dashBoardInside/dashTextArea.vue').default);
 // элемент столбцовой диаграммы
 Vue.component('dash-barchart', () => import('./components/dashBoardInside/dashBarChart.vue'));
 // элемент плиточной визуализации
@@ -139,13 +134,11 @@ Vue.component('dash-riskReview', () => import('./components/dashBoardInside/dash
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
 // компонент Accumulators
 Vue.component('dash-accumulators', () => import('./components/dashBoardInside/dashAccumulators.vue'));
+
 // компонент Menu
-Vue.component('dash-menu', () => import('./components/dashBoardInside/dashMenu.vue'));
+Vue.component('dash-menu', require('./components/dashBoardInside/dashMenu.vue').default);
+
 Vue.component('dash-dynamicForm', () => import('./components/dashBoardInside/dynamicForm.vue'));
-// элемнет поиска пока не актуален
-// Vue.component('dash-search', () => import('./components/dashBoardInside/dashSearch.vue'))
-// фильтр для таблицы пока не актуален
-// Vue.component('dash-filter', () => import('./components/dashBoardInside/dashFilter.vue'))
 // элемент создания формы
 Vue.component('modal-create-form', () => import('./components/forms/modalCreateForm.vue'));
 // элемент выбора элементов
@@ -161,24 +154,24 @@ Vue.component('modal-report', () => import('./components/modalReports.vue'));
 // модалка для удаления сущностей пользователей
 Vue.component('modal-delete-profile', () => import('./components/autorization/modalDeleteProfile.vue'));
 // модалка для вывода лога
-Vue.component('modal-log', () => import('./components/autorization/modalLog.vue'));
+Vue.component('modal-log', require('./components/autorization/modalLog.vue').default);
 //  компонент для получения данных для пользователя
 Vue.component('data-profile', () => import('./components/autorization/dataForProfile.vue'));
 //  компонент для загрузки svg
-Vue.component('modal-loading-svg', () => import('./components/modalLoadingSvg.vue'));
+Vue.component('modal-loading-svg', require('./components/modalLoadingSvg.vue').default);
 // Точечный график
 Vue.component('dash-scatterPlot', () => import('./components/dashBoardInside/dashScatterPlot.vue'));
 // Частотный график
 Vue.component('dash-frequencyGraph', () => import('./components/dashBoardInside/dashFrequencyGraph.vue'));
 // Компонент редактора кода
-Vue.component('code-editor', () => import('./components/codeEditor.vue'));
+Vue.component('code-editor', require('./components/codeEditor.vue').default);
 // Спидометр
 Vue.component('dash-gauge', () => import('./components/dashBoardInside/dashGauge/dashGauge'));
 // Водопад
 Vue.component('dash-waterfall', () => import('./components/dashBoardInside/dashWaterfall/dashWaterfall'));
 // Таблица v2
-Vue.component('dash-table', () => import('./components/dashBoardInside/dashTableV2/dashTableV2.vue'));
-Vue.component('dash-table-control', () => import('./components/dashBoardInside/dashTableV2/dashTableV2Control.vue'));
+Vue.component('dash-table', require('./components/dashBoardInside/dashTableV2/dashTableV2.vue').default);
+Vue.component('dash-table-control', require('./components/dashBoardInside/dashTableV2/dashTableV2Control.vue').default);
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {
