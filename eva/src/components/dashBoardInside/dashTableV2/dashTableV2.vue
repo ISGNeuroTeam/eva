@@ -465,8 +465,11 @@ export default {
       });
     },
     getTokens() {
-      return this.$store.state[this.idDashFrom].tockens
-        .filter((el) => el.elem === this.idFrom) || [];
+      if (this.$store.state[this.idDashFrom]?.tockens?.length > 0) {
+        return this.$store.state[this.idDashFrom].tockens
+          .filter((el) => el.elem === this.idFrom) || [];
+      }
+      return [];
     },
     // options
     frozenColumns() {
@@ -527,16 +530,21 @@ export default {
       deep: true,
     },
     dataRestFrom: {
-      handler() {
+      handler(val) {
         if (this.isValidSchema) {
+          if (this.idDashFrom === 'reports') {
+            this.updateDataInTable(val);
+          }
           this.onDataCompare();
         }
       },
       deep: true,
     },
     columnOptions: {
-      handler() {
-        this.updateColumnDefinition();
+      handler(val, oldVal) {
+        if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+          this.updateColumnDefinition();
+        }
       },
       deep: true,
     },
@@ -1221,24 +1229,26 @@ export default {
       return result;
     },
     setToken(event, data) {
-      const targetTokens = this.getTokens.filter((el) => el.action === event);
-      targetTokens.forEach((token) => {
-        if (token.capture) {
-          this.$store.commit('setTocken', {
-            token,
-            idDash: this.idDashFrom,
-            store: this.$store,
-            value: `${data.allCellInRow[token.capture]}`,
-          });
-        } else {
-          this.$store.commit('setTocken', {
-            token,
-            idDash: this.idDashFrom,
-            store: this.$store,
-            value: `${data.clickedCell}`,
-          });
-        }
-      });
+      if (this.getTokens?.length > 0) {
+        const targetTokens = this.getTokens.filter((el) => el.action === event);
+        targetTokens.forEach((token) => {
+          if (token.capture) {
+            this.$store.commit('setTocken', {
+              token,
+              idDash: this.idDashFrom,
+              store: this.$store,
+              value: `${data.allCellInRow[token.capture]}`,
+            });
+          } else {
+            this.$store.commit('setTocken', {
+              token,
+              idDash: this.idDashFrom,
+              store: this.$store,
+              value: `${data.clickedCell}`,
+            });
+          }
+        });
+      }
     },
     setAction(data) {
       this.actions = this.actions.map((action) => ({
@@ -1325,7 +1335,7 @@ export default {
       // this.tabulator.setPageSize(this.pageSize);
     },
     changeDefaultPagination(pageSize) {
-      if (`${pageSize}` !== `${this.dashFromStore.tableOptions.pageSize}`) {
+      if (`${pageSize}` !== `${this.dashFromStore?.tableOptions?.pageSize}`) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.tableOptions,
           prop: 'pageSize',
