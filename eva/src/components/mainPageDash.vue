@@ -4,8 +4,7 @@
     <v-main>
       <v-navigation-drawer
         v-model="openTree"
-        absolute
-        bottom
+        fixed
         temporary
         :style="{ color: theme.$main_text, background: theme.$main_bg }"
         class="nav-panel-drawer"
@@ -30,6 +29,7 @@
               <v-tabs-slider />
               <v-tab
                 v-for="item in tabsHeader"
+                :key="item.href"
                 :href="item.href"
                 :disabled="item.disabled"
                 @click="item.cb"
@@ -337,7 +337,6 @@ import {
 } from '@mdi/js';
 import draggable from 'vuedraggable';
 import { mapActions } from 'vuex';
-import NavigationTreeView from './navigationTreeView';
 import Notifications from './notifications';
 
 export default {
@@ -345,7 +344,6 @@ export default {
   components: {
     Notifications,
     draggable,
-    NavigationTreeView,
   },
   data() {
     const { startNavTab } = this.$store.getters['app/userSettings'];
@@ -418,7 +416,7 @@ export default {
       get() {
         return this.allDashs;
       },
-      set(value) {
+      set() {
         // this.allDashs = structuredClone(value);
       },
     },

@@ -58,8 +58,7 @@
         >
           <v-navigation-drawer
             v-model="openTree"
-            absolute
-            bottom
+            fixed
             temporary
             :style="{ color: theme.$main_text, background: theme.$main_bg }"
             class="nav-panel-drawer"
@@ -290,14 +289,10 @@
 
 <script>
 import draggable from 'vuedraggable';
-import ModalVisualisation from './modalVisualisation.vue';
-import NavigationTreeView from './navigationTreeView';
 
 export default {
   name: 'MainTitle',
   components: {
-    NavigationTreeView,
-    ModalVisualisation,
     draggable,
   },
   data() {
