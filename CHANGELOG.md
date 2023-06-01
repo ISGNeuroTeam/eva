@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - The scroll on the dashboard hangs if you open a large tree
+- Fixed searches to maps
 
 ## [1.135.0]
 
