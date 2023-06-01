@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TableV2: Fixed save visible columns
 - Table-v2: Fixed incorrect change in the visibility of fixed columns
 - Table-v2: Fixed update data on data-research page
+- Single-value: Fixed display of zero in single-value
 
 ## [1.134.1]
 
