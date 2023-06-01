@@ -13,6 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.136.0]
+
+### Added
+- Table-v2: Added auto-resize columns so they fit perfectly in the available table width
+- Table-v2: Added text transfer in table cells
+
+### Fixed
+- The scroll on the dashboard hangs if you open a large tree
+- TableV2: Fixed save visible columns
+- Table-v2: Fixed incorrect change in the visibility of fixed columns
+- Table-v2: Fixed update data on data-research page
+- Single-value: Fixed display of zero in single-value
+
 ## [1.135.0]
 
 ### Added

@@ -256,13 +256,11 @@ export default {
     dataRest() {
       let data = [];
       if (this.dataReady.length > 0) {
-        data = Object.keys(this.dataReady);
-        if (Object.keys(this.dataReady).length !== 0) {
-          if (!this.dataReady.error) {
-            data = Object.keys(this.dataReady[0])
-              .filter((item) => !this.dataReady
-                .map((x) => x[item]).every((x) => x === null));
-          }
+        if (!this.dataReady.error) {
+          data = Object.keys(this.dataReady[0]);
+          // .filter((item) => !this.dataReady.map((x) => x[item]).every((x) => x === null));
+        } else {
+          data = Object.keys(this.dataReady);
         }
       }
       return data;
