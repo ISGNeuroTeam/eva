@@ -527,9 +527,8 @@ export default {
       deep: true,
     },
     dataRestFrom: {
-      handler(val) {
+      handler() {
         if (this.isValidSchema) {
-          this.updateDataInTable(val);
           this.onDataCompare();
         }
       },
@@ -544,7 +543,7 @@ export default {
     columns: {
       handler(val, oldVal) {
         if (this.tabulator && (JSON.stringify(val) !== JSON.stringify(oldVal))) {
-          this.tabulator.redraw();
+          this.updateTable();
         }
       },
       deep: true,
@@ -557,7 +556,7 @@ export default {
     frozenColumns: {
       handler(val, oldVal) {
         if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
-          this.tabulator.redraw();
+          this.updateTable();
         }
       },
       deep: true,
@@ -612,8 +611,8 @@ export default {
     this.createFieldInStore('tableOptions', {});
     this.createFieldInStore('columnResized', false, 'tableOptions');
     this.createTable = throttle(this.createTable, 500);
-    this.redrawTable = throttle(this.redrawTable, 100);
-    this.updateTable = throttle(this.updateTable, 100);
+    this.redrawTable = throttle(this.redrawTable, 1000);
+    this.updateTable = throttle(this.updateTable, 1000);
   },
   beforeDestroy() {
     this.destroyTable();
@@ -693,7 +692,6 @@ export default {
       });
     },
     changeRowColor(row, color) {
-      row.getElement().classList.add('on-data-compare-color');
       row.getElement().style.backgroundColor = color;
     },
     changeCellColor(cell, color) {
@@ -803,7 +801,6 @@ export default {
         // paginationCounter: this.options.paginationCounter,
         movableColumns: this.movableColumns,
         // history
-        history: true,
         persistenceWriterFunc: this.persistenceWriterFunc,
         persistenceReaderFunc: this.persistenceReaderFunc,
       });
@@ -821,12 +818,18 @@ export default {
         if (this.saveMovedColumnPosition) {
           const fields = columns.map((el) => el.getField());
           this.updateFieldListInStore(fields);
+          if (this.idDashFrom !== 'reports') {
+            this.$store.commit('setState', [{
+              object: this.dashFromStore.tableOptions,
+              prop: 'columnResized',
+              value: true,
+            }]);
+          }
         }
       });
       this.tabulator.on('tableBuilt', () => {
         setTimeout(() => {
           this.isLoading = false;
-          this.setDefaultPagination();
           if (this.checkFieldList(this.fields, Object.keys(this.searchSchema))) {
             this.clearPersistenceFilter();
           } else {
@@ -1150,6 +1153,13 @@ export default {
       }
       return false;
     },
+    localThrottleFn(fn, timeout = 500) {
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+      }
+      this.timer = timeout;
+      this.timeout = setTimeout(fn, this.timer);
+    },
     persistenceWriterFunc(id, type, data) {
       if (this.timeout) {
         clearTimeout(this.timeout);
@@ -1231,9 +1241,10 @@ export default {
       });
     },
     setAction(data) {
-      this.actions.forEach((action) => {
-        action.capture = Object.keys(data);
-      });
+      this.actions = this.actions.map((action) => ({
+        ...action,
+        capture: Object.keys(data),
+      }));
       this.$store.commit('setActions', {
         actions: structuredClone(this.actions),
         idDash: this.idDashFrom,
@@ -1311,14 +1322,16 @@ export default {
       }
     },
     setDefaultPagination() {
-      this.tabulator.setPageSize(this.pageSize);
+      // this.tabulator.setPageSize(this.pageSize);
     },
     changeDefaultPagination(pageSize) {
-      this.$store.commit('setState', [{
-        object: this.dashFromStore.tableOptions,
-        prop: 'pageSize',
-        value: pageSize,
-      }]);
+      if (`${pageSize}` !== `${this.dashFromStore.tableOptions.pageSize}`) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.tableOptions,
+          prop: 'pageSize',
+          value: pageSize,
+        }]);
+      }
     },
     createFieldInStore(fieldName, defaultValue, parentField) {
       if (parentField && this.dashFromStore[parentField][fieldName] === undefined) {
