@@ -213,7 +213,9 @@ export default {
         { name: 'click', capture: [] },
         { name: 'change', capture: [] },
         { name: 'mouseover', capture: [] },
+        { name: 'closemenu', capture: [] },
       ],
+      autocomplite: false,
     };
   },
   computed: {
@@ -329,8 +331,16 @@ export default {
       }
       return [];
     },
+    isMenuActive() {
+      return !!this.autocomplite?.isMenuActive;
+    },
   },
   watch: {
+    isMenuActive(val, oldVal) {
+      if (val !== oldVal && !val) {
+        this.setTockenDelay('closemenu');
+      }
+    },
     'dashFromStore.options.defaultFromSourceData': {
       deep: true,
       handler(val, oldVal) {
@@ -389,6 +399,7 @@ export default {
     },
   },
   mounted() {
+    this.autocomplite = this.$refs.multiselect;
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
