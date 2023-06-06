@@ -280,18 +280,11 @@ export default {
       isLoadFromFile: false,
       activeButtons: [],
       headerFilters: {},
-      test: false,
-      // TODO: Перенести в настройки через библиотеку примитивов
       options: {
-        frozenRows: false,
-        fixedColumns: ['_time'],
-        selectable: false,
         selectColumn: false,
         paginationSize: 100,
         paginationSizeSelector: [10, 50, 100, 500, 1000, true],
         paginationCounter: 'rows',
-        movableColumns: true,
-        defaultFilterAllColumns: true,
       },
       actions: [
         { name: 'click', capture: [] },
@@ -517,11 +510,8 @@ export default {
             ? this.checkFieldList(Object.keys(value), structuredClone(this.fields))
             : true;
           if (isUpdatedValue) {
-            this.$store.commit('setState', [{
-              object: this.dashFromStore.tableOptions,
-              prop: 'columnResized',
-              value: false,
-            }]);
+            this.setColumnResized(false);
+            this.clearFrozenColumns();
             this.clearPersistenceFilter();
             this.updateFieldListInStore(Object.keys(value));
           }
@@ -610,6 +600,8 @@ export default {
       this.redrawTable();
       if (this.idDashFrom !== 'reports') {
         if (this.checkFieldList(this.fields, Object.keys(this.searchSchema))) {
+          this.setColumnResized(false);
+          this.clearFrozenColumns();
           this.updateFieldListInStore(Object.keys(this.searchSchema));
         }
       }
@@ -626,6 +618,20 @@ export default {
     this.destroyTable();
   },
   methods: {
+    clearFrozenColumns() {
+      this.$store.commit('setState', [{
+        object: this.dashFromStore.options,
+        prop: 'frozenColumns',
+        value: [],
+      }]);
+    },
+    setColumnResized(value) {
+      this.$store.commit('setState', [{
+        object: this.dashFromStore.tableOptions,
+        prop: 'columnResized',
+        value,
+      }]);
+    },
     checkFieldList(arr, oldArr) {
       const sortedOldArr = [...oldArr].sort().join(',');
       const sortedArr = [...arr].sort().join(',');
@@ -764,7 +770,7 @@ export default {
         height: '100%',
         layout: 'fitDataStretch',
         layoutColumnsOnNewData: true,
-        frozenRows: this.options.frozenRows,
+        frozenRows: false,
         nestedFieldSeparator: '|',
         selectable: this.selectableRow ? 1 : false,
         rowFormatter: this.rowFormatter,
@@ -815,11 +821,7 @@ export default {
       this.tabulator.on('columnResized', () => {
         // column - column component of the resized column
         if (this.idDashFrom !== 'reports') {
-          this.$store.commit('setState', [{
-            object: this.dashFromStore.tableOptions,
-            prop: 'columnResized',
-            value: true,
-          }]);
+          this.setColumnResized(true);
         }
       });
       this.tabulator.on('columnMoved', (column, columns) => {
@@ -827,11 +829,7 @@ export default {
           const fields = columns.map((el) => el.getField());
           this.updateFieldListInStore(fields);
           if (this.idDashFrom !== 'reports') {
-            this.$store.commit('setState', [{
-              object: this.dashFromStore.tableOptions,
-              prop: 'columnResized',
-              value: true,
-            }]);
+            this.setColumnResized(true);
           }
         }
       });
@@ -978,7 +976,10 @@ export default {
     },
     writeData() {
       this.tableData = this.tabulator.getData();
-      this.$root.writeData({ data: structuredClone(this.tableData), schema: this.searchSchema });
+      this.$root.writeData({
+        data: structuredClone(this.tableData),
+        schema: this.searchSchema,
+      });
     },
     // undo button
     undo() {
@@ -1134,6 +1135,9 @@ export default {
         '<=': '<=',
         '!=': '!=',
       };
+      const filterType = typeof value === 'string'
+        ? filterTypes[type]
+        : type;
       if (this.filters?.length > 0) {
         const filters = this.tabulator.getFilters();
         filters.forEach((filter) => {
@@ -1141,11 +1145,12 @@ export default {
             this.removeFilter(field, filter.type, filter.value);
           }
         });
-
-        this.tabulator.addFilter(field, typeof value === 'string' ? filterTypes[type] : type, value);
-      } else {
-        this.tabulator.addFilter(field, typeof value === 'string' ? filterTypes[type] : type, value);
       }
+      this.tabulator.addFilter(
+        field,
+        filterType,
+        value,
+      );
     },
     removeFilter(field, type, value) {
       this.tabulator.removeFilter(field, type, value);
@@ -1183,19 +1188,22 @@ export default {
             );
             const dataFromStore = this.dashFromStore.tableOptions[`${id}-${type}`];
             if (JSON.stringify(dataFromStore) !== JSON.stringify(data)) {
+              const fields = this.idDashFrom === 'reports' ? Object.keys(this.searchSchema) : this.fields;
+              const updatedData = fields.map((key) => {
+                const el = data.find((item) => item?.field === key);
+                if (this.isResized) {
+                  return el;
+                }
+                return {
+                  field: key,
+                  frozen: el.frozen,
+                  visible: el.visible,
+                };
+              });
               this.$store.commit('setState', [{
                 object: this.dashFromStore.tableOptions,
                 prop: `${id}-${type}`,
-                value: structuredClone(data.map((el) => {
-                  if (this.isResized) {
-                    return el;
-                  }
-                  return {
-                    field: el.field,
-                    frozen: el.frozen,
-                    visible: el.visible,
-                  };
-                })),
+                value: structuredClone(updatedData),
               }]);
             }
           } else {
