@@ -476,6 +476,9 @@ export default {
           }
         }
       }
+      if (isMenuActive) {
+        this.$refs.multiselect.blur();
+      }
     },
     updateActions(dataReady) {
       let data = [];
