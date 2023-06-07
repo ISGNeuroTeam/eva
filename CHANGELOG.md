@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Multiselect: New event 'closemenu'
+- Multiselect: hidden list by pressing enter
 
 ### Changed
 

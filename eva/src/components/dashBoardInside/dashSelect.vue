@@ -476,6 +476,11 @@ export default {
           }
         }
       }
+      if (this.getOptions?.closeListByEnter && isMenuActive) {
+        setTimeout(() => {
+          this.$refs.multiselect.blur();
+        }, 30);
+      }
     },
     updateActions(dataReady) {
       let data = [];
