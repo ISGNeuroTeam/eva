@@ -476,8 +476,10 @@ export default {
           }
         }
       }
-      if (isMenuActive) {
-        this.$refs.multiselect.blur();
+      if (this.getOptions?.closeListByEnter && isMenuActive) {
+        setTimeout(() => {
+          this.$refs.multiselect.blur();
+        }, 30);
       }
     },
     updateActions(dataReady) {
