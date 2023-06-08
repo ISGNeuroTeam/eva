@@ -503,8 +503,10 @@ export default {
     },
   },
   watch: {
-    events() {
-      this.redrawTable();
+    events(val, oldVal) {
+      if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+        this.redrawTable();
+      }
     },
     searchSchema: {
       handler(value) {
