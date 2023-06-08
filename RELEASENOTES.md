@@ -1,3 +1,15 @@
+# [1.137.0] - 2023-06-08
+
+### Added
+- Multiselect: 
+  - New event 'closemenu'
+  - Option: hidden list by pressing enter
+
+### Fixed
+- Table-v2: 
+  - save the position of the moved column
+  - events do not work when creating a dashboard
+
 # [1.136.0] - 2023-06-01
 
 ### Added

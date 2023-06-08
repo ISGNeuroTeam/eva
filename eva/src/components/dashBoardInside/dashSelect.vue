@@ -213,7 +213,9 @@ export default {
         { name: 'click', capture: [] },
         { name: 'change', capture: [] },
         { name: 'mouseover', capture: [] },
+        { name: 'closemenu', capture: [] },
       ],
+      autocomplite: false,
     };
   },
   computed: {
@@ -329,8 +331,16 @@ export default {
       }
       return [];
     },
+    isMenuActive() {
+      return !!this.autocomplite?.isMenuActive;
+    },
   },
   watch: {
+    isMenuActive(val, oldVal) {
+      if (val !== oldVal && !val) {
+        this.setTockenDelay('closemenu');
+      }
+    },
     'dashFromStore.options.defaultFromSourceData': {
       deep: true,
       handler(val, oldVal) {
@@ -389,6 +399,7 @@ export default {
     },
   },
   mounted() {
+    this.autocomplite = this.$refs.multiselect;
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
@@ -458,13 +469,19 @@ export default {
       } else if (filteredItems.length > 1) {
         const idxFind = filteredItems.findIndex((val) => val === this.$refs.multiselect.lazySearch);
         if (idxFind > -1) {
-          this.$refs.multiselect.selectItem(filteredItems[idxFind]);
+          // this.$refs.multiselect.selectItem(filteredItems[idxFind]);
           this.$refs.multiselect.lazySearch = '';
           if (this.multiple) {
             this.$refs.multiselect.$refs.menu.listIndex = -1;
           }
         }
       }
+      if (this.getOptions?.closeListByEnter && isMenuActive) {
+        setTimeout(() => {
+          this.$refs.multiselect.blur();
+        }, 30);
+      }
+      return true;
     },
     updateActions(dataReady) {
       let data = [];
