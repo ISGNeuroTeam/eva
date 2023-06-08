@@ -503,6 +503,11 @@ export default {
     },
   },
   watch: {
+    events(val, oldVal) {
+      if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+        this.redrawTable();
+      }
+    },
     searchSchema: {
       handler(value) {
         if (Object.keys(value)?.length > 0 && this.idDashFrom !== 'reports') {
