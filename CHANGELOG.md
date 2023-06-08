@@ -8,10 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Multiselect: New event 'closemenu'
-- Multiselect: hidden list by pressing enter
 
 ### Changed
+
+### Fixed
+
+## [1.137.0]
+
+### Added
+- Multiselect: New event 'closemenu'
+- Multiselect: hidden list by pressing enter
 
 ### Fixed
 - Table-v2: fixed save moved column position
