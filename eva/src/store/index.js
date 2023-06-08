@@ -473,6 +473,7 @@ export default new Vuex.Store({
         Vue.set(state[dashboard.id], 'currentTab', dashboard?.currentTab || 1);
         Vue.set(state[dashboard.id], 'modified', dashboard.modified);
         Vue.set(state[dashboard.id], 'tabs', false);
+        Vue.set(state[dashboard.id], 'events', []);
         // TODO: убрать геттер из мутации
         getters({ id: dashboard.id, first: true });
       }
