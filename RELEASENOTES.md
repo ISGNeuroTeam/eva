@@ -1,3 +1,30 @@
+# [1.137.0] - 2023-06-08
+
+### Added
+- Multiselect: 
+  - New event 'closemenu'
+  - Option: hidden list by pressing enter
+
+### Fixed
+- Table-v2: 
+  - save the position of the moved column
+  - events do not work when creating a dashboard
+
+# [1.136.0] - 2023-06-01
+
+### Added
+- Table-v2: 
+  - Auto-resize columns so they fit perfectly in the available table width
+  - Text transfer in table cells
+
+### Fixed
+- The scroll on the dashboard hangs if you open a large tree
+- Single-value: Fixed display of zero in single-value
+- Table-v2:
+  - Keep visible columns
+  - Incorrect change of visibility of fixed columns
+  - Refreshing data on the data-research page
+
 # [1.135.0] - 2023-05-26
 
 ### Added
