@@ -10,12 +10,14 @@
           class="py-0"
         >
           <v-autocomplete
+            ref="searchValue"
             v-model="searchValue"
             :style="{ color: theme.$main_text, 'pointer-events': 'auto' }"
             :items="filteredDataRestFrom"
             item-value="ID"
             item-text="label"
             label="Поиск"
+            :auto-select-first="false"
             dense
             outlined
             :color="theme.$main_text"
@@ -24,7 +26,7 @@
             :filter="searchElement"
             clearable
             @change="$emit('searchUpdate', searchValue)"
-            @click:clear.native="$emit('searchUpdate', '')"
+            @click:clear.prevent="clearSearch"
           >
             <template v-slot:item="{ item, on }">
               <v-list-item
@@ -439,7 +441,7 @@ export default {
         search: '',
         nameLegend: 'Легенда',
       },
-      searchValue: '',
+      autocompleteValue: '',
       localLayerList: [],
       toggleSelectLayer: false,
       toggleSelectPipeline: false,
@@ -464,6 +466,18 @@ export default {
     };
   },
   computed: {
+    searchValue: {
+      get() {
+        return this.autocompleteValue;
+      },
+      set(value) {
+        if (value) {
+          this.autocompleteValue = value;
+        } else {
+          this.autocompleteValue = '';
+        }
+      },
+    },
     filteredDataRestFrom() {
       if (this.dataRestFrom?.length > 0) {
         return this.dataRestFrom.filter((el) => el.coordinates);
@@ -577,6 +591,9 @@ export default {
     }
   },
   methods: {
+    clearSearch() {
+      this.$emit('searchUpdate', '');
+    },
     change(e) {
       if (e.isActive) {
         this.map.addLayerGroup(e.type);
