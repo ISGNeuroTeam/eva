@@ -280,18 +280,11 @@ export default {
       isLoadFromFile: false,
       activeButtons: [],
       headerFilters: {},
-      test: false,
-      // TODO: Перенести в настройки через библиотеку примитивов
       options: {
-        frozenRows: false,
-        fixedColumns: ['_time'],
-        selectable: false,
         selectColumn: false,
         paginationSize: 100,
         paginationSizeSelector: [10, 50, 100, 500, 1000, true],
         paginationCounter: 'rows',
-        movableColumns: true,
-        defaultFilterAllColumns: true,
       },
       actions: [
         { name: 'click', capture: [] },
@@ -465,8 +458,11 @@ export default {
       });
     },
     getTokens() {
-      return this.$store.state[this.idDashFrom].tockens
-        .filter((el) => el.elem === this.idFrom) || [];
+      if (this.$store.state[this.idDashFrom]?.tockens?.length > 0) {
+        return this.$store.state[this.idDashFrom].tockens
+          .filter((el) => el.elem === this.idFrom) || [];
+      }
+      return [];
     },
     // options
     frozenColumns() {
@@ -507,6 +503,11 @@ export default {
     },
   },
   watch: {
+    events(val, oldVal) {
+      if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+        this.redrawTable();
+      }
+    },
     searchSchema: {
       handler(value) {
         if (Object.keys(value)?.length > 0 && this.idDashFrom !== 'reports') {
@@ -514,11 +515,8 @@ export default {
             ? this.checkFieldList(Object.keys(value), structuredClone(this.fields))
             : true;
           if (isUpdatedValue) {
-            this.$store.commit('setState', [{
-              object: this.dashFromStore.tableOptions,
-              prop: 'columnResized',
-              value: false,
-            }]);
+            this.setColumnResized(false);
+            this.clearFrozenColumns();
             this.clearPersistenceFilter();
             this.updateFieldListInStore(Object.keys(value));
           }
@@ -529,22 +527,26 @@ export default {
     dataRestFrom: {
       handler(val) {
         if (this.isValidSchema) {
-          this.updateDataInTable(val);
+          if (this.idDashFrom === 'reports') {
+            this.updateDataInTable(val);
+          }
           this.onDataCompare();
         }
       },
       deep: true,
     },
     columnOptions: {
-      handler() {
-        this.updateColumnDefinition();
+      handler(val, oldVal) {
+        if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+          this.updateColumnDefinition();
+        }
       },
       deep: true,
     },
     columns: {
       handler(val, oldVal) {
         if (this.tabulator && (JSON.stringify(val) !== JSON.stringify(oldVal))) {
-          this.tabulator.redraw();
+          this.updateTable();
         }
       },
       deep: true,
@@ -557,7 +559,7 @@ export default {
     frozenColumns: {
       handler(val, oldVal) {
         if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
-          this.tabulator.redraw();
+          this.updateTable();
         }
       },
       deep: true,
@@ -603,6 +605,8 @@ export default {
       this.redrawTable();
       if (this.idDashFrom !== 'reports') {
         if (this.checkFieldList(this.fields, Object.keys(this.searchSchema))) {
+          this.setColumnResized(false);
+          this.clearFrozenColumns();
           this.updateFieldListInStore(Object.keys(this.searchSchema));
         }
       }
@@ -612,13 +616,27 @@ export default {
     this.createFieldInStore('tableOptions', {});
     this.createFieldInStore('columnResized', false, 'tableOptions');
     this.createTable = throttle(this.createTable, 500);
-    this.redrawTable = throttle(this.redrawTable, 100);
-    this.updateTable = throttle(this.updateTable, 100);
+    this.redrawTable = throttle(this.redrawTable, 1000);
+    this.updateTable = throttle(this.updateTable, 1000);
   },
   beforeDestroy() {
     this.destroyTable();
   },
   methods: {
+    clearFrozenColumns() {
+      this.$store.commit('setState', [{
+        object: this.dashFromStore.options,
+        prop: 'frozenColumns',
+        value: [],
+      }]);
+    },
+    setColumnResized(value) {
+      this.$store.commit('setState', [{
+        object: this.dashFromStore.tableOptions,
+        prop: 'columnResized',
+        value,
+      }]);
+    },
     checkFieldList(arr, oldArr) {
       const sortedOldArr = [...oldArr].sort().join(',');
       const sortedArr = [...arr].sort().join(',');
@@ -693,7 +711,6 @@ export default {
       });
     },
     changeRowColor(row, color) {
-      row.getElement().classList.add('on-data-compare-color');
       row.getElement().style.backgroundColor = color;
     },
     changeCellColor(cell, color) {
@@ -758,7 +775,7 @@ export default {
         height: '100%',
         layout: 'fitDataStretch',
         layoutColumnsOnNewData: true,
-        frozenRows: this.options.frozenRows,
+        frozenRows: false,
         nestedFieldSeparator: '|',
         selectable: this.selectableRow ? 1 : false,
         rowFormatter: this.rowFormatter,
@@ -803,30 +820,27 @@ export default {
         // paginationCounter: this.options.paginationCounter,
         movableColumns: this.movableColumns,
         // history
-        history: true,
         persistenceWriterFunc: this.persistenceWriterFunc,
         persistenceReaderFunc: this.persistenceReaderFunc,
       });
       this.tabulator.on('columnResized', () => {
         // column - column component of the resized column
         if (this.idDashFrom !== 'reports') {
-          this.$store.commit('setState', [{
-            object: this.dashFromStore.tableOptions,
-            prop: 'columnResized',
-            value: true,
-          }]);
+          this.setColumnResized(true);
         }
       });
       this.tabulator.on('columnMoved', (column, columns) => {
         if (this.saveMovedColumnPosition) {
           const fields = columns.map((el) => el.getField());
           this.updateFieldListInStore(fields);
+          if (this.idDashFrom !== 'reports') {
+            this.setColumnResized(true);
+          }
         }
       });
       this.tabulator.on('tableBuilt', () => {
         setTimeout(() => {
           this.isLoading = false;
-          this.setDefaultPagination();
           if (this.checkFieldList(this.fields, Object.keys(this.searchSchema))) {
             this.clearPersistenceFilter();
           } else {
@@ -967,7 +981,10 @@ export default {
     },
     writeData() {
       this.tableData = this.tabulator.getData();
-      this.$root.writeData({ data: structuredClone(this.tableData), schema: this.searchSchema });
+      this.$root.writeData({
+        data: structuredClone(this.tableData),
+        schema: this.searchSchema,
+      });
     },
     // undo button
     undo() {
@@ -1123,6 +1140,9 @@ export default {
         '<=': '<=',
         '!=': '!=',
       };
+      const filterType = typeof value === 'string'
+        ? filterTypes[type]
+        : type;
       if (this.filters?.length > 0) {
         const filters = this.tabulator.getFilters();
         filters.forEach((filter) => {
@@ -1130,11 +1150,12 @@ export default {
             this.removeFilter(field, filter.type, filter.value);
           }
         });
-
-        this.tabulator.addFilter(field, typeof value === 'string' ? filterTypes[type] : type, value);
-      } else {
-        this.tabulator.addFilter(field, typeof value === 'string' ? filterTypes[type] : type, value);
       }
+      this.tabulator.addFilter(
+        field,
+        filterType,
+        value,
+      );
     },
     removeFilter(field, type, value) {
       this.tabulator.removeFilter(field, type, value);
@@ -1149,6 +1170,13 @@ export default {
         return structuredClone(tableOptions[`${id}-${type}`]);
       }
       return false;
+    },
+    localThrottleFn(fn, timeout = 500) {
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+      }
+      this.timer = timeout;
+      this.timeout = setTimeout(fn, this.timer);
     },
     persistenceWriterFunc(id, type, data) {
       if (this.timeout) {
@@ -1165,19 +1193,22 @@ export default {
             );
             const dataFromStore = this.dashFromStore.tableOptions[`${id}-${type}`];
             if (JSON.stringify(dataFromStore) !== JSON.stringify(data)) {
+              const fields = this.idDashFrom === 'reports' ? Object.keys(this.searchSchema) : this.fields;
+              const updatedData = fields.map((key) => {
+                const el = data.find((item) => item?.field === key);
+                if (this.isResized) {
+                  return el;
+                }
+                return {
+                  field: key,
+                  frozen: el.frozen,
+                  visible: el.visible,
+                };
+              });
               this.$store.commit('setState', [{
                 object: this.dashFromStore.tableOptions,
                 prop: `${id}-${type}`,
-                value: structuredClone(data.map((el) => {
-                  if (this.isResized) {
-                    return el;
-                  }
-                  return {
-                    field: el.field,
-                    frozen: el.frozen,
-                    visible: el.visible,
-                  };
-                })),
+                value: structuredClone(updatedData),
               }]);
             }
           } else {
@@ -1211,29 +1242,32 @@ export default {
       return result;
     },
     setToken(event, data) {
-      const targetTokens = this.getTokens.filter((el) => el.action === event);
-      targetTokens.forEach((token) => {
-        if (token.capture) {
-          this.$store.commit('setTocken', {
-            token,
-            idDash: this.idDashFrom,
-            store: this.$store,
-            value: `${data.allCellInRow[token.capture]}`,
-          });
-        } else {
-          this.$store.commit('setTocken', {
-            token,
-            idDash: this.idDashFrom,
-            store: this.$store,
-            value: `${data.clickedCell}`,
-          });
-        }
-      });
+      if (this.getTokens?.length > 0) {
+        const targetTokens = this.getTokens.filter((el) => el.action === event);
+        targetTokens.forEach((token) => {
+          if (token.capture) {
+            this.$store.commit('setTocken', {
+              token,
+              idDash: this.idDashFrom,
+              store: this.$store,
+              value: `${data.allCellInRow[token.capture]}`,
+            });
+          } else {
+            this.$store.commit('setTocken', {
+              token,
+              idDash: this.idDashFrom,
+              store: this.$store,
+              value: `${data.clickedCell}`,
+            });
+          }
+        });
+      }
     },
     setAction(data) {
-      this.actions.forEach((action) => {
-        action.capture = Object.keys(data);
-      });
+      this.actions = this.actions.map((action) => ({
+        ...action,
+        capture: Object.keys(data),
+      }));
       this.$store.commit('setActions', {
         actions: structuredClone(this.actions),
         idDash: this.idDashFrom,
@@ -1311,14 +1345,16 @@ export default {
       }
     },
     setDefaultPagination() {
-      this.tabulator.setPageSize(this.pageSize);
+      // this.tabulator.setPageSize(this.pageSize);
     },
     changeDefaultPagination(pageSize) {
-      this.$store.commit('setState', [{
-        object: this.dashFromStore.tableOptions,
-        prop: 'pageSize',
-        value: pageSize,
-      }]);
+      if (`${pageSize}` !== `${this.dashFromStore?.tableOptions?.pageSize}`) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.tableOptions,
+          prop: 'pageSize',
+          value: pageSize,
+        }]);
+      }
     },
     createFieldInStore(fieldName, defaultValue, parentField) {
       if (parentField && this.dashFromStore[parentField][fieldName] === undefined) {

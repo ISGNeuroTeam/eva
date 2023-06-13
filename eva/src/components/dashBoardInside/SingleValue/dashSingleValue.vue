@@ -61,7 +61,7 @@
             />
           </span>
           <span
-            v-if="!isNaN(metric.value) && metric.value !== ''"
+            v-if="metric.value.toString"
             class="metric-value"
             :class="`color-${metric.color}`"
             style="

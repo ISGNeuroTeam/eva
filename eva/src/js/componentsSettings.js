@@ -339,6 +339,7 @@ export default {
       'resetValuesWhichAreNot',
       'searchMode',
       'selectedValuesAbove',
+      'closeListByEnter',
     ],
     picker: [
       'showLastTimeBlock',
@@ -1051,6 +1052,12 @@ export default {
     {
       option: 'resetValuesWhichAreNot',
       description: 'Сбросить значения, если источник данных их не содержит',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'closeListByEnter',
+      description: 'Закрывать список вариантов по Enter',
       elem: 'switch',
       default: false,
     },

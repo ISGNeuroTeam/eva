@@ -12,8 +12,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
-- The scroll on the dashboard hangs if you open a large tree
 - Fixed searches to maps
+
+## [1.137.0]
+
+### Added
+- Multiselect: New event 'closemenu'
+- Multiselect: hidden list by pressing enter
+
+### Fixed
+- Table-v2: fixed save moved column position
+- Table-v2: events do not work when creating a dashboard
+
+## [1.136.0]
+
+### Added
+- Table-v2: Added auto-resize columns so they fit perfectly in the available table width
+- Table-v2: Added text transfer in table cells
+
+### Fixed
+- The scroll on the dashboard hangs if you open a large tree
+- TableV2: Fixed save visible columns
+- Table-v2: Fixed incorrect change in the visibility of fixed columns
+- Table-v2: Fixed update data on data-research page
+- Single-value: Fixed display of zero in single-value
 
 ## [1.135.0]
 
@@ -23,18 +45,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Table: added option to limit decimal places
 - Risk-review: Added settings: idStart (starting point for line drawing), textPosY (vertical text position: center\top\bottom), textPosX (horizontal text position: center\default), textOffset (horizontal text offset from line), textColor
 - Table-v2: Added ctrlClick\click event
-- Table-v2: Added auto-resize columns so they fit perfectly in the available table width
-- Table-v2: Added text transfer in table cells
 
 ### Changed
 - Updated logic for changing the title of the browser tab
 
 ### Fixed
 - Risk-review: Fixed incorrect processing of empty values for captions
-- TableV2: Fixed save visible columns
-- Table-v2: Fixed incorrect change in the visibility of fixed columns
-- Table-v2: Fixed update data on data-research page
-- Single-value: Fixed display of zero in single-value
 
 ## [1.134.1]
 
