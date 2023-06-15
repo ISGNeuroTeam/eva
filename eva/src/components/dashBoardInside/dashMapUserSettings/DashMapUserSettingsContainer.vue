@@ -1,7 +1,7 @@
 <template>
   <div class="med">
-    <v-container
-      class="fill-height"
+    <div
+      class="pa-3 fill-height"
       style="align-items: normal"
     >
       <v-row class="ma-0 justify-end">
@@ -10,12 +10,14 @@
           class="py-0"
         >
           <v-autocomplete
+            ref="searchValue"
             v-model="searchValue"
             :style="{ color: theme.$main_text, 'pointer-events': 'auto' }"
             :items="filteredDataRestFrom"
             item-value="ID"
             item-text="label"
             label="Поиск"
+            :auto-select-first="false"
             dense
             outlined
             :color="theme.$main_text"
@@ -24,7 +26,7 @@
             :filter="searchElement"
             clearable
             @change="$emit('searchUpdate', searchValue)"
-            @click:clear.native="$emit('searchUpdate', '')"
+            @click:clear.prevent="clearSearch"
           >
             <template v-slot:item="{ item, on }">
               <v-list-item
@@ -378,7 +380,7 @@
           </v-card>
         </v-card>
       </v-row>
-    </v-container>
+    </div>
   </div>
 </template>
 
@@ -439,7 +441,7 @@ export default {
         search: '',
         nameLegend: 'Легенда',
       },
-      searchValue: '',
+      autocompleteValue: '',
       localLayerList: [],
       toggleSelectLayer: false,
       toggleSelectPipeline: false,
@@ -464,6 +466,18 @@ export default {
     };
   },
   computed: {
+    searchValue: {
+      get() {
+        return this.autocompleteValue;
+      },
+      set(value) {
+        if (value) {
+          this.autocompleteValue = value;
+        } else {
+          this.autocompleteValue = '';
+        }
+      },
+    },
     filteredDataRestFrom() {
       if (this.dataRestFrom?.length > 0) {
         return this.dataRestFrom.filter((el) => el.coordinates);
@@ -577,6 +591,9 @@ export default {
     }
   },
   methods: {
+    clearSearch() {
+      this.$emit('searchUpdate', '');
+    },
     change(e) {
       if (e.isActive) {
         this.map.addLayerGroup(e.type);
@@ -698,6 +715,8 @@ export default {
 
 .med
   height: 100%
+  max-width: 90%
+  width: 100%
   position: absolute
   right: 0
   z-index: 401

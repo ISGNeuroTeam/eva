@@ -135,6 +135,7 @@ export default {
       pipelineDataDictionary: {},
       position: null,
       layerGroup: {},
+      defaultZoomLevel: 10,
     };
   },
   computed: {
@@ -345,6 +346,7 @@ export default {
     if (this.$refs.map) {
       this.init();
     }
+    this.defaultZoomLevel = this.options.zoomLevel;
   },
   methods: {
     updateOptions(newOptions) {
@@ -538,15 +540,15 @@ export default {
         if (centerPoint) {
           this.map.setView(
             centerPoint,
-            this.options.zoomLevel,
+            this.defaultZoomLevel,
           );
         }
       } else if (this.options.initialPoint && !this.options.isAutoCenter) {
         this.map.setView(
           this.getCurrentPosition,
-          this.options.zoomLevel,
+          this.defaultZoomLevel,
         );
-      } else this.map.setView(this.map.startingPoint, this.options.zoomLevel);
+      } else this.map.setView(this.map.startingPoint, this.defaultZoomLevel);
     },
     deleteTitleByAttribute() {
       const leafletControlZoomOut = this.$refs.map.querySelector(
@@ -727,6 +729,7 @@ export default {
             this.map.selectElement(response);
           });
         } else {
+          this.map.unselectAllElements();
           this.centerMap(this.dataRestFrom, true);
         }
       }

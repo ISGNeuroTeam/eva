@@ -264,6 +264,7 @@ class MapClass {
       color: lib.color,
       weight: lib.width,
       opacity: lib.opacity,
+      id: element.ID,
     });
     const tooltip = L.tooltip({
       permanent: false,
@@ -354,6 +355,7 @@ class MapClass {
       icon,
       zIndexOffset: -1000,
       riseOnHover: true,
+      id: element.ID,
     })
       .bindTooltip(element.label, {
         permanent: false,
@@ -379,6 +381,7 @@ class MapClass {
     const marker = L.marker([coord[0], coord[1]], {
       icon,
       riseOnHover: true,
+      id: element.ID,
     })
       .bindTooltip(element.label, {
         permanent: false,
@@ -716,10 +719,10 @@ class MapClass {
           coordinates = MapClass.getCentralLatlngs(latlngs);
         }
         if (coordinates[0] > 0 && coordinates[1] > 0) {
+          // zoomLevel = 14;
           this.setView(coordinates, zoomLevel);
           resolve(findElement, coordinates, zoomLevel);
         } else {
-          console.log(findElement);
           reject(new Error(`Incorrect coordinates in element ID:${elementId}`));
         }
       }
@@ -734,6 +737,12 @@ class MapClass {
           layer.openTooltip();
         }, 250);
       }
+    });
+  }
+
+  unselectAllElements() {
+    this.map.eachLayer((layer) => {
+      layer.closeTooltip();
     });
   }
 

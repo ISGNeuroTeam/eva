@@ -240,13 +240,10 @@ export default {
                       }));
 
                     resultProm = await Promise.all(dataProm);
-                    const resolveData = [];
-
-                    resultProm.forEach((item) => {
-                      if (item.length !== 0) {
-                        resolveData.push(...item);
-                      }
-                    });
+                    const resolveData = resultProm.reduce((data, item) => {
+                      data = data.concat(item);
+                      return data;
+                    }, []);
 
                     if (shema != null && shema !== '') {
                       const keys = [];
