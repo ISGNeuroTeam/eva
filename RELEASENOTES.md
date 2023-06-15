@@ -1,3 +1,8 @@
+# [1.138.0] - 2023-06-15
+
+### Fixed
+- Fixed searches to maps
+
 # [1.137.0] - 2023-06-08
 
 ### Added

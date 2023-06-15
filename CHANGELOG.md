@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+
+## [1.138.0]
+
+### Fixed
 - Fixed searches to maps
 
 ## [1.137.0]
