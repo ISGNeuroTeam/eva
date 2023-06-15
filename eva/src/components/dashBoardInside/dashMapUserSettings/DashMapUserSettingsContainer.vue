@@ -61,10 +61,9 @@
                   background: theme.$secondary_bg,
                   color: theme.$main_text,
                   'pointer-events': 'auto',
-                  'margin-right': '30px',
                   height: '40px',
                 }"
-                class="med-btn"
+                class="med-btn ml-3"
                 v-on="menu"
                 @click="toggleSelectPipeline = !toggleSelectPipeline"
               >
@@ -112,10 +111,9 @@
                   background: theme.$secondary_bg,
                   color: theme.$main_text,
                   'pointer-events': 'auto',
-                  'margin-right': '30px',
                   height: '40px',
                 }"
-                class="med-btn"
+                class="med-btn ml-3"
                 v-on="menu"
                 @click="toggleSelect = !toggleSelect"
               >
@@ -159,10 +157,9 @@
                   background: theme.$secondary_bg,
                   color: theme.$main_text,
                   'pointer-events': 'auto',
-                  'margin-right': '30px',
                   height: '40px',
                 }"
-                class="med-btn"
+                class="med-btn ml-3"
                 v-on="menu"
                 @click="toggleSelectLayer = !toggleSelectLayer"
               >
@@ -210,6 +207,7 @@
         </v-menu>
         <v-btn
           rounded
+          class="ml-3"
           :style="`
           background: ${theme.$secondary_bg};
            color: ${theme.$main_text};
@@ -222,13 +220,10 @@
         </v-btn>
       </v-row>
 
-      <v-row
+      <div
         v-if="getOptions.showLegend && library && library.objects"
-        align="end"
-        align-content="end"
-        class="mb-5 mr-0"
+        class="legend-block pa-4 pb-5"
       >
-        <v-spacer />
         <v-card
           style="max-height: 466px; pointer-events: auto"
           max-width="280"
@@ -379,7 +374,7 @@
             </v-list>
           </v-card>
         </v-card>
-      </v-row>
+      </div>
     </div>
   </div>
 </template>
@@ -723,6 +718,11 @@ export default {
   pointer-events: none
   &-menu
     border: none !important
+
+.legend-block
+  position: absolute
+  bottom: 0
+  right: 0
 
 .theme--light.v-input input, .theme--light.v-input textarea
   color: var(--main_text) !important
