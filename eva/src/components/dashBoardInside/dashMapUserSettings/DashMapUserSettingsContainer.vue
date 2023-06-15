@@ -1,7 +1,7 @@
 <template>
   <div class="med">
-    <v-container
-      class="fill-height"
+    <div
+      class="pa-3 fill-height"
       style="align-items: normal"
     >
       <v-row class="ma-0 justify-end">
@@ -380,7 +380,7 @@
           </v-card>
         </v-card>
       </v-row>
-    </v-container>
+    </div>
   </div>
 </template>
 
@@ -715,6 +715,8 @@ export default {
 
 .med
   height: 100%
+  max-width: 90%
+  width: 100%
   position: absolute
   right: 0
   z-index: 401
