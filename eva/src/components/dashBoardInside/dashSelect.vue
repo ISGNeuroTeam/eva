@@ -469,11 +469,12 @@ export default {
       } else if (filteredItems.length > 1) {
         const idxFind = filteredItems.findIndex((val) => val === this.$refs.multiselect.lazySearch);
         if (idxFind > -1) {
-          // this.$refs.multiselect.selectItem(filteredItems[idxFind]);
           this.$refs.multiselect.lazySearch = '';
           if (this.multiple) {
             this.$refs.multiselect.$refs.menu.listIndex = -1;
           }
+        } else if (this.$refs.multiselect.$refs.menu.listIndex === -1) {
+          this.$refs.multiselect.selectItem(filteredItems[0]);
         }
       }
       if (this.getOptions?.closeListByEnter && isMenuActive) {
