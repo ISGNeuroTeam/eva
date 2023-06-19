@@ -8,10 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- SingleValue: Added options from otl
 
 ### Changed
 
 ### Fixed
+- Select: Fixed scroll
 
 ## [1.138.0]
 
