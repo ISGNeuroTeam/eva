@@ -11,6 +11,7 @@
     <v-card
       class="dash-block"
       :style="{
+        overflow: 'hidden',
         background: theme.$main_bg,
         boxShadow: `0 3px 1px -2px ${theme.$main_border},
         0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
