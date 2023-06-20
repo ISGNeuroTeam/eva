@@ -171,17 +171,15 @@ export default {
     },
     dataSources: {
       deep: true,
-      handler(val) {
+      handler(val, old) {
         const {
           defaultFromSourceData = null,
           defaultSourceDataUpdates = false,
         } = this.dashFromStore.options;
         if (defaultFromSourceData !== null && defaultSourceDataUpdates) {
-          const {
-            loading,
-            data,
-          } = val[defaultFromSourceData];
-          if (!loading && data.length) {
+          const { loading, data } = val[defaultFromSourceData];
+          const { loading: loadingOld } = old[defaultFromSourceData];
+          if (!loading && data.length && loadingOld) {
             const defaultValue = this.getDefaultValue();
             if (defaultValue !== null) {
               this.textarea = this.replaceLineWrapForTextarea(`${defaultValue}`);
