@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- textarea: the value is reset on the apply button
 
 ## [1.138.0]
 
