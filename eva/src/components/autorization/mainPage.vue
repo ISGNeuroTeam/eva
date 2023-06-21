@@ -53,6 +53,7 @@
             </v-card-text>
           </v-card>
           <v-card
+            v-if="false"
             class="product-block-itself"
             :style="{ backgroundColor: theme.$main_bg }"
             @click="openQuis"
