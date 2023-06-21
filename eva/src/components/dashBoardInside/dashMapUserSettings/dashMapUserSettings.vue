@@ -36,81 +36,133 @@
       <v-card-text
         :style="`color: ${theme.$main_text} !important; margin-top: 20px`"
       >
-        <p>Подложка</p>
+        <p
+          class="mb-1"
+          style="font-size: 16px"
+        >
+          Подложка
+        </p>
         <v-select
           v-model="options.selectedLayer"
           outlined
           return-object
           :items="tileLayers"
           light
+          dense
           item-text="name"
           item-value="tile[0]"
           :dark="isDark"
+          class="map-user-settings__select mb-2"
           :style="{ color: theme.$main_text }"
           @change="updateTileLayer($event)"
         />
-        <p>Начальный зум</p>
-        <v-slider
-          v-model="options.zoomLevel"
-          :style="`color: ${theme.$main_text} !important`"
-          class="align-center"
-          max="25"
-          min="0"
+        <p
+          class="mb-1"
+          style="font-size: 16px"
         >
-          <template v-slot:label>
+          Начальный зум
+        </p>
+        <div class="row align-center mb-3 mt-0">
+          <div class="col-3 pb-0 pt-0">
             <v-text-field
               v-model="options.zoomLevel"
               outlined
               dense
               :dark="isDark"
-              class="mt-0 pt-0 map-user-settings__input"
+              class="map-user-settings__input"
               hide-details
               single-line
               type="number"
               style="width: 60px; margin-right: 10px;"
             />
-          </template>
-        </v-slider>
-
-        <p>Шаг масштаба</p>
-        <v-slider
-          v-model="options.zoomStep"
-          class="align-center"
-          max="100"
-          min="1"
-          step="1"
+          </div>
+          <div class="col-9 pb-0 pt-0">
+            <v-slider
+              v-model="options.zoomLevel"
+              :style="`color: ${theme.$main_text} !important`"
+              class="map-user-settings__slider align-center"
+              dense
+              max="25"
+              min="0"
+            />
+          </div>
+        </div>
+        <p
+          class="mb-1"
+          style="font-size: 16px"
         >
-          <template v-slot:label>
+          Зум при поиске
+        </p>
+        <div class="row align-center mb-3 mt-0">
+          <div class="col-3 pb-0 pt-0">
+            <v-text-field
+              v-model="options.zoomLevelSearch"
+              outlined
+              dense
+              :dark="isDark"
+              class="map-user-settings__input"
+              hide-details
+              single-line
+              type="number"
+              style="width: 60px; margin-right: 10px;"
+            />
+          </div>
+          <div class="col-9 pb-0 pt-0">
+            <v-slider
+              v-model="options.zoomLevelSearch"
+              :style="`color: ${theme.$main_text} !important`"
+              class="map-user-settings__slider align-center"
+              max="25"
+              min="0"
+            />
+          </div>
+        </div>
+
+        <p
+          class="mb-1"
+          style="font-size: 16px"
+        >
+          Шаг масштаба
+        </p>
+        <div class="row align-center mb-3 mt-0">
+          <div class="col-3 pb-0 pt-0">
             <v-text-field
               v-model="options.zoomStep"
               outlined
               dense
               :dark="isDark"
-              class="mt-0 pt-0 map-user-settings__input"
+              class="map-user-settings__input"
               hide-details
               single-line
               type="number"
               style="width: 60px; margin-right: 10px;"
             />
-          </template>
-        </v-slider>
-
-        <p>Начальная точка</p>
-        <v-row>
-          <v-col
-            cols="12"
-          >
-            <v-checkbox
-              v-model="options.isAutoCenter"
-              hide-details
-              :class="options.isAutoCenter ? 'mb-5' : ''"
-              label="Авто-центрирование"
+          </div>
+          <div class="col-9 pb-0 pt-0">
+            <v-slider
+              v-model="options.zoomStep"
+              class="map-user-settings__slider align-center"
+              max="100"
+              min="1"
+              step="1"
             />
-          </v-col>
+          </div>
+        </div>
+
+        <p
+          class="mb-1"
+          style="font-size: 16px"
+        >
+          Начальная точка
+        </p>
+        <v-row
+          align="center"
+          class="mt-0 mb-0"
+        >
           <template v-if="!options.isAutoCenter">
             <v-col
               cols="3"
-              style="padding-right: 0"
+              class="pr-0 pt-0 pb-0"
             >
               <v-text-field
                 v-model="options.initialPoint.x"
@@ -119,7 +171,7 @@
                 :disabled="options.isAutoCenter"
                 :dark="isDark"
                 type="number"
-                class="map-user-settings__input"
+                class="map-user-settings__input mt-0"
                 :style="`color: ${theme.$secondary_text} !important`"
               >
                 <template v-slot:prepend>
@@ -129,7 +181,7 @@
             </v-col>
             <v-col
               cols="3"
-              style="padding-right: 0"
+              class="pr-0 pt-0 pb-0"
             >
               <v-text-field
                 v-model="options.initialPoint.y"
@@ -138,7 +190,7 @@
                 :dark="isDark"
                 :disabled="options.isAutoCenter"
                 type="number"
-                class="map-user-settings__input"
+                class="map-user-settings__input mt-0"
                 :style="`color: ${theme.$secondary_text} !important`"
               >
                 <template v-slot:prepend>
@@ -146,11 +198,12 @@
                 </template>
               </v-text-field>
             </v-col>
-            <v-col class="flex-grow-0">
+            <v-col
+              class="flex-grow-0 pt-0 pb-0 pr-0"
+            >
               <v-btn
                 small
                 color="primary"
-                class="mt-3"
                 :disabled="options.isAutoCenter"
                 @click="onClickChoosingCoordinates"
               >
@@ -158,16 +211,39 @@
               </v-btn>
             </v-col>
           </template>
+          <v-col
+            cols="12"
+            class="pt-0 pb-0"
+          >
+            <v-checkbox
+              v-model="options.isAutoCenter"
+              hide-details
+              dense
+              class="mt-0 mb-3"
+            >
+              <template v-slot:label>
+                <span style="font-size: 14px">
+                  Авто-центрирование
+                </span>
+              </template>
+            </v-checkbox>
+          </v-col>
         </v-row>
 
-        <p>Легенда карты</p>
+        <p
+          class="mb-1"
+          style="font-size: 16px"
+        >
+          Легенда карты
+        </p>
         <v-checkbox
           v-model="options.showLegend"
           hide-details
+          dense
           class="mb-3"
         >
           <template v-slot:label>
-            <span :style="`color: ${theme.$secondary_text} !important`">
+            <span :style="`color: ${theme.$main_text} !important; font-size: 14px`">
               Включить отображение легенды
             </span>
           </template>
@@ -182,7 +258,12 @@
           clearable
         />
 
-        <p>ИД для режима мониторинга</p>
+        <p
+          class="mb-1"
+          style="font-size: 16px"
+        >
+          ИД для режима мониторинга
+        </p>
         <v-select
           v-model="options.search"
           outlined
@@ -226,6 +307,7 @@ export default {
   data() {
     return {
       options: {
+        zoomLevelSearch: 10,
         selected: 'яндекс',
         selectedLayer: null,
         zoomLevel: 10,
@@ -455,4 +537,14 @@ export default {
     padding: 0 1px 0 12px !important
   .v-text-field__slot
     margin: 0 -12px 0 -1px
+  .v-text-field__details
+    display: none
+.map-user-settings__slider
+  .v-messages
+    display: none
+  .v-input__slot
+    margin-bottom: 0
+.map-user-settings__select
+  .v-text-field__details
+    display: none
 </style>
