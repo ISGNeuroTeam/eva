@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SingleValue: Added options from otl
 
 ### Changed
+- Hide Q&A page
 
 ### Fixed
 - Select: Fixed scroll
