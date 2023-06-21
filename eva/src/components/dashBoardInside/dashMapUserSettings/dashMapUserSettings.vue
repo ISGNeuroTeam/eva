@@ -36,12 +36,6 @@
       <v-card-text
         :style="`color: ${theme.$main_text} !important; margin-top: 20px`"
       >
-        <p
-          class="mb-1"
-          style="font-size: 16px"
-        >
-          Подложка
-        </p>
         <v-select
           v-model="options.selectedLayer"
           outlined
@@ -52,7 +46,8 @@
           item-text="name"
           item-value="tile[0]"
           :dark="isDark"
-          class="map-user-settings__select mb-2"
+          label="Подложка"
+          class="map-user-settings__select mb-3"
           :style="{ color: theme.$main_text }"
           @change="updateTileLayer($event)"
         />
@@ -63,19 +58,6 @@
           Начальный зум
         </p>
         <div class="row align-center mb-3 mt-0">
-          <div class="col-3 pb-0 pt-0">
-            <v-text-field
-              v-model="options.zoomLevel"
-              outlined
-              dense
-              :dark="isDark"
-              class="map-user-settings__input"
-              hide-details
-              single-line
-              type="number"
-              style="width: 60px; margin-right: 10px;"
-            />
-          </div>
           <div class="col-9 pb-0 pt-0">
             <v-slider
               v-model="options.zoomLevel"
@@ -84,6 +66,17 @@
               dense
               max="25"
               min="0"
+            />
+          </div>
+          <div class="col-3 pb-0 pt-0">
+            <v-text-field
+              v-model.number="options.zoomLevel"
+              outlined
+              dense
+              :dark="isDark"
+              class="map-user-settings__input"
+              hide-details
+              single-line
             />
           </div>
         </div>
@@ -94,19 +87,6 @@
           Зум при поиске
         </p>
         <div class="row align-center mb-3 mt-0">
-          <div class="col-3 pb-0 pt-0">
-            <v-text-field
-              v-model="options.zoomLevelSearch"
-              outlined
-              dense
-              :dark="isDark"
-              class="map-user-settings__input"
-              hide-details
-              single-line
-              type="number"
-              style="width: 60px; margin-right: 10px;"
-            />
-          </div>
           <div class="col-9 pb-0 pt-0">
             <v-slider
               v-model="options.zoomLevelSearch"
@@ -114,6 +94,17 @@
               class="map-user-settings__slider align-center"
               max="25"
               min="0"
+            />
+          </div>
+          <div class="col-3 pb-0 pt-0">
+            <v-text-field
+              v-model.number="options.zoomLevelSearch"
+              outlined
+              dense
+              :dark="isDark"
+              class="map-user-settings__input"
+              hide-details
+              single-line
             />
           </div>
         </div>
@@ -125,19 +116,6 @@
           Шаг масштаба
         </p>
         <div class="row align-center mb-3 mt-0">
-          <div class="col-3 pb-0 pt-0">
-            <v-text-field
-              v-model="options.zoomStep"
-              outlined
-              dense
-              :dark="isDark"
-              class="map-user-settings__input"
-              hide-details
-              single-line
-              type="number"
-              style="width: 60px; margin-right: 10px;"
-            />
-          </div>
           <div class="col-9 pb-0 pt-0">
             <v-slider
               v-model="options.zoomStep"
@@ -147,88 +125,103 @@
               step="1"
             />
           </div>
+          <div class="col-3 pb-0 pt-0">
+            <v-text-field
+              v-model.number="options.zoomStep"
+              outlined
+              dense
+              :dark="isDark"
+              class="map-user-settings__input"
+              hide-details
+              single-line
+            />
+          </div>
         </div>
 
         <p
-          class="mb-1"
+          :class="options.isAutoCenter ? 'mb-1' : 'mb-3'"
           style="font-size: 16px"
         >
           Начальная точка
         </p>
-        <v-row
-          align="center"
-          class="mt-0 mb-0"
-        >
-          <template v-if="!options.isAutoCenter">
-            <v-col
-              cols="3"
-              class="pr-0 pt-0 pb-0"
-            >
-              <v-text-field
-                v-model="options.initialPoint.x"
-                outlined
-                dense
-                :disabled="options.isAutoCenter"
-                :dark="isDark"
-                type="number"
-                class="map-user-settings__input mt-0"
-                :style="`color: ${theme.$secondary_text} !important`"
-              >
-                <template v-slot:prepend>
-                  <div>X:</div>
-                </template>
-              </v-text-field>
-            </v-col>
-            <v-col
-              cols="3"
-              class="pr-0 pt-0 pb-0"
-            >
-              <v-text-field
-                v-model="options.initialPoint.y"
-                outlined
-                dense
-                :dark="isDark"
-                :disabled="options.isAutoCenter"
-                type="number"
-                class="map-user-settings__input mt-0"
-                :style="`color: ${theme.$secondary_text} !important`"
-              >
-                <template v-slot:prepend>
-                  <div>Y:</div>
-                </template>
-              </v-text-field>
-            </v-col>
-            <v-col
-              class="flex-grow-0 pt-0 pb-0 pr-0"
-            >
-              <v-btn
-                small
-                color="primary"
-                :disabled="options.isAutoCenter"
-                @click="onClickChoosingCoordinates"
-              >
-                Указать на карте
-              </v-btn>
-            </v-col>
-          </template>
-          <v-col
-            cols="12"
-            class="pt-0 pb-0"
+        <div class="mb-2">
+          <div
+            v-if="!options.isAutoCenter"
+            class="row align-center"
           >
-            <v-checkbox
-              v-model="options.isAutoCenter"
-              hide-details
-              dense
-              class="mt-0 mb-3"
+            <div class="col-5">
+              <v-text-field
+                v-model.number="options.initialPoint.x"
+                outlined
+                dense
+                :disabled="options.isAutoCenter"
+                :dark="isDark"
+                class="map-user-settings__input mt-0 mb-0"
+                :style="`color: ${theme.$secondary_text} !important`"
+              >
+                <template v-slot:label>
+                  <div>X-координата:</div>
+                </template>
+              </v-text-field>
+            </div>
+            <div class="col-5">
+              <v-text-field
+                v-model.number="options.initialPoint.y"
+                outlined
+                dense
+                :dark="isDark"
+                :disabled="options.isAutoCenter"
+                class="map-user-settings__input mt-0 mb-0"
+                :style="`color: ${theme.$secondary_text} !important`"
+              >
+                <template v-slot:label>
+                  <div>Y-координата:</div>
+                </template>
+              </v-text-field>
+            </div>
+            <div
+              class="col-2"
             >
-              <template v-slot:label>
-                <span style="font-size: 14px">
-                  Авто-центрирование
-                </span>
-              </template>
-            </v-checkbox>
-          </v-col>
-        </v-row>
+              <v-tooltip
+                bottom
+                :color="theme.$primary_button"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    outlined
+                    :color="theme.$main_text"
+                    class="pa-0"
+                    min-width="36px"
+                    height="40px"
+                  >
+                    <v-icon
+                      :color="theme.$main_text"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="onClickChoosingCoordinates"
+                    >
+                      {{ mdiMapMarker }}
+                    </v-icon>
+                  </v-btn>
+                </template>
+                <span>Указать на карте</span>
+              </v-tooltip>
+            </div>
+          </div>
+        </div>
+
+        <v-checkbox
+          v-model="options.isAutoCenter"
+          hide-details
+          dense
+          class="mt-0 mb-3"
+        >
+          <template v-slot:label>
+            <div style="font-size: 14px">
+              Авто-центрирование
+            </div>
+          </template>
+        </v-checkbox>
 
         <p
           class="mb-1"
@@ -240,7 +233,7 @@
           v-model="options.showLegend"
           hide-details
           dense
-          class="mb-3"
+          class="mt-0 mb-3"
         >
           <template v-slot:label>
             <span :style="`color: ${theme.$main_text} !important; font-size: 14px`">
@@ -252,21 +245,17 @@
           v-model="options.nameLegend"
           label="Имя легенды"
           :color="theme.$accent_ui_color"
-          class="mb-3"
+          class="mb-4"
           outlined
+          dense
           hide-details
           clearable
         />
-
-        <p
-          class="mb-1"
-          style="font-size: 16px"
-        >
-          ИД для режима мониторинга
-        </p>
         <v-select
           v-model="options.search"
           outlined
+          dense
+          label="ИД для режима мониторинга"
           :dark="isDark"
           item-text="sid"
           :items="searches"
@@ -279,6 +268,10 @@
 </template>
 
 <script>
+
+import {
+  mdiMapMarker,
+} from '@mdi/js';
 
 export default {
   name: 'DashMapUserSettings',
@@ -323,6 +316,8 @@ export default {
         nameLegend: 'Легенда',
       },
       currentTile: {},
+      // icons
+      mdiMapMarker,
     };
   },
   computed: {
@@ -401,7 +396,7 @@ export default {
       if (val) {
         if (JSON.stringify(this.options)
             !== JSON.stringify(this.dashFromStore.options)) {
-          this.options = JSON.parse(JSON.stringify(this.dashFromStore.options));
+          this.options = structuredClone(this.dashFromStore.options);
         }
       }
     },
@@ -485,7 +480,7 @@ export default {
       });
     },
     updateSelectedLayerValue() {
-      const options = JSON.parse(JSON.stringify(this.getOptions));
+      const options = structuredClone(this.getOptions);
       this.tileLayers[0].tile = options.osmserver;
       // init store for reactivity
       if (!options.showLegend || !options.initialPoint) {
@@ -502,7 +497,7 @@ export default {
           options: { ...initOptions, ...options },
         });
       } else {
-        this.$set(this, 'options', JSON.parse(JSON.stringify(options)));
+        this.$set(this, 'options', structuredClone(options));
       }
     },
   },
@@ -534,9 +529,11 @@ export default {
 
 .map-user-settings__input
   .v-input__slot
-    padding: 0 1px 0 12px !important
+    margin-bottom: 0 !important
+    //padding: 0 1px 0 10px !important
+    //overflow: hidden
   .v-text-field__slot
-    margin: 0 -12px 0 -1px
+    //margin: 0 -12px 0 -1px
   .v-text-field__details
     display: none
 .map-user-settings__slider
