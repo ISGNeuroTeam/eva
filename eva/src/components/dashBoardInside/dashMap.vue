@@ -723,9 +723,10 @@ export default {
       return result;
     },
     searchUpdate(value) {
+      const searchZoomLevel = this.getOptions?.zoomLevelSearch || this.defaultZoomLevel;
       if (this.map) {
         if (value) {
-          this.map.goToElement(this.dataRestFrom, value).then((response) => {
+          this.map.goToElement(this.dataRestFrom, value, searchZoomLevel).then((response) => {
             this.map.selectElement(response);
           });
         } else {
