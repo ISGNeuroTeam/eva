@@ -475,6 +475,7 @@ export default {
           }
         } else if (this.$refs.multiselect.$refs.menu.listIndex === -1) {
           this.$refs.multiselect.selectItem(filteredItems[0]);
+          this.$refs.multiselect.lazySearch = '';
         }
       }
       if (this.getOptions?.closeListByEnter && isMenuActive) {
