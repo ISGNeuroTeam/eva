@@ -194,6 +194,7 @@ export default {
       if (this.getOptions.onButtonToken) {
         this.updateToken();
       }
+      this.setClick();
     },
     updateSearches() {
       const { idDash, id } = this;

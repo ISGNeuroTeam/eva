@@ -13,6 +13,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.139.0]
+
+### Added
+- SingleValue: Added options from otl
+- Map: Added option zoom level for search
+
+### Changed
+- Select: first filtered item has cursor for select by Enter
+- Hide Q&A page
+- Change title "Исследование данных 2.0\Исследование данных" 
+
+### Fixed
+- Select: First click disappears when clicking on selects
+- textarea: the value is reset on the apply button
+- Select: Fixed scroll
+- Button: The same names for settings for different functionality
+- Button: the onclick event doesn't work when the 'onButtonToken' or 'onButton' option is enable
+
 ## [1.138.0]
 
 ### Fixed

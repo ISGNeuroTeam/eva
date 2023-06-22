@@ -1,3 +1,23 @@
+# [1.139.0]
+
+### Added
+- SingleValue: Added options from otl
+- Map: Added option zoom level for search
+
+### Changed
+- Hide Q&A page
+- Change title "Исследование данных 2.0\Исследование данных"
+- Select: first filtered item has cursor for select by Enter
+
+### Fixed
+- textarea: the value is reset on the apply button
+- Select:
+  - First click disappears when clicking on selects
+  - Fixed scroll
+- Button:
+  - The same names for settings for different functionality
+  - The onclick event doesn't work when the 'onButtonToken' or 'onButton' option is enable
+
 # [1.138.0] - 2023-06-15
 
 ### Fixed
