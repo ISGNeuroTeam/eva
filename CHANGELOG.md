@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change title "Исследование данных 2.0\Исследование данных" 
 
 ### Fixed
+- Select: First click disappears when clicking on selects
 - textarea: the value is reset on the apply button
 - Select: Fixed scroll
 
