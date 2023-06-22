@@ -81,6 +81,7 @@
           <move-able
             v-for="elem in elements"
             :key="hash(elem.elem)"
+            :style="`z-index: ${sorting.indexOf(elem.elem)};`"
             :data-mode-from="mode"
             :id-dash-from="idDash"
             :data-elem="elem.elem"
@@ -325,7 +326,7 @@ export default {
       isConfirmModal: false,
       deleteTabId: '',
       deleteTabName: '',
-      tempSorting: {},
+      sorting: [],
       isDownloadModal: false,
       searchId: 0,
     };
@@ -407,7 +408,6 @@ export default {
             === this.currentTab
             || this.dashFromStore[elem].options?.pinned,
         )
-        .sort((a, b) => this.tempSorting[a] - this.tempSorting[b])
         .map((elem) => ({ elem, search: this.dashFromStore[elem].search }));
     },
     headerTop() {
@@ -578,7 +578,15 @@ export default {
     }
     this.checkTabOverflow();
     window.onresize = this.checkTabOverflow;
-    this.updateTempSorting();
+
+    const { elements = [] } = this.dashFromStore;
+    const elementsPos = elements
+      .reduce((acc, elem) => {
+        const { options = {} } = this.dashFromStore[elem];
+        acc[elem] = +options.level || 1;
+        return acc;
+      }, {});
+    this.sorting = Object.keys(elementsPos).sort((a, b) => (elementsPos[a] - elementsPos[b]));
   },
   methods: {
     saveDashToStore() {
@@ -591,12 +599,12 @@ export default {
     },
     updateTempSorting() {
       if (this.dashFromStore?.elements?.reduce) {
-        this.tempSorting = this.dashFromStore.elements
-          .reduce((acc, elem) => {
-            const { options = {} } = this.dashFromStore[elem];
-            acc[elem] = +options.level || 1;
-            return acc;
-          }, {});
+        const { elements } = this.dashFromStore;
+        const newItems = elements.filter((item) => this.sorting.indexOf(item) === -1);
+        const removeItems = this.sorting.filter((item) => elements.indexOf(item) === -1);
+        const newSorting = this.sorting.filter((item) => removeItems.indexOf(item) === -1);
+        newSorting.push(...newItems);
+        this.sorting = newSorting;
       }
     },
     startSearches(searches) {
@@ -905,14 +913,7 @@ export default {
       });
     },
     onActivated(elem) {
-      setTimeout(() => {
-        const newSorting = this.elements.reduce((acc, { elem: itemElem }, i) => {
-          acc[itemElem] = i + 1;
-          return acc;
-        }, {});
-        newSorting[elem] = 100;
-        this.$set(this, 'tempSorting', newSorting);
-      }, 120);
+      this.sorting.push(...this.sorting.splice(this.sorting.indexOf(elem), 1));
       return true;
     },
     openModalDownload(searchId) {
