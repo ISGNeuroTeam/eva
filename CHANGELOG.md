@@ -8,11 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- SingleValue: Added options from otl
 
 ### Changed
+- Select: first filtered item has cursor for select by Enter
+- Hide Q&A page
+- Change title "Исследование данных 2.0\Исследование данных" 
 
 ### Fixed
 - Select: First click disappears when clicking on selects
+- textarea: the value is reset on the apply button
+- Select: Fixed scroll
 
 ## [1.138.0]
 

@@ -45,7 +45,7 @@
               :style="{ color: theme.$title }"
             >
               Исследование <br>
-              данных 2.0
+              данных
               <p
                 class="delimetr"
                 :style="{ backgroundColor: theme.$title }"
@@ -53,6 +53,7 @@
             </v-card-text>
           </v-card>
           <v-card
+            v-if="false"
             class="product-block-itself"
             :style="{ backgroundColor: theme.$main_bg }"
             @click="openQuis"
