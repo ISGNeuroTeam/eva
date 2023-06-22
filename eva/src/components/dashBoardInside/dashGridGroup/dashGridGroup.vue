@@ -56,7 +56,7 @@
               :id-from="item.visualizationId"
               :id-dash-from="idDash"
               :color-from="theme"
-              :options="dashItemOptions[item.i] || {}"
+              :options="getOptions[item.i] || {}"
               :search="{}"
               :size-from="{
                 height: (item.h * rowHeight) + 36,
@@ -274,6 +274,9 @@ export default {
       }
       return this.$store.state[idDash][id];
     },
+    fullDashFromStore() {
+      return this.$store.state[this.idDash];
+    },
     tokensStore() {
       const { idDash } = this;
       return this.$store.state[idDash].tockens;
@@ -342,13 +345,7 @@ export default {
         let t = 0;
         let maxRowH = 0;
         const list = new Map();
-        const { colNum, idDash } = this;
-        this.dashItemOptions = this.dataRestFrom.reduce((obj, item) => {
-          const optionKey = item.option_key || item.id;
-          const visualizationId = `${item.visualization}-${this.idFrom}-${optionKey}-v1`;
-          obj[item.id] = this.$store.state[idDash][visualizationId]?.options;
-          return obj;
-        }, {});
+        const { colNum } = this;
         this.dataRestFrom
           .forEach((item) => {
             const optionKey = item.option_key || item.id;
@@ -404,6 +401,14 @@ export default {
         ...this.dataSources[item.id],
       }));
     },
+    getOptions() {
+      return this.dataRestFrom.reduce((obj, item) => {
+        const optionKey = item.option_key || item.id;
+        const visualizationId = `${item.visualization}-${this.idFrom}-${optionKey}-v1`;
+        obj[item.id] = this.$store.state[this.idDash][visualizationId]?.options;
+        return obj;
+      }, {});
+    },
   },
   methods: {
     setRange({ range }, item) {
@@ -418,7 +423,7 @@ export default {
       });
     },
     updateSettings(val, visualizationId) {
-      this.settings[visualizationId] = JSON.parse(JSON.stringify(val));
+      this.$set(this.settings, visualizationId, structuredClone(val));
     },
     hideDS() {
       this.$store.commit('setSwitch', {
