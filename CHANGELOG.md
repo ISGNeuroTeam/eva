@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Select: Fixed scroll
+- Button: The same names for settings for different functionality
 
 ## [1.138.0]
 

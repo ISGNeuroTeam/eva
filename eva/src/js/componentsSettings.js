@@ -990,7 +990,6 @@ export default {
       elem: 'switch',
     },
     {
-      label: 'Submit',
       option: 'onButton',
       description: 'Обновлять источники данных по клику',
       elem: 'switch',
@@ -1020,7 +1019,6 @@ export default {
       },
     },
     {
-      label: 'Submit',
       option: 'onButtonToken',
       description: 'Обнулять токены из списка',
       elem: 'switch',
