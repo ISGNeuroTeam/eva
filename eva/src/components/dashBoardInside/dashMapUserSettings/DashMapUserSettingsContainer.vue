@@ -207,7 +207,8 @@
         </v-menu>
         <v-btn
           rounded
-          class="ml-3"
+          class="ml-3 mb-0"
+          height="40px"
           :style="`
           background: ${theme.$secondary_bg};
            color: ${theme.$main_text};
@@ -769,7 +770,7 @@ export default {
 
 .map-user-settings__input
   .v-input__slot
-    padding: 0 1px 0 12px !important
+    //padding: 0 1px 0 12px !important
   .v-text-field__slot
-    margin: 0 -12px 0 -1px
+    //margin: 0 -12px 0 -1px
 </style>
