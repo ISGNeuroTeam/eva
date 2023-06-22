@@ -1003,7 +1003,7 @@ export default {
       elem: 'switch',
     },
     {
-      relation: ['SubmitByListDS'],
+      relation: ['SubmitByListDS', 'onButton'],
       label: 'ListDS',
       option: 'ListDS',
       description: 'Если токен содержится в ИД',
