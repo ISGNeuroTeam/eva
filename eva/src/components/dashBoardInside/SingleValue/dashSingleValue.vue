@@ -106,6 +106,7 @@ import { mdiSettings } from '@mdi/js';
 import SingleValueSettings from './SingleValueSettings.vue';
 import metricTitleIcons from './metricTitleIcons';
 import iconlist from '@/fonts/eva-iconfont/eva-iconlist.json';
+import { throttle } from '@/js/utils/throttle';
 
 export default {
   name: 'SingleValue',
@@ -169,6 +170,10 @@ export default {
       type: String,
       default: '',
     },
+    options: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data: () => ({
     mdiSettings,
@@ -207,7 +212,8 @@ export default {
     },
 
     metricsForRender() {
-      const elementsToShow = this.metricList.slice(0, this.metricCount);
+      const metricCount = this.getOptions.settings.metricCount || this.metricCount;
+      const elementsToShow = this.metricList.slice(0, metricCount);
       if (elementsToShow.length !== elementsToShow.filter(Boolean).length) {
         this.$store.commit('setState', [{
           object: this.getOptions.settings,
@@ -234,7 +240,7 @@ export default {
     },
 
     metricTemplateClass() {
-      return `metric-${this.metricCount} v-${this.template}`;
+      return `metric-${this.getOptions.settings.metricCount || this.metricCount} v-${this.getOptions.settings.template || this.template}`;
     },
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idFrom] || {};
@@ -259,7 +265,6 @@ export default {
           },
         }]);
       }
-
       return this.dashFromStore.options;
     },
     getClass() {
@@ -276,6 +281,7 @@ export default {
         if (val.length > 0) {
           const isNew = val.length !== oldVal.length;
           const options = structuredClone(this.getOptions);
+          this.setOptionsFromOtl(structuredClone(val[0]));
           this.setVisual(
             this.currentSettings.metricOptions?.length > 0
               ? this.currentSettings.metricOptions
@@ -302,8 +308,28 @@ export default {
   mounted() {
     /** Getting saved component options from the store. */
     this.init(null, true);
+    this.setOptionsFromOtl(structuredClone(this.dataRestFrom[0]));
   },
   methods: {
+    setOptionsFromOtl(options) {
+      if (options) {
+        const settingsFromStore = this.getOptions.settings;
+        const settings = {};
+        Object.keys(options).forEach((key) => {
+          if (settingsFromStore[key]) {
+            settings[key] = options[key];
+          }
+        });
+        this.$store.commit('setState', [{
+          object: this.getOptions,
+          prop: 'settings',
+          value: {
+            ...this.getOptions.settings,
+            ...settings,
+          },
+        }]);
+      }
+    },
     getIcon(metric) {
       if (!metric.metadata) {
         return undefined;
@@ -431,7 +457,7 @@ export default {
       const metricOptions = [];
       structuredClone(this.dataRestFrom).forEach((data) => {
         const {
-          metric, value, metadata, _order: sortOrder,
+          metric, value, metadata, _order: sortOrder, color,
         } = data;
         const id = sortOrder;
         if (metric === '_title') {
@@ -462,7 +488,6 @@ export default {
             range = metadata;
           }
           const startId = `${metric}_${id}`;
-
           const metricCurrent = metricOptionsCurrent?.find(
             (m) => m?.startId === startId,
           );
@@ -470,10 +495,12 @@ export default {
           const defaultMetricOption = {
             title: metric || data.phase,
             ...metricCurrent,
-            id: metricCurrent?.id || id,
+            id: metricCurrent?.listOrder === undefined
+              ? sortOrder
+              : metricCurrent?.listOrder,
             startId: metricCurrent?.startId || startId,
             metadata,
-            color: metricCurrent?.color || 'main',
+            color: color || metricCurrent?.color || 'main',
             icon: metricCurrent?.icon || 'no_icon',
             fontSize: metricCurrent?.fontSize || 54,
             fontWeight: metricCurrent?.fontWeight || 400,
@@ -534,22 +561,23 @@ export default {
 
     saveSettings(settings = {}) {
       const { metricCount, template, metricOptions = [] } = settings;
-      metricOptions.forEach((item, idx) => {
-        item.id = idx + 1;
-        item.listOrder = idx + 1;
-      });
-      const newSettings = { ...settings, metricOptions };
+      const updatedMetricOptions = metricOptions.map((item, idx) => ({
+        ...item,
+        id: idx + 1,
+        listOrder: idx + 1,
+      }));
+      const newSettings = { ...settings, metricOptions: updatedMetricOptions };
       this.template = template;
       this.metricCount = metricCount;
       /** Applying settings from the SingleValueSettings. */
       this.$store.commit('setState', [{
-        object: this.getOptions,
+        object: this.dashFromStore.options,
         prop: 'settings',
         value: newSettings,
       }]);
 
       /** Updated local metricList array. */
-      const newMetricList = metricOptions
+      const newMetricList = updatedMetricOptions
         .reduce((acc, updatedMetric, index) => {
           const {
             icon, title, color, fontSize, fontWeight,
@@ -578,6 +606,11 @@ export default {
 
       if (this.updateSettings) this.updateSettings(newSettings);
       this.update += 1;
+      this.$store.commit('setState', [{
+        object: this.getOptions.settings,
+        prop: 'fromOtl',
+        value: false,
+      }]);
     },
 
     closeSettings() {
