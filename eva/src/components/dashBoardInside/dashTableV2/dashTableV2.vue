@@ -1255,7 +1255,7 @@ export default {
               token,
               idDash: this.idDashFrom,
               store: this.$store,
-              value: `${data.allCellInRow[token.capture]}`,
+              value: `${data.allCellInRow[token.capture] === undefined ? '' : data.allCellInRow[token.capture]}`,
             });
           } else {
             this.$store.commit('setTocken', {
