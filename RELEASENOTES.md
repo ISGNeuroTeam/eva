@@ -5,8 +5,9 @@
 
 ### Fixed
 - Select: first filtered item has cursor for select by Enter
-- Don't update fields in tokens
-- TableV2: undefined in token
+- TableV2:
+  - Undefined in token
+  - Fields in tokens are not updated
 
 # [1.139.0]
 
