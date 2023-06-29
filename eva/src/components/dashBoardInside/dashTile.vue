@@ -30,6 +30,7 @@
                     : `${dataTile[i - 1].color}`,
                 }"
                 @click="setClick(dataTile[i - 1])"
+                @click.middle="setClick(dataTile[i - 1], true)"
               >
                 <p
                   :style="{
@@ -245,7 +246,7 @@ export default {
       }
       return result;
     },
-    setClick(item) {
+    setClick(item, openNewTab = false) {
       const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
 
@@ -287,6 +288,7 @@ export default {
               idDash: this.idDash,
               route: this.$router,
               store: this.$store,
+              openNewTab,
             });
           }
         });
