@@ -1,3 +1,13 @@
+# [1.140.0] - 2023-06-29
+
+### Added
+- Tiles: Switch to dash by clicking on the wheel in a new tab
+
+### Fixed
+- Select: first filtered item has cursor for select by Enter
+- Don't update fields in tokens
+- TableV2: undefined in token
+
 # [1.139.0]
 
 ### Added
