@@ -505,6 +505,11 @@ export default {
         this.redrawTable();
       }
     },
+    fields(val, oldVal) {
+      if (val?.length && JSON.stringify(val) !== JSON.stringify(oldVal)) {
+        this.setAction(this.searchSchema);
+      }
+    },
     searchSchema: {
       handler(value) {
         if (Object.keys(value)?.length > 0 && this.idDashFrom !== 'reports') {
@@ -1246,7 +1251,7 @@ export default {
               token,
               idDash: this.idDashFrom,
               store: this.$store,
-              value: `${data.allCellInRow[token.capture]}`,
+              value: `${data.allCellInRow[token.capture] === undefined ? '' : data.allCellInRow[token.capture]}`,
             });
           } else {
             this.$store.commit('setTocken', {
