@@ -1822,6 +1822,7 @@ export default {
           localOptions.change = false;
         }
         localOptions = { ...this.loadComponentsSettings(), ...localOptions };
+        this.openNewScreen = localOptions.openNewScreen;
         this.$set(this, 'options', localOptions);
       });
     },

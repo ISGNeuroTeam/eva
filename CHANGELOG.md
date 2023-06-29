@@ -8,10 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Tiles: Switch to dash by clicking on the wheel in a new tab
 
 ### Changed
 
 ### Fixed
+- Select: first filtered item has cursor for select by Enter
+- Don't update fields in tokens
+- TableV2: undefined in token
 - Table v2: Fixed table flickering when switching edit mode 
 
 ## [1.139.0]
