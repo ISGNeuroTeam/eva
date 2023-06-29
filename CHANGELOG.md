@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.140.0]
+
+### Added
+- Tiles: Switch to dash by clicking on the wheel in a new tab
+
+### Fixed
+- Select: first filtered item has cursor for select by Enter
+- TableV2: 
+  - Undefined in token
+  - Fields in tokens are not updated
+
 ## [1.139.0]
 
 ### Added
