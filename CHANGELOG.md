@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Tiles: Switch to dash by clicking on the wheel in a new tab
 
 ### Changed
 
