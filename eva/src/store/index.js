@@ -1987,7 +1987,8 @@ export default new Vuex.Store({
         (el) => el.id.toString() === event.event.tab,
       ) || 1;
       await dispatch('saveDashToStore', id);
-      if (!options?.openNewScreen) {
+      const { openNewTab } = event;
+      if (!options?.openNewScreen && !openNewTab) {
         if (!isTabMode) {
           event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = 1;
