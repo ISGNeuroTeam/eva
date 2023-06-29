@@ -388,6 +388,7 @@ export default {
       'timeFormat',
     ],
     tile: [
+      'openNewScreen',
       'visible',
       'level',
       'pinned',
