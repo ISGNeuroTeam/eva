@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Table v2: Fixed table flickering when switching edit mode 
 
 ## [1.140.0]
 

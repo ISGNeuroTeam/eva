@@ -478,10 +478,7 @@ export default {
       return !!this.getOptions?.selectableRow;
     },
     movableColumns() {
-      if (this.isEdit) {
-        return this.getOptions?.movableColumns || false;
-      }
-      return false;
+      return this.getOptions?.movableColumns || false;
     },
     defaultFilterAllColumns() {
       if (this.idDashFrom === 'reports') {
@@ -589,13 +586,6 @@ export default {
         this.updateColumnDefinition();
       }
     },
-    isEdit() {
-      this.$nextTick(() => {
-        this.$nextTick(() => {
-          this.createTable();
-        });
-      });
-    },
     loading(val) {
       if (!val) {
         this.redrawTable();
@@ -628,6 +618,12 @@ export default {
     this.destroyTable();
   },
   methods: {
+    setTableOption(module, option, value) {
+      // console.log('1', this.idFrom, this.tabulator);
+      this.tabulator[module].setOption(option, value);
+      // console.log('2', this.idFrom, this.tabulator);
+      // this.tabulator.setData(this.dataRestFrom);
+    },
     clearFrozenColumns() {
       this.$store.commit('setState', [{
         object: this.dashFromStore.options,
