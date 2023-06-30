@@ -565,6 +565,9 @@ export default {
       await this.checkAlreadyDash();
     }
 
+    // preload tokens
+    this.$store.dispatch('updatePreloadTokens', this.idDash);
+
     this.loadingDash = false;
     this.$root.$emit('setDocumentTitle', this.dashFromStore?.name || '404');
     if (this.$route.params.tabId) {

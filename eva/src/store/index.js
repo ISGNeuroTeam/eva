@@ -34,6 +34,7 @@ export default new Vuex.Store({
     },
     savingDashQueue: [],
     readingDashQueue: [],
+    preloadTokens: [],
   },
   mutations: {
     addSavingDashQueue(state, idDash) {
@@ -64,6 +65,25 @@ export default new Vuex.Store({
     setState(state, payload) {
       payload.forEach(({ object, prop, value }) => {
         Vue.set(object, prop, value);
+      });
+    },
+    pushPreloadTokens(state, { id, tokens }) {
+      state.preloadTokens.unshift({ id, tokens });
+    },
+    removePreloadTokens(state, id) {
+      Vue.set(state, 'preloadTokens', []);
+      /*const idx = state.preloadTokens.findIndex((item) => item.id === id);
+      if (idx > -1) {
+        state.preloadTokens.splice(idx, 1);
+      }*/
+    },
+    setTokens(state, { id, tokens }) {
+      state[id].tockens?.forEach((token) => {
+        tokens.forEach(({ name, value }) => {
+          if (token.name === name) {
+            Vue.set(token, 'value', value);
+          }
+        });
       });
     },
     setDefaultOptions(state, { idDash, id }) {
@@ -1157,6 +1177,10 @@ export default new Vuex.Store({
         if (state.savingDashQueue === undefined) {
           state.savingDashQueue = [];
         }
+        if (!navigator.storage) {
+          resolve();
+          return;
+        }
         if (state.savingDashQueue.includes(idDash)) {
           resolve();
         } else {
@@ -1179,6 +1203,10 @@ export default new Vuex.Store({
       return new Promise((resolve) => {
         if (state.readingDashQueue === undefined) {
           state.readingDashQueue = [];
+        }
+        if (!navigator.storage) {
+          resolve(null);
+          return;
         }
         if (state.readingDashQueue.includes(idDash)) {
           resolve('already reading');
@@ -1203,6 +1231,20 @@ export default new Vuex.Store({
           };
         }
       });
+    },
+    async updatePreloadTokens({ state, commit, dispatch }, id) {
+      const tokens = await dispatch('pullOutPreloadTokens', id);
+      commit('setTokens', { id, tokens });
+      commit('removePreloadTokens', id);
+      return tokens;
+    },
+    pullOutPreloadTokens({ state }, id) {
+      const idx = state.preloadTokens.findIndex((item) => item.id === id);
+      if (idx > -1) {
+        const { tokens } = state.preloadTokens[idx];
+        return tokens;
+      }
+      return [];
     },
     // метод получающий данные из rest
     getDataApi({ state }, searchFrom) {
@@ -1862,6 +1904,10 @@ export default new Vuex.Store({
     },
     // TODO refactor checkalreadydash
     letEventGo: async ({ state, commit, dispatch }, event) => {
+      const { openNewTab = false } = event;
+      if (!openNewTab) {
+        commit('removePreloadTokens', event.id);
+      }
       // load dash
 
       // при переходе на другой дашборд нам нужно обновить определенный токен
@@ -1956,6 +2002,15 @@ export default new Vuex.Store({
       }
 
       const changed = [];
+      if (openNewTab) {
+        commit('pushPreloadTokens', {
+          id,
+          tokens: item.prop.map((name, idx) => ({
+            name,
+            value: values[idx],
+          })),
+        });
+      }
       item.prop.forEach((itemProp, j) => {
         tockensTarget.forEach((itemTock, i) => {
           if (itemProp === itemTock.name) {
@@ -1987,25 +2042,21 @@ export default new Vuex.Store({
         (el) => el.id.toString() === event.event.tab,
       ) || 1;
       await dispatch('saveDashToStore', id);
-      const { openNewTab } = event;
-      if (!options?.openNewScreen && !openNewTab) {
+
+      if (options?.openNewScreen || openNewTab) {
+        newCurrentTabValue = currentTab || 1;
+        window.open(`/dashboards/${id}/${newCurrentTabValue}`);
+      } else {
         if (!isTabMode) {
-          event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = 1;
         } else if (!event.event.tab) {
-          event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = currentTab || 1;
         } else {
-          event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = lastEl?.id || 1;
         }
-      } else if (!isTabMode) {
-        window.open(`/dashboards/${id}`);
-        newCurrentTabValue = 1;
-      } else if (!event.event.tab) {
-        window.open(`/dashboards/${id}`);
-        newCurrentTabValue = currentTab || 1;
+        event.route.push(`/dashboards/${id}/${newCurrentTabValue}`);
       }
+
       commit('changeCurrentTab', {
         idDash: id,
         tab: newCurrentTabValue,
@@ -2163,6 +2214,7 @@ export default new Vuex.Store({
           form: state.form,
           logError: state.logError,
           dataResearch: state.dataResearch,
+          preloadTokens: state.preloadTokens,
         }),
         (val) => {
           storage.setItem('app', JSON.stringify(val));
