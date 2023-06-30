@@ -1897,6 +1897,9 @@ export default new Vuex.Store({
     // TODO refactor checkalreadydash
     letEventGo: async ({ state, commit, dispatch }, event) => {
       const { openNewTab = false } = event;
+      if (!openNewTab) {
+        commit('removePreloadTokens', event.id);
+      }
       // load dash
 
       // при переходе на другой дашборд нам нужно обновить определенный токен
