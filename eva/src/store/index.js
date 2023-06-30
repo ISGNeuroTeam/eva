@@ -78,7 +78,7 @@ export default new Vuex.Store({
       }*/
     },
     setTokens(state, { id, tokens }) {
-      state[id].tockens.forEach((token) => {
+      state[id].tockens?.forEach((token) => {
         tokens.forEach(({ name, value }) => {
           if (token.name === name) {
             Vue.set(token, 'value', value);
