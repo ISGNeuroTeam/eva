@@ -13,6 +13,7 @@ onmessage = async (e) => {
   const fileName = `dash-${id}.json`;
 
   try {
+    // throw new Error('No dash storage');
     // Get sync access handle
     const accessHandle = await openFile(fileName, type === 'saveDash');
     // Get size of the file.
