@@ -1996,7 +1996,7 @@ export default new Vuex.Store({
           id,
           tokens: item.prop.map((name, idx) => ({
             name,
-            value: item.value[idx],
+            value: values[idx],
           })),
         });
       }
