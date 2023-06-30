@@ -78,7 +78,7 @@ export default new Vuex.Store({
       }*/
     },
     setTokens(state, { id, tokens }) {
-      state[id].tockens.forEach((token) => {
+      state[id].tockens?.forEach((token) => {
         tokens.forEach(({ name, value }) => {
           if (token.name === name) {
             Vue.set(token, 'value', value);
@@ -1177,6 +1177,10 @@ export default new Vuex.Store({
         if (state.savingDashQueue === undefined) {
           state.savingDashQueue = [];
         }
+        if (!navigator.storage) {
+          resolve();
+          return;
+        }
         if (state.savingDashQueue.includes(idDash)) {
           resolve();
         } else {
@@ -1199,6 +1203,10 @@ export default new Vuex.Store({
       return new Promise((resolve) => {
         if (state.readingDashQueue === undefined) {
           state.readingDashQueue = [];
+        }
+        if (!navigator.storage) {
+          resolve(null);
+          return;
         }
         if (state.readingDashQueue.includes(idDash)) {
           resolve('already reading');
@@ -2034,24 +2042,21 @@ export default new Vuex.Store({
         (el) => el.id.toString() === event.event.tab,
       ) || 1;
       await dispatch('saveDashToStore', id);
-      if (!options?.openNewScreen && !openNewTab) {
+
+      if (options?.openNewScreen || openNewTab) {
+        newCurrentTabValue = currentTab || 1;
+        window.open(`/dashboards/${id}/${newCurrentTabValue}`);
+      } else {
         if (!isTabMode) {
-          event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = 1;
         } else if (!event.event.tab) {
-          event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = currentTab || 1;
         } else {
-          event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = lastEl?.id || 1;
         }
-      } else if (!isTabMode) {
-        window.open(`/dashboards/${id}`);
-        newCurrentTabValue = 1;
-      } else if (!event.event.tab) {
-        window.open(`/dashboards/${id}`);
-        newCurrentTabValue = currentTab || 1;
+        event.route.push(`/dashboards/${id}/${newCurrentTabValue}`);
       }
+
       commit('changeCurrentTab', {
         idDash: id,
         tab: newCurrentTabValue,
