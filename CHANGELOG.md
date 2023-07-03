@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Table v2: Fixed table flickering when switching edit mode 
+- Waterfall: No relation to number formatting setting in comments
 
 ## [1.140.0]
 
