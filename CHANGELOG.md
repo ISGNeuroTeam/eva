@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
-- Table v2: Fixed table flickering when switching edit mode 
+- Table v2: Fixed table flickering when switching edit mode
+- When switching to a tab with a datepicker, the data source is restarted
 
 ## [1.140.0]
 
