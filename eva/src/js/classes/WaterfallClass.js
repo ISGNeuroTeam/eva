@@ -299,11 +299,17 @@ export default class WaterfallClass {
         }
         return d.comment
           .replace(/(\(\s?[-+]?[\d\s.,]+\s?\))/g, (str) => {
-            const { numberFormat = false } = this.options;
+            const {
+              numberFormat = false,
+              decimalPlacesLimits = 2,
+            } = this.options;
             let printStr = str;
-            const nums = str.match(/[-+]?\d+/);
+            const nums = str.match(/[-+]?[\d.,]+/);
             if (nums.length === 1 && !Number.isNaN(Number(nums[0]))) {
-              printStr = `(${Number(nums[0]).toLocaleString(numberFormat)})`;
+              printStr = `(${Number(nums[0]).toLocaleString(numberFormat, {
+                minimumFractionDigits: decimalPlacesLimits,
+                maximumFractionDigits: decimalPlacesLimits,
+              })})`;
             }
             return `<tspan style="color: ${color}">${printStr}</tspan>`;
           });
