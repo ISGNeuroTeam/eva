@@ -304,10 +304,10 @@ export default class WaterfallClass {
               decimalPlacesLimits = 2,
             } = this.options;
             let printStr = str;
-            const nums = str.match(/[-+]?[\d.,]+/);
+            const nums = str.match(/[-+]?[\d.]+/);
             if (nums.length === 1 && !Number.isNaN(Number(nums[0]))) {
               printStr = `(${Number(nums[0]).toLocaleString(numberFormat, {
-                minimumFractionDigits: decimalPlacesLimits,
+                // minimumFractionDigits: decimalPlacesLimits,
                 maximumFractionDigits: decimalPlacesLimits,
               })})`;
             }
