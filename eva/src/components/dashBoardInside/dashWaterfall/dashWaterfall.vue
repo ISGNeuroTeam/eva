@@ -96,10 +96,14 @@ export default {
       return this.$store.state[this.idDashFrom].tockens || [];
     },
     chartOptions() {
-      const { numberFormat = false } = this.userSettings;
+      const {
+        numberFormat,
+        decimalPlacesLimits,
+      } = this.userSettings;
       return {
         ...this.options.chartOptions,
         numberFormat,
+        decimalPlacesLimits,
         titles: this.dataRestFrom.map((row) => row.title),
       };
     },
