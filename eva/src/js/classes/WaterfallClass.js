@@ -296,7 +296,9 @@ export default class WaterfallClass {
           return '';
         }
         let color;
-        if (opts?.changeColor) {
+        if (d.color) {
+          color = d.color;
+        } else if (opts?.changeColor) {
           color = opts.color;
         } else if (d.isTotal) {
           color = options.colorBarTotal;
@@ -341,11 +343,16 @@ export default class WaterfallClass {
         }
         return pos;
       })
-      .attr('stroke', ({ title: barTitle, value, isTotal }) => {
+      .attr('stroke', ({
+        title: barTitle, value, isTotal, color,
+      }) => {
         if (this.options.barsOptions.length) {
           const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
           if (opts?.hideComment) {
             return 'transparent';
+          }
+          if (color) {
+            return color;
           }
           if (opts?.changeColor) {
             return opts.color;
