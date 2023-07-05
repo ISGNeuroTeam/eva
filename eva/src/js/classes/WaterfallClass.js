@@ -124,7 +124,10 @@ export default class WaterfallClass {
       .attr('y', (d) => this.y(d.value < 0 ? d.total - d.value : d.total))
       .attr('height', (d) => this.y(0) - this.y(Math.abs(d.value)))
       .attr('width', this.x.bandwidth())
-      .attr('fill', ({ title: barTitle, value }) => {
+      .attr('fill', ({ title: barTitle, value, color }) => {
+        if (color) {
+          return color;
+        }
         if (this.options.barsOptions.length) {
           const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
           if (opts?.changeColor) {
@@ -139,7 +142,10 @@ export default class WaterfallClass {
       .attr('y', (d) => (d.total < 0 ? this.y(0) : this.y(d.total)))
       .attr('height', (d) => this.y(0) - this.y(Math.abs(d.total)))
       .attr('width', this.x.bandwidth())
-      .attr('fill', ({ title: barTitle }) => {
+      .attr('fill', ({ title: barTitle, color }) => {
+        if (color) {
+          return color;
+        }
         if (this.options.barsOptions.length) {
           const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
           if (opts?.changeColor) {
