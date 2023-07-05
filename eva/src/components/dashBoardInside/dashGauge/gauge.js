@@ -651,7 +651,7 @@
             const labelText = formatNumber(value, staticLabels.fractionDigits, this.options.numberFormat);
 
             // если предыдущее число близко
-            const progressiveMinDistance = 0.032 * (labelText.length + 1);
+            const progressiveMinDistance = 0.052 * (labelText.length + 1);
             const shiftText = j > 0 && (rotationAngle - (this.getAngle(ref[j-1]) - 3 * Math.PI / 2)) < progressiveMinDistance;
             if (shiftText) {
               line++;
