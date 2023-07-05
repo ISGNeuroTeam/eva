@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Table v2: Fixed table flickering when switching edit mode 
+- Map: Fixed search
 
 ## [1.140.0]
 
