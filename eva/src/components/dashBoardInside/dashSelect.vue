@@ -441,11 +441,17 @@ export default {
     },
     onFilterItems(item, queryText, itemText) {
       const { searchMode = 'contains' } = this.getOptions; // contains, begin
-      const foundIdx = itemText.toLocaleLowerCase().indexOf(queryText.toLocaleLowerCase());
+      const foundIdx = this.toSearchString(itemText)
+        .indexOf(
+          this.toSearchString(queryText),
+        );
       if (searchMode === 'begin') {
         return foundIdx === 0;
       }
       return foundIdx > -1;
+    },
+    toSearchString(str) {
+      return str.toLocaleLowerCase().replaceAll(' ', ' ');
     },
     onPressBackspace() {
       if (this.multiple) {
