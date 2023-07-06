@@ -293,6 +293,7 @@ export default new Vuex.Store({
     // TODO refactor
     // сохранение токена в хранилище
     setTocken(state, { token, idDash, value }) {
+      let restartSearches = true;
       const id = Object.keys(state[idDash].tockens).find(
         (item) => state[idDash].tockens[item].name === token.name
           && state[idDash].tockens[item].action === token.action
@@ -302,10 +303,19 @@ export default new Vuex.Store({
       if (id) {
         // если value задано, то присваиваем его токену
         if (value) {
-          state[idDash].tockens[id].value = value;
+          if (state[idDash].tockens[id].value !== value) {
+            state[idDash].tockens[id].value = value;
+          } else {
+            restartSearches = false;
+          }
           // если нет, то присваиваем токену дефолтное значение
         } else {
-          state[idDash].tockens[id].value = state[idDash].tockens[id].defaultValue;
+          const { defaultValue } = state[idDash].tockens[id];
+          if (state[idDash].tockens[id].value !== defaultValue) {
+            state[idDash].tockens[id].value = defaultValue;
+          } else {
+            restartSearches = false;
+          }
         }
 
         // если события вообще есть
@@ -415,18 +425,20 @@ export default new Vuex.Store({
           (el) => el.name === token.name,
         );
 
-        state[idDash].searches.forEach((search) => {
-          if (
-            search.original_otl.includes(`$${token.name}$`)
-            && !tempToken.onButton
-          ) {
-            this.commit('updateSearchStatus', {
-              idDash,
-              sid: search.sid,
-              status: 'empty',
-            });
-          }
-        });
+        if (restartSearches) {
+          state[idDash].searches.forEach((search) => {
+            if (
+              search.original_otl.includes(`$${token.name}$`)
+              && !tempToken.onButton
+            ) {
+              this.commit('updateSearchStatus', {
+                idDash,
+                sid: search.sid,
+                status: 'empty',
+              });
+            }
+          });
+        }
       }
       // Add filterParam(for multiLine)
       state[idDash].tockens.forEach((localToken) => {
