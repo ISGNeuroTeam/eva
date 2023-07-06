@@ -11,7 +11,7 @@
         >
           <v-autocomplete
             ref="searchValue"
-            v-model="searchValue"
+            v-model.trim="searchValue"
             :style="{ color: theme.$main_text, 'pointer-events': 'auto' }"
             :items="filteredDataRestFrom"
             item-value="ID"
@@ -682,16 +682,12 @@ export default {
     changePipeline(parameters) {
       this.map.options.pipelineParameters = parameters;
     },
-    searchElement(data, str) {
-      const subStr = str.toLowerCase();
-      const fields = ['label', 'group', 'ID', 'type', 'geometry_type'];
-      // eslint-disable-next-line no-restricted-syntax
-      for (const field of fields) {
-        if (data[field] && `${data[field]}`.toLowerCase().indexOf(subStr) !== -1) {
-          return true;
-        }
-      }
-      return false;
+    searchElement(_, queryText, itemText) {
+      return this.toSearchString(itemText)
+        .includes(this.toSearchString(queryText));
+    },
+    toSearchString(str) {
+      return str.toLocaleLowerCase().replaceAll(' ', ' ');
     },
   },
 };
