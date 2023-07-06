@@ -25,7 +25,10 @@
         v-show="!isDataError"
         class="row fill-height align-stretch"
       >
-        <div class="col-3">
+        <div
+          v-if="listColName || listColValue || leftTitle"
+          class="col-3"
+        >
           <div
             class="FGKRiskReview__col-title px-3"
             :style="{
@@ -82,7 +85,10 @@
             class="svg-container"
           />
         </div>
-        <div class="col-3">
+        <div
+          v-if="secondListColName || secondListColValue || rightTitle"
+          class="col-3"
+        >
           <div
             class="FGKRiskReview__col-title px-3"
             :style="{
