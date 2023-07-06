@@ -306,7 +306,21 @@ export default class WaterfallClass {
           color = d.value < 0 ? this.options.colorBarNegative : this.options.colorBarPositive;
         }
         return d.comment
-          .replace(/(\(\s?[-+]?[\d\s.,]+\s?\))/g, `<tspan style="color: ${color}">$1</tspan>`);
+          .replace(/(\(\s?[-+]?[\d\s.,]+\s?\))/g, (str) => {
+            const {
+              numberFormat = false,
+              decimalPlacesLimits = 2,
+            } = this.options;
+            let printStr = str;
+            const nums = str.match(/[-+]?[\d.]+/);
+            if (nums.length === 1 && !Number.isNaN(Number(nums[0]))) {
+              printStr = `(${Number(nums[0]).toLocaleString(numberFormat, {
+                // minimumFractionDigits: decimalPlacesLimits,
+                maximumFractionDigits: decimalPlacesLimits,
+              })})`;
+            }
+            return `<tspan style="color: ${color}">${printStr}</tspan>`;
+          });
       });
 
     barGroup.filter((d) => d.comment).append('line')
