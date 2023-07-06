@@ -124,7 +124,10 @@ export default class WaterfallClass {
       .attr('y', (d) => this.y(d.value < 0 ? d.total - d.value : d.total))
       .attr('height', (d) => this.y(0) - this.y(Math.abs(d.value)))
       .attr('width', this.x.bandwidth())
-      .attr('fill', ({ title: barTitle, value }) => {
+      .attr('fill', ({ title: barTitle, value, color }) => {
+        if (color) {
+          return color;
+        }
         if (this.options.barsOptions.length) {
           const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
           if (opts?.changeColor) {
@@ -139,7 +142,10 @@ export default class WaterfallClass {
       .attr('y', (d) => (d.total < 0 ? this.y(0) : this.y(d.total)))
       .attr('height', (d) => this.y(0) - this.y(Math.abs(d.total)))
       .attr('width', this.x.bandwidth())
-      .attr('fill', ({ title: barTitle }) => {
+      .attr('fill', ({ title: barTitle, color }) => {
+        if (color) {
+          return color;
+        }
         if (this.options.barsOptions.length) {
           const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
           if (opts?.changeColor) {
@@ -290,7 +296,9 @@ export default class WaterfallClass {
           return '';
         }
         let color;
-        if (opts?.changeColor) {
+        if (d.color) {
+          color = d.color;
+        } else if (opts?.changeColor) {
           color = opts.color;
         } else if (d.isTotal) {
           color = options.colorBarTotal;
@@ -298,7 +306,21 @@ export default class WaterfallClass {
           color = d.value < 0 ? this.options.colorBarNegative : this.options.colorBarPositive;
         }
         return d.comment
-          .replace(/(\(\s?[-+]?[\d\s.,]+\s?\))/g, `<tspan style="color: ${color}">$1</tspan>`);
+          .replace(/(\(\s?[-+]?[\d\s.,]+\s?\))/g, (str) => {
+            const {
+              numberFormat = false,
+              decimalPlacesLimits = 2,
+            } = this.options;
+            let printStr = str;
+            const nums = str.match(/[-+]?[\d.]+/);
+            if (nums.length === 1 && !Number.isNaN(Number(nums[0]))) {
+              printStr = `(${Number(nums[0]).toLocaleString(numberFormat, {
+                // minimumFractionDigits: decimalPlacesLimits,
+                maximumFractionDigits: decimalPlacesLimits,
+              })})`;
+            }
+            return `<tspan style="color: ${color}">${printStr}</tspan>`;
+          });
       });
 
     barGroup.filter((d) => d.comment).append('line')
@@ -335,11 +357,16 @@ export default class WaterfallClass {
         }
         return pos;
       })
-      .attr('stroke', ({ title: barTitle, value, isTotal }) => {
+      .attr('stroke', ({
+        title: barTitle, value, isTotal, color,
+      }) => {
         if (this.options.barsOptions.length) {
           const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
           if (opts?.hideComment) {
             return 'transparent';
+          }
+          if (color) {
+            return color;
           }
           if (opts?.changeColor) {
             return opts.color;

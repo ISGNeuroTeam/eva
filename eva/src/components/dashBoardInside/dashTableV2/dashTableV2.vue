@@ -134,7 +134,7 @@ const headerFilter = function (cell/* , onRendered, success, cancel , editorPara
   const field = cell.getField();
   const elementId = `${filterId}-${field}`;
 
-  const container = document.createElement('span');
+  const container = document.createElement('div');
   container.id = elementId;
   container.classList.add('dash-table-v2-container__filter-container');
 
@@ -161,7 +161,6 @@ const headerFilter = function (cell/* , onRendered, success, cancel , editorPara
   textInput.id = `${elementId}-textInput`;
   textInput.type = 'text';
   textInput.classList.add('dash-table-v2-container__filter-input');
-  textInput.placeholder = 'Значение';
 
   let selectValue = '';
   let textValue = '';
@@ -189,6 +188,12 @@ const headerFilter = function (cell/* , onRendered, success, cancel , editorPara
     } else {
       textValue = value;
     }
+    const maxWidth = container.offsetWidth - select.offsetWidth;
+    const length = textInput.value.length && textInput.value.length > 1
+      ? textInput.value.length + 2
+      : 3;
+    textInput.style.maxWidth = `${maxWidth - 10}px`;
+    textInput.style.width = `calc(${length} * 1ch)`;
   }
 
   // add event listeners
@@ -400,7 +405,7 @@ export default {
           } : false,
           headerMenu: options?.headerMenu && this.isEdit ? this.headerMenu : false,
           cellClick: this.cellClickEvent,
-          minWidth: options?.minWidth || (options?.headerFilter ? 150 : 80),
+          minWidth: options?.minWidth || (options?.headerFilter ? 78 : 78),
         };
 
         if (options?.formatter) {
@@ -478,10 +483,7 @@ export default {
       return !!this.getOptions?.selectableRow;
     },
     movableColumns() {
-      if (this.isEdit) {
-        return this.getOptions?.movableColumns || false;
-      }
-      return false;
+      return this.getOptions?.movableColumns || false;
     },
     defaultFilterAllColumns() {
       if (this.idDashFrom === 'reports') {
@@ -589,13 +591,6 @@ export default {
         this.updateColumnDefinition();
       }
     },
-    isEdit() {
-      this.$nextTick(() => {
-        this.$nextTick(() => {
-          this.createTable();
-        });
-      });
-    },
     loading(val) {
       if (!val) {
         this.redrawTable();
@@ -628,6 +623,12 @@ export default {
     this.destroyTable();
   },
   methods: {
+    setTableOption(module, option, value) {
+      // console.log('1', this.idFrom, this.tabulator);
+      this.tabulator[module].setOption(option, value);
+      // console.log('2', this.idFrom, this.tabulator);
+      // this.tabulator.setData(this.dataRestFrom);
+    },
     clearFrozenColumns() {
       this.$store.commit('setState', [{
         object: this.dashFromStore.options,
@@ -1396,13 +1397,16 @@ export default {
   }
   &__filter-container {
     display: grid;
-    grid-template-columns: 25% 75%;
+    max-width: 100%;
+    grid-template-columns: 32px minmax(32px, 1fr);
     gap: 5px;
     padding: 0 8px 0 0;
   }
   &__filter-select {
     border: 1px solid var(--main_border);
     border-radius: 4px;
+    min-width: 32px;
+    width: 32px;
     color: var(--main_text);
     outline: none;
     text-align: center;
@@ -1425,6 +1429,8 @@ export default {
   &__filter-input {
     border: 1px solid var(--main_border);
     border-radius: 4px;
+    width: 32px;
+    min-width: 32px;
     color: var(--main_text);
     outline: none;
   }
