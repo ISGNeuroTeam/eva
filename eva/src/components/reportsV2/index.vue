@@ -295,8 +295,9 @@ export default {
         let localStatistic = '';
         this.rows = [];
         if (event.data.data.length !== 0) {
-          this.shema = event.data.shema;
-          this.$set(this, 'schema', event.data.shema);
+          const schema = event.data.shema || {};
+          this.shema = schema;
+          this.$set(this, 'schema', schema);
           // this.data = event.data.data;
           this.$set(this, 'data', event.data.data);
 

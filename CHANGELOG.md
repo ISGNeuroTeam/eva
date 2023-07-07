@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Tokens: not all fields exist at the time of token editing
 
 ## [1.141.0]
 
