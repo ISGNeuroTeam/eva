@@ -1202,22 +1202,23 @@ export default {
     capture() {
       // получение всех подсобытий элемента на странице (события второго уровня )
       return ({ elem, action }) => {
+        const result = new Set();
         if (!this.dashFromStore || !this.dashFromStore[elem]) {
           return [];
         }
-        // new logic
+        // add fields
         const search = this.searches.find(({ id }) => id === this.dashFromStore[elem].search);
         if (search?.schema) {
-          return Object.keys(search.schema);
+          Object.keys(search.schema).forEach((field) => result.add(field));
         }
-        // @deprecated: old logic
+        // add captures
         if (this.dashFromStore[elem]) {
           const {
             capture = [],
-          } = this.dashFromStore[elem].actions.find(({ name }) => name === action);
-          return capture;
+          } = this.dashFromStore[elem].actions.find(({ name }) => name === action) || {};
+          capture.forEach((item) => result.add(item));
         }
-        return [];
+        return [...result];
       };
     },
     blockToolStyle() {
