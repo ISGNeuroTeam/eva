@@ -1081,14 +1081,40 @@ class ConstructorSchemesClass {
     this.graphComponent.inputMode = mode;
   }
 
-  getTemplateElementsForCopy(xOffset = 10, yOffset = 10) {
+  getOffsetSelectedElements() {
+    const selectedElements = this.graphComponent.selection.toArray();
+    let minX = selectedElements[0].layout.x;
+    let minY = selectedElements[0].layout.y;
+    let { maxX } = selectedElements[0].layout;
+    let maxY = selectedElements[0].layout.y;
+    // eslint-disable-next-line no-restricted-syntax
+    for (const item of selectedElements) {
+      if (item instanceof INode) {
+        if (minX > item.layout.x) minX = item.layout.x;
+        if (minY > item.layout.y) minY = item.layout.y;
+        if (maxX < item.layout.maxX) maxX = item.layout.maxX;
+        if (maxY < item.layout.maxY) maxY = item.layout.maxY;
+      }
+    }
+    const width = maxX - minX;
+    const height = maxY - minY;
+    return {
+      x: width / 2,
+      y: height / 2,
+    };
+  }
+
+  getTemplateElementsForCopy() {
+    const offset = this.getOffsetSelectedElements();
     return this.graphComponent.selection.toArray().map((el) => {
       // TODO: Пока сделано только для узлов
       if (el instanceof INode) {
+        const xPos = el.layout.x + (el.layout.width / 2);
+        const yPos = el.layout.y + (el.layout.height / 2);
         const node = {
           location: {
-            x: el.layout.x + xOffset,
-            y: el.layout.y + yOffset,
+            x: xPos + offset.x,
+            y: yPos + offset.y,
           },
           layout: {
             width: el.layout.width,
