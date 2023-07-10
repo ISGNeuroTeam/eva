@@ -52,7 +52,10 @@
             </v-tabs>
             <div class="d-flex">
               <report :length="dataLength" />
-              <download :data="data" />
+              <download
+                :data="data"
+                :schema="schema"
+              />
             </div>
           </div>
           <keep-alive>
