@@ -659,8 +659,7 @@ export default {
   },
   async setLoadingSvg(param, restAuth) {
     let data = [];
-
-    const response = await fetch('/api/load/svg', {
+    const response = await fetch(`/api/load/${param?.path || 'svg'}`, {
       // сперва нужно подать post запрос
       method: 'POST',
       body: param.formData,
@@ -673,7 +672,7 @@ export default {
     if (response.status === 200) {
       // если получилось
       await response
-        .text()
+        .json()
         .then((res) => {
           // переводим полученные данные из json в нормальный объект
           data = res;

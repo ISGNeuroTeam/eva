@@ -10,6 +10,19 @@
       <div class="b-loading-svg__title">
         Загрузка SVG
       </div>
+      <div class="b-loading-svg__radio">
+        <v-radio-group
+          v-model="uploadType"
+          :color="theme.$primary_button"
+        >
+          <v-radio
+            v-for="option in uploadTypes"
+            :key="option.value"
+            :label="option.label"
+            :value="option.value"
+          />
+        </v-radio-group>
+      </div>
       <div class="b-loading-svg__input">
         <v-file-input
           v-model="file"
@@ -37,7 +50,7 @@
           :color="theme.$primary_button"
           class="b-loading-svg__button"
           :disabled="!file || file.type !== 'image/svg+xml' || file.size > 1000000 || disabled"
-          @click="loadingSvg"
+          @click="loadFile"
         >
           Отправить
         </v-btn>
@@ -74,9 +87,17 @@ export default {
       type: Boolean,
       default: false,
     },
+    uploadTypes: {
+      type: Array,
+      default: () => ([
+        { label: 'SVG', value: 'svg' },
+        { label: 'Файл', value: 'file' },
+      ]),
+    },
   },
   data() {
     return {
+      uploadType: 'svg',
       file: null,
       message: '',
       color: '',
@@ -97,29 +118,28 @@ export default {
         this.$emit('updateModalValue', false);
       }
     },
-    async loadingSvg() {
+    async loadFile() {
       this.disabled = true;
       const formData = new FormData();
       formData.append('file', this.file);
-      const response = await this.$store.dispatch('setLoadingSvg', {
+      const res = await this.$store.dispatch('setLoadingSvg', {
         file: this.file,
         formData,
+        path: this.uploadType,
       });
-      const res = JSON.parse(response);
+      this.color = '';
+      this.message = '';
       if (res.status === 'ok' && res?.notifications) {
         this.$store.commit('notify/addNotifications', res.notifications);
         setTimeout(() => {
           this.file = null;
           this.$emit('updateModalValue', false);
-          this.color = '';
-          this.message = '';
-          this.disabled = false;
         }, 1000);
       } else {
-        this.disabled = false;
         this.color = 'red';
-        this.message = `Загрузить файл ${this.file.name} не удалось.`;
+        this.message = res.statusText ? `Ошибка: ${res.statusText}` : 'Загрузить файл не удалось.';
       }
+      this.disabled = false;
     },
     focus() {
       this.color = '';
@@ -127,7 +147,7 @@ export default {
     },
     confirm(val) {
       if (val) {
-        this.loadingSvg();
+        this.loadFile();
       } else {
         this.file = null;
         this.$emit('updateModalValue', false);
@@ -149,6 +169,12 @@ export default {
     text-align: center;
   }
   &__input::v-deep {
+    .v-icon,
+    .v-file-input__text {
+      color: var(--main_text) !important;
+    }
+  }
+  &__radio::v-deep {
     .v-icon,
     .v-file-input__text {
       color: var(--main_text) !important;

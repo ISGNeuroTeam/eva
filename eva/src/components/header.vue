@@ -82,7 +82,7 @@
               {{ mdiCloudUpload }}
             </v-icon>
           </template>
-          <span>Загрузка SVG</span>
+          <span>Загрузка файла</span>
         </v-tooltip>
         <v-tooltip
           bottom
