@@ -148,7 +148,9 @@ export default {
       link.remove(); // удаляем ссылку
     },
     exportDataxlsx() {
-      const workSheet = utils.json_to_sheet(this.data);
+      const workSheet = utils.json_to_sheet(this.data, {
+        header: Object.keys(this.schema),
+      });
       const wb = utils.book_new();
       utils.book_append_sheet(wb, workSheet, 'data');
       writeFile(wb, 'report.xlsx');
