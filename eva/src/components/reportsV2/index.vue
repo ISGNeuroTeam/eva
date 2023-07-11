@@ -80,6 +80,7 @@
                 <events
                   class="events component-block"
                   :data="data"
+                  :schema="schema"
                 />
               </v-col>
             </v-row>

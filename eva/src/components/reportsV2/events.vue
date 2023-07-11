@@ -44,20 +44,20 @@
         >
           <div style="margin-left: 216px">
             <div
-              v-for="(value, name) in elem.item.inputCount"
+              v-for="(name) in fields"
               :key="name"
             >
-              <span
-                v-if="name !== '_time'"
-                :style="{ color: theme.$raspberry }"
-              >{{ name }}:
-              </span>
-              <span
-                v-if="name !== '_time'"
-                :style="{ color: theme.$forest }"
-              >{{
-                value
-              }}</span>
+              <template v-if="elem.item.inputCount[name] !== undefined">
+                <span
+                  v-if="name !== '_time'"
+                  :style="{ color: theme.$raspberry }"
+                >{{ name }}:
+                </span>
+                <span
+                  v-if="name !== '_time'"
+                  :style="{ color: theme.$forest }"
+                >{{ elem.item.inputCount[name] }}</span>
+              </template>
             </div>
           </div>
         </td>
@@ -90,6 +90,10 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    schema: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -116,6 +120,9 @@ export default {
   computed: {
     theme() {
       return this.$store.getters.getTheme;
+    },
+    fields() {
+      return Object.keys(this.schema);
     },
     dataset() {
       const dataset = [];
