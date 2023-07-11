@@ -1259,7 +1259,7 @@ export default new Vuex.Store({
       return [];
     },
     // метод получающий данные из rest
-    getDataApi({ state }, searchFrom) {
+    async getDataApi({ state, commit }, searchFrom) {
       // создаем произвольный хэш чтобы наши запросы не повторялись
       const hash = Math.floor(Math.random() * 1000);
 
@@ -1369,7 +1369,15 @@ export default new Vuex.Store({
       };
       rest.setStore(this);
       // отправляем в файл storeRest.js
-      return rest.rest(formData, searchForRest, restAuth, idDash);
+      const result = await rest.rest(formData, searchForRest, restAuth, idDash);
+      commit('setState', [
+        {
+          object: search,
+          prop: 'schema',
+          value: result.schema,
+        },
+      ]);
+      return result;
     },
     createSearchesId({ state }, payload) {
       const data = payload?.bodyData || state[payload?.id];
