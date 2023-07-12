@@ -110,6 +110,10 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    schema: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -129,10 +133,12 @@ export default {
       const searchData = this.data;
       // const searchData = this.dataObject[searchName].data
       let csvContent = 'data:text/csv;charset=utf-8,'; // задаем кодировку csv файла
-      const keys = Object.keys(searchData[0]); // получаем ключи для заголовков столбцов
-      csvContent += encodeURIComponent(`${keys.join(',')}\n`); // добавляем ключи в файл
+      const fields = Object.keys(this.schema);
+      csvContent += encodeURIComponent(`${fields.map((field) => `"${field}"`).join(',')}\n`); // добавляем ключи в файл
       csvContent += encodeURIComponent(
-        searchData.map((item) => Object.values(item).join(',')).join('\n'),
+        searchData
+          .map((item) => fields.map((field) => `"${item[field] || ''}"`).join(','))
+          .join('\n'),
       );
 
       const link = document.createElement('a'); // создаем ссылку
@@ -142,7 +148,9 @@ export default {
       link.remove(); // удаляем ссылку
     },
     exportDataxlsx() {
-      const workSheet = utils.json_to_sheet(this.data);
+      const workSheet = utils.json_to_sheet(this.data, {
+        header: Object.keys(this.schema),
+      });
       const wb = utils.book_new();
       utils.book_append_sheet(wb, workSheet, 'data');
       writeFile(wb, 'report.xlsx');
