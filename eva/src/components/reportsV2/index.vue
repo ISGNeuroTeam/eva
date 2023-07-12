@@ -52,7 +52,10 @@
             </v-tabs>
             <div class="d-flex">
               <report :length="dataLength" />
-              <download :data="data" />
+              <download
+                :data="data"
+                :schema="schema"
+              />
             </div>
           </div>
           <keep-alive>
@@ -77,6 +80,7 @@
                 <events
                   class="events component-block"
                   :data="data"
+                  :schema="schema"
                 />
               </v-col>
             </v-row>
@@ -295,8 +299,9 @@ export default {
         let localStatistic = '';
         this.rows = [];
         if (event.data.data.length !== 0) {
-          this.shema = event.data.shema;
-          this.$set(this, 'schema', event.data.shema);
+          const schema = event.data.shema || {};
+          this.shema = schema;
+          this.$set(this, 'schema', schema);
           // this.data = event.data.data;
           this.$set(this, 'data', event.data.data);
 

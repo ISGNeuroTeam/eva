@@ -1147,10 +1147,8 @@ class ConstructorSchemesClass {
     if (this.copiedElements?.length > 0) {
       this.graphComponent.selection.clear();
       await Promise.all(this.copiedElements.map((element) => this.nodeCreator({
-        graph: this.graphComponent.graph,
         dropData: element,
         dropLocation: element?.location,
-        isNewNode: false,
       }))).then((createdElements) => {
         createdElements.forEach((el) => {
           this.graphComponent.inputMode.setSelected(el, true);
@@ -1164,7 +1162,6 @@ class ConstructorSchemesClass {
   async nodeCreator({
     dropData,
     dropLocation,
-    isCopiedElement = false,
   }) {
     const elementCreator = new ElementCreator({
       graph: this.graphComponent.graph,
@@ -1175,8 +1172,8 @@ class ConstructorSchemesClass {
         layout: {
           width: dropData.layout.width,
           height: dropData.layout.height,
-          x: isCopiedElement ? dropLocation.x : dropLocation.x - (dropData.layout.width / 2),
-          y: isCopiedElement ? dropLocation.y : dropLocation.y - (dropData.layout.height / 2),
+          x: dropLocation.x - (dropData.layout.width / 2),
+          y: dropLocation.y - (dropData.layout.height / 2),
         },
         icon: dropData?.style?.image,
         tag: {
