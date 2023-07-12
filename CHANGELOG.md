@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - When downloading the result in csv, the columns may float
+- Tokens: not all fields exist at the time of token editing
 
 ## [1.141.0]
 
