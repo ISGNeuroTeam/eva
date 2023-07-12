@@ -1311,6 +1311,7 @@ export default {
     copyPaste(e) {
       e.stopPropagation();
       e.preventDefault();
+      this.closeDataPanel();
       // ctrl + c
       if (e.keyCode === 67) {
         this.constructorSchemes.copyElement();
