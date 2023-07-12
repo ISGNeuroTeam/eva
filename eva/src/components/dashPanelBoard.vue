@@ -1202,21 +1202,23 @@ export default {
     capture() {
       // получение всех подсобытий элемента на странице (события второго уровня )
       return ({ elem, action }) => {
-        if (this.dashFromStore && this.dashFromStore[elem]) {
-          let j = Object.keys(this.dashFromStore[elem].actions).find(
-            (key) => this.dashFromStore[elem].actions[key].name === action,
-          );
-          Object.keys(this.dashFromStore[elem].actions).forEach((item) => {
-            if (this.dashFromStore[elem].actions[item].name === action) {
-              j = item;
-            }
-          });
-          if (j) {
-            return this.dashFromStore[elem].actions[j].capture;
-          }
+        const result = new Set();
+        if (!this.dashFromStore || !this.dashFromStore[elem]) {
           return [];
         }
-        return [];
+        // add fields
+        const search = this.searches.find(({ id }) => id === this.dashFromStore[elem].search);
+        if (search?.schema) {
+          Object.keys(search.schema).forEach((field) => result.add(field));
+        }
+        // add captures
+        if (this.dashFromStore[elem]) {
+          const {
+            capture = [],
+          } = this.dashFromStore[elem].actions.find(({ name }) => name === action) || {};
+          capture.forEach((item) => result.add(item));
+        }
+        return [...result];
       };
     },
     blockToolStyle() {
