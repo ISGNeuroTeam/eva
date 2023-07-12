@@ -734,6 +734,7 @@
       if (this.textField) {
         this.textField.render(this);
       }
+      h -= 15
       this.ctx.lineCap = "butt";
       radius = this.radius * this.options.radiusScale;
       if (this.options.staticLabels) {
