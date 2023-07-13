@@ -75,7 +75,7 @@
     value = num[0];
     digits = 0 || num[1];
     numberFormat = false || num[2];
-    return addCommas(value.toLocaleString(numberFormat, {
+    return /*addCommas*/(value.toLocaleString(numberFormat, {
       minimumFractionDigits: digits,
       maximumFractionDigits: digits,
     }));
