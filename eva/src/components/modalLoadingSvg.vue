@@ -29,10 +29,10 @@
           :color="theme.$main_text"
           :style="{ color: theme.$main_text }"
           :rules="[
-            value => !value || value.size < 1000000 || 'Размер должен быть меньше 1 МБ!',
-            value => !value || value.type === 'image/svg+xml' || 'Недопустимый формат!',
+            // value => !value || value.size < 1000000 || 'Размер должен быть меньше 1 МБ!',
+            value => !value || (!fileType || value.type === fileType) || 'Недопустимый формат!',
           ]"
-          accept="image/svg+xml"
+          :accept="fileType"
           :label="fileLabel"
           @focus="focus()"
         />
@@ -49,7 +49,8 @@
           small
           :color="theme.$primary_button"
           class="b-loading-svg__button"
-          :disabled="!file || file.type !== 'image/svg+xml' || file.size > 1000000 || disabled"
+          :disabled="!file || (fileType && file.type !== fileType) || disabled"
+          :loading="fileLoading"
           @click="loadFile"
         >
           Отправить
@@ -90,8 +91,8 @@ export default {
     uploadTypes: {
       type: Array,
       default: () => ([
-        { label: 'SVG', value: 'svg' },
-        { label: 'Файл', value: 'file' },
+        { label: 'SVG', value: 'svg', type: 'image/svg+xml' },
+        { label: 'Файл', value: 'file', type: null },
       ]),
     },
   },
@@ -103,6 +104,7 @@ export default {
       color: '',
       modalValue: false,
       disabled: false,
+      fileLoading: false,
     };
   },
   computed: {
@@ -112,6 +114,10 @@ export default {
     fileLabel() {
       const { uploadTypes, uploadType } = this;
       return `Выберите ${uploadTypes.find(({ value }) => value === uploadType).label.toLowerCase()}`;
+    },
+    fileType() {
+      const { uploadTypes, uploadType } = this;
+      return uploadTypes.find(({ value }) => value === uploadType).type;
     },
   },
   methods: {
@@ -124,6 +130,7 @@ export default {
     },
     async loadFile() {
       this.disabled = true;
+      this.fileLoading = true;
       const formData = new FormData();
       formData.append('file', this.file);
       const res = await this.$store.dispatch('setLoadingSvg', {
@@ -131,6 +138,7 @@ export default {
         formData,
         path: this.uploadType,
       });
+      this.fileLoading = false;
       this.color = '';
       this.message = '';
       if (res.status === 'ok' && res?.notifications) {
