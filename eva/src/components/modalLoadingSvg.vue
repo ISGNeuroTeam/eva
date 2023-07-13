@@ -8,7 +8,7 @@
   >
     <div class="b-loading-svg__content">
       <div class="b-loading-svg__title">
-        Загрузка SVG
+        Загрузка файла
       </div>
       <div class="b-loading-svg__radio">
         <v-radio-group
@@ -33,7 +33,7 @@
             value => !value || value.type === 'image/svg+xml' || 'Недопустимый формат!',
           ]"
           accept="image/svg+xml"
-          label="Выберите Svg"
+          :label="fileLabel"
           @focus="focus()"
         />
       </div>
@@ -108,6 +108,10 @@ export default {
   computed: {
     theme() {
       return this.$store.getters.getTheme;
+    },
+    fileLabel() {
+      const { uploadTypes, uploadType } = this;
+      return `Выберите ${uploadTypes.find(({ value }) => value === uploadType).label.toLowerCase()}`;
     },
   },
   methods: {
