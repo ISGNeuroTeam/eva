@@ -114,10 +114,8 @@ export default {
         this.resize();
       }
     },
-    dataRestFrom(data) {
-      if (data.length) {
-        this.loadData(data);
-      }
+    dataRestFrom(val) {
+      this.loadData(val);
     },
     theme() {
       this.resize();
