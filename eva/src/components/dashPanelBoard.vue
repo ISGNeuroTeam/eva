@@ -77,16 +77,16 @@
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
-              <div
+              <v-icon
                 class="control-button theme--dark"
-                :style="{ display: 'inline-flex' }"
-                :class="{ hide_control: !editMode }"
+                :style="{ color: theme.$secondary_text }"
                 v-on="on"
                 @click="loadSvg = !loadSvg"
-                v-html="svgIcon.svg"
-              />
+              >
+                {{ upload_icon }}
+              </v-icon>
             </template>
-            <span>Загрузка SVG</span>
+            <span>Загрузка файла</span>
           </v-tooltip>
           <v-tooltip
             bottom
@@ -948,6 +948,7 @@ import {
   mdiUndoVariant,
   mdiVariable,
   mdiFileTree,
+  mdiCloudUpload,
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
 import EvaLogo from '../images/eva-logo.svg';
@@ -955,7 +956,6 @@ import settings from '../js/componentsSettings';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
 import { globalTockens } from '../constants/globalTockens';
 import Notifications from '@/components/notifications';
-import { svgIcon } from '@/js/svg';
 
 export default {
   name: 'DashPanelBoard',
@@ -1001,6 +1001,7 @@ export default {
       edit_layout: mdiTableEdit,
       code_icon: mdiCodeTags,
       save_icon: mdiContentSave,
+      upload_icon: mdiCloudUpload,
       pencil: mdiPencil,
       play: mdiPlay,
       clock: mdiClockOutline,
@@ -1105,7 +1106,6 @@ export default {
       allGroups: [],
       tokens: [],
       loadSvg: false,
-      svgIcon,
     };
   },
   computed: {
@@ -1202,21 +1202,23 @@ export default {
     capture() {
       // получение всех подсобытий элемента на странице (события второго уровня )
       return ({ elem, action }) => {
-        if (this.dashFromStore && this.dashFromStore[elem]) {
-          let j = Object.keys(this.dashFromStore[elem].actions).find(
-            (key) => this.dashFromStore[elem].actions[key].name === action,
-          );
-          Object.keys(this.dashFromStore[elem].actions).forEach((item) => {
-            if (this.dashFromStore[elem].actions[item].name === action) {
-              j = item;
-            }
-          });
-          if (j) {
-            return this.dashFromStore[elem].actions[j].capture;
-          }
+        const result = new Set();
+        if (!this.dashFromStore || !this.dashFromStore[elem]) {
           return [];
         }
-        return [];
+        // add fields
+        const search = this.searches.find(({ id }) => id === this.dashFromStore[elem].search);
+        if (search?.schema) {
+          Object.keys(search.schema).forEach((field) => result.add(field));
+        }
+        // add captures
+        if (this.dashFromStore[elem]) {
+          const {
+            capture = [],
+          } = this.dashFromStore[elem].actions.find(({ name }) => name === action) || {};
+          capture.forEach((item) => result.add(item));
+        }
+        return [...result];
       };
     },
     blockToolStyle() {

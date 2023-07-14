@@ -227,7 +227,7 @@ class ElementCreator {
           try {
             this.createPort(createdNode, data.position, data.tag);
           } catch (e) {
-            throw new Error(e);
+            throw new Error(`ElementCreator: ${e}`);
           }
         });
       }
