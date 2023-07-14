@@ -40,6 +40,9 @@
               label="Значение"
               :filter="tagNameAutocompleteFilter"
               class="col-11 pb-0"
+              :menu-props="{
+                'z-index': 1000,
+              }"
             >
               <template v-slot:item="{ item, on }">
                 <v-list-item
@@ -175,6 +178,9 @@
               label="Данные для строки"
               :filter="tagNameAutocompleteFilter"
               class="col-11 pb-0"
+              :menu-props="{
+                'z-index': 1000,
+              }"
             >
               <template v-slot:item="{ item, on }">
                 <v-list-item
@@ -237,6 +243,9 @@
                   label="Значение"
                   :filter="tagNameAutocompleteFilter"
                   :class="dataObject.items.length > 1 ? 'col-10' : 'col-12'"
+                  :menu-props="{
+                    'z-index': 1000,
+                  }"
                 >
                   <template v-slot:item="{ item, on }">
                     <v-list-item
@@ -444,6 +453,9 @@
                 label="Значение"
                 :filter="tagNameAutocompleteFilter"
                 class="col-11"
+                :menu-props="{
+                  'z-index': 1000,
+                }"
               >
                 <template v-slot:item="{ item, on }">
                   <v-list-item
@@ -814,6 +826,9 @@
               item-value="id"
               item-text="label"
               label="Фигура"
+              :menu-props="{
+                'z-index': 1000,
+              }"
             />
           </div>
         </div>
@@ -1037,7 +1052,7 @@ export default {
 }
 
 .dash-constructor-schemes__data-panel-select {
-  min-width: 420px;
+  min-width: 220px;
   max-width: 420px;
 }
 </style>

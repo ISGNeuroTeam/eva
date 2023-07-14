@@ -79,7 +79,7 @@
             </div>
           </div>
         </div>
-        <div class="col">
+        <div class="col px-1">
           <div
             ref="svgContainer"
             class="svg-container"
@@ -539,7 +539,7 @@ export default {
       const width = svgContainer.offsetWidth - this.marginX * 2;
 
       this.xScale = d3.scaleLinear()
-        .range([35, width - 35])
+        .range([55, width - 55])
         .domain(d3.extent(xDomain));
 
       const padInner = 0.3;
