@@ -96,6 +96,13 @@ export default class WaterfallClass {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
+    if (this.data.length === 0) {
+      this.svg.append('text')
+        .attr('x', this.width / 2 - 45)
+        .attr('y', this.height / 2 - 20)
+        .text('Нет данных');
+    }
+
     this.createXAxis();
     this.createYAxis();
 

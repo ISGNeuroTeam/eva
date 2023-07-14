@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tokens: not all fields exist at the time of token editing
 - Constructor-schemes: Fixed Incorrect coordinates of copied items
 - Gauge: Text is cut off
+- Waterfall: Does not redraw in the absence of data
 
 ## [1.141.0]
 
