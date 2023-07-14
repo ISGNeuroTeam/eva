@@ -1,3 +1,20 @@
+# [1.142.0] - 2023-07-14
+
+### Added
+- Ability to upload file to the server
+- Constructor-schemes:
+  - Added auto-close feature when copying or pasting
+  - Clear data-panel on copy/paste
+
+### Fixed
+- CSV Download: Fixed floating columns issue
+- Tokens: Resolved missing fields during editing
+- Constructor-schemes: Fixed incorrect coordinates of copied items
+- Gauge: Resolved text truncation issue
+- Waterfall: Redraws properly when no data is available
+- RiskReview: Increased space for numerical values
+
+
 # [1.141.0] - 2023-07-06
 
 ### Added
