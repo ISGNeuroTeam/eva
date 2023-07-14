@@ -291,7 +291,7 @@ export default {
                     if (idDash === 'reports') {
                       resolve({ data: resolveData, shema, cid: result.cid });
                     } else {
-                      resolve(resolveData);
+                      resolve({ data: resolveData, schema: shema });
                     }
                   } else {
                     restAuth.putLog(
