@@ -148,7 +148,10 @@ export default {
       this.downloadModal = false;
     },
     exportDataXlsx() {
-      const workSheet = utils.json_to_sheet(this.dataObject[this.searchId].data);
+      const { data = [], schema = {} } = this.dataObject[this.searchId];
+      const workSheet = utils.json_to_sheet(data, {
+        header: Object.keys(schema),
+      });
       const wb = utils.book_new();
       utils.book_append_sheet(wb, workSheet, 'data');
       writeFile(wb, `${this.idDash}-${this.searchId}.xlsx`);

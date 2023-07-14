@@ -662,19 +662,22 @@ export default {
       return this.searches.find((search) => search?.id === searchId)?.id || '';
     },
     exportDataCSV(searchName) {
-      const searchData = this.dataObject[searchName].data;
+      const {
+        schema = {},
+        data = [],
+      } = this.dataObject[searchName];
       // задаем кодировку csv файла
       let csvContent = 'data:text/csv;charset=utf-8,';
 
-      if (searchData.length) {
-        // получаем ключи для заголовков столбцов
-        const keys = Object.keys(searchData[0]);
-        // добавляем ключи в файл
-        csvContent += encodeURIComponent(`${keys.join(',')}\n`);
+      if (data.length) {
+        const fields = Object.keys(schema);
+        csvContent += encodeURIComponent(`${fields.map((field) => `"${field}"`).join(',')}\n`);
+        csvContent += encodeURIComponent(
+          data
+            .map((item) => fields.map((field) => `"${item[field] || ''}"`).join(','))
+            .join('\n'),
+        );
       }
-      csvContent += encodeURIComponent(
-        searchData.map((item) => Object.values(item).join(',')).join('\n'),
-      );
 
       // создаем ссылку
       const link = document.createElement('a');

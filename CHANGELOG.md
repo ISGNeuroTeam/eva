@@ -9,10 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Ability to upload a file to the server
+- Constructor-schemes: Added auto-close and clear data-panel on copy\paste
 
 ### Changed
 
 ### Fixed
+- When downloading the result in csv, the columns may float
+- Tokens: not all fields exist at the time of token editing
+- Constructor-schemes: Fixed Incorrect coordinates of copied items
+- Gauge: Text is cut off
+- Waterfall: Does not redraw in the absence of data
 
 ## [1.141.0]
 
