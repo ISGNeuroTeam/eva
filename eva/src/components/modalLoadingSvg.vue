@@ -14,6 +14,7 @@
         <v-radio-group
           v-model="uploadType"
           :color="theme.$primary_button"
+          @change="file = null"
         >
           <v-radio
             v-for="option in uploadTypes"
@@ -29,7 +30,6 @@
           :color="theme.$main_text"
           :style="{ color: theme.$main_text }"
           :rules="[
-            // value => !value || value.size < 1000000 || 'Размер должен быть меньше 1 МБ!',
             value => !value || (!fileType || value.type === fileType) || 'Недопустимый формат!',
           ]"
           :accept="fileType"
@@ -49,7 +49,7 @@
           small
           :color="theme.$primary_button"
           class="b-loading-svg__button"
-          :disabled="!file || (fileType && file.type !== fileType) || disabled"
+          :disabled="!file || (fileType && file.type !== fileType) || disabled || fileLoading"
           :loading="fileLoading"
           @click="loadFile"
         >
@@ -68,7 +68,7 @@
     <modal-confirm
       v-model="modalValue"
       :theme="theme"
-      :modal-text="`Есть несохраненные данные, сохранить?`"
+      :modal-text="`Есть неотправленные данные, отправить?`"
       btn-confirm-text="Да"
       btn-cancel-text="Нет"
       @result="confirm($event)"
@@ -122,7 +122,8 @@ export default {
   },
   methods: {
     cancelModal() {
-      if (this.file) {
+      const { file, fileType } = this;
+      if (this.file && (!fileType || file.type === fileType)) {
         this.modalValue = true;
       } else {
         this.$emit('updateModalValue', false);
@@ -142,9 +143,9 @@ export default {
       this.color = '';
       this.message = '';
       if (res.status === 'ok' && res?.notifications) {
+        this.file = null;
         this.$store.commit('notify/addNotifications', res.notifications);
         setTimeout(() => {
-          this.file = null;
           this.$emit('updateModalValue', false);
         }, 1000);
       } else {
