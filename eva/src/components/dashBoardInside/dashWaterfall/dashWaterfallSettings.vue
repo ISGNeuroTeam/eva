@@ -417,7 +417,7 @@ export default {
           this.options[param] = this.receivedSettings[param];
         }
       });
-      if (this.receivedSettings.barsOptions.length > 0) {
+      if (this.receivedSettings?.barsOptions?.length > 0) {
         if (this.receivedSettings.isGrouped) {
           this.barsOptions = this.barsOptions.map((el) => ({
             ...el,
