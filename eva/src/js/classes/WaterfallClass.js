@@ -42,6 +42,10 @@ export default class WaterfallClass {
     this.height = height;
   }
 
+  get margin() {
+    return this.margin;
+  }
+
   set data(list) {
     this.dataSet = list.reduce((acc, item, idx) => {
       item.value = +item.value;
@@ -72,6 +76,37 @@ export default class WaterfallClass {
     return this.dataSet;
   }
 
+  get groupedData() {
+    if (this.data?.length === 0) {
+      return [];
+    }
+    const groupedData = [];
+
+    const group = {
+      title: this.data[0].title,
+      nextChildrenLength: null,
+      children: [this.data[0]],
+    };
+    // eslint-disable-next-line no-restricted-syntax
+    for (let i = 1; i < this.data.length; i += 1) {
+      const { title } = this.data[i];
+      if (group.title === title) {
+        group.children.push(this.data[i]);
+      } else {
+        groupedData.push(structuredClone(group));
+        group.title = title;
+        if (groupedData[groupedData.length - 2]) {
+          groupedData[groupedData.length - 2].nextChildrenLength = group.children.length;
+        }
+        group.children = [this.data[i]];
+      }
+    }
+    groupedData[groupedData.length - 1].nextChildrenLength = group.children.length;
+    group.nextChildrenLength = null;
+    groupedData.push(group);
+    return groupedData;
+  }
+
   update(data) {
     this.data = data;
     this.render();
@@ -86,9 +121,8 @@ export default class WaterfallClass {
     if (!rerender) {
       this.svg.remove();
     }
-    const { margin, padding, options } = this;
+    const { margin } = this;
     const { width, height } = this;
-    const { numberFormat = false } = this.options;
 
     this.svg = d3.select(this.svgContainer)
       .attr('width', width)
@@ -118,100 +152,29 @@ export default class WaterfallClass {
     this.createYAxis();
     this.createZeroLine();
 
-    // add bar group
-    const barGroup = this.svg.selectAll('.bar')
-      .data(this.data)
-      .enter().append('g')
+    // add bar group=
+    const barGroups = this.svg.selectAll('.bar')
+      .data(this.groupedData)
+      .enter()
+      .append('g')
       .attr('class', 'bar')
       .attr('transform', (d) => `translate(${this.x(d.title)},0)`)
+    // TODO: Накинуть на элемент группы
       .on('click', (d) => this.onClick(d));
-
-    // add red/green bars
-    barGroup.filter((d) => !d.isTotal).append('rect')
-      .attr('y', (d) => this.y(d.value < 0 ? d.total - d.value : d.total))
-      .attr('height', (d) => this.y(0) - this.y(Math.abs(d.value)))
-      .attr('width', this.x.bandwidth())
-      .attr('fill', ({ title: barTitle, value, color }) => {
-        if (color) {
-          return color;
-        }
-        if (this.options.barsOptions.length) {
-          const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
-          if (opts?.changeColor) {
-            return opts.color;
-          }
-        }
-        return value < 0 ? options.colorBarNegative : options.colorBarPositive;
-      });
-
-    // add total bars
-    barGroup.filter((d) => d.isTotal).append('rect')
-      .attr('y', (d) => (d.total < 0 ? this.y(0) : this.y(d.total)))
-      .attr('height', (d) => this.y(0) - this.y(Math.abs(d.total)))
-      .attr('width', this.x.bandwidth())
-      .attr('fill', ({ title: barTitle, color }) => {
-        if (color) {
-          return color;
-        }
-        if (this.options.barsOptions.length) {
-          const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
-          if (opts?.changeColor) {
-            return opts.color;
-          }
-        }
-        return options.colorBarTotal;
-      });
-
-    barGroup.append('text')
-      .attr('x', this.x.bandwidth() / 2)
-      .attr('y', (d) => this.y(d.total) + 5)
-      .attr('dy', (d) => `${(d.isTotal ? (d.total < 0) : d.value < 0) ? '-' : ''}.75em`)
-      .attr('font-size', '13')
-      .attr('text-anchor', 'middle')
-      .attr('fill', options.colorText)
-      .text((d) => (d.isTotal ? d.total : d.value).toLocaleString(numberFormat));
-
-    barGroup.append('line').filter((d, idx) => idx !== this.data.length - 1)
-      .attr('class', 'connector')
-      .attr('x1', this.x.bandwidth() + 2)
-      .attr('y1', (d) => this.y(d.total))
-      .attr('x2', this.x.bandwidth() / (1 - padding) - 4)
-      .attr('y2', (d) => this.y(d.total))
-      .attr('stroke', options.colorBarTotal)
-      .attr('stroke-dasharray', '0 2 0');
-
-    if (this.data.filter((d) => d.comment).length) {
-      this.renderComments(barGroup);
-
-      // check comment cropped
-      const { y: yCtn, height: heightCtn } = this.svg.select('g.yAxis path.domain').node().getBBox();
-      this.innerVertOffset = this.svg.selectAll('rect.comment').nodes()
-        .map((el) => {
-          // eslint-disable-next-line no-shadow
-          const { y, height } = el.getBBox();
-          return [y - yCtn, heightCtn - (y + height)];
-        })
-        .reduce((acc, [top, bottom]) => {
-          if (top < acc[0]) acc[0] = top;
-          if (bottom < acc[1]) acc[1] = bottom;
-          return acc;
-        }, [0, 0])
-        .map((val) => 0 - val.toFixed(0));
-
-      if (this.innerVertOffset.join() !== '0,0' && rerender) {
-        this.innerVertOffset[1] += 10;
-        this.createChart(false);
-        this.innerVertOffset = [0, 0];
-      }
+    this.createDefaultBars(barGroups, rerender);
+    if (this.options.groupedBorder) {
+      this.createGroupRect(barGroups);
     }
   }
 
-  renderComments(barGroup) {
+  renderComments() {
     const { options } = this;
     const textVertOffset = 5;
-    const textAreaLeftOffset = this.x.bandwidth() * 0.1;
-    const bandwidth1 = 1.3;
-    const bandwidth2 = 2.3;
+    // eslint-disable-next-line max-len
+    const textAreaLeftOffset = (this.x.bandwidth() * 0.1) + (this.x.bandwidth() * (this.padding / 2));
+    const lineLeftOffset = textAreaLeftOffset - (textAreaLeftOffset * this.padding);
+    const bandwidth1 = 1;
+    const bandwidth2 = 1.8;
     const dataWithComments = this.data.filter((d) => d.comment);
     const barCommentParams = dataWithComments.map((d, idx) => {
       if (d.comment) {
@@ -242,7 +205,9 @@ export default class WaterfallClass {
     const getForTwoColumns = (idx) => barCommentParams[idx].width > this.x.bandwidth() * 1.2
       && idx + 1 !== barCommentParams.length;
 
-    barGroup.filter((d) => d.comment).append('rect')
+    this.svg.selectAll('.group-item')
+      .filter((d) => d.comment)
+      .append('rect')
       .attr('class', 'comment')
       .attr('x', 0)
       .attr('y', (d, idx) => {
@@ -268,10 +233,11 @@ export default class WaterfallClass {
         const opts = this.options.barsOptions.find(({ title }) => (title === d.title));
         return !opts?.hideComment ? barCommentParams[idx].height : 0;
       })
-      // .attr('fill', '#fff3')
       .attr('fill', 'transparent');
 
-    barGroup.filter((d) => d.comment).append('foreignObject')
+    this.svg.selectAll('.group-item')
+      .filter((d) => d.comment)
+      .append('foreignObject')
       .attr('x', textAreaLeftOffset)
       .attr('y', (d, idx) => {
         const { _next } = d;
@@ -330,10 +296,12 @@ export default class WaterfallClass {
           });
       });
 
-    barGroup.filter((d) => d.comment).append('line')
+    this.svg.selectAll('.group-item')
+      .filter((d) => d.comment)
+      .append('line')
       .attr('class', 'vertical')
-      .attr('x1', 1)
-      .attr('x2', 1)
+      .attr('x1', () => lineLeftOffset)
+      .attr('x2', () => lineLeftOffset)
       .attr('y2', (d, idx) => {
         const { _next } = d;
         const points = [d.lastTotal, d.total];
@@ -407,9 +375,9 @@ export default class WaterfallClass {
     const xWidth = this.width - this.margin.left - this.margin.right;
 
     this.x = d3.scaleBand()
-      .domain(this.data.map((d) => d.title))
+      .domain(this.groupedData.map((d) => d.title))
       .range([0, xWidth])
-      .padding(this.padding)
+      .paddingOuter(this.padding)
       .round(true);
 
     this.xAxis = this.svg
@@ -490,6 +458,168 @@ export default class WaterfallClass {
     }
   }
 
+  createGroupRect(barGroups) {
+    barGroups
+      .append('rect')
+      .attr('stroke', (d) => (d.children.length > 1 ? 'currentColor' : 'transparent'))
+      .attr('stroke-width', 1)
+      .attr('stroke-dasharray', '1 4 0')
+      .attr('width', this.x.bandwidth() - (this.x.bandwidth() * (this.padding / 5)))
+      .attr('transform', `translate(${this.x.bandwidth() * (this.padding / 10)},0)`)
+      .attr('fill', 'transparent')
+      .attr('height', this.y.range()[0]);
+  }
+
+  createDefaultBars(barGroups, rerender) {
+    // add all bars
+    this.createBars(barGroups);
+
+    this.createBarLabels(barGroups);
+    //
+    this.createBarLines(barGroups);
+    //
+    const isGrouped = this.groupedData.some((d) => d.children.length > 1);
+    if (this.data.filter((d) => d.comment).length && !isGrouped) {
+      this.renderComments(barGroups);
+
+      // check comment cropped
+      const { y: yCtn, height: heightCtn } = this.svg.select('g.yAxis path.domain').node().getBBox();
+      this.innerVertOffset = this.svg.selectAll('rect.comment').nodes()
+        .map((el) => {
+          // eslint-disable-next-line no-shadow
+          const { y, height } = el.getBBox();
+          return [y - yCtn, heightCtn - (y + height)];
+        })
+        .reduce((acc, [top, bottom]) => {
+          if (top < acc[0]) acc[0] = top;
+          if (bottom < acc[1]) acc[1] = bottom;
+          return acc;
+        }, [0, 0])
+        .map((val) => 0 - val.toFixed(0));
+
+      if (this.innerVertOffset.join() !== '0,0' && rerender) {
+        this.innerVertOffset[1] += 10;
+        this.createChart(false);
+        this.innerVertOffset = [0, 0];
+      }
+    }
+  }
+
+  createBars(barGroups) {
+    barGroups.selectAll('g')
+      .data((d) => {
+        const children = [];
+        for (let i = 0; i < d.children.length; i += 1) {
+          children.push({
+            ...d.children[i],
+            childrenIndex: i,
+            nextChildrenLength: d.nextChildrenLength,
+            childrenCount: d.children.length,
+          });
+        }
+        return children;
+      })
+      .enter()
+      .append('g')
+      .attr('class', 'group-item')
+      .append('rect')
+      .attr('y', (d) => {
+        if (d.isTotal) {
+          return d.total < 0 ? this.y(0) : this.y(d.total);
+        }
+        return this.y(d.value < 0 ? d.total - d.value : d.total);
+      })
+      .attr('x', (d) => {
+        const padding = ((this.x.bandwidth() / d.childrenCount) * this.padding);
+        return (this.x.bandwidth() / d.childrenCount) * d.childrenIndex + (padding / 2);
+      })
+      .attr('height', (d) => {
+        const height = this.y(0) - this.y(Math.abs(d.isTotal ? d.total : d.value));
+        if (height === 0) {
+          return 1;
+        }
+        return height;
+      })
+      .attr('width', (d) => this.x.bandwidth() / d.childrenCount - ((this.x.bandwidth() / d.childrenCount) * this.padding))
+      .attr('fill', ({
+        title: barTitle, value, color, isTotal,
+      }) => {
+        if (color) {
+          return color;
+        }
+        if (this.options.barsOptions.length) {
+          const opts = this.options.barsOptions.find(({ title }) => (title === barTitle));
+          if (opts?.changeColor) {
+            return opts.color;
+          }
+        }
+        if (isTotal) {
+          return this.options.colorBarTotal;
+        }
+        return value < 0 ? this.options.colorBarNegative : this.options.colorBarPositive;
+      });
+  }
+
+  createBarLabels(barGroup) {
+    barGroup
+      .selectAll('.group-item')
+      .append('text')
+      .attr('x', (d) => {
+        const xPos = this.x.bandwidth() / d.childrenCount;
+        return d.childrenIndex > 0 ? xPos * (d.childrenIndex + 1) - (xPos / 2) : xPos / 2;
+      })
+      .attr('y', (d) => this.y(d.total) + 5)
+      .attr('dy', (d) => `${(d.isTotal ? (d.total < 0) : d.value < 0) ? '-' : ''}.75em`)
+      .attr('font-size', '13')
+      .attr('text-anchor', 'middle')
+      .attr('fill', this.options.colorText)
+      .text((d) => (d.isTotal ? d.total : d.value)
+        .toLocaleString(this.options.numberFormat || false));
+  }
+
+  createBarLines() {
+    this.svg.selectAll('.group-item')
+      .append('line')
+      .filter((d, idx) => idx !== this.data.length - 1)
+      .attr('class', 'connector')
+      .attr('x1', (d) => {
+        const elWidth = this.getElWidth(d);
+        const padding = this.getElPadding(d);
+        return elWidth + (elWidth * d.childrenIndex) - (padding / 2);
+      })
+      .attr('y1', (d) => this.y(d.total))
+      .attr('x2', (d) => {
+        const elWidth = this.getElWidth(d);
+        const padding = this.getElPadding(d);
+        const xPos = (elWidth + (elWidth * d.childrenIndex));
+        const nextInGroup = d.nextChildrenLength && d.nextChildrenLength > 1;
+        const currentInGroup = d.childrenCount > 1;
+        const currentLast = !((d.childrenIndex + 1) < d.childrenCount);
+        if (nextInGroup && currentInGroup && !currentLast) {
+          return xPos + (padding / d.childrenCount);
+        }
+        if (nextInGroup && currentInGroup && currentLast) {
+          return xPos + (padding / d.nextChildrenLength);
+        }
+        if (nextInGroup && !currentInGroup) {
+          return xPos + (padding / (d.nextChildrenLength * 2));
+        }
+        if (!nextInGroup && !currentLast && currentInGroup) {
+          return xPos + (padding / d.childrenCount);
+        }
+        if (!nextInGroup && currentLast && currentInGroup) {
+          return xPos + padding;
+        }
+        if (!nextInGroup && !currentInGroup) {
+          return xPos + padding / 2;
+        }
+        return 0;
+      })
+      .attr('y2', (d) => this.y(d.total))
+      .attr('stroke', this.options.colorBarTotal)
+      .attr('stroke-dasharray', '0 2 0');
+  }
+
   createZeroLine() {
     const xWidth = this.width - this.margin.left - this.margin.right;
     const lines = [
@@ -507,5 +637,13 @@ export default class WaterfallClass {
       .attr('x2', xWidth)
       .attr('y2', this.y(0))
       .attr('stroke', 'currentColor');
+  }
+
+  getElWidth(d) {
+    return this.x.bandwidth() / d.childrenCount;
+  }
+
+  getElPadding(d) {
+    return ((this.x.bandwidth() / d.childrenCount) * this.padding);
   }
 }
