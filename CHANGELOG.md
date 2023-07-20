@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.143.0]
+
+### Added
+- Waterfall: Added legend
+- Waterfall: Added grouping bars
+
 ## [1.142.0]
 
 ### Added

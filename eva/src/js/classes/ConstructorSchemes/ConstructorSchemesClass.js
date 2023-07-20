@@ -1089,7 +1089,7 @@ class ConstructorSchemesClass {
     let maxY = selectedElements[0].layout.y;
     // eslint-disable-next-line no-restricted-syntax
     for (const item of selectedElements) {
-      if (item instanceof INode) {
+      if (item instanceof INode && item.tag.dataType !== 'invisible') {
         if (minX > item.layout.x) minX = item.layout.x;
         if (minY > item.layout.y) minY = item.layout.y;
         if (maxX < item.layout.maxX) maxX = item.layout.maxX;
@@ -1108,7 +1108,7 @@ class ConstructorSchemesClass {
     const offset = this.getOffsetSelectedElements();
     return this.graphComponent.selection.toArray().map((el) => {
       // TODO: Пока сделано только для узлов
-      if (el instanceof INode) {
+      if (el instanceof INode && el.tag.dataType !== 'invisible') {
         const xPos = el.layout.x + (el.layout.width / 2);
         const yPos = el.layout.y + (el.layout.height / 2);
         const node = {

@@ -15,10 +15,38 @@
       >
         {{ icons.mdiSettings }}
       </v-icon>
+      <div
+        v-if="chartOptions.showLegend && legend"
+        ref="legend"
+        class="waterfall-legend pl-4"
+        :style="{
+          'margin-left': `${marginWaterfall.left}px`,
+        }"
+      >
+        <div
+          v-for="({ color }, title) in legend"
+          :key="title"
+          class="waterfall-legend__item"
+        >
+          <div
+            class="waterfall-legend__color"
+            :style="{
+              'background-color': color,
+            }"
+          />
+          <div class="waterfall-legend__title">
+            {{ title }}
+          </div>
+        </div>
+      </div>
       <svg ref="waterfall" />
       <DashWaterfallSettings
         v-model="isSettingsComponentOpen"
-        :received-settings="chartOptions"
+        :received-settings="{
+          ...chartOptions,
+          isLegend,
+          isGrouped,
+        }"
         @save="saveSettings"
         @close="closeSettings"
       />
@@ -70,6 +98,12 @@ export default {
   data() {
     return {
       isSettingsComponentOpen: false,
+      marginWaterfall: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      },
     };
   },
   computed: {
@@ -107,6 +141,57 @@ export default {
         titles: this.dataRestFrom.map((row) => row.title),
       };
     },
+    legend() {
+      const { barsOptions } = this.chartOptions;
+      const result = {};
+      // eslint-disable-next-line no-restricted-syntax
+      for (const el of this.dataRestFrom) {
+        let color = '';
+        // Легенда указана в настройках
+        if (el?.legend) {
+          // Элемент еще не добавлен
+          if (!result[el.legend]) {
+            // Цвет указан в OTL
+            if (el?.color) {
+              color = el?.color;
+            }
+            if (barsOptions?.length > 0 && !color) {
+              const colorFromOptions = barsOptions.find((opt) => opt.title === el.title);
+              // Настрйока указана для текущего
+              if (colorFromOptions) {
+                color = colorFromOptions.color;
+              }
+            }
+            if (!color) {
+              if (el.isTotal) {
+                color = this.chartOptions.colorBarTotal;
+              } else {
+                color = el.value < 0
+                  ? this.chartOptions.colorBarNegative
+                  : this.chartOptions.colorBarPositive;
+              }
+            }
+            result[el.legend] = {
+              color,
+            };
+          }
+        }
+      }
+      return Object.keys(result)?.length > 0 ? result : null;
+    },
+    isLegend() {
+      return this.dataRestFrom.some((el) => el?.legend);
+    },
+    isGrouped() {
+      if (this.dataRestFrom?.length === 0) {
+        return false;
+      }
+      const titles = this.dataRestFrom.map((el) => el.title);
+      if (titles?.length === 0) {
+        return false;
+      }
+      return [...new Set(titles)]?.length !== titles?.length;
+    },
   },
   watch: {
     box(val, old) {
@@ -123,8 +208,14 @@ export default {
     fullScreenMode() {
       this.$nextTick().then(() => {
         this.chart.moveInNewContainer(this.$refs.waterfall);
-        this.chart.setSize(this.box.width, this.box.height);
-        this.chart.render();
+        this.resize();
+      });
+    },
+    legend() {
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          this.resize();
+        });
       });
     },
   },
@@ -132,6 +223,7 @@ export default {
     this.initWaterfall();
     this.loadData(this.dataRestFrom);
     this.setActions(this.dataRestFrom);
+    this.resize();
   },
   methods: {
     initWaterfall() {
@@ -140,6 +232,7 @@ export default {
       }
       const { width, height } = this.box;
       this.chart = new WaterfallClass(this.$refs.waterfall, width, height, this.chartOptions);
+      this.marginWaterfall = this.chart.margin;
       this.chart.onClick = (row) => {
         this.tokensStore
           .filter(({ elem, action }) => (elem === this.idFrom && action === 'click'))
@@ -153,9 +246,10 @@ export default {
       };
     },
     resize() {
+      const legendSize = this.$refs.legend ? this.$refs.legend.offsetHeight : 0;
       // из за специфической работы фулскрина
       setTimeout(() => {
-        this.chart.setSize(this.box.width, this.box.height);
+        this.chart.setSize(this.box.width, this.box.height - legendSize);
         this.chart.render();
       }, 10);
     },
@@ -204,6 +298,31 @@ export default {
   svg {
     margin: 0 2px;
     fill: var(--main_text);
+  }
+  .waterfall-legend {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    &__item {
+      display: flex;
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+    }
+    &__color {
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--main_border);
+    }
+    &__title {
+      color: var(--main_text);
+      font-size: 14px;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
   }
 }
 </style>
