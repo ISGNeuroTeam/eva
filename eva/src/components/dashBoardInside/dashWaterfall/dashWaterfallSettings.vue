@@ -16,6 +16,34 @@
         <span class="main-title">Настройка визуализации</span>
       </v-card-title>
       <v-card-text class="content groups-multiline-settings">
+        <v-row v-if="receivedSettings.isLegend">
+          <v-col cols="6">
+            <h3 class="mt-4">
+              Отображать легенду:
+            </h3>
+          </v-col>
+          <v-col cols="6">
+            <v-switch
+              v-model="options.showLegend"
+              hide-details
+              @change="isChanged = true"
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="6">
+            <h3 class="mt-4">
+              Рамка групп:
+            </h3>
+          </v-col>
+          <v-col cols="6">
+            <v-switch
+              v-model="options.groupedBorder"
+              hide-details
+              @change="isChanged = true"
+            />
+          </v-col>
+        </v-row>
         <v-row>
           <v-col cols="6 pr-0">
             <h3 class="mt-4">
@@ -213,6 +241,7 @@
                 label="Скрыть комментарий"
                 persistent-placeholder
                 dense
+                :disabled="receivedSettings.isGrouped"
                 outlined
                 hide-details
                 color="blue"
@@ -325,6 +354,8 @@ export default {
       colorBarNegative: '#dd0000',
       colorBarTotal: '#999999',
       xLabelRotate: true,
+      showLegend: false,
+      groupedBorder: false,
     },
     titles: [],
     barsOptions: [],
@@ -386,6 +417,14 @@ export default {
           this.options[param] = this.receivedSettings[param];
         }
       });
+      if (this.receivedSettings.barsOptions.length > 0) {
+        if (this.receivedSettings.isGrouped) {
+          this.barsOptions = this.barsOptions.map((el) => ({
+            ...el,
+            hideComment: true,
+          }));
+        }
+      }
     },
 
     close() {
@@ -397,7 +436,7 @@ export default {
         title: '',
         newTitle: '',
         changeColor: false,
-        hideComment: false,
+        hideComment: !!this.receivedSettings.isGrouped,
         color: '#FF0000',
       });
     },
