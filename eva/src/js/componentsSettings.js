@@ -117,15 +117,18 @@ export default {
       type: 'waterfall',
       dataSourceDescription:
         '#### Обязательные поля:\n'
-        + '- ```title``` - Название столбца, строка\n'
+        + '- ```title``` - Название столбца(так же используется для группировки), строка\n'
         + '- ```value``` - Значение столбца, число\n'
         + '#### Дополнительные поля:\n'
         + '- ```isTotal``` - Отобразить столбик суммы, булевый\n'
+        + '- ```color``` - Цвет столбца, строка\n'
+        + '- ```legend``` - Легенда, строка\n'
+        + '- ```comment``` - Комментарий, строка\n'
         + '#### Пример данных:\n'
-        + '| title | value | isTotal | comment |\n'
-        + '| :--- | :---: | :---: | ---: |\n'
-        + '| Total 1 | 182527 | True | text |\n'
-        + '| Cost of Revenue | -84732 | | text html |\n'
+        + '| title | value | isTotal | comment | color | legend |\n'
+        + '| :--- | :---: | :---: | ---: | ---: | ---: |\n'
+        + '| Total 1 | 182527 | True | text | #000000 | text |\n'
+        + '| Cost of Revenue | -84732 | | text html | red | text 2 |\n'
         + '| Operating Expenses | -56571 | | |\n'
         + '| Total 2 | | True | |\n',
     },

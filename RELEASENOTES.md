@@ -1,3 +1,10 @@
+# [1.143.0] - 2023-07-20
+
+### Added
+- Waterfall:
+  - Added legend
+  - Added grouping bars
+
 # [1.142.0] - 2023-07-14
 
 ### Added
