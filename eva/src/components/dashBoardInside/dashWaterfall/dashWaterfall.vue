@@ -155,7 +155,7 @@ export default {
             if (el?.color) {
               color = el?.color;
             }
-            if (barsOptions.length > 0 && !color) {
+            if (barsOptions?.length > 0 && !color) {
               const colorFromOptions = barsOptions.find((opt) => opt.title === el.title);
               // Настрйока указана для текущего
               if (colorFromOptions) {
@@ -183,8 +183,14 @@ export default {
       return this.dataRestFrom.some((el) => el?.legend);
     },
     isGrouped() {
+      if (this.dataRestFrom?.length === 0) {
+        return false;
+      }
       const titles = this.dataRestFrom.map((el) => el.title);
-      return [...new Set(titles)].length !== titles.length;
+      if (titles?.length === 0) {
+        return false;
+      }
+      return [...new Set(titles)]?.length !== titles?.length;
     },
   },
   watch: {
