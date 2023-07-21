@@ -116,18 +116,21 @@ export default {
     height() {
       return this.sizeFrom.height - 59;
     },
-    dashFromStore() {
+    visualisationFromStore() {
       return this.$store.state[this.idDash][this.id];
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDash];
     },
     getOptions() {
       if (!this.idDash) {
         return [];
       }
-      if (!this.dashFromStore.options) {
+      if (!this.visualisationFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
       }
 
-      return this.dashFromStore.options;
+      return this.visualisationFromStore.options;
     },
     fontSize() {
       const { fontSize } = this.getOptions;
@@ -316,7 +319,7 @@ export default {
               idDash: this.idDash,
             });
           } else if (item.action === 'go') {
-            this.$store.commit('letEventGo', {
+            this.$store.dispatch('letEventGo', {
               event: item,
               idDash: this.idDash,
               route: this.$router,
@@ -333,27 +336,48 @@ export default {
           } else if (
             item.action.toLowerCase() === 'changeReport'.toLowerCase()
           ) {
-            // если экшен open
+            // если экшен changeReport
             this.createReport(item, 'report');
           } else if (
             item.action.toLowerCase() === 'exportSearch'.toLowerCase()
           ) {
-            // если экшен open
+            // если экшен exportSearch
             this.exportSearch(item, 'search');
+          } else if (item.action.toLowerCase() === 'download') {
+            this.downloadEvent(item);
           }
         });
       }
     },
-    downloadFile(fileLink) {
-      const namefile = fileLink.split('/')[2];
-      const url = `${window.location.protocol}//${window.location.host}/${fileLink}`;
-      const link = this.$refs.buttonEl.parentElement.appendChild(
+    downloadEvent({ searchName }) {
+      const targetSearch = Object.values(this.dashFromStore.searches)
+        .find((search) => searchName === search.sid);
+      this.$store.dispatch('letEventDownload', {
+        search: targetSearch,
+        idDash: this.idDash,
+      }).then((response) => {
+        if (response?.data?.length > 0) {
+          if (response.data[0]?.path_to_file) {
+            this.downloadFile(response.data[0]?.path_to_file);
+          } else {
+            console.error('Отсутсвует поле: path_to_file');
+          }
+        } else {
+          console.error('Нет данных');
+        }
+      });
+    },
+    downloadFile(link) {
+      const namefile = link.split('/')[link.split('/').length - 2];
+      const fileLink = link[0] === '/' ? link.substring(1) : link;
+      const url = `${process.env.VUE_APP_PROXY}/${fileLink}`;
+      const el = this.$refs.buttonEl.parentElement.appendChild(
         document.createElement('a'),
       ); // создаем ссылку
-      link.setAttribute('href', url); // указываем ссылке что надо скачать наш файл csv
-      link.setAttribute('download', namefile); // указываем имя файла
-      link.click(); // жмем на скачку
-      link.remove(); // удаляем ссылку
+      el.setAttribute('href', url); // указываем ссылке что надо скачать наш файл csv
+      el.setAttribute('download', namefile); // указываем имя файла
+      el.click(); // жмем на скачку
+      el.remove(); // удаляем ссылку
     },
     getSearch(search, sid) {
       let csvContent = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,'; // задаем кодировку csv файла
