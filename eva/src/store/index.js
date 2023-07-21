@@ -72,10 +72,10 @@ export default new Vuex.Store({
     },
     removePreloadTokens(state, id) {
       Vue.set(state, 'preloadTokens', []);
-      /*const idx = state.preloadTokens.findIndex((item) => item.id === id);
+      /* const idx = state.preloadTokens.findIndex((item) => item.id === id);
       if (idx > -1) {
         state.preloadTokens.splice(idx, 1);
-      }*/
+      } */
     },
     setTokens(state, { id, tokens }) {
       state[id].tockens?.forEach((token) => {
@@ -2127,6 +2127,19 @@ export default new Vuex.Store({
           });
         });
       }
+    },
+
+    letEventDownload: async ({ state, commit, dispatch }, props) => {
+      commit('updateSearchStatus', {
+        idDash: props.idDash,
+        sid: props.search.sid,
+        status: 'empty',
+      });
+
+      return dispatch('getDataApi', {
+        search: props.search,
+        idDash: props.idDash,
+      });
     },
 
     setLoadingSvg(context, param) {
