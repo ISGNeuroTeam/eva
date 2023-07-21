@@ -8,10 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Button: Added event "click(visualisation-id, download(sid))"
 
 ### Changed
 
 ### Fixed
+- Waterfall: Fixed resize after change tab
 
 ## [1.143.0]
 
