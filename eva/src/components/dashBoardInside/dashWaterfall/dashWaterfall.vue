@@ -246,12 +246,13 @@ export default {
       };
     },
     resize() {
-      const legendSize = this.$refs.legend ? this.$refs.legend.offsetHeight : 0;
-      // из за специфической работы фулскрина
-      setTimeout(() => {
-        this.chart.setSize(this.box.width, this.box.height - legendSize);
-        this.chart.render();
-      }, 10);
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          const legendSize = this.$refs.legend ? this.$refs.legend.offsetHeight : 0;
+          this.chart.setSize(this.box.width, this.box.height - legendSize);
+          this.chart.render();
+        });
+      });
     },
     saveOptions(options) {
       this.$store.commit('setOptions', {
