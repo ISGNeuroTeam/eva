@@ -1,9 +1,10 @@
-# [1.143.0] - 2023-07-20
+# [1.144.0] - 2023-07-20
 
 ### Added
-- Waterfall:
-  - Added legend
-  - Added grouping bars
+- Button: Added event "click(visualisation-id, download(sid))"
+
+### Fixed
+- Waterfall: Fixed resize after change tab
 
 # [1.142.0] - 2023-07-14
 
