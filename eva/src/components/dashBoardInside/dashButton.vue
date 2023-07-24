@@ -5,13 +5,18 @@
   >
     <div
       v-if="optionsData.onButton || getOptions.onButtonToken"
-      :style="customStyle"
+      :style="{
+        ...customStyle,
+        height: `${height}px`,
+      }"
       :class="customClass"
       class="dash-button"
       v-bind="$attrs"
     >
       <v-btn
         class="name"
+        :disabled="eventLoading"
+        :loading="eventLoading"
         :class="{ textDecoration: underline }"
         :style="{
           color: optionsData.colorText || theme.$main_text,
@@ -29,12 +34,18 @@
       v-else
       ref="buttonEl"
       class="dash-button"
+      :class="{
+        'button-disabled': eventLoading,
+        'button-loading': eventLoading,
+      }"
       style="padding: 0"
       @click="setClick"
     >
       <div
         class="name d-flex align-center justify-center"
-        :class="{ textDecoration: underline }"
+        :class="{
+          textDecoration: underline,
+        }"
         :style="{
           color: optionsData.colorText || theme.$main_text,
           height: `${height}px`,
@@ -96,6 +107,7 @@ export default {
         colorText: '',
         onButton: false,
       },
+      eventLoading: false,
       underline: false,
     };
   },
@@ -114,20 +126,23 @@ export default {
       return this.$store.getters.getTheme;
     },
     height() {
-      return this.sizeFrom.height - 59;
+      return this.sizeFrom.height - 36;
+    },
+    visualisationFromStore() {
+      return this.$store.state[this.idDash][this.id];
     },
     dashFromStore() {
-      return this.$store.state[this.idDash][this.id];
+      return this.$store.state[this.idDash];
     },
     getOptions() {
       if (!this.idDash) {
         return [];
       }
-      if (!this.dashFromStore.options) {
+      if (!this.visualisationFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
       }
 
-      return this.dashFromStore.options;
+      return this.visualisationFromStore.options;
     },
     fontSize() {
       const { fontSize } = this.getOptions;
@@ -316,7 +331,7 @@ export default {
               idDash: this.idDash,
             });
           } else if (item.action === 'go') {
-            this.$store.commit('letEventGo', {
+            this.$store.dispatch('letEventGo', {
               event: item,
               idDash: this.idDash,
               route: this.$router,
@@ -333,27 +348,53 @@ export default {
           } else if (
             item.action.toLowerCase() === 'changeReport'.toLowerCase()
           ) {
-            // если экшен open
+            // если экшен changeReport
             this.createReport(item, 'report');
           } else if (
             item.action.toLowerCase() === 'exportSearch'.toLowerCase()
           ) {
-            // если экшен open
+            // если экшен exportSearch
             this.exportSearch(item, 'search');
+          } else if (item.action.toLowerCase() === 'download') {
+            this.downloadEvent(item);
           }
         });
       }
     },
-    downloadFile(fileLink) {
-      const namefile = fileLink.split('/')[2];
+    downloadEvent({ searchName }) {
+      this.eventLoading = true;
+      const targetSearch = Object.values(this.dashFromStore.searches)
+        .find((search) => searchName === search.sid);
+      this.$store.dispatch('letEventDownload', {
+        search: targetSearch,
+        idDash: this.idDash,
+      }).then((response) => {
+        if (response?.data?.length > 0) {
+          response.data.forEach((dataElement, i) => {
+            if (dataElement?.path_to_file) {
+              this.downloadFile(dataElement?.path_to_file);
+            } else {
+              console.error(`Отсутствует значение поля или поле: path_to_file, строка: ${i + 1}`);
+            }
+          });
+        } else {
+          console.error('Нет данных');
+        }
+      }).finally(() => {
+        this.eventLoading = false;
+      });
+    },
+    downloadFile(link) {
+      const namefile = link.split('/')[link.split('/').length - 1];
+      const fileLink = link[0] === '/' ? link.substring(1) : link;
       const url = `${window.location.protocol}//${window.location.host}/${fileLink}`;
-      const link = this.$refs.buttonEl.parentElement.appendChild(
+      const el = this.$refs.buttonEl.parentElement.appendChild(
         document.createElement('a'),
       ); // создаем ссылку
-      link.setAttribute('href', url); // указываем ссылке что надо скачать наш файл csv
-      link.setAttribute('download', namefile); // указываем имя файла
-      link.click(); // жмем на скачку
-      link.remove(); // удаляем ссылку
+      el.setAttribute('href', url); // указываем ссылке что надо скачать наш файл csv
+      el.setAttribute('download', namefile); // указываем имя файла
+      el.click(); // жмем на скачку
+      el.remove(); // удаляем ссылку
     },
     getSearch(search, sid) {
       let csvContent = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,'; // задаем кодировку csv файла

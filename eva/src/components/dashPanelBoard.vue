@@ -1134,17 +1134,22 @@ export default {
     headerTop() {
       return document.body.clientWidth <= 1400 ? 40 : 50;
     },
+    getSearchesFromStore() {
+      if (this.idDash) {
+        return this.$store.state[this.idDash].searches;
+      }
+      return [];
+    },
     searches() {
       // массив со всеми ИС на странице
       let searchesRes = [];
       if (this.idDash) {
-        // const searches = this.$store.dispatch('getSearches', this.idDash);
-        const { searches } = this.$store.state[this.idDash];
-        if (searches) {
-          searches.forEach((item) => {
+        // const searches = this.$store.dispatch('getSearches', this.idDash);;
+        if (this.getSearchesFromStore) {
+          this.getSearchesFromStore.forEach((item) => {
             this.$set(this.change, item.sid, false);
           });
-          searchesRes = searches;
+          searchesRes = this.getSearchesFromStore;
         }
       }
       return searchesRes;
@@ -2093,6 +2098,8 @@ export default {
                     this.$set(this.event, 'value', ['']);
                   }
                 }
+              } else if (doing[0].toLowerCase() === 'download'.toLowerCase()) {
+                this.$set(this.event, 'searchName', doing[1] ? doing[1].replace(')', '') : '');
               } else if (doing[0].toLowerCase() === 'go'.toLowerCase()) {
                 /// go
 
