@@ -1,7 +1,7 @@
-# [1.144.0] - 2023-07-20
+# [1.144.0] - 2023-07-24
 
 ### Added
-- Button: Added event "click(visualisation-id, download(sid))"
+- Button: Added event "onclick(visualisation-id, download(sid))"
 
 ### Fixed
 - Waterfall: Fixed resize after change tab
