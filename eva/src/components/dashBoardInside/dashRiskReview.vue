@@ -534,12 +534,12 @@ export default {
           extent.push(ds[part.idStart] + ds[part.id]);
         });
       });
-
       const xDomain = d3.extent(extent);
-      const width = svgContainer.offsetWidth - this.marginX * 2;
-
+      const symbolWidth = 10;
+      const symbolCount = Math.round((`${xDomain[0]}`.length + `${xDomain[1]}`.length) / 2);
+      const width = svgContainer.offsetWidth - (this.marginX * 2);
       this.xScale = d3.scaleLinear()
-        .range([55, width - 55])
+        .range([symbolCount * symbolWidth, width - (symbolCount * symbolWidth)])
         .domain(d3.extent(xDomain));
 
       const padInner = 0.3;
@@ -559,12 +559,13 @@ export default {
 
     createAxisX() {
       const paddingXOfChart = 70;
-      const sizeOfChar = 10;
+      const sizeOfChar = 16;
       const paddingXOfChar = 16;
       const sizeOfNumber = this.getMaxCountChars() * sizeOfChar + paddingXOfChar;
       const widthSVGContainer = this.$refs.svgContainer.offsetWidth - this.marginX * 2;
       const axis = this.svg
-        .append('g').attr('fill', 'black')
+        .append('g')
+        .attr('fill', 'black')
         .call(d3.axisBottom(this.xScale)
           .ticks((widthSVGContainer - paddingXOfChart) / sizeOfNumber));
 
