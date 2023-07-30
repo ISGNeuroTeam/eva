@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Risk-review: Legend moved from the tooltip to the main visualization
 
 ### Fixed
 - Risk-review: Fixed processing of large numbers
