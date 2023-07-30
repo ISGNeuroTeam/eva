@@ -4,11 +4,11 @@
     :disabled="!fullScreenMode"
   >
     <div
-      class="FGKRiskReview"
+      class="risk-review"
       :style="{
         ...customStyle,
-        'width': `${sizeFrom.width - 22}px`,
-        'height': `${sizeFrom.height - 60}px`,
+        'width': `${widthFrom}px`,
+        'height': `${heightFromOuter}px`,
         background: isPanelBackHide ? 'transparent' : theme.$secondary_bg,
         margin: '0 10px',
       }"
@@ -17,20 +17,24 @@
     >
       <div
         v-if="isDataError"
-        class="FGKRiskReview__dataError"
+        class="risk-review__dataError"
       >
         {{ errorMessage }}
       </div>
       <div
         v-show="!isDataError"
-        class="row fill-height align-stretch"
+        :style="{
+          'width': `${widthFrom}px`,
+          'height': `${heightFromInner}px`,
+        }"
+        class="row align-stretch"
       >
         <div
           v-if="listColName || listColValue || leftTitle"
           class="col-3"
         >
           <div
-            class="FGKRiskReview__col-title px-3"
+            class="risk-review__col-title px-3"
             :style="{
               height: leftTitle ? 'auto' : '27px',
             }"
@@ -44,7 +48,7 @@
             <div
               v-for="(item, i) in titles"
               :key="`t-${i}`"
-              class="FGKRiskReview__left-text"
+              class="risk-review__left-text"
               :style="{
                 height: `${barHeight}px`,
                 marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
@@ -90,7 +94,7 @@
           class="col-3"
         >
           <div
-            class="FGKRiskReview__col-title px-3"
+            class="risk-review__col-title px-3"
             :style="{
               height: rightTitle ? 'auto' : '27px',
             }"
@@ -104,7 +108,7 @@
             <div
               v-for="(item, i) in secondTitles"
               :key="`t-${i}`"
-              class="FGKRiskReview__right-text"
+              class="risk-review__right-text"
               :style="{
                 height: `${barHeight}px`,
                 marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
@@ -145,7 +149,7 @@
           v-if="isVisibleResidualImpactPanel"
           class="col-2"
         >
-          <div class="FGKRiskReview__col-title FGKRiskReview__col-title--residual">
+          <div class="risk-review__col-title risk-review__col-title--residual">
             Остаточное влияние
           </div>
           <div
@@ -153,69 +157,49 @@
             :style="titlesContainerStyle"
           >
             <div
-              v-for="(title, i) in residualEffectList"
+              v-for="(value, i) in residualEffectList"
               :key="`t-${i}`"
               class="bar-title bar-title--residual"
               :style="{
                 height: `${barHeight}px`,
                 marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
               }"
-              v-text="title"
+              v-text="toDivide(value)"
             />
           </div>
         </div>
       </div>
       <div
         v-if="!isDataError && !hideLegend"
-        class="FGKRiskReview__help-btn"
+        ref="riskReviewLegend"
+        class="risk-review-legend"
       >
-        <v-tooltip
-          top
-          :nudge-top="5"
-          :color="theme.$secondary_bg"
+        <div
+          v-for="(part, i) in barParts"
+          :key="`legend-${i}`"
+          class="risk-review-legend__item"
         >
-          <template v-slot:activator="{ on }">
-            <button
-              v-on="on"
-            >
-              <v-icon
-                class="control-button edit-icon theme--dark"
-                :style="{ color: theme.$main_text }"
-              >
-                {{ iconHelp }}
-              </v-icon>
-            </button>
-          </template>
-          <div class="column pa-3">
-            <div
-              v-for="(part, i) in barParts"
-              :key="`legend-${i}`"
-              class="d-flex align-center"
-              :class="(i + 1) !== barParts.length ? 'mb-2' : ''"
-            >
-              <div
-                class="mr-2"
-                :style="{
-                  backgroundColor: part.fill,
-                  width: '15px',
-                  height: '15px',
-                }"
-              />
-              <div
-                class="risk-review-legend-container__text"
-                v-text="part.title"
-              />
-            </div>
-          </div>
-        </v-tooltip>
+          <div
+            class="risk-review-legend__color"
+            :style="{
+              backgroundColor: part.fill,
+            }"
+          />
+          <div
+            class="risk-review-legend__text"
+            v-text="part.title"
+          />
+        </div>
       </div>
     </div>
   </portal>
 </template>
 
 <script>
-import * as d3 from 'd3';
 import { mdiHelp } from '@mdi/js';
+
+import { mapGetters } from 'vuex';
+import RiskReviewClass from '../../js/classes/RIskReviewClass';
 
 export default {
   name: 'RiskReview',
@@ -266,9 +250,6 @@ export default {
     isDataError: false,
     errorMessage: '',
     dataAttr: '',
-    svg: null,
-    xScale: null,
-    yScale: null,
     marginX: 40,
     marginY: 0,
     barHeight: 0,
@@ -276,8 +257,29 @@ export default {
     chartPaddingOuter: 0,
     /** Chart user config data. */
     iconHelp: mdiHelp,
+    // Высота шапки визуализации
+    // TODO: По возможности сделать не статичным числом, а вычисляемым значением
+    dashHeaderHeight: 48,
+    // Размер X-отступов визуализации
+    // TODO: По возможности сделать не статичным числом, а вычисляемым значением
+    dashXPadding: 22,
+    // Высота элемента с легендой
+    legendHeight: 0,
   }),
   computed: {
+    ...mapGetters('app', [
+      'userSettings',
+    ]),
+    globalSettings() {
+      const {
+        numberFormat,
+        decimalPlacesLimits,
+      } = this.userSettings;
+      return {
+        numberFormat,
+        decimalPlacesLimits,
+      };
+    },
     titlesContainerStyle() {
       const { chartPaddingOuter, marginY } = this;
       return { paddingTop: `${(chartPaddingOuter - 24) + marginY}px` };
@@ -327,13 +329,18 @@ export default {
       return [];
     },
     widthFrom() {
-      return `${this.sizeFrom?.width}px` || '100%';
+      return this.sizeFrom.width - this.dashXPadding;
     },
-    heightFrom() {
-      if (this.sizeFrom?.height) {
-        return `${this.sizeFrom.height - 30}px` || '100%';
+    heightFromOuter() {
+      if (this.idDashFrom === 'reports') {
+        // Для страницы ИД
+        // TODO: По возможности сделать не статичным числом, а вычисляемым значением
+        return this.sizeFrom.height - this.dashHeaderHeight + 15;
       }
-      return '100%';
+      return this.sizeFrom.height - this.dashHeaderHeight;
+    },
+    heightFromInner() {
+      return this.sizeFrom.height - this.dashHeaderHeight - this.legendHeight;
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -408,22 +415,27 @@ export default {
       handler() {
         this.$nextTick(() => {
           this.$nextTick(() => {
+            this.getLegendHeight();
             this.render();
           });
         });
       },
     },
+    hideLegend() {
+      this.render();
+    },
   },
   mounted() {
-    const { svgContainer } = this.$refs;
-    const attrs = svgContainer.getAttributeNames();
-    /** Used to support scoped styles. */
-    this.$nextTick(() => {
-      this.dataAttr = attrs.find((attr) => attr.startsWith('data-'));
-      this.render();
-    });
+    this.getLegendHeight();
+    this.render();
   },
   methods: {
+    getLegendHeight() {
+      if (this.$refs.riskReviewLegend) {
+        this.legendHeight = this.$refs.riskReviewLegend.offsetHeight + 4;
+      }
+    },
+
     setActions() {
       this.$store.commit('setActions', {
         actions: structuredClone(this.actions),
@@ -447,221 +459,44 @@ export default {
       }
     },
 
-    setTitleColName(name = '') {
-      this.titleColName = name;
-      this.render();
-    },
-
-    setBarParts(barParts) {
-      this.barParts = barParts;
-      this.render();
-    },
-
     setError(text = '', show = false) {
       this.errorMessage = text;
       this.isDataError = show;
     },
 
     render() {
-      const { isValid, error } = this.validateData();
+      const validate = RiskReviewClass.validateData;
+
+      const { isValid, error } = validate(
+        this.dataRestFrom,
+        this.barParts,
+        this.loading,
+      );
 
       if (!isValid) {
         this.setError(error, true);
       } else {
         this.setError('', false);
         this.$nextTick(() => {
-          this.clearSvgContainer();
-          this.prepareRenderData();
-          this.createAxisX();
-          this.createBars();
-          this.createLines();
-        });
-      }
-    },
-
-    validateData() {
-      const { dataset, barParts } = this;
-
-      if (dataset.length <= 0) {
-        if (this.loading) {
-          return { isValid: false, error: 'Загрузка' };
-        }
-        return { isValid: false, error: 'Нет данных для построения' };
-      }
-
-      if (barParts.length <= 0) {
-        return { isValid: false, error: 'Не указаны части столбцов' };
-      }
-
-      const dsCols = Object.keys(dataset[0]);
-
-      // eslint-disable-next-line no-restricted-syntax
-      for (const id of barParts.map((p) => p.id)) {
-        if (!dsCols.includes(id)) {
-          return { isValid: false, error: `Отсутствует столбец данных "${id}"` };
-        }
-      }
-
-      return { isValid: true, error: '' };
-    },
-
-    clearSvgContainer() {
-      d3.select(this.$refs.svgContainer).select('svg').remove();
-    },
-
-    prepareRenderData() {
-      const { svgContainer } = this.$refs;
-      this.svg = d3.select(svgContainer)
-        .append('svg')
-        .attr(this.dataAttr, '')
-        .attr('class', 'content')
-        .append('g')
-        .attr('transform', `translate(${this.marginX}, ${this.marginY})`);
-
-      this.svg.append('rect')
-        .attr(this.dataAttr, '')
-        .attr('class', 'chart-back')
-        .attr('x', 0)
-        .attr('y', 0)
-        .attr('width', '100%')
-        .attr('height', '100%');
-
-      const extent = [];
-
-      this.barParts.forEach((part) => {
-        this.dataset.forEach((ds) => {
-          extent.push(ds[part.id]);
-          extent.push(ds[part.idStart] + ds[part.id]);
-        });
-      });
-      const xDomain = d3.extent(extent);
-      const symbolWidth = 10;
-      const symbolCount = Math.round((`${xDomain[0]}`.length + `${xDomain[1]}`.length) / 2);
-      const width = svgContainer.offsetWidth - (this.marginX * 2);
-      this.xScale = d3.scaleLinear()
-        .range([symbolCount * symbolWidth, width - (symbolCount * symbolWidth)])
-        .domain(d3.extent(xDomain));
-
-      const padInner = 0.3;
-      const padOuter = 0.7;
-      const height = (this.sizeFrom.height - 60) - this.marginY * 2;
-
-      this.yScale = d3.scaleBand()
-        .range([0, height])
-        .domain(this.dataset.map((b, i) => i))
-        .paddingInner(padInner)
-        .paddingOuter(padOuter);
-
-      this.barHeight = this.yScale.bandwidth();
-      this.chartPaddingInner = this.yScale.step() * padInner;
-      this.chartPaddingOuter = this.yScale.step() * padOuter;
-    },
-
-    createAxisX() {
-      const paddingXOfChart = 70;
-      const sizeOfChar = 16;
-      const paddingXOfChar = 16;
-      const sizeOfNumber = this.getMaxCountChars() * sizeOfChar + paddingXOfChar;
-      const widthSVGContainer = this.$refs.svgContainer.offsetWidth - this.marginX * 2;
-      const axis = this.svg
-        .append('g')
-        .attr('fill', 'black')
-        .call(d3.axisBottom(this.xScale)
-          .ticks((widthSVGContainer - paddingXOfChart) / sizeOfNumber));
-
-      // eslint-disable-next-line func-names
-      axis.selectAll('.tick line').each(function () {
-        d3.select(this).remove();
-      });
-      const { dataAttr } = this;
-      // eslint-disable-next-line func-names
-      axis.selectAll('.tick text').each(function () {
-        d3.select(this)
-          .attr(dataAttr, '')
-          .attr('class', 'x-axis-tick-caption');
-      });
-      axis.select('.domain').remove();
-    },
-
-    createBars() {
-      const {
-        xScale, yScale, barHeight, barParts, toDivide,
-      } = this;
-      const halfBarHeight = barHeight / 2;
-
-      // eslint-disable-next-line no-restricted-syntax
-      for (const part of barParts) {
-        const {
-          id, idStart, type, textPosY, textPosX, textColor, textOffset = 10,
-        } = part;
-
-        // eslint-disable-next-line no-continue
-        if (type !== 'bar') continue;
-
-        const {
-          fill = 'var(--secondary_text)',
-          isTitleShow = false,
-          isFullHeight = true,
-        } = part;
-
-        const height = isFullHeight ? barHeight : halfBarHeight;
-
-        this.svg.selectAll()
-          .data(this.dataset)
-          .enter()
-          .append('rect')
-          .attr('x', (d) => {
-            const startX = idStart ? d[idStart] : 0;
-            return xScale(Math.min(startX, d[id] + startX));
-          })
-          .attr('y', (d, i) => {
-            const y = yScale(i);
-
-            if (isTitleShow) {
-              const xData = d[id];
-              const textPositionsX = {
-                default: idStart ? xData + d[idStart] : xData,
-                center: idStart ? xData + (d[idStart] / 2) : xData / 2,
-              };
-              const x = textPosX
-                ? xScale(textPositionsX[textPosX])
-                : xScale(textPositionsX.default);
-              const xAttr = xData >= 0 ? x + +textOffset : x - +textOffset;
-              const yAttr = y + barHeight / 2;
-              const anchor = xData >= 0 ? 'start' : 'end';
-              this.svg.append('text')
-                .text(Number(xData) >= 0 ? `+${toDivide(xData)}` : toDivide(xData))
-                .attr(this.dataAttr, '')
-                .attr('class', 'bar-text-caption')
-                .attr('fill', textColor || fill)
-                .attr('text-anchor', anchor)
-                .attr('x', xAttr)
-                .attr('y', yAttr)
-              // eslint-disable-next-line func-names
-                .attr('dy', function () {
-                  const textHeight = this.getBBox().height;
-                  const textPositionsY = {
-                    top: textHeight - (textHeight * 3),
-                    bottom: textHeight * 2.5,
-                    center: textHeight / 3,
-                  };
-                  return textPosY ? textPositionsY[textPosY] : textHeight / 3;
-                });
-            }
-
-            return isFullHeight ? y : y + height / 2;
-          })
-          .attr('fill', fill)
-          .attr('height', height)
-          .attr('width', (d) => {
-            const start = idStart ? d[idStart] : 0;
-            const width = Math.abs(xScale(d[id] + start) - xScale(start));
-            // eslint-disable-next-line no-restricted-globals
-            return isNaN(width) ? 0 : width;
-          })
-          .on('click', (event, d) => {
-            this.setTokens(event);
+          const riskReview = new RiskReviewClass({
+            container: this.$refs.svgContainer,
+            width: this.sizeFrom.width,
+            marginX: this.marginX,
+            marginY: this.marginY,
+            height: this.hideLegend
+              ? this.sizeFrom.height
+              : this.sizeFrom.height - this.$refs.riskReviewLegend.offsetHeight - 16,
+            barParts: this.barParts,
+            dataRest: this.dataRestFrom,
+            setTokenFn: this.setTokens,
+            toDivideFn: this.toDivide,
           });
+          this.$nextTick(() => {
+            this.barHeight = riskReview.barHeight;
+            this.chartPaddingInner = riskReview.chartPaddingInner;
+            this.chartPaddingOuter = riskReview.chartPaddingOuter;
+          });
+        });
       }
     },
 
@@ -686,65 +521,6 @@ export default {
           }
         });
       }
-    },
-
-    createLines() {
-      const {
-        xScale, yScale, barHeight, barParts,
-      } = this;
-      // eslint-disable-next-line no-restricted-syntax
-      for (const part of barParts) {
-        const {
-          id, type, fill = 'var(--pink)', isTitleShow = true,
-        } = part;
-
-        // eslint-disable-next-line no-continue
-        if (type !== 'line') continue;
-
-        this.dataset.forEach((bar, i) => {
-          const value = bar[id];
-          const x = xScale(value);
-          const y = yScale(i);
-          const line = d3.line();
-
-          this.svg.append('path')
-            .attr('stroke', fill)
-            .attr('stroke-width', 3)
-            .attr('d', line([[x, y - 5], [x, y + barHeight + 5]]));
-
-          if (isTitleShow) {
-            this.svg.append('text')
-              .text(value)
-              .attr(this.dataAttr, '')
-              .attr('class', 'bar-text-caption')
-              .attr('fill', fill)
-              .attr('text-anchor', 'end')
-              .attr('x', x - 5)
-              .attr('y', y + barHeight / 2)
-            // eslint-disable-next-line func-names
-              .attr('dy', function () {
-                const textHeight = this.getBBox().height;
-                return textHeight / 3;
-              });
-          }
-        });
-      }
-    },
-
-    getMaxCountChars() {
-      let maxNumLength = 0;
-
-      this.barParts.forEach((part) => {
-        this.dataset.forEach((ds) => {
-          const number = ds[part.id];
-          const numLength = number.toString().length;
-          if (numLength > maxNumLength) {
-            maxNumLength = numLength;
-          }
-        });
-      });
-
-      return maxNumLength;
     },
 
     getFormattedTitles(elem, {
@@ -788,16 +564,24 @@ export default {
       return result;
     },
 
-    toDivide(number) {
-      return number.toLocaleString()
-        .replace(',', ' ');
+    toDivide(value) {
+      const {
+        numberFormat,
+        decimalPlacesLimits,
+      } = this.globalSettings;
+      const strToNumber = typeof value === 'number'
+        ? value
+        : Number(value);
+      return strToNumber.toLocaleString(numberFormat, {
+        maximumFractionDigits: decimalPlacesLimits,
+      });
     },
   },
 };
 </script>
 
-<style lang="scss" scoped>
-.FGKRiskReview {
+<style lang="scss">
+.risk-review {
   font-family: 'Proxima Nova', serif;
   position: relative;
   padding: 10px;
@@ -927,6 +711,31 @@ export default {
       flex-direction: row;
       flex-wrap: wrap;
     }
+  }
+}
+
+.risk-review-legend {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  &__item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+  &__color {
+    width: 15px;
+    height: 15px;
+    border: 1px solid var(--main_border);
+  }
+  &__text {
+    white-space: nowrap;
+    color: var(--main_text);
+    font-size: 14px;
   }
 }
 </style>
