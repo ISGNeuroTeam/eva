@@ -65,6 +65,7 @@
             :multiple="multiple"
             :color="theme.$accent_ui_color"
             :style="{ color: theme.$main_text, fill: theme.$main_text }"
+            :menu-props="{zIndex: 100}"
             hide-details
             class="select theme--dark"
             label="Значение"
