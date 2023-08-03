@@ -559,7 +559,7 @@ export default class WaterfallClass {
       })
       .attr('height', (d) => {
         const height = this.y(0) - this.y(Math.abs(d.isTotal ? d.total : d.value));
-        if (height === 0) {
+        if (height < 1) {
           return 1;
         }
         return height;
