@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+
+### Fixed
+
+## [1.145.0]
+
+### Changed
 - Waterfall: Optimizing the size of the comment text
 - Risk-review: Legend moved from the tooltip to the main visualization
 

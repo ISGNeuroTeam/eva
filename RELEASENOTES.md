@@ -1,3 +1,14 @@
+# [1.145.0] - 2023-08-03
+
+### Changed
+- Waterfall: Optimizing the size of the comment text
+- Risk-review: Legend moved from the tooltip to the main visualization
+
+### Fixed
+- Problem with select list overlapped by other panels
+- Risk-review: Fixed processing of large numbers
+- Gauge: Fixed size in small container
+
 # [1.144.0] - 2023-07-24
 
 ### Added
