@@ -2,12 +2,14 @@
   <portal
     :to="idFrom"
     :disabled="!fullScreenMode"
-    class="gauge"
-    :class="{
-      small: box.isSmall,
-    }"
   >
-    <div v-bind="$attrs">
+    <div
+      class="gauge"
+      :class="{
+        small: box.isSmall,
+      }"
+      v-bind="$attrs"
+    >
       <v-icon
         v-if="dataModeFrom && !fullScreenMode"
         class="options-icon"
@@ -19,7 +21,7 @@
       <canvas
         ref="gauge"
         :width="box.width"
-        :height="box.height > box.width ? box.width * .6 : box.height - 120"
+        :height="canvasHeight"
       />
       <div class="gauge-value-text">
         <span :style="`color: ${valueColor}`">{{ displayValue }}</span>
@@ -109,6 +111,16 @@ export default {
     ...mapGetters('app', [
       'userSettings',
     ]),
+    canvasHeight() {
+      if (this.box.isSmall) {
+        return this.box.height > this.box.width
+          ? this.box.width * 0.6
+          : this.box.height - 55;
+      }
+      return this.box.height > this.box.width
+        ? this.box.width * 0.6
+        : this.box.height - 90;
+    },
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idFrom];
     },
@@ -211,6 +223,7 @@ export default {
     this.loadStoredZones();
     this.initGauge();
     this.loadData(this.dataRestFrom);
+    this.resize();
   },
   methods: {
     initGauge() {
@@ -290,11 +303,13 @@ export default {
 
 <style scoped lang="scss">
 .gauge {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto auto;
   justify-content: center;
+  justify-items: center;
   align-items: center;
-  height: calc(100% - 40px);
+  height: inherit;
   color: var(--main_text);
   .options-icon {
     position: absolute;
@@ -306,21 +321,24 @@ export default {
     font-size: 48px;
     font-weight: bold;
     line-height: 1;
-    margin-top: -16px;
     color: var(--main_text);
+    margin-top: -32px;
   }
   &-metric-text {
     font-size: 20px;
     text-align: center;
     color: var(--main_text);
+    //margin-top: -16px;
   }
   &.small {
+    min-height: 100px;
     .gauge-value-text {
-      font-size: 32px;
-      margin-top: -8px;
+      font-size: 28px;
+      margin-top: -56px;
     }
     .gauge-metric-text {
       font-size: 14px;
+      margin-top: -24px;
     }
   }
 }
