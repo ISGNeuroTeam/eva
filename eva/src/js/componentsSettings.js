@@ -248,8 +248,8 @@ export default {
       height: 400,
     },
     waterfall: {
-      width: 600,
-      height: 500,
+      width: 1200,
+      height: 700,
     },
     riskReview: {
       width: 1440,
