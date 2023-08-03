@@ -230,8 +230,6 @@ export default class RIskReviewClass {
     createBars() {
       const halfBarHeight = this.barHeight / 2;
 
-      const { toDivide } = this;
-
       // eslint-disable-next-line no-restricted-syntax
       for (const part of this.barParts) {
         const {
@@ -281,7 +279,7 @@ export default class RIskReviewClass {
               const yAttr = y + this.barHeight / 2;
               const anchor = xData >= 0 ? 'start' : 'end';
               this.svg.append('text')
-                .text(Number(xData) >= 0 ? `+${toDivide(xData)}` : toDivide(xData))
+                .text(Number(xData) >= 0 ? `+${this.toDivide(xData)}` : this.toDivide(xData))
                 .attr('class', 'bar-text-caption')
                 .attr('fill', textColor || fill)
                 .attr('text-anchor', anchor)
@@ -346,7 +344,7 @@ export default class RIskReviewClass {
 
           if (isTitleShow) {
             this.svg.append('text')
-              .text(value)
+              .text(Number(value) >= 0 ? `+${this.toDivide(value)}` : this.toDivide(value))
               .attr('class', 'bar-text-caption')
               .attr('fill', fill)
               .attr('text-anchor', 'end')
