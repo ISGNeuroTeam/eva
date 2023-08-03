@@ -232,9 +232,9 @@ export default class WaterfallClass {
         const [min, max] = d3.extent(points);
         let pos = this.y(min);
         if (idx % 2 === 0) {
-          pos = this.y(max) - barCommentParams[idx].height - textVertOffset;
+          pos = this.y(max) - barCommentParams[idx].height - textVertOffset - 10;
         } else {
-          pos += textVertOffset;
+          pos += textVertOffset + 10;
         }
         return pos;
       })
@@ -422,6 +422,7 @@ export default class WaterfallClass {
       const text = p.append('foreignObject')
         .attr('y', 5)
         .attr('x', -width / 2)
+        .style('padding', '0 5px')
         .attr('width', width)
         .append('xhtml:p')
         .attr('style', 'word-wrap: break-word; text-align:center;')
@@ -591,14 +592,8 @@ export default class WaterfallClass {
         const xPos = this.x.bandwidth() / d.childrenCount;
         return d.childrenIndex > 0 ? xPos * (d.childrenIndex + 1) - (xPos / 2) : xPos / 2;
       })
-      .attr('y', (d) => {
-        const height = this.y(0) - this.y(Math.abs(d.isTotal ? d.total : d.value));
-        if (height < 16) {
-          return this.y(d.total) + (d.total > 0 ? 10 : -8);
-        }
-        return this.y(d.total) + 6;
-      })
-      .attr('dy', (d) => `${(d.isTotal ? (d.total < 0) : d.value < 0) ? '-' : ''}.75em`)
+      .attr('y', (d) => this.y(d.total) + 4)
+      .attr('dy', (d) => `${(d.isTotal ? (d.total < 0) : (d.value < 0)) ? '-' : ''}8px`)
       .attr('font-size', '13')
       .attr('text-anchor', 'middle')
       .attr('fill', this.options.colorText)
