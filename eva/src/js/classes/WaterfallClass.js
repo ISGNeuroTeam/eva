@@ -20,7 +20,7 @@ export default class WaterfallClass {
 
   innerVertOffset = [0, 0];
 
-  padding = 0.3
+  padding = 0.2
 
   svgContainer = null
 
@@ -129,6 +129,7 @@ export default class WaterfallClass {
       .attr('height', height)
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
+    // .style('outline', '1px dashed orange').style('outline-offset', '-1px');
 
     if (this.data.length === 0) {
       this.svg.append('text')
@@ -171,29 +172,31 @@ export default class WaterfallClass {
     const { options } = this;
     const textVertOffset = 5;
     // eslint-disable-next-line max-len
-    const textAreaLeftOffset = (this.x.bandwidth() * 0.1) + (this.x.bandwidth() * (this.padding / 2));
+    const textAreaLeftOffset = (this.x.bandwidth() * (this.padding / 4) + 2);
     const lineLeftOffset = textAreaLeftOffset - (textAreaLeftOffset * this.padding);
     const bandwidth1 = 1;
-    const bandwidth2 = 1.8;
+    const bandwidth2 = 2.1;
     const dataWithComments = this.data.filter((d) => d.comment);
     const barCommentParams = dataWithComments.map((d, idx) => {
       if (d.comment) {
         const elem = this.svg.append('foreignObject')
           .attr('width', () => `${this.x.bandwidth() * (idx + 1 === dataWithComments.length ? bandwidth1 : bandwidth2)}px`)
           .style('x', -1000)
-          .style('overflow', 'inherit')
-          .style('line-height', 1.3)
-          .attr('font-size', '14')
+          .style('overflow-y', 'scroll')
+          .style('line-height', 1.15)
+          .style('font-size', '12px')
+          .style('padding-left', '4px')
           .html(d.comment);
 
         const elemText = this.svg.append('text')
           .style('x', -1000)
-          .style('overflow', 'inherit')
-          .attr('font-size', '14')
           .html(d.comment);
 
+        const { scrollHeight } = elem.node();
+        const heightLimit = this.height / 6; // 108
         const result = {
-          height: elem.node().scrollHeight,
+          scrollHeight,
+          height: scrollHeight < heightLimit ? scrollHeight : heightLimit,
           width: elemText.node().scrollWidth,
         };
         elem.remove();
@@ -235,33 +238,51 @@ export default class WaterfallClass {
       })
       .attr('fill', 'transparent');
 
+    // верх низ графика
+    const borders = { top: null, bottom: null };
+    this.svg.selectAll('rect.comment').each((el, idx, els) => {
+      const { y, height } = els[idx].getBBox();
+      if (borders.top > y) borders.top = y;
+      if (borders.bottom < y + height) borders.bottom = y + height;
+    });
+    this.svg.selectAll('rect.comment')
+      .attr('height', (d, idx, els) => {
+        const { scrollHeight, height } = barCommentParams[idx];
+        if (scrollHeight > height) {
+          const { y } = els[idx].getBBox();
+          if (idx % 2) {
+            /// если внизу
+            // если блок влезет
+            return scrollHeight + y <= borders.bottom ? scrollHeight : borders.bottom - y;
+            // если не влезет
+          }
+          /// если вверху
+          // если блок влезет
+          if (y > 0) {
+            if (y - scrollHeight + height > 0) {
+              d3.select(els[idx]).attr('y', y - scrollHeight + height);
+              return scrollHeight;
+            }
+            // если не влезет
+            d3.select(els[idx]).attr('y', 0);
+            return scrollHeight + y - scrollHeight + height;
+          }
+        }
+        return height;
+      });
+
     this.svg.selectAll('.group-item')
       .filter((d) => d.comment)
       .append('foreignObject')
       .attr('x', textAreaLeftOffset)
-      .attr('y', (d, idx) => {
-        const { _next } = d;
-        const points = [d.lastTotal, d.total];
-        if (getForTwoColumns(idx)) {
-          points.push(_next?.total);
-        }
-        if (d.isTotal || _next?.isTotal) {
-          points.push(0);
-        }
-        const [min, max] = d3.extent(points);
-        let pos = this.y(min);
-        if (idx % 2 === 0) {
-          pos = this.y(max) - barCommentParams[idx].height - textVertOffset;
-        } else {
-          pos += textVertOffset;
-        }
-        return pos;
-      })
+      .attr('y', (d, idx, els) => d3.select(els[idx].parentNode).select('.comment').node().getBBox().y)
       .attr('width', (d, idx) => `${this.x.bandwidth() * (getForTwoColumns(idx) ? bandwidth2 : bandwidth1)}px`)
-      .attr('height', (d, idx) => `${barCommentParams[idx].height}px`)
-      .style('overflow', 'inherit')
-      .attr('font-size', '14')
-      .style('line-height', 1.3)
+      .attr('height', (d, idx, els) => d3.select(els[idx].parentNode).select('.comment').node().getBBox().height)
+      .style('overflow-y', 'scroll')
+      // .style('outline', '1px dashed red')
+      .style('line-height', 1.15)
+      .style('font-size', '12px')
+      .style('padding-left', '4px')
       .attr('text-anchor', 'bottom')
       .html((d) => {
         const opts = this.options.barsOptions.find(({ title }) => (title === d.title));
@@ -302,23 +323,9 @@ export default class WaterfallClass {
       .attr('class', 'vertical')
       .attr('x1', () => lineLeftOffset)
       .attr('x2', () => lineLeftOffset)
-      .attr('y2', (d, idx) => {
-        const { _next } = d;
-        const points = [d.lastTotal, d.total];
-        if (getForTwoColumns(idx)) {
-          points.push(_next?.total);
-        }
-        if (d.isTotal || _next?.isTotal) {
-          points.push(0);
-        }
-        const [min, max] = d3.extent(points);
-        let pos = this.y(min);
-        if (idx % 2 === 0) {
-          pos = this.y(max) - barCommentParams[idx].height - textVertOffset;
-        } else {
-          pos += barCommentParams[idx].height + textVertOffset;
-        }
-        return pos;
+      .attr('y2', (d, idx, els) => {
+        const { height, y } = d3.select(els[idx].parentNode).select('.comment').node().getBBox();
+        return (idx % 2) ? (height + y) : y;
       })
       .attr('y1', (d, idx) => {
         const points = [d.lastTotal, d.total];
@@ -377,11 +384,11 @@ export default class WaterfallClass {
     this.x = d3.scaleBand()
       .domain(this.groupedData.map((d) => d.title))
       .range([0, xWidth])
-      .paddingOuter(this.padding)
-      .round(true);
+      .padding(this.padding);
 
     this.xAxis = this.svg
       .append('g')
+      // .style('outline', '1px dashed red').style('outline-offset', '-1px')
       .attr('transform', `translate(0,${yHeight})`)
       .attr('class', 'xAxis')
       .call(d3.axisBottom(this.x));
@@ -443,15 +450,17 @@ export default class WaterfallClass {
 
     this.yAxis = this.svg
       .append('g')
+      // .style('outline', '1px dashed yellow').style('outline-offset', '-1px')
       .attr('class', 'yAxis')
       .call(d3.axisLeft(this.y)
         .tickFormat((val) => val.toLocaleString(numberFormat)));
 
     if (this.innerVertOffset[1]) {
+      this.yAxis.select('path.domain').attr('stroke', 'transparent');
       this.yAxis.append('line')
         .attr('stroke-width', 1)
         .attr('x1', 0.5)
-        .attr('y1', this.y(minMax[0]))
+        .attr('y1', 0)
         .attr('x2', 0.5)
         .attr('y2', this.y(minMax[0]) + this.innerVertOffset[1])
         .attr('stroke', 'currentColor');
@@ -459,12 +468,15 @@ export default class WaterfallClass {
   }
 
   createGroupRect(barGroups) {
+    const width = this.x.bandwidth() - (this.x.bandwidth() * (this.padding / 5));
+    const wOffset = (width * this.padding) / 2;
     barGroups
       .append('rect')
+      .attr('x', -wOffset)
       .attr('stroke', (d) => (d.children.length > 1 ? 'currentColor' : 'transparent'))
       .attr('stroke-width', 1)
       .attr('stroke-dasharray', '1 4 0')
-      .attr('width', this.x.bandwidth() - (this.x.bandwidth() * (this.padding / 5)))
+      .attr('width', width + wOffset * 2)
       .attr('transform', `translate(${this.x.bandwidth() * (this.padding / 10)},0)`)
       .attr('fill', 'transparent')
       .attr('height', this.y.range()[0]);
@@ -521,6 +533,7 @@ export default class WaterfallClass {
       })
       .enter()
       .append('g')
+      // .style('outline', '1px dashed blue').style('outline-offset', '-1px')
       .attr('class', 'group-item')
       .append('rect')
       .attr('y', (d) => {
@@ -531,7 +544,7 @@ export default class WaterfallClass {
       })
       .attr('x', (d) => {
         const padding = ((this.x.bandwidth() / d.childrenCount) * this.padding);
-        return (this.x.bandwidth() / d.childrenCount) * d.childrenIndex + (padding / 2);
+        return (this.x.bandwidth() / d.childrenCount) * d.childrenIndex + (padding / 4);
       })
       .attr('height', (d) => {
         const height = this.y(0) - this.y(Math.abs(d.isTotal ? d.total : d.value));
@@ -540,7 +553,7 @@ export default class WaterfallClass {
         }
         return height;
       })
-      .attr('width', (d) => this.x.bandwidth() / d.childrenCount - ((this.x.bandwidth() / d.childrenCount) * this.padding))
+      .attr('width', (d) => this.x.bandwidth() / d.childrenCount - ((this.x.bandwidth() / d.childrenCount) * (this.padding / 2)))
       .attr('fill', ({
         title: barTitle, value, color, isTotal,
       }) => {
@@ -585,35 +598,35 @@ export default class WaterfallClass {
       .attr('x1', (d) => {
         const elWidth = this.getElWidth(d);
         const padding = this.getElPadding(d);
-        return elWidth + (elWidth * d.childrenIndex) - (padding / 2);
+        return elWidth + (elWidth * d.childrenIndex) - (padding / 4);
       })
       .attr('y1', (d) => this.y(d.total))
       .attr('x2', (d) => {
         const elWidth = this.getElWidth(d);
-        const padding = this.getElPadding(d);
+        const padding = this.padding * 4;
         const xPos = (elWidth + (elWidth * d.childrenIndex));
-        const nextInGroup = d.nextChildrenLength && d.nextChildrenLength > 1;
+        const nextInGroup = d?.nextChildrenLength > 1;
         const currentInGroup = d.childrenCount > 1;
         const currentLast = !((d.childrenIndex + 1) < d.childrenCount);
         if (nextInGroup && currentInGroup && !currentLast) {
           return xPos + (padding / d.childrenCount);
         }
-        if (nextInGroup && currentInGroup && currentLast) {
+        /* if (nextInGroup && currentInGroup && currentLast) {
           return xPos + (padding / d.nextChildrenLength);
         }
         if (nextInGroup && !currentInGroup) {
           return xPos + (padding / (d.nextChildrenLength * 2));
         }
-        if (!nextInGroup && !currentLast && currentInGroup) {
-          return xPos + (padding / d.childrenCount);
-        }
         if (!nextInGroup && currentLast && currentInGroup) {
           return xPos + padding;
         }
         if (!nextInGroup && !currentInGroup) {
-          return xPos + padding / 2;
+          return xPos + padding / 4;
+        } */
+        if (!nextInGroup && !currentLast && currentInGroup) {
+          return xPos + (padding / d.childrenCount);
         }
-        return 0;
+        return this.x.bandwidth() / (1 - this.padding) + 2;
       })
       .attr('y2', (d) => this.y(d.total))
       .attr('stroke', this.options.colorBarTotal)

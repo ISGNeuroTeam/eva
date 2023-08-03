@@ -299,6 +299,12 @@ export default {
   svg {
     margin: 0 2px;
     fill: var(--main_text);
+    foreignObject {
+      &::-webkit-scrollbar {
+        width: initial;
+        display: none;
+      }
+    }
   }
   .waterfall-legend {
     display: flex;
