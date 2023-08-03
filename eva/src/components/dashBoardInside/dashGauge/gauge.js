@@ -438,7 +438,7 @@
 
     Gauge.prototype.paddingTop = 0.2;
 
-    Gauge.prototype.paddingBottom = 0.15;
+    Gauge.prototype.paddingBottom = 0.05;
 
     Gauge.prototype.percentColors = null;
 

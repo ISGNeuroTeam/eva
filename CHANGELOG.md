@@ -10,8 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Risk-review: Legend moved from the tooltip to the main visualization
 
 ### Fixed
+- Problem with select list overlapped by other panels
+- Risk-review: Fixed processing of large numbers
 - Gauge: Fixed size in small container
 
 ## [1.144.0]
