@@ -140,7 +140,7 @@
       }
       if (force || this.displayedValue !== this.value) {
         if (this.ctx && this.clear) {
-          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          this.ctx.clearRect(0, 10, this.canvas.width, this.canvas.height);
         }
         diff = this.value - this.displayedValue;
         if (Math.abs(diff / this.animationSpeed) <= 0.001) {
@@ -436,9 +436,9 @@
 
     Gauge.prototype.lineWidth = 40;
 
-    Gauge.prototype.paddingTop = 0.1;
+    Gauge.prototype.paddingTop = 0.2;
 
-    Gauge.prototype.paddingBottom = 0.1;
+    Gauge.prototype.paddingBottom = 0.05;
 
     Gauge.prototype.percentColors = null;
 
