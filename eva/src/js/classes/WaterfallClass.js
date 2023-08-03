@@ -146,6 +146,13 @@ export default class WaterfallClass {
     this.margin.bottom = xAxisSizes.height;
     const yAxisSizes = this.yAxis.node().getBBox();
     this.margin.left = yAxisSizes.width;
+
+    // если ось х вышла за границу слева
+    const { x } = this.svg.select('g.xAxis').node().getBBox();
+    if (x < 0) {
+      this.margin.left = -x + 10;
+    }
+
     this.svg.attr('transform', `translate(${margin.left},${margin.top})`);
     this.xAxis.remove();
     this.createXAxis();
@@ -186,7 +193,7 @@ export default class WaterfallClass {
           .style('line-height', 1.15)
           .style('font-size', '12px')
           .style('padding-left', '4px')
-          .html(d.comment);
+          .html(() => this.formattedHtml(d));
 
         const elemText = this.svg.append('text')
           .style('x', -1000)
@@ -284,38 +291,7 @@ export default class WaterfallClass {
       .style('font-size', '12px')
       .style('padding-left', '4px')
       .attr('text-anchor', 'bottom')
-      .html((d) => {
-        const opts = this.options.barsOptions.find(({ title }) => (title === d.title));
-        if (opts?.hideComment) {
-          return '';
-        }
-        let color;
-        if (d.color) {
-          color = d.color;
-        } else if (opts?.changeColor) {
-          color = opts.color;
-        } else if (d.isTotal) {
-          color = options.colorBarTotal;
-        } else {
-          color = d.value < 0 ? this.options.colorBarNegative : this.options.colorBarPositive;
-        }
-        return d.comment
-          .replace(/(\(\s?[-+]?[\d\s.,]+\s?\))/g, (str) => {
-            const {
-              numberFormat = false,
-              decimalPlacesLimits = 2,
-            } = this.options;
-            let printStr = str;
-            const nums = str.match(/[-+]?[\d.]+/);
-            if (nums.length === 1 && !Number.isNaN(Number(nums[0]))) {
-              printStr = `(${Number(nums[0]).toLocaleString(numberFormat, {
-                // minimumFractionDigits: decimalPlacesLimits,
-                maximumFractionDigits: decimalPlacesLimits,
-              })})`;
-            }
-            return `<tspan style="color: ${color}">${printStr}</tspan>`;
-          });
-      });
+      .html((d) => this.formattedHtml(d));
 
     this.svg.selectAll('.group-item')
       .filter((d) => d.comment)
@@ -361,6 +337,40 @@ export default class WaterfallClass {
       })
       .attr('stroke-dasharray', '1 4 0')
       .attr('stroke-width', '2px');
+  }
+
+  formattedHtml(d) {
+    const { options } = this;
+    const opts = this.options.barsOptions.find(({ title }) => (title === d.title));
+    if (opts?.hideComment) {
+      return '';
+    }
+    let color;
+    if (d.color) {
+      color = d.color;
+    } else if (opts?.changeColor) {
+      color = opts.color;
+    } else if (d.isTotal) {
+      color = options.colorBarTotal;
+    } else {
+      color = d.value < 0 ? this.options.colorBarNegative : this.options.colorBarPositive;
+    }
+    return d.comment
+      .replace(/(\(\s?[-+]?[\d\s.,]+\s?\))/g, (str) => {
+        const {
+          numberFormat = false,
+          decimalPlacesLimits = 2,
+        } = this.options;
+        let printStr = str;
+        const nums = str.match(/[-+]?[\d.]+/);
+        if (nums.length === 1 && !Number.isNaN(Number(nums[0]))) {
+          printStr = `(${Number(nums[0]).toLocaleString(numberFormat, {
+            // minimumFractionDigits: decimalPlacesLimits,
+            maximumFractionDigits: decimalPlacesLimits,
+          })})`;
+        }
+        return `<tspan style="color: ${color}">${printStr}</tspan>`;
+      });
   }
 
   render() {
@@ -440,8 +450,8 @@ export default class WaterfallClass {
     const { numberFormat = false } = this.options;
     const yHeight = this.height - this.margin.top - this.margin.bottom;
     const minMax = [
-      d3.min(this.data, (d) => (d.total < 0 ? d.total : 0)) * 1.1,
-      d3.max(this.data, (d) => (d.total > 0 ? d.total : 0)) * 1.1,
+      d3.min(this.data, (d) => (d.total < 0 ? d.total : 0)),
+      d3.max(this.data, (d) => (d.total > 0 ? d.total : 0)),
     ];
 
     this.y = d3.scaleLinear()
@@ -581,7 +591,13 @@ export default class WaterfallClass {
         const xPos = this.x.bandwidth() / d.childrenCount;
         return d.childrenIndex > 0 ? xPos * (d.childrenIndex + 1) - (xPos / 2) : xPos / 2;
       })
-      .attr('y', (d) => this.y(d.total) + 5)
+      .attr('y', (d) => {
+        const height = this.y(0) - this.y(Math.abs(d.isTotal ? d.total : d.value));
+        if (height < 16) {
+          return this.y(d.total) + (d.total > 0 ? 10 : -8);
+        }
+        return this.y(d.total) + 6;
+      })
       .attr('dy', (d) => `${(d.isTotal ? (d.total < 0) : d.value < 0) ? '-' : ''}.75em`)
       .attr('font-size', '13')
       .attr('text-anchor', 'middle')
