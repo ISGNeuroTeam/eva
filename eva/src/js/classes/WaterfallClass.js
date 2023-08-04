@@ -190,7 +190,7 @@ export default class WaterfallClass {
     const barCommentParams = dataWithComments.map((d, idx) => {
       if (d.comment) {
         const elem = this.svg.append('foreignObject')
-          .attr('width', () => `${this.x.bandwidth() * (idx + 1 === dataWithComments.length ? bandwidth1 : bandwidth2)}px`)
+          .attr('width', () => `${this.x.bandwidth() * (d._lastBar ? bandwidth1 : bandwidth2)}px`)
           .style('x', -1000)
           .style('overflow-y', 'scroll')
           .style('line-height', 1.15)
@@ -206,7 +206,7 @@ export default class WaterfallClass {
         const heightLimit = this.height / 6; // 108
         const result = {
           scrollHeight,
-          height: scrollHeight < heightLimit ? scrollHeight : heightLimit,
+          height: (scrollHeight < heightLimit) ? scrollHeight : heightLimit,
           width: elemText.node().scrollWidth,
         };
         elem.remove();
