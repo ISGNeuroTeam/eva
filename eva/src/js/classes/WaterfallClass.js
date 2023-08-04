@@ -73,7 +73,10 @@ export default class WaterfallClass {
   }
 
   get data() {
-    return this.dataSet;
+    return this.dataSet.map((d, idx) => ({
+      ...d,
+      _lastBar: this.dataSet.length === idx + 1,
+    }));
   }
 
   get groupedData() {
@@ -187,7 +190,7 @@ export default class WaterfallClass {
     const barCommentParams = dataWithComments.map((d, idx) => {
       if (d.comment) {
         const elem = this.svg.append('foreignObject')
-          .attr('width', () => `${this.x.bandwidth() * (idx + 1 === dataWithComments.length ? bandwidth1 : bandwidth2)}px`)
+          .attr('width', () => `${this.x.bandwidth() * (d._lastBar ? bandwidth1 : bandwidth2)}px`)
           .style('x', -1000)
           .style('overflow-y', 'scroll')
           .style('line-height', 1.15)
@@ -203,7 +206,7 @@ export default class WaterfallClass {
         const heightLimit = this.height / 6; // 108
         const result = {
           scrollHeight,
-          height: scrollHeight < heightLimit ? scrollHeight : heightLimit,
+          height: (scrollHeight < heightLimit) ? scrollHeight : heightLimit,
           width: elemText.node().scrollWidth,
         };
         elem.remove();
@@ -212,8 +215,7 @@ export default class WaterfallClass {
       }
       return 0;
     });
-    const getForTwoColumns = (idx) => barCommentParams[idx].width > this.x.bandwidth() * 1.2
-      && idx + 1 !== barCommentParams.length;
+    const getForTwoColumns = (idx) => barCommentParams[idx].width > this.x.bandwidth() * 1.2;
 
     this.svg.selectAll('.group-item')
       .filter((d) => d.comment)
@@ -238,7 +240,7 @@ export default class WaterfallClass {
         }
         return pos;
       })
-      .attr('width', (d, idx) => `${this.x.bandwidth() * ((getForTwoColumns(idx) ? bandwidth2 : bandwidth1) + 0.1)}px`)
+      .attr('width', (d, idx) => `${this.x.bandwidth() * ((getForTwoColumns(idx) && !d._lastBar ? bandwidth2 : bandwidth1) + 0.1)}px`)
       .attr('height', (d, idx) => {
         const opts = this.options.barsOptions.find(({ title }) => (title === d.title));
         return !opts?.hideComment ? barCommentParams[idx].height : 0;
@@ -283,7 +285,7 @@ export default class WaterfallClass {
       .append('foreignObject')
       .attr('x', textAreaLeftOffset)
       .attr('y', (d, idx, els) => d3.select(els[idx].parentNode).select('.comment').node().getBBox().y)
-      .attr('width', (d, idx) => `${this.x.bandwidth() * (getForTwoColumns(idx) ? bandwidth2 : bandwidth1)}px`)
+      .attr('width', (d, idx) => `${this.x.bandwidth() * (getForTwoColumns(idx) && !d._lastBar ? bandwidth2 : bandwidth1)}px`)
       .attr('height', (d, idx, els) => d3.select(els[idx].parentNode).select('.comment').node().getBBox().height)
       .style('overflow-y', 'scroll')
       // .style('outline', '1px dashed red')
@@ -652,7 +654,7 @@ export default class WaterfallClass {
     this.svg
       .selectAll('line.zero')
       .data(lines)
-      .enter().filter((d) => d < 0)
+      .enter().filter((d) => d <= 0)
       .append('line')
       .attr('class', 'zero')
       .attr('stroke-width', 0.3)
