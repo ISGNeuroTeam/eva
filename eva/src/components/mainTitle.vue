@@ -153,12 +153,9 @@
           :class="{
             active: currentTab === tab.id,
             'edit-mode-tab': mode,
-            hover: tab.id === hoveredTabID,
           }"
           class="tab-item"
           @click="clickTab(tab.id)"
-          @mouseover="tabOver(tab.id)"
-          @mouseleave="tabLeave(tab.id)"
         >
           <div
             v-if="tab.id !== editableTabID"
@@ -315,7 +312,6 @@ export default {
       tabEditMode: false,
       tempName: '',
       editableTabID: 0,
-      hoveredTabID: 0,
       loadingDash: true,
       dataObject: {},
       dataObjectConst: {},
@@ -799,12 +795,6 @@ export default {
         this.editableTabID = 0;
         this.tempName = '';
       }
-    },
-    tabOver(tabID) {
-      this.hoveredTabID = tabID;
-    },
-    tabLeave() {
-      this.hoveredTabID = 0;
     },
     hash(elem) {
       return `${elem}#${this.idDash}`;
