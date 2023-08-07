@@ -81,7 +81,7 @@
           <move-able
             v-for="elem in elements"
             :key="hash(elem.elem)"
-            :style="`z-index: ${sorting.indexOf(elem.elem)};`"
+            :z-index="sorting.indexOf(elem.elem)"
             :data-mode-from="mode"
             :id-dash-from="idDash"
             :data-elem="elem.elem"
