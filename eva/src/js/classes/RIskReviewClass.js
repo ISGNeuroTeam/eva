@@ -8,13 +8,13 @@ export default class RIskReviewClass {
 
     height = null;
 
-    marginX = 0;
+    marginX = 10;
 
     marginY = 0;
 
-    paddingInner = 0.3;
+    paddingInner = 0.45;
 
-    paddingOuter = 0.7;
+    paddingOuter = 0.45;
 
     chartPaddingInner = 0;
 
@@ -52,12 +52,14 @@ export default class RIskReviewClass {
         return { isValid: false, error: 'Не указаны части столбцов' };
       }
 
-      const dsCols = Object.keys(dataRest[0]);
-
       // eslint-disable-next-line no-restricted-syntax
-      for (const id of barParts.map((p) => p.id)) {
-        if (!dsCols.includes(id)) {
-          return { isValid: false, error: `Отсутствует столбец данных "${id}"` };
+      for (const dsItem of dataRest) {
+        const dsCols = Object.keys(dsItem);
+        // eslint-disable-next-line no-restricted-syntax
+        for (const bar of barParts) {
+          if (!dsCols.includes(bar.id)) {
+            return { isValid: false, error: `Отсутствует столбец данных "${bar.id}"` };
+          }
         }
       }
 
@@ -124,31 +126,53 @@ export default class RIskReviewClass {
       dataRest = [],
       barParts = [],
       options = {},
-      paddingOuter = 0.5,
-      paddingInner = 0.5,
+      paddingOuter,
+      paddingInner,
       setTokenFn = null,
       onClickFn = null,
-      marginX = 0,
-      marginY = 0,
+      marginX,
+      marginY,
       toDivideFn,
     }) {
       this.svgContainer = container;
       this.dataRest = dataRest;
       this.barParts = barParts;
       this.options = options;
-      this.paddingOuter = paddingOuter;
-      this.paddingInner = paddingInner;
+      if (paddingOuter) this.paddingOuter = paddingOuter;
+      if (paddingInner) this.paddingInner = paddingInner;
+      if (marginX) this.marginX = marginX;
+      if (marginY) this.marginY = marginY;
       this.setTokenFn = setTokenFn;
       this.onClickFn = onClickFn;
       this.width = width;
       this.height = height;
-      this.marginX = marginX;
-      this.marginY = marginY;
       if (toDivideFn) {
         this.toDivide = toDivideFn;
       }
-
       this.render();
+    }
+
+    filteringData() {
+      const updatedData = [];
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const currentItem of this.dataRest) {
+        const updatedItem = {};
+
+        // eslint-disable-next-line no-restricted-syntax
+        for (const currentBar of this.barParts) {
+          const targetId = currentBar.id;
+          const currentValue = currentItem[targetId];
+
+          if (!currentBar.hideZeroValue || Math.abs(Number(currentValue)) !== 0) {
+            updatedItem[targetId] = currentValue;
+          }
+        }
+
+        updatedData.push(updatedItem);
+      }
+
+      this.dataRest = updatedData;
     }
 
     // Очистить полотно
@@ -156,12 +180,27 @@ export default class RIskReviewClass {
       d3.select(this.svgContainer).select('svg').remove();
     }
 
-    render() {
+    render(rerender = false) {
       this.clear();
       this.prepareRenderData();
       this.createXAxis();
       this.createBars();
       this.createLines();
+      if (!rerender) {
+        this.fitContent();
+      }
+    }
+
+    fitContent() {
+      const gBox = d3.select('.content-g').node().getBBox();
+      const containerWidth = this.svgContainer.offsetWidth;
+      const gXOffsetLeft = Math.round(Math.abs(gBox.x));
+      const gXOffsetRight = Math.round(gBox.width) - (containerWidth + this.marginX);
+      const updatedMarginX = gXOffsetRight + gXOffsetLeft + this.marginX;
+      if (updatedMarginX > 0) {
+        this.marginX = updatedMarginX;
+        this.render(true);
+      }
     }
 
     createSvg() {
@@ -169,6 +208,7 @@ export default class RIskReviewClass {
         .append('svg')
         .attr('class', 'content')
         .append('g')
+        .attr('class', 'content-g')
         .attr('transform', `translate(${this.marginX}, ${this.marginY})`);
 
       this.svg.append('rect')
@@ -192,9 +232,11 @@ export default class RIskReviewClass {
       this.barParts.forEach((part) => {
         this.dataRest.forEach((ds) => {
           const number = ds[part.id];
-          const numLength = number.toString().length;
-          if (numLength > maxNumLength) {
-            maxNumLength = numLength;
+          if (number) {
+            const numLength = number.toString().length;
+            if (numLength > maxNumLength) {
+              maxNumLength = numLength;
+            }
           }
         });
       });
@@ -233,7 +275,7 @@ export default class RIskReviewClass {
       // eslint-disable-next-line no-restricted-syntax
       for (const part of this.barParts) {
         const {
-          id, idStart, type, textPosY, textPosX, textColor, textOffset = 10,
+          id, idStart, type, textPosY, textPosX, textColor, textOffset = 10, hideZeroValue,
         } = part;
 
         // eslint-disable-next-line no-continue
@@ -252,21 +294,26 @@ export default class RIskReviewClass {
           .enter()
           .append('rect')
           .attr('x', (d) => {
-            const start = idStart ? d[idStart] : 0;
-            const width = this.xScale(d[id] + start) - this.xScale(start);
-            const startX = idStart ? d[idStart] : 0;
+            const value = typeof d[id] !== 'undefined' ? d[id] : 0;
+            const startValue = typeof d[idStart] !== 'undefined' ? d[idStart] : 0;
+            const start = idStart ? startValue : 0;
+            const width = this.xScale(value + start) - this.xScale(start);
+            const startX = idStart ? startValue : 0;
             if (start !== 0) {
-              return this.xScale(Math.min(startX, d[id] + startX));
+              return this.xScale(Math.min(startX, value + startX));
+            }
+            if (d[id] === 0 && hideZeroValue) {
+              return 0;
             }
             if (width > 0) {
-              return this.xScale(Math.min(startX, d[id] + startX)) + 1;
+              return this.xScale(Math.min(startX, value + startX)) + 1;
             }
-            return this.xScale(Math.min(startX, d[id] + startX)) - 1;
+            return this.xScale(Math.min(startX, value + startX)) - 1;
           })
           .attr('y', (d, i) => {
             const y = this.yScale(i);
 
-            if (isTitleShow) {
+            if (isTitleShow && (typeof d[id] !== 'undefined')) {
               const xData = d[id];
               const textPositionsX = {
                 default: idStart ? xData + d[idStart] : xData,
@@ -279,7 +326,12 @@ export default class RIskReviewClass {
               const yAttr = y + this.barHeight / 2;
               const anchor = xData >= 0 ? 'start' : 'end';
               this.svg.append('text')
-                .text(Number(xData) >= 0 ? `+${this.toDivide(xData)}` : this.toDivide(xData))
+                .text(() => {
+                  if (hideZeroValue && xData === 0) {
+                    return '';
+                  }
+                  return Number(xData) >= 0 ? `+${this.toDivide(xData)}` : this.toDivide(xData);
+                })
                 .attr('class', 'bar-text-caption')
                 .attr('fill', textColor || fill)
                 .attr('text-anchor', anchor)
@@ -305,8 +357,8 @@ export default class RIskReviewClass {
             const start = idStart ? d[idStart] : 0;
             const width = Math.abs(this.xScale(d[id] + start) - this.xScale(start));
             // eslint-disable-next-line no-restricted-globals
-            if (isNaN(width)) {
-              return 1;
+            if (isNaN(width) || (d[id] === 0 && hideZeroValue)) {
+              return 0;
             }
             if (width > 1) {
               return width;
@@ -325,26 +377,44 @@ export default class RIskReviewClass {
       // eslint-disable-next-line no-restricted-syntax
       for (const part of this.barParts) {
         const {
-          id, type, fill = 'var(--pink)', isTitleShow = true,
+          id, type, fill = 'var(--pink)', isTitleShow = true, hideZeroValue,
         } = part;
 
         // eslint-disable-next-line no-continue
         if (type !== 'line') continue;
 
         this.dataRest.forEach((bar, i) => {
-          const value = bar[id];
+          const value = bar[id] ? Number(bar[id]) : 0;
           const x = this.xScale(value);
           const y = this.yScale(i);
           const line = d3.line();
 
           this.svg.append('path')
-            .attr('stroke', fill)
-            .attr('stroke-width', 3)
+            .attr('stroke', () => {
+              if (hideZeroValue && value === 0) {
+                return 'transparent';
+              }
+              return fill;
+            })
+            .attr('stroke-width', () => {
+              if (hideZeroValue && (value === 0 || `${value}` === '-0' || `${value}` === '+0')) {
+                return 0;
+              }
+              return 3;
+            })
             .attr('d', line([[x, y - 5], [x, y + this.barHeight + 5]]));
 
           if (isTitleShow) {
             this.svg.append('text')
-              .text(Number(value) >= 0 ? `+${this.toDivide(value)}` : this.toDivide(value))
+              .text(() => {
+                if (hideZeroValue && value === 0) {
+                  return '';
+                }
+                if (`${value}` === '-0') {
+                  return '-0';
+                }
+                return Number(value) >= 0 ? `+${this.toDivide(value)}` : this.toDivide(value);
+              })
               .attr('class', 'bar-text-caption')
               .attr('fill', fill)
               .attr('text-anchor', 'end')
