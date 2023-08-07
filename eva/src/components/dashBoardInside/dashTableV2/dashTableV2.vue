@@ -356,6 +356,7 @@ export default {
               const num = cell.getValue();
               if (typeof num === 'number') {
                 return num.toLocaleString(numberFormat, {
+                  minimumFractionDigits: 0,
                   maximumFractionDigits: decimalPlacesLimits || 10,
                 });
               }
