@@ -809,7 +809,7 @@ export default {
     {
       option: 'enableDecimalPlacesLimits',
       optionGroup: 'tableOptions',
-      description: 'Ограничение десятичных знаков',
+      description: 'Включить форматирование чисел',
       elem: 'switch',
       default: false,
     },
