@@ -554,7 +554,7 @@ export default {
     },
     getOptions: {
       handler() {
-        this.updateColumnDefinition();
+        this.redrawTable();
       },
       deep: true,
     },
