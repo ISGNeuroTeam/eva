@@ -342,6 +342,7 @@ export default {
     },
     columnOptions() {
       const columnOptions = {};
+      const { enableDecimalPlacesLimits } = this;
       const {
         numberFormat,
         decimalPlacesLimits,
@@ -352,10 +353,11 @@ export default {
             headerFilter: this.defaultFilterAllColumns,
             headerMenu: true,
             frozen: this.frozenColumns.includes(column),
-            formatter: (this.enableDecimalPlacesLimits) ? (cell) => {
+            formatter: (enableDecimalPlacesLimits) ? (cell) => {
               const num = cell.getValue();
               if (typeof num === 'number') {
                 return num.toLocaleString(numberFormat, {
+                  minimumFractionDigits: 0,
                   maximumFractionDigits: decimalPlacesLimits || 10,
                 });
               }
@@ -547,6 +549,12 @@ export default {
         if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
           this.updateColumnDefinition();
         }
+      },
+      deep: true,
+    },
+    getOptions: {
+      handler() {
+        this.redrawTable();
       },
       deep: true,
     },
