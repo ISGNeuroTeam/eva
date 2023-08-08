@@ -64,6 +64,7 @@
       ref="chartSettings"
       v-model="isSettingsComponentOpen"
       :received-settings="receivedSettings"
+      :data-rest-from="dataRestFrom"
       @save="saveSettings"
       @close="closeSettings"
     />
@@ -125,6 +126,10 @@ export default {
       isSettingsComponentOpen: false,
       defaultSettings: {
         useGroups: true,
+      },
+      max: {
+        key: '',
+        value: 0,
       },
     };
   },
@@ -214,7 +219,8 @@ export default {
       const metricsByGroup = [];
       const existsMetrics = [];
       if (this.options.metricsByGroup && this.options.metricsByGroup.length) {
-        this.options.metricsByGroup.forEach((group) => {
+        this.options.metricsByGroup.forEach((group, i) => {
+          this.max = this.getMaxValueYAxis(this.dataRestFrom, this.options.metricsByGroup[i]);
           const metrics = [];
           group.forEach((metric) => {
             if (this.metrics.includes(metric.name)) {
@@ -235,13 +241,18 @@ export default {
       // add new metrics config
       const newMetrics = this.metrics.filter((i) => existsMetrics.indexOf(i) < 0);
       if (newMetrics.length) {
-        metricsByGroup.push([]);
+        // metricsByGroup.push([]);
         newMetrics.forEach((metricName, nN) => {
           const metric = this.getOldMetricConfig(metricName);
           if (!this.options.useGroups && metricsByGroup[metricsByGroup.length - 1].length > 0) {
             metricsByGroup.push([]);
           }
-          metricsByGroup[metricsByGroup.length - 1].push(metric);
+          if (this.options.commonAxisY) {
+            metricsByGroup[0].push(metric);
+          } else {
+            metricsByGroup.push([]);
+            metricsByGroup[metricsByGroup.length - 1].push(metric);
+          }
           // если тащим настройки со старого мультилайна то добавим группы для не united графиков
           if (this.options?.united === false && nN !== newMetrics.length - 1) {
             metricsByGroup.push([]);
@@ -285,6 +296,7 @@ export default {
         metricsByGroup: [...this.metricsByGroup],
         xAxis: { ...this.xAxisSettings },
         useGroups: !!this.options.useGroups,
+        commonAxisY: !!this.options.commonAxisY,
       };
     },
   },
@@ -325,6 +337,7 @@ export default {
       const { numberFormat = false } = this.userSettings;
       this.chart = new ChartClass(this.$refs.svgContainer, width, height, this.theme, {
         useGroups: !!this.options.useGroups,
+        commonAxisY: !!this.options.commonAxisY,
         numberFormat,
         xAxis: {
           type: 'time', // linear, time, - log, point, band
@@ -473,6 +486,7 @@ export default {
         type: isBarplot ? 'barplot' : 'line',
         // yAxisSide: (this.options.united && metricsAxis[name]) === 'right' ? 'right' : 'left',
         yAxisSide: 'left',
+        yAxisLink: this.max.value > 0 && this.options.commonAxisY ? this.max.key : '',
         // eslint-disable-next-line no-nested-ternary
         lastDot: conclusion_count[name] || (isDataAlwaysShow ? 1 : (lastDot ? 0 : '')),
         // eslint-disable-next-line no-restricted-globals
@@ -495,6 +509,27 @@ export default {
       };
     },
 
+    getMaxValueYAxis(dataRest, metricsByGroup) {
+      const max = {
+        key: '',
+        value: 0,
+      };
+      // eslint-disable-next-line no-restricted-syntax
+      for (const item of dataRest) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const key of Object.keys(item)) {
+          if (key !== '_time' && metricsByGroup.find((metric) => metric.name === key)) {
+            const value = item[key];
+            if (max.value < value) {
+              max.value = value;
+              max.key = key;
+            }
+          }
+        }
+      }
+      return max;
+    },
+
     openSettings() {
       this.isSettingsComponentOpen = true;
     },
@@ -504,7 +539,9 @@ export default {
     },
 
     saveSettings(settings = {}) {
-      const { metricsByGroup, xAxis, useGroups } = settings;
+      const {
+        metricsByGroup, xAxis, useGroups, commonAxisY,
+      } = settings;
       this.$store.commit('setOptions', {
         id: this.idFrom,
         idDash: this.idDashFrom,
@@ -514,6 +551,7 @@ export default {
           metricsByGroup,
           xAxis,
           version: 3,
+          commonAxisY,
         },
       });
       this.chart.update(this.metricsByGroup, this.xAxisSettings, this.dataRestFrom, this.xMetric);
