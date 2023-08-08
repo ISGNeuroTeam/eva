@@ -7,6 +7,7 @@
     :h="height === 0 ? movableProps.grid[1] : height"
     :x="left"
     :y="top"
+    :z="zIndex"
     :draggable="dragRes"
     :drag-cancel="'.v-slider, .no-draggable'"
     :resizable="dragRes"
@@ -65,6 +66,10 @@ export default {
       required: true,
     },
     horizontalCell: {
+      type: Number,
+      required: true,
+    },
+    zIndex: {
       type: Number,
       required: true,
     },

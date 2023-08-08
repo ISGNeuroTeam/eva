@@ -338,8 +338,13 @@ export default {
   },
   watch: {
     isMenuActive(val, oldVal) {
-      if (val !== oldVal && !val) {
-        this.setTockenDelay('closemenu');
+      if (val !== oldVal) {
+        if (val) {
+          this.autocomplite.$el.dispatchEvent(new Event('mousedown', { bubbles: true }));
+          this.autocomplite.$el.dispatchEvent(new Event('mouseup', { bubbles: true }));
+        } else {
+          this.setTockenDelay('closemenu');
+        }
       }
     },
     'dashFromStore.options.defaultFromSourceData': {
