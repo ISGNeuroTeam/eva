@@ -98,8 +98,9 @@ export default class ChartClass {
   }
 
   createTooltip() {
-    this.tooltip = d3.select(this.svgContainer)
+    this.tooltip = d3.select('.v-application')// this.svgContainer.parentElement
       .append('div')
+      .attr('class', 'multiline-tooltip')
       .style('position', 'absolute')
       .style('background-color', 'var(--secondary_bg)')
       .style('border', '1px solid var(--main_border)')
@@ -108,7 +109,7 @@ export default class ChartClass {
       .style('padding', '5px')
       .style('font-size', '12px')
       .style('white-space', 'nowrap')
-      .style('z-index', '2')
+      .style('z-index', '10000')
       .style('pointer-events', 'none')
       .style('text-align', 'left')
       .style('visibility', 'hidden');
@@ -741,7 +742,14 @@ export default class ChartClass {
     }
   }
 
-  updateTooltip(d, metric, left, top, curMetricBold = true) {
+  updateTooltip(d, metric, localLeft, localTop, curMetricBold = true) {
+    const {
+      scrollTop,
+      clientHeight,
+      clientWidth,
+    } = document.documentElement;
+    // eslint-disable-next-line
+    const { pageX: left, pageY: top } = event;
     const {
       numberFormat,
     } = this.options;
@@ -762,12 +770,12 @@ export default class ChartClass {
       );
 
     let leftPos = left;
-    if (left > this.box.width / 2) {
+    if (left > clientWidth / 2) {
       leftPos -= this.tooltip.node().offsetWidth + 20;
     }
 
     let topPos = top;
-    if (top > this.box.height / 2) {
+    if (top - scrollTop > clientHeight / 2) {
       topPos -= this.tooltip.node().offsetHeight + 20;
     }
 
@@ -1180,7 +1188,7 @@ export default class ChartClass {
         this.hideTooltip();
         this.hideLineDot();
       })
-      .on('mouseenter', (d) => {
+      .on('mousemove', (d) => {
         const { metric } = d;
         const lineXPos = this.x(d.data[this.xMetric]);
         let lineYPos = this.y[metric.name](d[1]);
@@ -1263,7 +1271,7 @@ export default class ChartClass {
       })
       .attr('fill', (d) => d.color)
       .on('click', (d) => this.clickChart([d.data[this.xMetric], d.value]))
-      .on('mouseenter', (d) => {
+      .on('mousemove', (d) => {
         const { metric } = d;
         const lineXPos = this.x(d.data[this.xMetric]);
         const lineYPos = this.y[metric.name](d.value);
