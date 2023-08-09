@@ -743,7 +743,11 @@ export default class ChartClass {
   }
 
   updateTooltip(d, metric, localLeft, localTop, curMetricBold = true) {
-    const { clientWidth, clientHeight } = document.body;
+    const {
+      scrollTop,
+      clientHeight,
+      clientWidth,
+    } = document.documentElement;
     // eslint-disable-next-line
     const { pageX: left, pageY: top } = event;
     const {
@@ -771,7 +775,7 @@ export default class ChartClass {
     }
 
     let topPos = top;
-    if (top > clientHeight / 2) {
+    if (top - scrollTop > clientHeight / 2) {
       topPos -= this.tooltip.node().offsetHeight + 20;
     }
 
