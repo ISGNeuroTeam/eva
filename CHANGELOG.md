@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+TableV2: number formatting
 - Risk-review: Added setting to hide metrics with zero values
 - Risk-review: Hide description if metric value = 0
 - Risk-review: Added auto-resize on change textOffset options
@@ -17,7 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Risk-review: Changed outer padding from 40px to 5px
 
 ### Fixed
+- Select does not activate visualization
 - Risk-review: Fixed visualization container
+
+## [1.145.1]
+
+### Fixed
+- Waterfall: print zero line, width of comments
 
 ## [1.145.0]
 

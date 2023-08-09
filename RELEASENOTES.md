@@ -1,3 +1,8 @@
+# [1.145.1] - 2023-08-04
+
+### Fixed
+- Waterfall: display zero line, width of comments
+
 # [1.145.0] - 2023-08-03
 
 ### Changed

@@ -22,12 +22,8 @@
         {{ errorMessage || 'Данные не отображаются из-за настроек' }}
       </div>
       <div
-        v-show="!isDataError"
-        :style="{
-          'width': `${widthFrom}px`,
-          'height': `${heightFromInner}px`,
-          ...gridStyles,
-        }"
+        v-show="!(isDataError || filteredData.length === 0)"
+        :style="gridContainerStyles"
         class="risk-review__grid-container"
       >
         <div
@@ -166,7 +162,7 @@
                 height: `${barHeight}px`,
                 marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
               }"
-              v-text="toDivide(value)"
+              v-text="toDivide(value || 0)"
             />
           </div>
         </div>
@@ -428,38 +424,7 @@ export default {
       });
       return fieldsCount > 0 ? result : [];
     },
-  },
-  watch: {
-    dataset: {
-      deep: true,
-      handler(val) {
-        if (val?.length > 0) {
-          this.render();
-          this.updateActionCapture(val);
-        }
-      },
-    },
-    sizeFrom: {
-      deep: true,
-      handler() {
-        this.$nextTick(() => {
-          this.$nextTick(() => {
-            this.getLegendHeight();
-            this.render();
-          });
-        });
-      },
-    },
-    hideLegend() {
-      this.render();
-    },
-  },
-  mounted() {
-    this.getLegendHeight();
-    this.render();
-  },
-  methods: {
-    setGridStyles() {
+    gridContainerStyles() {
       const leftDescArea = (this.listColName || this.listColValue || this.leftTitle)
         ? 'left-descr '
         : '';
@@ -476,17 +441,81 @@ export default {
         ? ' residual'
         : '';
       const residualSize = residualArea
-        ? ' minmax(auto, 13%)'
+        ? ' minmax(10px, 0.5fr)'
         : '';
-      this.gridStyles = {
+      return {
+        width: `${this.widthFrom}px`,
+        height: `${this.heightFromInner}px`,
         display: 'grid',
         'grid-template-rows': '1fr',
         'grid-template-columns': `${leftDescSize}1fr${rightDescSize}${residualSize}`,
         'grid-template-areas': `"${leftDescArea}svg${rightDescArea}${residualArea}"`,
       };
     },
+  },
+  watch: {
+    filteredData: {
+      deep: true,
+      handler(val, oldVal) {
+        const updatedValue = JSON.stringify(val) !== JSON.stringify(oldVal);
+        if (val?.length > 0 && updatedValue) {
+          this.$nextTick(() => {
+            this.$nextTick(() => {
+              this.getLegendHeight();
+              this.render();
+              this.updateActionCapture(val);
+            });
+          });
+        }
+      },
+    },
+    sizeFrom: {
+      deep: true,
+      handler(val, oldVal) {
+        const isUpdatedSize = JSON.stringify(val) !== JSON.stringify(oldVal);
+        if (this.filteredData?.length > 0 && isUpdatedSize) {
+          this.$nextTick(() => {
+            this.$nextTick(() => {
+              this.getLegendHeight();
+              this.render();
+            });
+          });
+        }
+      },
+    },
+    barParts: {
+      deep: true,
+      handler(val, oldVal) {
+        const isUpdatedValue = JSON.stringify(val) !== JSON.stringify(oldVal);
+        if (isUpdatedValue) {
+          this.$nextTick(() => {
+            this.$nextTick(() => {
+              this.getLegendHeight();
+              this.render();
+            });
+          });
+        }
+      },
+    },
+    hideLegend(val, oldVal) {
+      if (val !== oldVal) {
+        this.render();
+      }
+    },
+  },
+  mounted() {
+    if (this.filteredData?.length > 0) {
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          this.getLegendHeight();
+          this.render();
+        });
+      });
+    }
+  },
+  methods: {
     getLegendHeight() {
-      if (this.$refs.riskReviewLegend) {
+      if (this.$refs?.riskReviewLegend?.offsetHeight) {
         this.legendHeight = this.$refs.riskReviewLegend.offsetHeight + 4;
       }
     },
@@ -520,7 +549,6 @@ export default {
     },
 
     render() {
-      this.setGridStyles();
       this.$nextTick(() => {
         const validate = RiskReviewClass.validateData;
 
@@ -542,7 +570,7 @@ export default {
               marginY: this.marginY,
               height: this.hideLegend
                 ? this.sizeFrom.height
-                : this.sizeFrom.height - this.$refs.riskReviewLegend.offsetHeight - 16,
+                : this.sizeFrom.height - this.legendHeight - 16,
               barParts: this.barParts,
               dataRest: this.filteredData,
               setTokenFn: this.setTokens,

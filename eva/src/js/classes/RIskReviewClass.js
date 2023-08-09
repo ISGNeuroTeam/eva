@@ -12,9 +12,9 @@ export default class RIskReviewClass {
 
     marginY = 0;
 
-    paddingInner = 0.45;
+    paddingInner = 0.5;
 
-    paddingOuter = 0.45;
+    paddingOuter = 0.2;
 
     chartPaddingInner = 0;
 
@@ -110,10 +110,10 @@ export default class RIskReviewClass {
     }
 
     get yScale() {
-      const height = (this.height) - this.marginY * 2;
+      const height = (this.height) - 40;
 
       return d3.scaleBand()
-        .range([0, height])
+        .range([30, height])
         .domain(this.dataRest.map((b, i) => i))
         .paddingInner(this.paddingInner)
         .paddingOuter(this.paddingOuter);
@@ -187,18 +187,24 @@ export default class RIskReviewClass {
       this.createBars();
       this.createLines();
       if (!rerender) {
-        this.fitContent();
+        setTimeout(() => {
+          this.fitContent();
+        }, 0);
       }
     }
 
     fitContent() {
-      const gBox = d3.select('.content-g').node().getBBox();
+      const gBox = d3.select(this.svgContainer).select('.content-g').node().getBBox();
       const containerWidth = this.svgContainer.offsetWidth;
-      const gXOffsetLeft = Math.round(Math.abs(gBox.x));
-      const gXOffsetRight = Math.round(gBox.width) - (containerWidth + this.marginX);
-      const updatedMarginX = gXOffsetRight + gXOffsetLeft + this.marginX;
+      const gXOffsetLeft = Math.round(Math.abs(gBox.x + (gBox.x * 0.05)));
+      let gXOffsetRight = 0;
+      if (gBox.width > containerWidth) {
+        const boxSizeWithOffset = Math.abs(Math.round(gBox.width + (gBox.width * 0.05)));
+        gXOffsetRight = boxSizeWithOffset - containerWidth;
+      }
+      const updatedMarginX = gXOffsetRight + gXOffsetLeft;
       if (updatedMarginX > 0) {
-        this.marginX = updatedMarginX;
+        this.marginX += updatedMarginX;
         this.render(true);
       }
     }
