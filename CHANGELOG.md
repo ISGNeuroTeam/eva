@@ -14,6 +14,7 @@ TableV2: number formatting
 
 ### Fixed
 - Select does not activate visualization
+- Multiline: tooltip is clipped outside the graph
 
 ## [1.145.1]
 
