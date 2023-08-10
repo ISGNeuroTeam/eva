@@ -20,6 +20,7 @@ TableV2: number formatting
 ### Fixed
 - Select does not activate visualization
 - Risk-review: Fixed visualization container
+- Multiline: tooltip is clipped outside the graph
 
 ## [1.145.1]
 
