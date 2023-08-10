@@ -288,7 +288,7 @@ export default class RIskReviewClass {
         if (type !== 'bar') continue;
 
         const {
-          fill = 'var(--secondary_text)',
+          fill = 'var(--main_text)',
           isTitleShow = false,
           isFullHeight = true,
         } = part;
@@ -383,7 +383,7 @@ export default class RIskReviewClass {
       // eslint-disable-next-line no-restricted-syntax
       for (const part of this.barParts) {
         const {
-          id, type, fill = 'var(--pink)', isTitleShow = true, hideZeroValue,
+          id, type, fill = 'var(--main_text)', textColor, isTitleShow = true, hideZeroValue,
         } = part;
 
         // eslint-disable-next-line no-continue
@@ -422,7 +422,7 @@ export default class RIskReviewClass {
                 return Number(value) >= 0 ? `+${this.toDivide(value)}` : this.toDivide(value);
               })
               .attr('class', 'bar-text-caption')
-              .attr('fill', fill)
+              .attr('fill', textColor || fill)
               .attr('text-anchor', 'end')
               .attr('x', x - 5)
               .attr('y', y + this.barHeight / 2)
