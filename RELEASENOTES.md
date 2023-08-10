@@ -1,3 +1,20 @@
+# [1.146.0] - 2023-08-10
+
+### Added
+- TableV2: number formatting
+- Risk-review: 
+  - Setting to hide metrics with zero values
+  - Hide description if metric value is 0
+  - Added auto-resize on change textOffset options
+
+### Changed
+- Risk-review: Changed inner and outer padding
+
+### Fixed
+- Select does not activate visualization
+- Risk-review: Fixed visualization container
+- Multiline: tooltip is clipped outside the graph
+
 # [1.145.1] - 2023-08-04
 
 ### Fixed

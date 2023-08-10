@@ -8,7 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-TableV2: number formatting
+
+### Changed
+
+### Fixed
+
+## [1.146.0]
+
+### Added
+- TableV2: number formatting
 - Risk-review: Added setting to hide metrics with zero values
 - Risk-review: Hide description if metric value = 0
 - Risk-review: Added auto-resize on change textOffset options
