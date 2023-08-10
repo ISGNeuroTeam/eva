@@ -281,8 +281,8 @@ export default {
       };
     },
     titlesContainerStyle() {
-      const { chartPaddingOuter, marginY } = this;
-      return { paddingTop: `${(chartPaddingOuter - 24) + marginY}px` };
+      const { chartPaddingOuter, marginY, legendHeight } = this;
+      return { paddingTop: `${legendHeight > 0 ? chartPaddingOuter : (chartPaddingOuter - 24) + marginY}px` };
     },
     dataset() {
       if (this.filteredData?.length > 0) {
@@ -429,13 +429,13 @@ export default {
         ? 'left-descr '
         : '';
       const leftDescSize = leftDescArea
-        ? 'minmax(auto, 20%) '
+        ? 'minmax(auto, 27%) '
         : '';
       const rightDescArea = (this.secondListColName || this.secondListColValue || this.rightTitle)
         ? ' right-descr'
         : '';
       const rightDescSize = rightDescArea
-        ? ' minmax(auto, 20%)'
+        ? ' minmax(auto, 27%)'
         : '';
       const residualArea = this.isVisibleResidualImpactPanel
         ? ' residual'
