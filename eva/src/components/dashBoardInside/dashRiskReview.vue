@@ -16,25 +16,22 @@
       v-bind="$attrs"
     >
       <div
-        v-if="isDataError"
+        v-if="isDataError || filteredData.length === 0"
         class="risk-review__dataError"
       >
-        {{ errorMessage }}
+        {{ errorMessage || 'Данные не отображаются из-за настроек' }}
       </div>
       <div
-        v-show="!isDataError"
-        :style="{
-          'width': `${widthFrom}px`,
-          'height': `${heightFromInner}px`,
-        }"
-        class="row align-stretch"
+        v-show="!(isDataError || filteredData.length === 0)"
+        :style="gridContainerStyles"
+        class="risk-review__grid-container"
       >
         <div
           v-if="listColName || listColValue || leftTitle"
-          class="col-3"
+          class="risk-review__left-descriptions"
         >
           <div
-            class="risk-review__col-title px-3"
+            class="risk-review__col-title pl-3 pr-2"
             :style="{
               height: leftTitle ? 'auto' : '27px',
             }"
@@ -42,7 +39,7 @@
             {{ leftTitle }}
           </div>
           <div
-            class="titles-container px-3"
+            class="titles-container pl-3 pr-2"
             :style="titlesContainerStyle"
           >
             <div
@@ -61,29 +58,31 @@
                 {{ item.title }}:
               </div>
               <div class="bar-list">
-                <div
-                  v-for="(listItem, listIndex) in item.list"
-                  :key="`left-${i}-${listIndex}`"
-                  class="bar-list__item"
-                >
-                  {{ listIndex + 1 }}. {{ listItem.title }}
-                  <span
-                    v-if="listItem.value"
-                    class="bar-list__value-text"
+                <template v-for="(listItem, listIndex) in item.list">
+                  <div
+                    v-if="listItem.value && listItem.value !== 0 && listItem.title"
+                    :key="`left-${i}-${listIndex}`"
+                    class="bar-list__item"
                   >
-                    (<span
-                      class="bar-list__value"
-                      :style="{
-                        color: valueColor,
-                      }"
-                    >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
-                  </span>
-                </div>
+                    {{ listIndex + 1 }}. {{ listItem.title }}
+                    <span
+                      v-if="listItem.value"
+                      class="bar-list__value-text"
+                    >
+                      (<span
+                        class="bar-list__value"
+                        :style="{
+                          color: valueColor,
+                        }"
+                      >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
+                    </span>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
         </div>
-        <div class="col px-1">
+        <div class="risk-review__svg">
           <div
             ref="svgContainer"
             class="svg-container"
@@ -91,10 +90,10 @@
         </div>
         <div
           v-if="secondListColName || secondListColValue || rightTitle"
-          class="col-3"
+          class="risk-review__right-descriptions"
         >
           <div
-            class="risk-review__col-title px-3"
+            class="risk-review__col-title px-2"
             :style="{
               height: rightTitle ? 'auto' : '27px',
             }"
@@ -102,7 +101,7 @@
             {{ rightTitle }}
           </div>
           <div
-            class="titles-container titles-container--second px-3"
+            class="titles-container titles-container--second px-2"
             :style="titlesContainerStyle"
           >
             <div
@@ -123,13 +122,12 @@
               <div class="bar-list bar-list--second">
                 <template v-for="(listItem, listIndex) in item.list">
                   <div
-                    v-if="listItem && listItem.title"
+                    v-if="listItem && listItem.title && listItem.value && listItem.value !== 0"
                     :key="`right-${i}-${listIndex}`"
                     class="bar-list__item bar-list__item--second"
                   >
                     {{ listIndex + 1 }}. {{ listItem.title }}
                     <span
-                      v-if="listItem.value"
                       class="bar-list__value-text bar-list__value-text--second"
                     >
                       (<span
@@ -147,13 +145,13 @@
         </div>
         <div
           v-if="isVisibleResidualImpactPanel"
-          class="col-2"
+          class="risk-review__residual"
         >
           <div class="risk-review__col-title risk-review__col-title--residual">
             Остаточное влияние
           </div>
           <div
-            class="titles-container titles-container--residual px-3"
+            class="titles-container titles-container--residual px-2"
             :style="titlesContainerStyle"
           >
             <div
@@ -164,15 +162,15 @@
                 height: `${barHeight}px`,
                 marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
               }"
-              v-text="toDivide(value)"
+              v-text="toDivide(value || 0)"
             />
           </div>
         </div>
       </div>
       <div
-        v-if="!isDataError && !hideLegend"
+        v-if="!isDataError && !hideLegend && filteredData.length > 0"
         ref="riskReviewLegend"
-        class="risk-review-legend"
+        class="risk-review-legend px-3"
       >
         <div
           v-for="(part, i) in barParts"
@@ -180,6 +178,7 @@
           class="risk-review-legend__item"
         >
           <div
+            v-if="part.title"
             class="risk-review-legend__color"
             :style="{
               backgroundColor: part.fill,
@@ -250,7 +249,7 @@ export default {
     isDataError: false,
     errorMessage: '',
     dataAttr: '',
-    marginX: 40,
+    marginX: 0,
     marginY: 0,
     barHeight: 0,
     chartPaddingInner: 0,
@@ -265,6 +264,7 @@ export default {
     dashXPadding: 22,
     // Высота элемента с легендой
     legendHeight: 0,
+    gridStyles: {},
   }),
   computed: {
     ...mapGetters('app', [
@@ -285,14 +285,14 @@ export default {
       return { paddingTop: `${(chartPaddingOuter - 24) + marginY}px` };
     },
     dataset() {
-      if (this.dataRestFrom?.length > 0) {
-        return this.dataRestFrom;
+      if (this.filteredData?.length > 0) {
+        return this.filteredData;
       }
       return [];
     },
     titles() {
-      if (this.dataRestFrom?.length > 0) {
-        return this.dataRestFrom.map((elem) => this.getFormattedTitles(
+      if (this.filteredData?.length > 0) {
+        return this.filteredData.map((elem) => this.getFormattedTitles(
           elem,
           {
             titleColName: this.titleColName,
@@ -304,14 +304,14 @@ export default {
       return [];
     },
     formattedTitles() {
-      if (this.dataRestFrom?.length > 0) {
-        return this.dataRestFrom.map((ds) => ds[this.titleColName]);
+      if (this.filteredData?.length > 0) {
+        return this.filteredData.map((ds) => ds[this.titleColName]);
       }
       return [];
     },
     secondTitles() {
-      if (this.dataRestFrom?.length > 0) {
-        return this.dataRestFrom.map((elem) => this.getFormattedTitles(
+      if (this.filteredData?.length > 0) {
+        return this.filteredData.map((elem) => this.getFormattedTitles(
           elem,
           {
             titleColName: this.secondTitleColName,
@@ -323,8 +323,8 @@ export default {
       return [];
     },
     residualEffectList() {
-      if (this.dataRestFrom?.length > 0) {
-        return this.dataRestFrom.map((ds) => ds[this.residualEffectField]);
+      if (this.filteredData?.length > 0) {
+        return this.filteredData.map((ds) => ds[this.residualEffectField]);
       }
       return [];
     },
@@ -399,39 +399,123 @@ export default {
     hideLegend() {
       return this.optionsFromStore?.hideLegend;
     },
+    filteredData() {
+      const result = [];
+      let fieldsCount = 0;
+      this.dataRestFrom.forEach((el) => {
+        const updatedEl = structuredClone(el);
+        const barFields = {};
+        this.barParts.forEach((option) => {
+          if (option?.hideZeroValue === true) {
+            if (Number(el[option.id]) === 0) {
+              delete updatedEl[option.id];
+            } else {
+              fieldsCount += 1;
+              barFields[option.id] = el[option.id];
+            }
+          } else {
+            fieldsCount += 1;
+            barFields[option.id] = el[option.id];
+          }
+        });
+        if (Object.keys(barFields).length > 0) {
+          result.push(updatedEl);
+        }
+      });
+      return fieldsCount > 0 ? result : [];
+    },
+    gridContainerStyles() {
+      const leftDescArea = (this.listColName || this.listColValue || this.leftTitle)
+        ? 'left-descr '
+        : '';
+      const leftDescSize = leftDescArea
+        ? 'minmax(auto, 20%) '
+        : '';
+      const rightDescArea = (this.secondListColName || this.secondListColValue || this.rightTitle)
+        ? ' right-descr'
+        : '';
+      const rightDescSize = rightDescArea
+        ? ' minmax(auto, 20%)'
+        : '';
+      const residualArea = this.isVisibleResidualImpactPanel
+        ? ' residual'
+        : '';
+      const residualSize = residualArea
+        ? ' minmax(10px, 0.5fr)'
+        : '';
+      return {
+        width: `${this.widthFrom}px`,
+        height: `${this.heightFromInner}px`,
+        display: 'grid',
+        'grid-template-rows': '1fr',
+        'grid-template-columns': `${leftDescSize}1fr${rightDescSize}${residualSize}`,
+        'grid-template-areas': `"${leftDescArea}svg${rightDescArea}${residualArea}"`,
+      };
+    },
   },
   watch: {
-    dataset: {
+    filteredData: {
       deep: true,
-      handler(val) {
-        if (val?.length > 0) {
-          this.render();
-          this.updateActionCapture(val);
+      handler(val, oldVal) {
+        const updatedValue = JSON.stringify(val) !== JSON.stringify(oldVal);
+        if (val?.length > 0 && updatedValue) {
+          this.$nextTick(() => {
+            this.$nextTick(() => {
+              this.getLegendHeight();
+              this.render();
+              this.updateActionCapture(val);
+            });
+          });
         }
       },
     },
     sizeFrom: {
       deep: true,
-      handler() {
-        this.$nextTick(() => {
+      handler(val, oldVal) {
+        const isUpdatedSize = JSON.stringify(val) !== JSON.stringify(oldVal);
+        if (this.filteredData?.length > 0 && isUpdatedSize) {
           this.$nextTick(() => {
-            this.getLegendHeight();
-            this.render();
+            this.$nextTick(() => {
+              this.getLegendHeight();
+              this.render();
+            });
           });
-        });
+        }
       },
     },
-    hideLegend() {
-      this.render();
+    barParts: {
+      deep: true,
+      handler(val, oldVal) {
+        const isUpdatedValue = JSON.stringify(val) !== JSON.stringify(oldVal);
+        if (isUpdatedValue) {
+          this.$nextTick(() => {
+            this.$nextTick(() => {
+              this.getLegendHeight();
+              this.render();
+            });
+          });
+        }
+      },
+    },
+    hideLegend(val, oldVal) {
+      if (val !== oldVal) {
+        this.render();
+      }
     },
   },
   mounted() {
-    this.getLegendHeight();
-    this.render();
+    if (this.filteredData?.length > 0) {
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          this.getLegendHeight();
+          this.render();
+        });
+      });
+    }
   },
   methods: {
     getLegendHeight() {
-      if (this.$refs.riskReviewLegend) {
+      if (this.$refs?.riskReviewLegend?.offsetHeight) {
         this.legendHeight = this.$refs.riskReviewLegend.offsetHeight + 4;
       }
     },
@@ -465,39 +549,41 @@ export default {
     },
 
     render() {
-      const validate = RiskReviewClass.validateData;
+      this.$nextTick(() => {
+        const validate = RiskReviewClass.validateData;
 
-      const { isValid, error } = validate(
-        this.dataRestFrom,
-        this.barParts,
-        this.loading,
-      );
+        const { isValid, error } = validate(
+          this.dataRestFrom,
+          this.barParts,
+          this.loading,
+        );
 
-      if (!isValid) {
-        this.setError(error, true);
-      } else {
-        this.setError('', false);
-        this.$nextTick(() => {
-          const riskReview = new RiskReviewClass({
-            container: this.$refs.svgContainer,
-            width: this.sizeFrom.width,
-            marginX: this.marginX,
-            marginY: this.marginY,
-            height: this.hideLegend
-              ? this.sizeFrom.height
-              : this.sizeFrom.height - this.$refs.riskReviewLegend.offsetHeight - 16,
-            barParts: this.barParts,
-            dataRest: this.dataRestFrom,
-            setTokenFn: this.setTokens,
-            toDivideFn: this.toDivide,
-          });
+        if (!isValid) {
+          this.setError(error, true);
+        } else {
+          this.setError('', false);
           this.$nextTick(() => {
-            this.barHeight = riskReview.barHeight;
-            this.chartPaddingInner = riskReview.chartPaddingInner;
-            this.chartPaddingOuter = riskReview.chartPaddingOuter;
+            const riskReview = new RiskReviewClass({
+              container: this.$refs.svgContainer,
+              width: this.sizeFrom.width,
+              marginX: this.marginX,
+              marginY: this.marginY,
+              height: this.hideLegend
+                ? this.sizeFrom.height
+                : this.sizeFrom.height - this.legendHeight - 16,
+              barParts: this.barParts,
+              dataRest: this.filteredData,
+              setTokenFn: this.setTokens,
+              toDivideFn: this.toDivide,
+            });
+            this.$nextTick(() => {
+              this.barHeight = riskReview.barHeight;
+              this.chartPaddingInner = riskReview.chartPaddingInner;
+              this.chartPaddingOuter = riskReview.chartPaddingOuter;
+            });
           });
-        });
-      }
+        }
+      });
     },
 
     setTokens(data) {
@@ -584,12 +670,33 @@ export default {
 .risk-review {
   font-family: 'Proxima Nova', serif;
   position: relative;
-  padding: 10px;
   width: 100%;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
   & > * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+  }
+
+  &__grid-container {
+    overflow: hidden;
+  }
+
+  &__left-description {
+    grid-area: left-descr;
+  }
+
+  &__svg {
+    grid-area: svg;
+  }
+
+  &__right-description {
+    grid-area: right-descr;
+  }
+
+  &__residual {
+    grid-area: residual;
   }
 
   &__help-btn {
@@ -715,7 +822,7 @@ export default {
 }
 
 .risk-review-legend {
-  display: flex;
+  display: flex !important;
   justify-content: flex-start;
   align-items: center;
   gap: 20px;

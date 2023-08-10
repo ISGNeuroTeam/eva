@@ -9,11 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 TableV2: number formatting
+- Risk-review: Added setting to hide metrics with zero values
+- Risk-review: Hide description if metric value = 0
+- Risk-review: Added auto-resize on change textOffset options
 
 ### Changed
+- Risk-review: Changed inner padding from 40px to 5px
+- Risk-review: Changed outer padding from 40px to 5px
 
 ### Fixed
 - Select does not activate visualization
+- Risk-review: Fixed visualization container
 - Multiline: tooltip is clipped outside the graph
 
 ## [1.145.1]
