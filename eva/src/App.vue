@@ -87,5 +87,5 @@ export default {
 </script>
 
 <style>
-@import './yfiles/es-modules/yfiles.css';
+@import '../node_modules/yfiles/yfiles.css';
 </style>

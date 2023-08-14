@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- removed libraries yFiles and license from project
 
 ### Fixed
 - Risk-review: Fixed visible single bar
