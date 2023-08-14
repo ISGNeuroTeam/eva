@@ -579,6 +579,12 @@ export default {
       },
       deep: true,
     },
+    getTokens: {
+      handler() {
+        this.redrawTable();
+      },
+      deep: true,
+    },
     selectableRow(val, oldVal) {
       if (val !== oldVal) {
         this.redrawTable();
@@ -694,15 +700,36 @@ export default {
         } = event;
         row.getCells().forEach((cell, index, arr) => {
           const cellField = cell.getColumn().getField();
-          if (cellField === targetField) {
+          let runAction = cellField === targetField;
+
+          if (!runAction) {
+            if (targetField[0] === '/' && targetField[targetField.length - 1] === '/') {
+              try {
+                if (new RegExp(targetField.replace(/^\/+|\/+$/g, '')).test(cellField)) {
+                  runAction = true;
+                }
+              } catch (err) {
+                console.warn('OnDataCompare regex', err);
+              }
+            }
+          }
+
+          if (runAction) {
             const cellValue = cell.getValue();
             const secondCell = arr.find((el) => el.getColumn().getField() === compareField);
-            const secondCellValue = secondCell ? secondCell.getValue() : compareField;
+            let secondCellValue = secondCell ? secondCell.getValue() : compareField;
+
+            if (secondCellValue[0] === '$' && secondCellValue[secondCellValue.length - 1] === '$') {
+              const tokenForReplace = this.getTokens.find(({ name }) => `$${name}$` === secondCellValue);
+              if (tokenForReplace) {
+                secondCellValue = tokenForReplace.value;
+              }
+            }
             if (compare === 'equals' && `${cellValue}` === `${secondCellValue}`) {
               this.changeColorElement({ cell, row }, type, color);
-            } else if (compare === 'over' && cellValue > secondCellValue) {
+            } else if (compare === 'over' && parseFloat(cellValue) > parseFloat(secondCellValue)) {
               this.changeColorElement({ cell, row }, type, color);
-            } else if (compare === 'less' && cellValue < secondCellValue) {
+            } else if (compare === 'less' && parseFloat(cellValue) < parseFloat(secondCellValue)) {
               this.changeColorElement({ cell, row }, type, color);
             }
           }
