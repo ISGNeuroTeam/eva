@@ -19,6 +19,12 @@ For do that run
 npm install
 ```
 
+Download license
+
+```
+npm run license
+```
+
 Then for run dev-server (work with app - update, fix, create some and etc.)
 
 ```

@@ -14,7 +14,7 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "lint-no-fix": "vue-cli-service lint --no-fix",
-    "license": "wget http://s.dev.isgneuro.com/repository/components/yfiles-licenses/license_2021-12-22.json -O ./src/license/license.json"
+    "license": "npx wget -d ./src/license/license.json http://s.dev.isgneuro.com/repository/components/yfiles-licenses/license_2021-12-22.json"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
@@ -42,6 +42,7 @@
     "jest-fetch-mock": "^3.0.3",
     "mini-css-extract-plugin": "^0.8.0",
     "node-sass": "^4.14.1",
+    "node-wget": "^0.4.3",
     "path": "^0.12.7",
     "postcss-loader": "^3.0.0",
     "prettier": "^2.2.1",
