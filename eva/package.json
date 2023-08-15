@@ -14,7 +14,7 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "lint-no-fix": "vue-cli-service lint --no-fix",
-    "license": "wget -O ./src/license/license.json http://s.dev.isgneuro.com/repository/components/yfiles-licenses/license_2021-12-22.json"
+    "license": "npx wget -O ./src/license/license.json http://s.dev.isgneuro.com/repository/components/yfiles-licenses/license_2021-12-22.json"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
