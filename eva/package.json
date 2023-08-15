@@ -14,7 +14,9 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "lint-no-fix": "vue-cli-service lint --no-fix",
-    "license": "wget http://s.dev.isgneuro.com/repository/components/yfiles-licenses/license_2021-12-22.json -O ./src/license/license.json"
+    "license": "run-script-os",
+    "license:linux": "wget http://s.dev.isgneuro.com/repository/components/yfiles-licenses/license_2021-12-22.json -O ./src/license/license.json",
+    "license:win32": "Invoke-WebRequest http://s.dev.isgneuro.com/repository/components/yfiles-licenses/license_2021-12-22.json -OutFile ./src/license/license.json"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
