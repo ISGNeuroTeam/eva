@@ -191,6 +191,7 @@
                       color: theme.$main_text,
                       borderColors: theme.$main_border,
                     }"
+                    @click.middle="onClickMiddle(dash)"
                   >
                     <v-card-title class="dash-group-title">
                       <div
@@ -617,6 +618,10 @@ export default {
       this.actionBtn = false;
       this.curGroup = groupId;
       this.updateModalCreateFrom(dashIndex);
+    },
+    onClickMiddle(dash) {
+      const routeData = this.$router.resolve(`/dashboards/${dash.id}`);
+      window.open(routeData.href, '_blank');
     },
     getGroups() {
       this.loading = true;
