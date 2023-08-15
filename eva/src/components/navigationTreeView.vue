@@ -368,11 +368,16 @@ export default {
       event.preventDefault();
     },
     onClickMiddleMouse(item) {
+      let routeData = null;
       if (item.type === 'dash') {
         this.$store.commit('app/treeOpenItems', [...this.$refs.tree.openCache]);
-        const routeData = this.$router.resolve(`/dashboards/${item.id}`);
-        window.open(routeData.href, '_blank');
+        routeData = this.$router.resolve(`/dashboards/${item.id}`);
         this.$refs.tree.updateActive(item.treeId, true);
+      } else if (['group', 'custom-group'].includes(item.type)) {
+        routeData = this.$router.resolve(`/dashboards/group/${item.id}`);
+      }
+      if (routeData) {
+        window.open(routeData.href, '_blank');
       }
     },
     onUpdateOpen(opened) {

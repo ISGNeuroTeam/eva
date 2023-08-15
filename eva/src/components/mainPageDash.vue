@@ -65,6 +65,7 @@
                       color: theme.$main_text,
                       borderColors: theme.$main_border
                     }"
+                    @click.middle="onClickMiddle('group', group)"
                   >
                     <v-card-title class="dash-group-title">
                       <div
@@ -191,7 +192,7 @@
                       color: theme.$main_text,
                       borderColors: theme.$main_border,
                     }"
-                    @click.middle="onClickMiddle(dash)"
+                    @click.middle="onClickMiddle('dash', dash)"
                   >
                     <v-card-title class="dash-group-title">
                       <div
@@ -619,8 +620,12 @@ export default {
       this.curGroup = groupId;
       this.updateModalCreateFrom(dashIndex);
     },
-    onClickMiddle(dash) {
-      const routeData = this.$router.resolve(`/dashboards/${dash.id}`);
+    onClickMiddle(type, dash) {
+      let path = `/dashboards/${dash.id}`;
+      if (type === 'group') {
+        path = `/dashboards/group/${dash.id}`;
+      }
+      const routeData = this.$router.resolve(path);
       window.open(routeData.href, '_blank');
     },
     getGroups() {
