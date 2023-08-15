@@ -56,7 +56,7 @@ test: $(PROJECT_NAME)/node_modules
 	npm run --prefix ./$(PROJECT_NAME) test
 
 $(PROJECT_NAME)/node_modules:
-	echo Download license
-	npm run --prefix ./$(PROJECT_NAME) license
 	echo Start command: npm i
 	npm i --prefix ./$(PROJECT_NAME)
+	echo Download license
+	npm run --prefix ./$(PROJECT_NAME) license
