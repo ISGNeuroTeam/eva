@@ -5,6 +5,13 @@
 npm install
 ```
 
+### Download license
+Download yFiles license file from http://s.dev.isgneuro.com/repository/components/yfiles-licenses/license_2021-12-22.json 
+and save it in ./src/license/license.json
+```
+npm run license
+```
+
 ### Compiles and hot-reloads for development
 ```
 npm run serve
