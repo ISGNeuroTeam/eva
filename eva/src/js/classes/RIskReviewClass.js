@@ -8,7 +8,7 @@ export default class RIskReviewClass {
 
     height = null;
 
-    marginX = 10;
+    marginX = 0;
 
     marginY = 0;
 
@@ -133,7 +133,6 @@ export default class RIskReviewClass {
       paddingInner,
       setTokenFn = null,
       onClickFn = null,
-      marginX,
       marginY,
       toDivideFn,
     }) {
@@ -143,7 +142,6 @@ export default class RIskReviewClass {
       this.options = options;
       if (paddingOuter) this.paddingOuter = paddingOuter;
       if (paddingInner) this.paddingInner = paddingInner;
-      if (marginX) this.marginX = marginX;
       if (marginY) this.marginY = marginY;
       this.setTokenFn = setTokenFn;
       this.onClickFn = onClickFn;
@@ -176,8 +174,10 @@ export default class RIskReviewClass {
     fitContent() {
       const gBox = d3.select(this.svgContainer).select('.content-g').node().getBBox();
       const containerWidth = this.svgContainer.offsetWidth;
-      if ((containerWidth - gBox.x - gBox.width) < 0) {
-        this.marginX += Math.abs(containerWidth - gBox.x - gBox.width) * 4;
+      const gWidth = gBox.width + Math.abs(gBox.x);
+      const updatedWidth = gWidth + (gWidth * 0.005);
+      if (containerWidth < updatedWidth) {
+        this.marginX = (updatedWidth - containerWidth);
         this.render(true);
       }
     }
