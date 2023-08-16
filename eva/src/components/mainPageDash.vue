@@ -58,6 +58,7 @@
                   <v-card
                     v-for="(group, i) in allGroups"
                     :key="group.id"
+                    v-ripple
                     class="dash-group"
                     :ripple="false"
                     :style="{
@@ -65,6 +66,7 @@
                       color: theme.$main_text,
                       borderColors: theme.$main_border
                     }"
+                    @click.middle="onClickMiddle('group', group)"
                   >
                     <v-card-title class="dash-group-title">
                       <div
@@ -184,6 +186,7 @@
                   <v-card
                     v-for="(dash, i) in allDashs"
                     :key="dash.id"
+                    v-ripple
                     class="dash-group"
                     :ripple="false"
                     :style="{
@@ -191,7 +194,7 @@
                       color: theme.$main_text,
                       borderColors: theme.$main_border,
                     }"
-                    @click.middle="onClickMiddle(dash)"
+                    @click.middle="onClickMiddle('dash', dash)"
                   >
                     <v-card-title class="dash-group-title">
                       <div
@@ -619,8 +622,12 @@ export default {
       this.curGroup = groupId;
       this.updateModalCreateFrom(dashIndex);
     },
-    onClickMiddle(dash) {
-      const routeData = this.$router.resolve(`/dashboards/${dash.id}`);
+    onClickMiddle(type, dash) {
+      let path = `/dashboards/${dash.id}`;
+      if (type === 'group') {
+        path = `/dashboards/group/${dash.id}`;
+      }
+      const routeData = this.$router.resolve(path);
       window.open(routeData.href, '_blank');
     },
     getGroups() {

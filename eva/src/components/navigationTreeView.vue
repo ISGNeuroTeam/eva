@@ -368,11 +368,16 @@ export default {
       event.preventDefault();
     },
     onClickMiddleMouse(item) {
+      let routeData = null;
       if (item.type === 'dash') {
         this.$store.commit('app/treeOpenItems', [...this.$refs.tree.openCache]);
-        const routeData = this.$router.resolve(`/dashboards/${item.id}`);
+        routeData = this.$router.resolve(`/dashboards/${item.id}`);
+      } else if (['group', 'custom-group'].includes(item.type)) {
+        routeData = this.$router.resolve(`/dashboards/group/${item.id}`);
+      }
+      this.$refs.tree.updateActive(item.treeId, true);
+      if (routeData) {
         window.open(routeData.href, '_blank');
-        this.$refs.tree.updateActive(item.treeId, true);
       }
     },
     onUpdateOpen(opened) {
