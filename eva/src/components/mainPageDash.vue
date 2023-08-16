@@ -58,6 +58,7 @@
                   <v-card
                     v-for="(group, i) in allGroups"
                     :key="group.id"
+                    v-ripple
                     class="dash-group"
                     :ripple="false"
                     :style="{
@@ -185,6 +186,7 @@
                   <v-card
                     v-for="(dash, i) in allDashs"
                     :key="dash.id"
+                    v-ripple
                     class="dash-group"
                     :ripple="false"
                     :style="{
