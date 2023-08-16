@@ -151,6 +151,7 @@
                 class="profile-dropdown--button"
                 icon
                 @click="item.onClick"
+                @click.middle="item.onMiddleClick"
               >
                 <v-icon
                   class="edit icon-aut"
@@ -229,6 +230,10 @@ export default {
           label: 'Редактировать',
           icon: mdiAccountEdit,
           onClick: this.edit,
+          onMiddleClick: () => {
+            const routeData = this.$router.resolve('/profile');
+            window.open(routeData.href, '_blank');
+          },
           // hide: this.inside,
         },
         {
