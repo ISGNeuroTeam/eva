@@ -42,29 +42,50 @@ export default class RIskReviewClass {
     svg = null;
 
     // Проверка данных на валидность
-    static validateData(dataRest, barParts, isLoading) {
+    static validateData(dataRest, requiredFields, isLoading) {
       if (dataRest.length <= 0) {
         if (isLoading) {
-          return { isValid: false, error: 'Загрузка' };
+          return { isValid: false, error: 'Загрузка...' };
         }
-        return { isValid: false, error: 'Нет данных для построения' };
-      }
-
-      if (barParts.length <= 0) {
-        return { isValid: false, error: 'Не указаны части столбцов' };
+        return { isValid: false, error: 'Нет данных для построения.' };
       }
 
       // eslint-disable-next-line no-restricted-syntax
       for (const dsItem of dataRest) {
         const dsCols = Object.keys(dsItem);
         // eslint-disable-next-line no-restricted-syntax
-        for (const bar of barParts) {
-          if (!dsCols.includes(bar.id)) {
-            return { isValid: false, error: `Отсутствует столбец данных "${bar.id}"` };
+        for (const field of requiredFields) {
+          if (!dsCols.includes(field)) {
+            return {
+              isValid: false,
+              error: `Отсутствует столбец данных "${field}"`,
+            };
           }
         }
       }
 
+      // eslint-disable-next-line no-underscore-dangle
+      const orderList = dataRest.map((el, index) => (typeof el._order !== 'undefined'
+      // eslint-disable-next-line no-underscore-dangle
+        ? el._order
+        : index)).sort();
+      let counter = 0;
+      const uniqueOrderList = [...new Set(orderList)];
+      if (orderList.length !== uniqueOrderList.length) {
+        return {
+          isValid: false,
+          error: 'Не корректно заполнено поле "_order".\n '
+              + 'Поле должно быть заполнено начиная с 0, без пропусков.',
+        };
+      }
+      if (Math.min(orderList) > 0) {
+        return { isValid: false, error: 'Не корректно заполнено поле "_order"' };
+      }
+      // eslint-disable-next-line no-restricted-syntax
+      for (const order of orderList) {
+        if (order !== counter) return { isValid: false, error: 'Не корректно заполнено поле "_order"' };
+        counter += 1;
+      }
       return { isValid: true, error: '' };
     }
 
