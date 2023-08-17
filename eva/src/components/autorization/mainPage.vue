@@ -22,6 +22,7 @@
             class="product-block-itself"
             :style="{ backgroundColor: theme.$main_bg }"
             @click="openDash"
+            @click.middle="windowOpen('/dashboards')"
           >
             <v-card-text
               class="product-text"
@@ -39,6 +40,7 @@
             class="product-block-itself"
             :style="{ backgroundColor: theme.$main_bg }"
             @click="openDataResearch"
+            @click.middle="windowOpen('/data-research')"
           >
             <v-card-text
               class="product-text"
@@ -101,6 +103,9 @@ export default {
   methods: {
     openDash() {
       this.$router.push('/dashboards');
+    },
+    windowOpen(link) {
+      window.open(link, '_blank');
     },
     openDataResearch() {
       this.$router.push('/data-research');
