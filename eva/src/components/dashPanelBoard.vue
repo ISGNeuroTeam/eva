@@ -1990,8 +1990,7 @@ export default {
           events.forEach((item) => {
             originItem = item;
             if (item !== '') {
-              // reg = new RegExp(/^[\s+]?[\w]+\(/, 'g');
-              reg = /^[\s+]?[\w]+\(/g;
+              reg = /^\s*\w+\(/g;
               this.$set(
                 this.event,
                 'event',
