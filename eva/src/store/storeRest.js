@@ -1,4 +1,4 @@
-import { mdiNetwork, mdiAlertCircleOutline } from '@mdi/js';
+import { mdiNetwork, mdiAlertCircleOutline, mdiCheck } from '@mdi/js';
 import Vue from 'vue';
 
 export default {
@@ -22,8 +22,6 @@ export default {
           formData: Object.fromEntries(formData.entries()),
           searchFrom,
         });
-        console.log('Object.fromEntries(formData.entries())', Object.fromEntries(formData.entries()));
-        console.log('searchFrom', searchFrom);
         worker.onmessage = (event) => {
           // console.log('[response] worker: %s', searchFrom.sid/*, event.data*/)
           worker.terminate();
@@ -33,14 +31,26 @@ export default {
             log = [],
             notifications = [],
             schema,
+            status,
           } = event.data;
           if (log.length) {
             log.forEach(([time, msg]) => restAuth.putLog(`[worker] ${msg}`, time));
           }
-          if (error) {
-            console.log('event', event);
+          if (status === 'success' && searchFrom.isNotifyOnFinish) {
             this.store.commit('notify/addNotification', {
-              id: searchFrom.sid,
+              id: `${searchFrom.sid}-success`,
+              icon: mdiCheck,
+              message: searchFrom.messageOnFinish,
+              read: false,
+              type: 'success',
+              time: 2,
+            });
+          }
+
+          console.log(event);
+          if (error) {
+            this.store.commit('notify/addNotification', {
+              id: `${searchFrom.sid}-error`,
               icon: mdiAlertCircleOutline,
               message: error.replaceAll('&nbsp;', ' '),
               read: false,
