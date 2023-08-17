@@ -327,7 +327,11 @@ export default {
     },
     titlesContainerStyle() {
       const { chartPaddingOuter, marginY, legendHeight } = this;
-      return { paddingTop: `${legendHeight > 0 ? chartPaddingOuter : (chartPaddingOuter - 24) + marginY}px` };
+      return {
+        paddingTop: `${legendHeight > 0
+          ? chartPaddingOuter
+          : (chartPaddingOuter) + marginY}px`,
+      };
     },
     residualEffectList() {
       if (this.filteredData?.length > 0) {
@@ -403,10 +407,20 @@ export default {
     isLegendShow() {
       return this.optionsFromStore?.isLegendShow;
     },
+    dataRestFromWIthOrder() {
+      if (this.dataRestFrom?.length > 0) {
+        return this.dataRestFrom.map((el, index) => ({
+          ...el,
+          // eslint-disable-next-line no-underscore-dangle
+          _order: typeof el._order !== 'undefined' ? el._order : index,
+        }));
+      }
+      return [];
+    },
     filteredData() {
       const result = [];
       let fieldsCount = 0;
-      this.dataRestFrom.forEach((el) => {
+      this.dataRestFromWIthOrder.forEach((el) => {
         const updatedEl = structuredClone(el);
         const barFields = {};
         if (this.barParts?.length > 0) {
@@ -428,7 +442,21 @@ export default {
           }
         }
       });
-      return fieldsCount > 0 ? result : [];
+      return fieldsCount > 0 ? result.sort((a, b) => {
+        // eslint-disable-next-line no-underscore-dangle
+        const nameA = a._order; // ignore upper and lowercase
+        // eslint-disable-next-line no-underscore-dangle
+        const nameB = b._order; // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+
+        // names must be equal
+        return 0;
+      }) : [];
     },
     gridContainerStyles() {
       const leftDescArea = (this.firstMetricTitle || this.isListValid.first)
@@ -459,7 +487,7 @@ export default {
       };
     },
     preparedDataRest() {
-      if (this.dataRestFrom?.length === 0) {
+      if (this.dataRestFromWIthOrder?.length === 0) {
         return null;
       }
       // Убираем приставку this(просто для сокращения кода)
@@ -474,11 +502,11 @@ export default {
       const metricOptions = [];
       const data = [];
       // eslint-disable-next-line no-restricted-syntax
-      for (let index = 0; index < this.dataRestFrom.length; index += 1) {
-        const element = this.dataRestFrom[index];
+      for (let index = 0; index < this.dataRestFromWIthOrder.length; index += 1) {
+        const element = this.dataRestFromWIthOrder[index];
         const params = {};
         // Убираем поле _time
-        const fieldList = Object.keys(element).filter((el) => el !== '_time' && el !== 'residual');
+        const fieldList = Object.keys(element).filter((el) => el !== '_time' && el !== 'residual' && '_order');
         // Список элементов (text\value) для первой основной метрики
         const firstList = {
           items: [],
@@ -499,19 +527,21 @@ export default {
             } else if (!metricList.includes(secondMainMetric)) {
               // Добавляем вторую основную метрику в список метрик, если её там еще нет
               metricList.push(secondMainMetric);
-            } else if (field.startsWith(metricKeys.firstTitle)) {
+            }
+            if (field.startsWith(metricKeys.firstTitle)) {
               // Достаем заголовок блока первой основной метрики
               params[metricKeys.firstTitle] = element[field];
             } else if (field.startsWith(metricKeys.secondTitle)) {
               // Достаем заголовок блока второй основной метрики
               params[metricKeys.secondTitle] = element[field];
-            } else if (field.startsWith(metricKeys.firstListTitle)) {
-              // Достаем заголовок для списка в блоке первой основной метрики
-              firstList[metricKeys.firstListTitle] = element[field];
-            } else if (field.startsWith(metricKeys.secondListTitle)) {
-              // Достаем заголовок для списка в блоке второй основной метрики
-              secondList[metricKeys.secondListTitle] = element[field];
             } else if (field.indexOf('list') !== -1) {
+              if (field.startsWith(metricKeys.firstListTitle)) {
+                // Достаем заголовок для списка в блоке первой основной метрики
+                firstList[metricKeys.firstListTitle] = element[field];
+              } else if (field.startsWith(metricKeys.secondListTitle)) {
+                // Достаем заголовок для списка в блоке второй основной метрики
+                secondList[metricKeys.secondListTitle] = element[field];
+              }
               const listIndex = Number(field.substring(field.length - 1, field.length));
               // eslint-disable-next-line no-restricted-globals
               if (!isNaN(listIndex)) {
@@ -559,7 +589,7 @@ export default {
           id: metricName,
           legend: oldSettings?.title || savedSettings?.title || metricName,
           isLegendShow: oldSettings?.isLegendShow
-              || typeof savedSettings?.isLegendShow !== 'undefined'
+          || typeof savedSettings?.isLegendShow !== 'undefined'
             ? savedSettings?.isLegendShow : true,
           type: oldSettings?.type || savedSettings?.type || 'bar',
           types: [
@@ -602,13 +632,13 @@ export default {
             },
           ],
           isTitleShow: oldSettings?.isTitleShow
-              || typeof savedSettings?.isTitleShow !== 'undefined'
+          || typeof savedSettings?.isTitleShow !== 'undefined'
             ? savedSettings?.isTitleShow : true,
           isFullHeight: oldSettings?.isFullHeight
-              || typeof savedSettings?.isFullHeight !== 'undefined'
+          || typeof savedSettings?.isFullHeight !== 'undefined'
             ? savedSettings?.isFullHeight : true,
           hideZeroValue: oldSettings?.hideZeroValue
-              || typeof savedSettings?.hideZeroValue !== 'undefined'
+          || typeof savedSettings?.hideZeroValue !== 'undefined'
             ? savedSettings?.hideZeroValue : false,
         });
       }
@@ -674,6 +704,9 @@ export default {
           || (this.getDataForHtmlTemplate && this.isListValid.second);
     },
     isEdit() {
+      if (this.idDashFrom === 'reports') {
+        return true;
+      }
       return this.dashFromStore.editMode;
     },
   },
@@ -814,10 +847,13 @@ export default {
       this.loadOptionsFromStore();
       this.$nextTick(() => {
         const validate = RiskReviewClass.validateData;
-
+        const requiredFields = [
+          this.firstMainMetric,
+          this.secondMainMetric,
+        ];
         const { isValid, error } = validate(
-          this.dataRestFrom,
-          this.barParts,
+          this.dataRestFromWIthOrder,
+          requiredFields,
           this.loading,
         );
 
@@ -894,6 +930,7 @@ export default {
   width: 100%;
   padding-left: 0 !important;
   padding-right: 0 !important;
+
   & > * {
     box-sizing: border-box;
     margin: 0;
@@ -952,6 +989,7 @@ export default {
     justify-content: center;
     flex-direction: column;
     color: var(--main_text);
+
     .Icon {
       color: var(--border_secondary);
       font-size: 100px;
@@ -973,14 +1011,17 @@ export default {
     display: flex;
     flex-direction: column;
     height: 100%;
+
     .bar-title {
       font-weight: bold;
       line-height: 18px;
       color: var(--main_text);
+
       &--second {
         justify-content: flex-start;
         text-align: left;
       }
+
       &--residual {
         display: flex;
         align-items: center;
@@ -991,14 +1032,18 @@ export default {
         color: var(--primary_button);
       }
     }
+
     .bar-list {
       color: var(--secondary_text);
+
       &--second {
         text-align: left;
       }
+
       &__value {
         font-weight: bold;
       }
+
       &__value-text {
         white-space: nowrap;
       }
@@ -1009,6 +1054,7 @@ export default {
     width: 100%;
     overflow: hidden;
     height: 100%;
+
     .content {
       width: 100%;
       height: 100%;
@@ -1058,6 +1104,7 @@ export default {
   gap: 20px;
   min-height: 24px;
   flex-wrap: wrap;
+
   &__item {
     display: flex;
     justify-content: flex-start;
@@ -1065,11 +1112,13 @@ export default {
     gap: 10px;
     flex-wrap: nowrap;
   }
+
   &__color {
     width: 15px;
     height: 15px;
     border: 1px solid var(--main_border);
   }
+
   &__text {
     white-space: nowrap;
     color: var(--main_text);
