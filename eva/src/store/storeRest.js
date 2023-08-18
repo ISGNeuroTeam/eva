@@ -37,7 +37,7 @@ export default {
             log.forEach(([time, msg]) => restAuth.putLog(`[worker] ${msg}`, time));
           }
           if (status === 'success' && searchFrom.isNotifyOnFinish) {
-            this.store.commit('notify/addNotification', {
+            this.store.dispatch('notify/addNotification', {
               id: `${searchFrom.sid}-success`,
               icon: mdiCheck,
               message: searchFrom.messageOnFinish,
@@ -47,9 +47,8 @@ export default {
             });
           }
 
-          console.log(event);
           if (error) {
-            this.store.commit('notify/addNotification', {
+            this.store.dispatch('notify/addNotification', {
               id: `${searchFrom.sid}-error`,
               icon: mdiAlertCircleOutline,
               message: error.replaceAll('&nbsp;', ' '),
@@ -61,7 +60,7 @@ export default {
           }
           if (notifications.length) {
             // console.log('[notifications]', notifications)
-            this.store.commit('notify/addNotifications', notifications);
+            this.store.dispatch('notify/addNotifications', notifications);
           }
           return resolve({ data, schema } || []);
         };
@@ -161,7 +160,7 @@ export default {
                   );
                   status = res.status;
                   if (store && res?.notifications) {
-                    store.commit('notify/addNotifications', res?.notifications);
+                    store.dispatch('notify/addNotifications', res?.notifications);
                   }
                   // console.log(status);
                   return res;
@@ -281,7 +280,7 @@ export default {
                         console.warn(`%cНе удалось прочитать схему данных! _SCHEMA: %c${shema}`, 'font-weight: bold', 'font-weight: normal');
                         console.error(err);
                         // eslint-disable-next-line no-alert
-                        this.store.commit('notify/addNotification', {
+                        this.store.dispatch('notify/addNotification', {
                           id: 'schema-error-reading',
                           icon: mdiNetwork,
                           message: 'Не удалось прочитать схему данных',
