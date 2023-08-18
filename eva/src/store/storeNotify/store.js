@@ -36,13 +36,7 @@ export default {
         });
       });
     },
-    addNotification(state, payload) {
-      const time = moment().unix();
-      const newItem = {
-        ...payload,
-        time,
-      };
-      const savedItem = state.notifications.find((item) => item.id === payload.id);
+    addNotification(state, { newItem, savedItem }) {
       if (savedItem) {
         Object.assign(savedItem, newItem);
       } else {
@@ -54,10 +48,33 @@ export default {
       }
     },
     dismiss(state, payload) {
-      state.notifications[payload].read = true;
+      if (state.notifications && state.notifications[payload]) {
+        state.notifications[payload].read = true;
+      }
     },
   },
   actions: {
+    addNotification({ state, commit }, payload) {
+      const time = moment().unix();
+      const newItem = {
+        ...payload,
+        time,
+      };
+      const savedItem = state.notifications.find((item) => item.id === payload.id);
+      commit('addNotification', { newItem, savedItem });
+
+      let id;
+      if (savedItem) {
+        id = state.notifications.indexOf(savedItem);
+      } else {
+        id = state.notifications.indexOf(state.notifications
+          .find((item) => item.id === payload.id));
+      }
+
+      setTimeout(() => {
+        commit('dismiss', id);
+      }, 3000);
+    },
   },
   getters: {
   },
