@@ -507,6 +507,8 @@ export default {
       // eslint-disable-next-line no-restricted-syntax
       for (let index = 0; index < this.dataRestFromWIthOrder.length; index += 1) {
         const element = this.dataRestFromWIthOrder[index];
+        // eslint-disable-next-line no-underscore-dangle
+        const order = element._order;
         const params = {};
         // Убираем поле _time, residual, _order
         const fieldList = Object.keys(element).filter((field) => field !== '_time'
@@ -575,7 +577,7 @@ export default {
             metricList.push(field);
           }
         }
-        data[index] = {
+        data[order] = {
           ...params,
           firstList,
           secondList,
