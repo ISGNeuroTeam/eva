@@ -854,7 +854,8 @@ export default {
         columns: this.columns,
         pagination: 'local',
         paginationCounter(pageSize, currentRow, currentPage, totalRows/* , totalPages */) {
-          return `${currentRow}-${pageSize} из ${totalRows}`;
+          if (!currentRow) return '';
+          return `${currentRow}-${currentRow + pageSize - 1} из ${totalRows}`;
         },
         paginationSize: this.pageSize,
         paginationSizeSelector: this.options.paginationSizeSelector,
