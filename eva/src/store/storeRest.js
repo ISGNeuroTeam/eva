@@ -1,4 +1,4 @@
-import { mdiNetwork } from '@mdi/js';
+import { mdiNetwork, mdiAlertCircleOutline, mdiCheck } from '@mdi/js';
 import Vue from 'vue';
 
 export default {
@@ -31,17 +31,36 @@ export default {
             log = [],
             notifications = [],
             schema,
+            status,
           } = event.data;
           if (log.length) {
             log.forEach(([time, msg]) => restAuth.putLog(`[worker] ${msg}`, time));
           }
+          if (status === 'success' && searchFrom.isNotifyOnFinish) {
+            this.store.dispatch('notify/addNotification', {
+              id: `${searchFrom.sid}-success`,
+              icon: mdiCheck,
+              message: searchFrom.messageOnFinish,
+              read: false,
+              type: 'success',
+              time: 2,
+            });
+          }
+
           if (error) {
-            console.log('[error]', error);
+            this.store.dispatch('notify/addNotification', {
+              id: `${searchFrom.sid}-error`,
+              icon: mdiAlertCircleOutline,
+              message: error.replaceAll('&nbsp;', ' '),
+              read: false,
+              type: 'error',
+              time: 2,
+            });
             restAuth.putLog(error);
           }
           if (notifications.length) {
             // console.log('[notifications]', notifications)
-            this.store.commit('notify/addNotifications', notifications);
+            this.store.dispatch('notify/addNotifications', notifications);
           }
           return resolve({ data, schema } || []);
         };
@@ -141,7 +160,7 @@ export default {
                   );
                   status = res.status;
                   if (store && res?.notifications) {
-                    store.commit('notify/addNotifications', res?.notifications);
+                    store.dispatch('notify/addNotifications', res?.notifications);
                   }
                   // console.log(status);
                   return res;
@@ -261,7 +280,7 @@ export default {
                         console.warn(`%cНе удалось прочитать схему данных! _SCHEMA: %c${shema}`, 'font-weight: bold', 'font-weight: normal');
                         console.error(err);
                         // eslint-disable-next-line no-alert
-                        this.store.commit('notify/addNotification', {
+                        this.store.dispatch('notify/addNotification', {
                           id: 'schema-error-reading',
                           icon: mdiNetwork,
                           message: 'Не удалось прочитать схему данных',

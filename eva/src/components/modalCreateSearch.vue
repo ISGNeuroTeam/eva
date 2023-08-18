@@ -190,6 +190,30 @@
             </span>
           </template>
         </v-checkbox>
+        <div>
+          <v-checkbox
+            v-model="search.parametrs.isNotifyOnFinish"
+            hide-details
+            :color="theme.$primary_button"
+          >
+            <template v-slot:label>
+              <span :style="`color: ${theme.$secondary_text} !important`">
+                Показывать уведомление при успешном выполнении
+              </span>
+            </template>
+          </v-checkbox>
+          <v-text-field
+            v-model="search.parametrs.customMessageOnFinish"
+            :color="theme.$primary_button"
+            :style="{ color: theme.$main_text }"
+            class="textarea-item textarea-item-name"
+            outlined
+            label="Текст уведомления"
+            :placeholder="`Запрос ${search.sid} успешно выполнен`"
+            hide-details
+            @input="isChanged = true"
+          />
+        </div>
       </div>
       <v-card-actions class="searchBtn">
         <div
@@ -264,6 +288,8 @@ export default {
           field_extraction: false,
           cache_ttl: 60,
           isStartImmediately: true,
+          isNotifyOnFinish: false,
+          customMessageOnFinish: '',
         },
       },
       createText: 'Создать',

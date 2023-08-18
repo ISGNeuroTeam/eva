@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Table event OnDataCompare: 
   - Ability use the token in the value
   - Ability to use regular expressions in the column name
+- Notify on data source error
+- Optional notify on data source finished
 
 ### Changed
 - removed libraries yFiles and license from project
