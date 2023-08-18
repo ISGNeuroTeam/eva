@@ -273,17 +273,19 @@ export default class RIskReviewClass {
           yPosition,
           value,
           startValue,
+          isFullHeight,
         } = element;
         const getHorizontalAnchor = (anchor = 'default') => {
           const anchorList = {
             default: startValue ? startValue + value : value,
-            center: startValue ? (startValue / 2) + value : value / 2,
+            center: startValue ? startValue + (value / 2) : value / 2,
           };
           if (anchorList[anchor]) {
             return anchorList[anchor];
           }
           return anchorList.default;
         };
+        // const textXPosition = this.xScale(startValue ? startValue + value : value);
         const textXPosition = textPosX
           ? this.xScale(getHorizontalAnchor(textPosX))
           : this.xScale(getHorizontalAnchor());
@@ -297,16 +299,25 @@ export default class RIskReviewClass {
           .attr('class', 'bar-text-caption')
           .attr('fill', textColor)
           .attr('text-anchor', value >= 0 ? 'start' : 'end')
-          .attr('x', textXPositionWithOffset)
+          .attr('x', textPosX === 'center' ? textXPosition : textXPositionWithOffset)
         // eslint-disable-next-line func-names
           .attr('dy', function () {
             const textHeight = this.getBBox().height;
             const textPositionsY = {
-              top: textHeight - (textHeight * 3),
-              bottom: textHeight * 2.5,
-              center: textHeight / 3,
+              top: isFullHeight ? textHeight - (textHeight * 4.4) : textHeight - (textHeight * 4.4),
+              bottom: isFullHeight ? textHeight * 3.6 : textHeight * 0.5,
+              center: isFullHeight ? textHeight * 0.3 : textHeight * 1.25 * -1,
             };
-            return textPosY ? textPositionsY[textPosY] : textHeight / 3;
+            return textPositionsY[textPosY];
+          })
+        // eslint-disable-next-line func-names
+          .attr('dx', function () {
+            const textWidth = this.getBBox().width;
+            const textDX = {
+              default: 0,
+              center: value >= 0 ? (textWidth / 2) * -1 : textWidth / 2,
+            };
+            return textDX[textPosX];
           });
       }
     }
@@ -319,6 +330,8 @@ export default class RIskReviewClass {
       xPosition,
       yPosition,
       value,
+      startValue,
+      isFullHeight = true,
       id,
     }) {
       this.textBlocks.push({
@@ -329,6 +342,8 @@ export default class RIskReviewClass {
         xPosition,
         yPosition,
         value,
+        startValue,
+        isFullHeight,
         id,
       });
     }
@@ -459,6 +474,7 @@ export default class RIskReviewClass {
               textOffset,
               yPosition,
               xPosition,
+              isFullHeight,
               value,
               startValue: data[idStart],
               id,

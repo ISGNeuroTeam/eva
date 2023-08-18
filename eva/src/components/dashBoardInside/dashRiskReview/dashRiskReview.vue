@@ -594,6 +594,7 @@ export default {
         if (metricName.indexOf(this.secondMainMetric) !== -1) defaultMetricFill = '#00FF00';
         metricOptions.push({
           id: metricName,
+          idStart: oldSettings?.idStart || savedSettings?.idStart || null,
           legend: oldSettings?.title || savedSettings?.title || metricName,
           isLegendShow: oldSettings?.isLegendShow
           || typeof savedSettings?.isLegendShow !== 'undefined'
