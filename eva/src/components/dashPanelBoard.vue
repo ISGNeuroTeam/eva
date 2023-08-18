@@ -311,137 +311,152 @@
           </v-icon>
         </div>
 
-        <div
-          v-for="search in searches"
-          :key="search.sid"
-          class="searches-one"
-          @click="openEditSearch($event, search.sid)"
+        <draggable
+          v-model="searches"
+          handle=".burger"
+          class="searches-list"
+          :options="{
+            clone: true,
+            chosenClass: 'vd-dragging',
+            animation: 150,
+          }"
         >
           <div
-            class="search-id"
-            :style="{
-              background: theme.$accent_ui_color,
-              color: '#fff',
-              border: `1px solid ${theme.$accent_ui_color}`,
-              width: '65px',
-            }"
-            :title="search.sid"
+            v-for="search in searches"
+            :key="search.sid"
+            class="searches-one"
+            @click="openEditSearch($event, search.sid)"
           >
-            {{ checkSid(search.sid) }}
-          </div>
-          <div
-            class="search-query"
-            :style="{
-              background: theme.$secondary_bg,
-              color: theme.$main_text,
-              border: `1px solid ${theme.$main_border}`,
-            }"
-          >
-            {{ search.original_otl }}
-            <div
-              class="loading-bar"
-              :style="{ background: theme.$accent_ui_color }"
-              :class="{
-                loading:
-                  search.status === 'pending' && search.original_otl !== null,
-              }"
+            <v-icon
+              size="22"
+              class="burger mr-3"
+              style="cursor: move"
+              :color="theme.$main_border"
+              v-text="dragVerticalIcon"
             />
+            <div style="position: relative;">
+              <div
+                class="search-id"
+                :style="{
+                  background: theme.$accent_ui_color,
+                  color: '#fff',
+                }"
+                :title="search.sid"
+              >
+                {{ search.sid }}
+              </div>
+              <div
+                class="search-query"
+                :style="{
+                  background: theme.$secondary_bg,
+                  color: theme.$main_text,
+                  border: `1px solid ${theme.$main_border}`,
+                }"
+              >
+                {{ search.original_otl }}
+                <div
+                  v-if="search.status === 'pending' && search.original_otl !== null"
+                  class="loading-bar loading"
+                  :style="{ background: theme.$accent_ui_color }"
+                />
+              </div>
+            </div>
+            <v-tooltip
+              z-index="99"
+              bottom
+              :color="theme.$accent_ui_color"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  class="search-play"
+                  :color="theme.$primary_button"
+                  v-on="on"
+                  @click="startSearch(search)"
+                >
+                  {{ play }}
+                </v-icon>
+              </template>
+              <span>Запустить ИД</span>
+            </v-tooltip>
+            <v-tooltip
+              z-index="99"
+              bottom
+              :color="theme.$accent_ui_color"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  class="search-pencil"
+                  :color="theme.$primary_button"
+                  v-on="on"
+                  @click="openEdit(search.sid)"
+                >
+                  {{ pencil }}
+                </v-icon>
+              </template>
+              <span>Редактировать ИД</span>
+            </v-tooltip>
+            <v-tooltip
+              z-index="99"
+              bottom
+              :color="theme.$accent_ui_color"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  class="search-clock"
+                  :color="theme.$primary_button"
+                  v-on="on"
+                  @click="openSchedule(search.sid)"
+                >
+                  {{ clock }}
+                </v-icon>
+              </template>
+              <span>Планировщик</span>
+            </v-tooltip>
+            <v-tooltip
+              z-index="99"
+              bottom
+              :color="theme.$accent_ui_color"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  class="search-clock"
+                  :color="theme.$primary_button"
+                  :disabled="search.status !== 'downloaded'"
+                  v-on="on"
+                  @click="exportSearch(search.id)"
+                >
+                  {{ download }}
+                </v-icon>
+              </template>
+              <span>Экспортировать ИД</span>
+            </v-tooltip>
+            <v-tooltip
+              bottom
+              z-index="99"
+              :color="theme.$accent_ui_color"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  class="search-trash"
+                  :color="theme.$primary_button"
+                  v-on="on"
+                  @click="deleteSearch(search.sid)"
+                >
+                  {{ trash }}
+                </v-icon>
+              </template>
+              <span>Удалить ИД</span>
+            </v-tooltip>
           </div>
-          <v-tooltip
-            z-index="99"
-            bottom
-            :color="theme.$accent_ui_color"
+          <v-btn
+            small
+            class="create-search"
+            :color="theme.$primary_button"
+            @click="openModal"
           >
-            <template v-slot:activator="{ on }">
-              <v-icon
-                class="search-play"
-                :color="theme.$primary_button"
-                v-on="on"
-                @click="startSearch(search)"
-              >
-                {{ play }}
-              </v-icon>
-            </template>
-            <span>Запустить ИД</span>
-          </v-tooltip>
-          <v-tooltip
-            z-index="99"
-            bottom
-            :color="theme.$accent_ui_color"
-          >
-            <template v-slot:activator="{ on }">
-              <v-icon
-                class="search-pencil"
-                :color="theme.$primary_button"
-                v-on="on"
-                @click="openEdit(search.sid)"
-              >
-                {{ pencil }}
-              </v-icon>
-            </template>
-            <span>Редактировать ИД</span>
-          </v-tooltip>
-          <v-tooltip
-            z-index="99"
-            bottom
-            :color="theme.$accent_ui_color"
-          >
-            <template v-slot:activator="{ on }">
-              <v-icon
-                class="search-clock"
-                :color="theme.$primary_button"
-                v-on="on"
-                @click="openSchedule(search.sid)"
-              >
-                {{ clock }}
-              </v-icon>
-            </template>
-            <span>Планировщик</span>
-          </v-tooltip>
-          <v-tooltip
-            z-index="99"
-            bottom
-            :color="theme.$accent_ui_color"
-          >
-            <template v-slot:activator="{ on }">
-              <v-icon
-                class="search-clock"
-                :color="theme.$primary_button"
-                :disabled="search.status !== 'downloaded'"
-                v-on="on"
-                @click="exportSearch(search.id)"
-              >
-                {{ download }}
-              </v-icon>
-            </template>
-            <span>Экспортировать ИД</span>
-          </v-tooltip>
-          <v-tooltip
-            bottom
-            z-index="99"
-            :color="theme.$accent_ui_color"
-          >
-            <template v-slot:activator="{ on }">
-              <v-icon
-                class="search-trash"
-                :color="theme.$primary_button"
-                v-on="on"
-                @click="deleteSearch(search.sid)"
-              >
-                {{ trash }}
-              </v-icon>
-            </template>
-            <span>Удалить ИД</span>
-          </v-tooltip>
-        </div>
-        <v-btn
-          small
-          class="create-search"
-          :color="theme.$primary_button"
-          @click="openModal"
-        >
-          Создать
-        </v-btn>
+            Создать
+          </v-btn>
+        </draggable>
       </div>
       <v-row
         class="block-tool"
@@ -950,8 +965,10 @@ import {
   mdiVariable,
   mdiFileTree,
   mdiCloudUpload,
+  mdiDragHorizontalVariant,
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
+import draggable from 'vuedraggable';
 import EvaLogo from '../images/eva-logo.svg';
 import settings from '../js/componentsSettings';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
@@ -964,6 +981,7 @@ export default {
     Notifications,
     EvaLogo,
     DashFilterPanel,
+    draggable,
   },
   props: {
     idDashFrom: {
@@ -1003,6 +1021,7 @@ export default {
       code_icon: mdiCodeTags,
       save_icon: mdiContentSave,
       upload_icon: mdiCloudUpload,
+      dragVerticalIcon: mdiDragHorizontalVariant,
       pencil: mdiPencil,
       play: mdiPlay,
       clock: mdiClockOutline,
@@ -1145,19 +1164,30 @@ export default {
       }
       return [];
     },
-    searches() {
-      // массив со всеми ИС на странице
-      let searchesRes = [];
-      if (this.idDash) {
-        // const searches = this.$store.dispatch('getSearches', this.idDash);;
-        if (this.getSearchesFromStore) {
-          this.getSearchesFromStore.forEach((item) => {
-            this.$set(this.change, item.sid, false);
-          });
-          searchesRes = this.getSearchesFromStore;
+    searches: {
+      get() {
+        // массив со всеми ИС на странице
+        let searchesRes = [];
+        if (this.idDash) {
+          // const searches = this.$store.dispatch('getSearches', this.idDash);;
+          if (this.getSearchesFromStore) {
+            this.getSearchesFromStore.forEach((item) => {
+              this.$set(this.change, item.sid, false);
+            });
+            searchesRes = [...this.getSearchesFromStore];
+          }
         }
-      }
-      return searchesRes;
+        return searchesRes;
+      },
+      set(val) {
+        this.$store.commit('setState', [
+          {
+            object: this.$store.state[this.idDash],
+            prop: 'searches',
+            value: [...val],
+          },
+        ]);
+      },
     },
     name() {
       return this.$store.state[this.idDash].name;
@@ -1776,15 +1806,6 @@ export default {
     noSearch() {
       // если нажали на кнопку нет
       this.openwarning = false;
-    },
-    checkSid(sid) {
-      let newSid = sid;
-      // если там больше 10 символов
-      if (sid.length > 5) {
-        // обрезаем и добовляем троеточие
-        newSid = `${sid.substring(0, 5)}...`;
-      }
-      return newSid;
     },
     openEditSearch(event, sid) {
       if (
