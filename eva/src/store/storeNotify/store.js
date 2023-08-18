@@ -36,7 +36,7 @@ export default {
         });
       });
     },
-    addNotification(state, { newItem, savedItem }) {console.log('addNotification', newItem, savedItem);
+    addNotification(state, { newItem, savedItem }) {
       if (savedItem) {
         Object.assign(savedItem, newItem);
         savedItem.read = false;
