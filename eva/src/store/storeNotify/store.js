@@ -39,6 +39,7 @@ export default {
     addNotification(state, { newItem, savedItem }) {
       if (savedItem) {
         Object.assign(savedItem, newItem);
+        savedItem.read = false;
       } else {
         // @todo: check please
         state.notifications.push({
@@ -55,6 +56,7 @@ export default {
   },
   actions: {
     addNotification({ state, commit }, payload) {
+      commit('removeOldNotifications');
       const time = moment().unix();
       const newItem = {
         ...payload,
@@ -74,6 +76,17 @@ export default {
       setTimeout(() => {
         commit('dismiss', id);
       }, 3000);
+    },
+
+    addNotifications({ state, commit, dispatch }, items) {
+      items.forEach((item) => {
+        const id = `notif-code-${item.code || 'last'}`;
+        dispatch('addNotification', {
+          id,
+          message: getMessage(item),
+          ...item,
+        });
+      });
     },
   },
   getters: {
