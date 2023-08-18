@@ -335,7 +335,10 @@ export default {
     },
     residualEffectList() {
       if (this.filteredData?.length > 0) {
-        return this.filteredData.map((ds) => ds[this.metricKeys.residualMetric]);
+        // eslint-disable-next-line no-restricted-globals
+        return this.filteredData.map((ds) => (isNaN(Number(ds[this.metricKeys.residualMetric]))
+          ? 0
+          : Number(ds[this.metricKeys.residualMetric])));
       }
       return [];
     },
@@ -505,8 +508,10 @@ export default {
       for (let index = 0; index < this.dataRestFromWIthOrder.length; index += 1) {
         const element = this.dataRestFromWIthOrder[index];
         const params = {};
-        // Убираем поле _time
-        const fieldList = Object.keys(element).filter((el) => el !== '_time' && el !== 'residual' && '_order');
+        // Убираем поле _time, residual, _order
+        const fieldList = Object.keys(element).filter((field) => field !== '_time'
+            && field !== 'residual'
+            && field !== '_order');
         // Список элементов (text\value) для первой основной метрики
         const firstList = {
           items: [],
