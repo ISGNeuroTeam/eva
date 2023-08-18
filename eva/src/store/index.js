@@ -1366,6 +1366,8 @@ export default new Vuex.Store({
         tws,
         twf,
         cache_ttl: search.parametrs.cache_ttl,
+        isNotifyOnFinish: search.parametrs.isNotifyOnFinish || false,
+        messageOnFinish: search.parametrs.customMessageOnFinish || `Запрос ${search.sid} успешно выполнен`,
       };
       rest.setStore(this);
       // отправляем в файл storeRest.js
