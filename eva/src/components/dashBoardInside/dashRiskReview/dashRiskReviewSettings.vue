@@ -190,6 +190,32 @@
                 </h3>
               </div>
               <v-col cols="12">
+                <!--idStart(select)-->
+                <v-row
+                  v-if="item.idStartList && item.idStartList.length > 0"
+                  align="center"
+                  align-content="center"
+                  class="pa-3"
+                >
+                  <v-col cols="6">
+                    <h3>
+                      Название стартовой метрики:
+                    </h3>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-select
+                      v-model="item.idStart"
+                      :items="item.idStartList"
+                      item-text="label"
+                      item-value="value"
+                      outlined
+                      dense
+                      clearable
+                      class="risk-review-settings__select"
+                      @change="updateIdStart"
+                    />
+                  </v-col>
+                </v-row>
                 <!--isLegendShow(switch)-->
                 <v-row
                   align="center"
@@ -559,14 +585,60 @@ export default {
     },
   },
   methods: {
+    updateIdListInMetricOptions(metricOptions) {
+      if (metricOptions?.length > 0) {
+        const updatedMetricOptions = [];
+        const allSelectedIdStart = metricOptions
+          .map((el) => el.idStart)
+          .filter((idStart) => !!idStart);
+        // eslint-disable-next-line no-restricted-syntax
+        for (const metric of metricOptions) {
+          let idStartList = metricOptions
+            .filter((el) => el.id !== metric.id)
+            .map((el) => ({
+              label: el.id,
+              value: el.id,
+            }));
+          if (allSelectedIdStart?.length > 0) {
+            const selectedStartId = allSelectedIdStart
+              .find((idStart) => idStart === metric.idStart);
+            idStartList = idStartList
+              .filter((el) => !allSelectedIdStart.includes(el.value));
+            if (selectedStartId) {
+              idStartList.push({
+                label: selectedStartId,
+                value: selectedStartId,
+              });
+            }
+          }
+          updatedMetricOptions.push({
+            ...metric,
+            idStartList,
+          });
+        }
+        return updatedMetricOptions;
+      }
+      return [];
+    },
     clearLocalOptions() {
       this.localOptions = null;
     },
     setLocalOptions(options) {
-      this.localOptions = structuredClone(options);
+      const optionsClone = structuredClone(options);
+      const updatedMetricOptions = this.updateIdListInMetricOptions(optionsClone.metricOptions);
+      this.localOptions = {
+        ...optionsClone,
+        metricOptions: updatedMetricOptions,
+      };
       this.$nextTick(() => {
         this.isChanged = false;
       });
+    },
+    updateIdStart() {
+      this.isChanged = true;
+      this.localOptions.metricOptions = this.updateIdListInMetricOptions(
+        structuredClone(this.localOptions.metricOptions),
+      );
     },
     save() {
       this.$emit('updateSettings', structuredClone(this.localOptions));
