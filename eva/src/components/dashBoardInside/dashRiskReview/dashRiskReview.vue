@@ -590,8 +590,8 @@ export default {
           ? this.optionsFromStore.metricOptions.find((metric) => metric.id === metricName)
           : null;
         let defaultMetricFill = this.theme.$main_text;
-        if (metricName.indexOf(this.firstMainMetric) !== -1) defaultMetricFill = '#00FF00';
-        if (metricName.indexOf(this.secondMainMetric) !== -1) defaultMetricFill = '#FF0000';
+        if (metricName.indexOf(this.firstMainMetric) !== -1) defaultMetricFill = '#FF0000';
+        if (metricName.indexOf(this.secondMainMetric) !== -1) defaultMetricFill = '#00FF00';
         metricOptions.push({
           id: metricName,
           legend: oldSettings?.title || savedSettings?.title || metricName,
