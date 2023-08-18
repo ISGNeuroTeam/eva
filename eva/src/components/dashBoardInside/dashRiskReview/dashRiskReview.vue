@@ -793,7 +793,9 @@ export default {
       };
       if (metricOptions) {
         // Если настройки были указаны в панели настроек
-        result.metricOptions = metricOptions;
+        result.metricOptions = metricOptions.filter((metric) => metric.id !== '_order'
+            && metric.id !== '_time'
+            && metric.id !== 'residual');
       } else {
         result.metricOptions = this.barParts;
       }
