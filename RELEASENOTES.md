@@ -1,3 +1,27 @@
+# [1.147.0] - 2023-08-22
+
+### Added
+- Sorting data sources
+- Mouse middle click by group tile and dashboard tile
+- Notify on data source error
+- Optional notify on data source finished
+- Risk-review: 
+  - Added auto-generated options for metric
+  - Added documentation on create visualisation
+  - Added options panel
+- Table event OnDataCompare:
+  - Ability use the token in the value
+  - Ability to use regular expressions in the column name
+
+### Changed
+- Data source design
+- Risk-review: 
+  - Delete primitives library
+  - Changed fields naming for metrics from 'risk, measure, riskfactor' to '\[main_metric_1], \[main_metric_2]'+suffixes '_title, _list_title, \_list_text\_\[0-1-2...], \_list_value\_\[0-1-2...]'
+
+### Fixed
+- Risk-review: Fixed visible single bar
+
 # [1.146.0] - 2023-08-10
 
 ### Added
