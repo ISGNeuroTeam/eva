@@ -39,11 +39,12 @@
             {{ firstMetricTitle }}
           </div>
           <div
+            v-if="getDataForHtmlTemplate && getDataForHtmlTemplate.length > 0"
             class="titles-container pl-3 pr-2"
             :style="titlesContainerStyle"
           >
             <div
-              v-for="({ firstList }, i) in getDataForHtmlTemplate"
+              v-for="(element, i) in getDataForHtmlTemplate"
               :key="`t-${i}`"
               class="risk-review__left-text"
               :style="{
@@ -51,34 +52,36 @@
                 marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
               }"
             >
-              <div
-                v-if="firstList && firstList[metricKeys.firstListTitle]"
-                class="bar-title"
-              >
-                {{ firstList[metricKeys.firstListTitle] }}:
-              </div>
-              <div class="bar-list">
-                <template v-for="(listItem, listIndex) in firstList.items">
-                  <div
-                    v-if="listItem.value && listItem.value !== 0 && listItem.text"
-                    :key="`left-${i}-${listIndex}`"
-                    class="bar-list__item"
-                  >
-                    {{ listIndex + 1 }}. {{ listItem.text }}
-                    <span
-                      v-if="listItem.value"
-                      class="bar-list__value-text"
+              <template v-if="element && element.firstList">
+                <div
+                  v-if="element.firstList[metricKeys.firstListTitle]"
+                  class="bar-title"
+                >
+                  {{ element.firstList[metricKeys.firstListTitle] }}:
+                </div>
+                <div class="bar-list">
+                  <template v-for="(listItem, listIndex) in element.firstList.items">
+                    <div
+                      v-if="listItem.value && listItem.value !== 0 && listItem.text"
+                      :key="`left-${i}-${listIndex}`"
+                      class="bar-list__item"
                     >
-                      (<span
-                        class="bar-list__value"
-                        :style="{
-                          color: leftValueColor,
-                        }"
-                      >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
-                    </span>
-                  </div>
-                </template>
-              </div>
+                      {{ listIndex + 1 }}. {{ listItem.text }}
+                      <span
+                        v-if="listItem.value"
+                        class="bar-list__value-text"
+                      >
+                        (<span
+                          class="bar-list__value"
+                          :style="{
+                            color: leftValueColor,
+                          }"
+                        >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
+                      </span>
+                    </div>
+                  </template>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -101,11 +104,12 @@
             {{ secondMetricTitle }}
           </div>
           <div
+            v-if="getDataForHtmlTemplate && getDataForHtmlTemplate.length > 0"
             class="titles-container titles-container--second px-2"
             :style="titlesContainerStyle"
           >
             <div
-              v-for="({ secondList }, i) in getDataForHtmlTemplate"
+              v-for="(element, i) in getDataForHtmlTemplate"
               :key="`t-${i}`"
               class="risk-review__right-text"
               :style="{
@@ -113,33 +117,35 @@
                 marginTop: `${i === 0 ? 0 : chartPaddingInner}px`
               }"
             >
-              <div
-                v-if="secondList && secondList[metricKeys.secondListTitle]"
-                class="bar-title bar-title--second"
-              >
-                {{ secondList[metricKeys.secondListTitle] }}
-              </div>
-              <div class="bar-list bar-list--second">
-                <template v-for="(listItem, listIndex) in secondList.items">
-                  <div
-                    v-if="listItem && listItem.text && listItem.value && listItem.value !== 0"
-                    :key="`right-${i}-${listIndex}`"
-                    class="bar-list__item bar-list__item--second"
-                  >
-                    {{ listIndex + 1 }}. {{ listItem.text }}
-                    <span
-                      class="bar-list__value-text bar-list__value-text--second"
+              <template v-if="element && element.secondList">
+                <div
+                  v-if="element.secondList[metricKeys.secondListTitle]"
+                  class="bar-title bar-title--second"
+                >
+                  {{ element.secondList[metricKeys.secondListTitle] }}
+                </div>
+                <div class="bar-list bar-list--second">
+                  <template v-for="(listItem, listIndex) in element.secondList.items">
+                    <div
+                      v-if="listItem && listItem.text && listItem.value && listItem.value !== 0"
+                      :key="`right-${i}-${listIndex}`"
+                      class="bar-list__item bar-list__item--second"
                     >
-                      (<span
-                        class="bar-list__value bar-list__value--second"
-                        :style="{
-                          color: rightValueColor,
-                        }"
-                      >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
-                    </span>
-                  </div>
-                </template>
-              </div>
+                      {{ listIndex + 1 }}. {{ listItem.text }}
+                      <span
+                        class="bar-list__value-text bar-list__value-text--second"
+                      >
+                        (<span
+                          class="bar-list__value bar-list__value--second"
+                          :style="{
+                            color: rightValueColor,
+                          }"
+                        >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
+                      </span>
+                    </div>
+                  </template>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -438,9 +444,13 @@ export default {
       if (this.getDataForHtmlTemplate?.length > 0) {
         const allFirstListItems = [];
         const allSecondListItems = [];
-        this.getDataForHtmlTemplate.forEach(({ firstList, secondList }) => {
-          allFirstListItems.push(...firstList.items);
-          allSecondListItems.push(...secondList.items);
+        this.getDataForHtmlTemplate.forEach((element) => {
+          if (element?.firstList) {
+            allFirstListItems.push(...element.firstList.items);
+          }
+          if (element?.secondList) {
+            allSecondListItems.push(...element.secondList.items);
+          }
         });
         return {
           first: allFirstListItems.length > 0,
