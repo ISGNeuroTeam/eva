@@ -175,328 +175,352 @@
             </h2>
           </v-col>
           <v-col cols="12">
-            <v-row
-              v-for="(item, index) in localOptions.metricOptions"
-              :key="item.id"
-              align="center"
-              class="risk-review-settings__metric-options mx-1"
-              :class="{
-                'mb-5': index < localOptions.metricOptions.length - 1
-              }"
+            <v-expansion-panels
+              class="risk-review-settings__expansion-panels"
             >
-              <div class="risk-review-settings__metric-title">
-                <h3>
-                  {{ item.id }}
-                </h3>
-              </div>
-              <v-col cols="12">
-                <!--idStart(select)-->
-                <v-row
-                  v-if="item.idStartList && item.idStartList.length > 0"
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
+              <draggable
+                v-model="draggableList"
+                handle=".burger"
+                class="risk-review-settings__draggable"
+              >
+                <v-expansion-panel
+                  v-for="(item) in localOptions.metricOptions"
+                  :key="item.id"
+                  class="risk-review-settings__expansion-panel"
                 >
-                  <v-col cols="6">
-                    <h3>
-                      Название стартовой метрики:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-select
-                      v-model="item.idStart"
-                      :items="item.idStartList"
-                      item-text="label"
-                      item-value="value"
-                      outlined
-                      dense
-                      clearable
-                      class="risk-review-settings__select"
-                      @change="updateIdStart"
-                    />
-                  </v-col>
-                </v-row>
-                <!--isLegendShow(switch)-->
-                <v-row
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
-                >
-                  <v-col cols="6">
-                    <h3>
-                      Отображать элемент в легенде:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-switch
-                      v-model="item.isLegendShow"
-                      dense
-                      class="risk-review-settings__switch"
-                      @change="isChanged = true"
-                    />
-                  </v-col>
-                </v-row>
-                <!--legend(text-field)-->
-                <v-row
-                  v-if="item.isLegendShow"
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
-                >
-                  <v-col cols="6">
-                    <h3>
-                      Наименование для легенды:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field
-                      v-model="item.legend"
-                      dense
-                      outlined
-                      class="risk-review-settings__text-field"
-                      @change="isChanged = true"
-                    />
-                  </v-col>
-                </v-row>
-                <!--type(select)-->
-                <v-row
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
-                >
-                  <v-col cols="6">
-                    <h3>
-                      Тип:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-select
-                      v-model="item.type"
-                      item-value="value"
-                      item-text="label"
-                      dense
-                      :items="item.types"
-                      outlined
-                      class="risk-review-settings__select"
-                      @change="isChanged = true"
-                    />
-                  </v-col>
-                </v-row>
-                <!--fill(color-picker)-->
-                <v-row
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
-                >
-                  <v-col cols="6">
-                    <h3>
-                      Цвет заливки:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-color-picker
-                      v-model="item.fill"
-                      hide-inputs
-                      hide-sliders
-                      width="50"
-                      canvas-height="50"
-                      flat
-                      class="risk-review-settings__color-picker float-left mt-1"
-                      @update:color="isChanged = true"
-                    />
-                    <v-color-picker
-                      v-model="item.fill"
-                      hide-inputs
-                      hide-canvas
-                      width="250"
-                      canvas-height="50"
-                      flat
-                      class="risk-review-settings__color-picker"
-                      @update:color="isChanged = true"
-                    />
-                  </v-col>
-                </v-row>
-                <!--textColor(color-picker)-->
-                <v-row
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
-                >
-                  <v-col cols="6">
-                    <h3>
-                      Цвет текста:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-color-picker
-                      v-model="item.textColor"
-                      hide-inputs
-                      hide-sliders
-                      width="50"
-                      canvas-height="50"
-                      flat
-                      class="risk-review-settings__color-picker float-left mt-1"
-                      @update:color="isChanged = true"
-                    />
-                    <v-color-picker
-                      v-model="item.textColor"
-                      hide-inputs
-                      hide-canvas
-                      width="250"
-                      canvas-height="50"
-                      flat
-                      class="risk-review-settings__color-picker"
-                      @update:color="isChanged = true"
-                    />
-                  </v-col>
-                </v-row>
-                <!--textOffset(text-field\slider)-->
-                <v-row
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
-                >
-                  <v-col cols="6">
-                    <h3>
-                      Отступ текста от элемента:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-row align="center">
-                      <v-col cols="4">
+                  <v-expansion-panel-header class="risk-review-settings__expansion-header">
+                    <div class="d-flex align-center">
+                      <v-icon
+                        size="16"
+                        class="burger mr-4"
+                        style="cursor: move"
+                        :color="theme.$main_border"
+                        v-text="mdiMenu"
+                      />
+                      <h3
+                        class="mb-0"
+                        :class="item.legend ? 'mr-3' : ''"
+                      >
+                        {{ item.id }}
+                      </h3>
+                      <h3
+                        v-if="item.legend && item.legend !== item.id && item.isLegendShow"
+                        class="mb-0"
+                      >
+                        "{{ item.legend }}"
+                      </h3>
+                    </div>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content class="risk-review-settings__expansion-content">
+                    <!--idStart(select)-->
+                    <v-row
+                      v-if="item.idStartList && item.idStartList.length > 0"
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Название стартовой метрики:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-select
+                          v-model="item.idStart"
+                          :items="item.idStartList"
+                          item-text="label"
+                          item-value="value"
+                          outlined
+                          dense
+                          clearable
+                          class="risk-review-settings__select"
+                          @change="updateIdStart"
+                        />
+                      </v-col>
+                    </v-row>
+                    <!--isLegendShow(switch)-->
+                    <v-row
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Отображать элемент в легенде:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-switch
+                          v-model="item.isLegendShow"
+                          dense
+                          class="risk-review-settings__switch"
+                          @change="isChanged = true"
+                        />
+                      </v-col>
+                    </v-row>
+                    <!--legend(text-field)-->
+                    <v-row
+                      v-if="item.isLegendShow"
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Наименование для легенды:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
                         <v-text-field
-                          v-model="item.textOffset"
+                          v-model="item.legend"
                           dense
                           outlined
                           class="risk-review-settings__text-field"
                           @change="isChanged = true"
                         />
                       </v-col>
-                      <v-col cols="8">
-                        <v-slider
-                          v-model="item.textOffset"
-                          :style="`color: ${theme.$main_text} !important`"
-                          class="risk-review-settings__slider align-center"
+                    </v-row>
+                    <!--type(select)-->
+                    <v-row
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Тип:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-select
+                          v-model="item.type"
+                          item-value="value"
+                          item-text="label"
                           dense
-                          max="35"
-                          min="-35"
+                          :items="item.types"
+                          outlined
+                          class="risk-review-settings__select"
                           @change="isChanged = true"
                         />
                       </v-col>
                     </v-row>
-                  </v-col>
-                </v-row>
-                <!--textPosY(select)-->
-                <v-row
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
-                >
-                  <v-col cols="6">
-                    <h3>
-                      Вертикальная позиция текста:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-select
-                      v-model="item.textPosY"
-                      :items="item.textPosYItems"
-                      item-text="label"
-                      item-value="value"
-                      outlined
-                      dense
-                      class="risk-review-settings__select"
-                      @change="isChanged = true"
-                    />
-                  </v-col>
-                </v-row>
-                <!--textPosX(select)-->
-                <v-row
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
-                >
-                  <v-col cols="6">
-                    <h3>
-                      Горизонтальная позиция текста:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-select
-                      v-model="item.textPosX"
-                      :items="item.textPosXItems"
-                      item-text="label"
-                      item-value="value"
-                      outlined
-                      dense
-                      class="risk-review-settings__select"
-                      @change="isChanged = true"
-                    />
-                  </v-col>
-                </v-row>
-                <!--isTitleShow(switch)-->
-                <v-row
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
-                >
-                  <v-col cols="6">
-                    <h3>
-                      Отображать подпись:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-switch
-                      v-model="item.isTitleShow"
-                      dense
-                      class="risk-review-settings__switch"
-                      @change="isChanged = true"
-                    />
-                  </v-col>
-                </v-row>
-                <!--isFullHeight(switch)-->
-                <v-row
-                  v-if="item.type !== 'line'"
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
-                >
-                  <v-col cols="6">
-                    <h3>
-                      Отрисовать в полную высоту:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-switch
-                      v-model="item.isFullHeight"
-                      dense
-                      class="risk-review-settings__switch"
-                      @change="isChanged = true"
-                    />
-                  </v-col>
-                </v-row>
-                <!--hideZeroValue(switch)-->
-                <v-row
-                  align="center"
-                  align-content="center"
-                  class="pa-3"
-                >
-                  <v-col cols="6">
-                    <h3>
-                      Скрыть значения равные нулю:
-                    </h3>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-switch
-                      v-model="item.hideZeroValue"
-                      dense
-                      class="risk-review-settings__switch"
-                      @change="isChanged = true"
-                    />
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
+                    <!--fill(color-picker)-->
+                    <v-row
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Цвет заливки:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-color-picker
+                          v-model="item.fill"
+                          hide-inputs
+                          hide-sliders
+                          width="50"
+                          canvas-height="50"
+                          flat
+                          class="risk-review-settings__color-picker float-left mt-1"
+                          @update:color="isChanged = true"
+                        />
+                        <v-color-picker
+                          v-model="item.fill"
+                          hide-inputs
+                          hide-canvas
+                          width="250"
+                          canvas-height="50"
+                          flat
+                          class="risk-review-settings__color-picker"
+                          @update:color="isChanged = true"
+                        />
+                      </v-col>
+                    </v-row>
+                    <!--textColor(color-picker)-->
+                    <v-row
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Цвет текста:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-color-picker
+                          v-model="item.textColor"
+                          hide-inputs
+                          hide-sliders
+                          width="50"
+                          canvas-height="50"
+                          flat
+                          class="risk-review-settings__color-picker float-left mt-1"
+                          @update:color="isChanged = true"
+                        />
+                        <v-color-picker
+                          v-model="item.textColor"
+                          hide-inputs
+                          hide-canvas
+                          width="250"
+                          canvas-height="50"
+                          flat
+                          class="risk-review-settings__color-picker"
+                          @update:color="isChanged = true"
+                        />
+                      </v-col>
+                    </v-row>
+                    <!--textOffset(text-field\slider)-->
+                    <v-row
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Отступ текста от элемента:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-row align="center">
+                          <v-col cols="4">
+                            <v-text-field
+                              v-model="item.textOffset"
+                              dense
+                              outlined
+                              class="risk-review-settings__text-field"
+                              @change="isChanged = true"
+                            />
+                          </v-col>
+                          <v-col cols="8">
+                            <v-slider
+                              v-model="item.textOffset"
+                              :style="`color: ${theme.$main_text} !important`"
+                              class="risk-review-settings__slider align-center"
+                              dense
+                              max="35"
+                              min="-35"
+                              @change="isChanged = true"
+                            />
+                          </v-col>
+                        </v-row>
+                      </v-col>
+                    </v-row>
+                    <!--textPosY(select)-->
+                    <v-row
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Вертикальная позиция текста:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-select
+                          v-model="item.textPosY"
+                          :items="item.textPosYItems"
+                          item-text="label"
+                          item-value="value"
+                          outlined
+                          dense
+                          class="risk-review-settings__select"
+                          @change="isChanged = true"
+                        />
+                      </v-col>
+                    </v-row>
+                    <!--textPosX(select)-->
+                    <v-row
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Горизонтальная позиция текста:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-select
+                          v-model="item.textPosX"
+                          :items="item.textPosXItems"
+                          item-text="label"
+                          item-value="value"
+                          outlined
+                          dense
+                          class="risk-review-settings__select"
+                          @change="isChanged = true"
+                        />
+                      </v-col>
+                    </v-row>
+                    <!--isTitleShow(switch)-->
+                    <v-row
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Отображать подпись:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-switch
+                          v-model="item.isTitleShow"
+                          dense
+                          class="risk-review-settings__switch"
+                          @change="isChanged = true"
+                        />
+                      </v-col>
+                    </v-row>
+                    <!--isFullHeight(switch)-->
+                    <v-row
+                      v-if="item.type !== 'line'"
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Отрисовать в полную высоту:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-switch
+                          v-model="item.isFullHeight"
+                          dense
+                          class="risk-review-settings__switch"
+                          @change="isChanged = true"
+                        />
+                      </v-col>
+                    </v-row>
+                    <!--hideZeroValue(switch)-->
+                    <v-row
+                      align="center"
+                      align-content="center"
+                      class="pa-3"
+                    >
+                      <v-col cols="6">
+                        <h3>
+                          Скрыть значения равные нулю:
+                        </h3>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-switch
+                          v-model="item.hideZeroValue"
+                          dense
+                          class="risk-review-settings__switch"
+                          @change="isChanged = true"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </draggable>
+            </v-expansion-panels>
           </v-col>
         </v-row>
       </v-card-text>
@@ -535,9 +559,16 @@
 <script>
 
 import { mapGetters } from 'vuex';
+import {
+  mdiMenu,
+} from '@mdi/js';
+import draggable from 'vuedraggable';
 
 export default {
   name: 'DashRiskReviewSettings',
+  components: {
+    draggable,
+  },
   model: {
     prop: 'modelValue',
     event: 'updateModelValue',
@@ -559,6 +590,7 @@ export default {
   data: () => ({
     isChanged: false,
     localOptions: null,
+    mdiMenu,
   }),
   computed: {
     ...mapGetters({
@@ -576,6 +608,14 @@ export default {
         this.$emit('updateModelValue', value);
       },
     },
+    draggableList: {
+      get() {
+        return this.localOptions.metricOptions;
+      },
+      set(value) {
+        this.localOptions.metricOptions = value;
+      },
+    },
   },
   watch: {
     isOpen(val) {
@@ -589,28 +629,19 @@ export default {
       if (metricOptions?.length > 0) {
         const updatedMetricOptions = [];
         const allSelectedIdStart = metricOptions
-          .map((el) => el.idStart)
-          .filter((idStart) => !!idStart);
+          .map((el) => ({
+            idStart: el.idStart,
+            id: el.id,
+          }))
+          .filter((el) => !!el.idStart);
         // eslint-disable-next-line no-restricted-syntax
         for (const metric of metricOptions) {
-          let idStartList = metricOptions
+          const idStartList = metricOptions
             .filter((el) => el.id !== metric.id)
             .map((el) => ({
               label: el.id,
               value: el.id,
             }));
-          if (allSelectedIdStart?.length > 0) {
-            const selectedStartId = allSelectedIdStart
-              .find((idStart) => idStart === metric.idStart);
-            idStartList = idStartList
-              .filter((el) => !allSelectedIdStart.includes(el.value));
-            if (selectedStartId) {
-              idStartList.push({
-                label: selectedStartId,
-                value: selectedStartId,
-              });
-            }
-          }
           updatedMetricOptions.push({
             ...metric,
             idStartList,
@@ -674,6 +705,9 @@ export default {
     border-radius: 4px;
     background-color: var(--secondary_bg);
   }
+  &__draggable {
+    width: inherit;
+  }
   &__slider::v-deep {
     .v-messages {
       display: none !important;
@@ -699,6 +733,39 @@ export default {
       display: none !important;
     }
   }
+  &__expansion-panels::v-deep {
+    background-color: var(--main_bg);
+    border: none;
+    box-shadow: none;
+    &::after, ::before {
+      display: none;
+    }
+  }
+  &__expansion-panel::v-deep {
+    background-color: var(--main_bg);
+    border: none;
+    box-shadow: none;
+    &::after, ::before {
+      display: none;
+    }
+  }
+  &__expansion-header::v-deep {
+    background-color: var(--main_bg);
+    border: none;
+    box-shadow: none;
+    padding: 6px 8px;
+    &::after, ::before {
+      display: none;
+    }
+  }
+  &__expansion-content::v-deep {
+    background-color: var(--main_bg);
+    border: none;
+    box-shadow: none;
+    &::after, ::before {
+      display: none;
+    }
+  }
   &__footer {
     background-color: var(--main_bg);
     display: flex;
@@ -708,6 +775,7 @@ export default {
     bottom: 0;
     left: 0;
     right: 0;
+    z-index: 1;
   }
 }
 </style>
