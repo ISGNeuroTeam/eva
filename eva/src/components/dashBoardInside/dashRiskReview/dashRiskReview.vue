@@ -168,12 +168,12 @@
         </div>
       </div>
       <div
-        v-if="!isDataError && isLegendShow && filteredData.length > 0"
+        v-if="isLegendShow"
         ref="riskReviewLegend"
         class="risk-review-legend px-3"
       >
         <template
-          v-for="(part, i) in barParts"
+          v-for="(part, i) in generatedOptions.metricOptions"
         >
           <div
             v-if="part.legend && part.isLegendShow"
@@ -452,8 +452,13 @@ export default {
         second: false,
       };
     },
+
     isLegendShow() {
-      return this.optionsFromStore?.isLegendShow;
+      return !this.isDataError
+      && this.filteredData?.length > 0
+      && this.generatedOptions?.metricOptions?.length > 0
+        ? this.optionsFromStore?.isLegendShow
+        : false;
     },
     dataRestFromWIthOrder() {
       if (this.dataRestFrom?.length > 0) {
