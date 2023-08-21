@@ -272,9 +272,11 @@ export default class RIskReviewClass {
           textOffset,
           yPosition,
           value,
+          type,
           startValue,
           isFullHeight,
         } = element;
+        const { barHeight } = this;
         const getHorizontalAnchor = (anchor = 'default') => {
           const anchorList = {
             default: startValue ? startValue + value : value,
@@ -295,7 +297,14 @@ export default class RIskReviewClass {
         this.svg
           .append('text')
           .text(() => `${Number(value) >= 0 ? '+' : ''}${this.toDivide(value)}`)
-          .attr('y', yPosition + this.barHeight / 2)
+          .attr('y', () => {
+            const yPositions = {
+              top: yPosition,
+              center: yPosition + this.barHeight / 2,
+              bottom: yPosition + this.barHeight,
+            };
+            return yPositions[textPosY];
+          })
           .attr('class', 'bar-text-caption')
           .attr('fill', textColor)
           .attr('text-anchor', value >= 0 ? 'start' : 'end')
@@ -304,11 +313,24 @@ export default class RIskReviewClass {
           .attr('dy', function () {
             const textHeight = this.getBBox().height;
             const textPositionsY = {
-              top: isFullHeight ? textHeight - (textHeight * 4.4) : textHeight - (textHeight * 4.4),
-              bottom: isFullHeight ? textHeight * 3.6 : textHeight * 0.5,
-              center: isFullHeight ? textHeight * 0.3 : textHeight * 1.25 * -1,
+              line: {
+                top: textHeight - (textHeight * 1.15),
+                bottom: textHeight * 0.6,
+                center: textHeight * 0.3,
+              },
+              bar: {
+                top: isFullHeight
+                  ? textHeight - (textHeight * 1)
+                  : textHeight - (textHeight * 1),
+                bottom: isFullHeight
+                  ? textHeight * 3.6
+                  : textHeight - (textHeight * 2.2),
+                center: isFullHeight
+                  ? textHeight * 0.3
+                  : textHeight * 1.25 * -1,
+              },
             };
-            return textPositionsY[textPosY];
+            return textPositionsY[type][textPosY];
           })
         // eslint-disable-next-line func-names
           .attr('dx', function () {
@@ -317,7 +339,7 @@ export default class RIskReviewClass {
               default: 0,
               center: value >= 0 ? (textWidth / 2) * -1 : textWidth / 2,
             };
-            return textDX[textPosX];
+            return type === 'line' ? textDX.default : textDX[textPosX];
           });
       }
     }
@@ -332,6 +354,7 @@ export default class RIskReviewClass {
       value,
       startValue,
       isFullHeight = true,
+      type,
       id,
     }) {
       this.textBlocks.push({
@@ -344,6 +367,7 @@ export default class RIskReviewClass {
         value,
         startValue,
         isFullHeight,
+        type,
         id,
       });
     }
@@ -368,6 +392,7 @@ export default class RIskReviewClass {
         id,
         fill = 'var(--main_text)',
         textColor,
+        type,
         isTitleShow = true,
         hideZeroValue = false,
         textPosY = 'center',
@@ -407,6 +432,7 @@ export default class RIskReviewClass {
               xPosition,
               yPosition,
               value,
+              type,
               id,
             });
           }
@@ -424,6 +450,7 @@ export default class RIskReviewClass {
         textColor,
         textOffset = 10,
         hideZeroValue = false,
+        type,
         fill = 'var(--main_text)',
         isTitleShow = false,
         isFullHeight = true,
@@ -476,6 +503,7 @@ export default class RIskReviewClass {
               xPosition,
               isFullHeight,
               value,
+              type,
               startValue: data[idStart],
               id,
             });

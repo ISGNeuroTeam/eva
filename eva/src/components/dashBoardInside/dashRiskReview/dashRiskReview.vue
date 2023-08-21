@@ -204,7 +204,7 @@
       </v-icon>
       <risk-review-settings
         v-model="isModalSettings"
-        :options="localOptions"
+        :options="generatedOptions"
         :metric-keys="metricKeys"
         @updateSettings="updateOptionsInStore"
       />
@@ -382,6 +382,51 @@ export default {
         return this.preparedDataRest.metricOptions;
       }
       return [];
+    },
+    generatedOptions() {
+      const {
+        // Настройки для метрик
+        metricOptions,
+        // Отображение легенды
+        isLegendShow,
+      } = this.optionsFromStore;
+      const isResidual = typeof this.optionsFromStore[this.metricKeys.residualMetric] !== 'undefined';
+      const result = {
+        isLegendShow: typeof isLegendShow !== 'undefined' ? isLegendShow : false,
+        [this.metricKeys.residualMetric]: isResidual
+          ? this.optionsFromStore[this.metricKeys.residualMetric]
+          : false,
+        [this.metricKeys.firstTitle]: this.optionsFromStore[this.metricKeys.firstTitle]
+        || '',
+        leftValueColor: this.leftValueColor,
+        [this.metricKeys.secondTitle]: this.optionsFromStore[this.metricKeys.secondTitle]
+        || '',
+        rightValueColor: this.rightValueColor,
+      };
+      if (metricOptions) {
+        const metricIDListFromData = this.barParts.map((metric) => metric.id);
+        const currentMetricIDList = metricOptions.map((metric) => metric.id);
+        const resultMetricList = [];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const metric of metricOptions) {
+          if (metricIDListFromData.includes(metric.id)) {
+            resultMetricList.push(metric);
+          }
+        }
+        // eslint-disable-next-line no-restricted-syntax
+        for (const metric of this.barParts) {
+          if (!currentMetricIDList.includes(metric.id)) {
+            resultMetricList.push(metric);
+          }
+        }
+        result.metricOptions = resultMetricList.filter((metric) => metric.id !== '_order'
+            && metric.id !== '_time'
+            && metric.id !== 'residual');
+      } else {
+        // Для новой визуализации, генерим метрики
+        result.metricOptions = this.barParts;
+      }
+      return structuredClone(result);
     },
     leftValueColor() {
       return this.optionsFromStore.leftValueColor || '#FF0000';
@@ -795,11 +840,26 @@ export default {
         rightValueColor: this.rightValueColor,
       };
       if (metricOptions) {
-        // Если настройки были указаны в панели настроек
-        result.metricOptions = metricOptions.filter((metric) => metric.id !== '_order'
+        const metricIDListFromData = this.barParts.map((metric) => metric.id);
+        const currentMetricIDList = metricOptions.map((metric) => metric.id);
+        const resultMetricList = [];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const metric of metricOptions) {
+          if (metricIDListFromData.includes(metric.id)) {
+            resultMetricList.push(metric);
+          }
+        }
+        // eslint-disable-next-line no-restricted-syntax
+        for (const metric of this.barParts) {
+          if (!currentMetricIDList.includes(metric.id)) {
+            resultMetricList.push(metric);
+          }
+        }
+        result.metricOptions = resultMetricList.filter((metric) => metric.id !== '_order'
             && metric.id !== '_time'
             && metric.id !== 'residual');
       } else {
+        // Для новой визуализации, генерим метрики
         result.metricOptions = this.barParts;
       }
       this.localOptions = structuredClone(result);
@@ -879,7 +939,7 @@ export default {
               height: !this.isLegendShow
                 ? this.sizeFrom.height
                 : this.sizeFrom.height - this.legendHeight - 16,
-              barParts: this.barParts,
+              barParts: [...this.generatedOptions.metricOptions].reverse(),
               dataRest: this.filteredData,
               setTokenFn: this.setTokens,
               toDivideFn: this.toDivide,
