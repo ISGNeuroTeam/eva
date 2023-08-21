@@ -978,6 +978,7 @@ export default {
         }, {});
       const data = {
         clickedCell: cell.value,
+        columnField: cell.column.field,
         allCellInRow,
       };
       this.setToken('click', data);
@@ -1284,26 +1285,13 @@ export default {
       return result;
     },
     setToken(event, data) {
-      if (this.getTokens?.length > 0) {
-        const targetTokens = this.getTokens.filter((el) => el.action === event);
-        targetTokens.forEach((token) => {
-          if (token.capture) {
-            this.$store.commit('setTocken', {
-              token,
-              idDash: this.idDashFrom,
-              store: this.$store,
-              value: `${data.allCellInRow[token.capture] === undefined ? '' : data.allCellInRow[token.capture]}`,
-            });
-          } else {
-            this.$store.commit('setTocken', {
-              token,
-              idDash: this.idDashFrom,
-              store: this.$store,
-              value: `${data.clickedCell}`,
-            });
-          }
-        });
-      }
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: event,
+        value: data.allCellInRow,
+        capture: data.columnField,
+      });
     },
     setAction(data) {
       this.actions = this.actions.map((action) => ({
