@@ -16,7 +16,7 @@ const defaultSourceData = {
           if (rowKeys.includes(fieldName)) {
             return firstRow[fieldName];
           }
-          this.$store.commit('notify/addNotification', {
+          this.$store.dispatch('notify/addNotification', {
             id: `defSourceWarn-${this.idFrom}`,
             icon: mdiViewDashboard,
             message: `Поле "${fieldName}" для дефолтного значения из ИД не найдено для компонента ${this.idFrom}`,
