@@ -74,16 +74,16 @@ export default class RIskReviewClass {
       if (orderList.length !== uniqueOrderList.length) {
         return {
           isValid: false,
-          error: 'Не корректно заполнено поле "_order".\n '
+          error: 'Некорректно заполнено поле "_order".\n '
               + 'Поле должно быть заполнено начиная с 0, без пропусков.',
         };
       }
       if (Math.min(orderList) > 0) {
-        return { isValid: false, error: 'Не корректно заполнено поле "_order"' };
+        return { isValid: false, error: 'Некорректно заполнено поле "_order"' };
       }
       // eslint-disable-next-line no-restricted-syntax
       for (const order of orderList) {
-        if (order !== counter) return { isValid: false, error: 'Не корректно заполнено поле "_order"' };
+        if (order !== counter) return { isValid: false, error: 'Некорректно заполнено поле "_order"' };
         counter += 1;
       }
       return { isValid: true, error: '' };
@@ -323,7 +323,7 @@ export default class RIskReviewClass {
                   ? textHeight - (textHeight * 1)
                   : textHeight - (textHeight * 1),
                 bottom: isFullHeight
-                  ? textHeight * 3.6
+                  ? textHeight * 0.6
                   : textHeight - (textHeight * 2.2),
                 center: isFullHeight
                   ? textHeight * 0.3
