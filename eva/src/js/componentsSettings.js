@@ -93,7 +93,40 @@ export default {
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
     { name: 'Число', img: mdiNumeric, type: 'single' },
-    { name: 'Детализация рисков', img: mdiScaleBalance, type: 'riskReview' },
+    {
+      name: 'Детализация рисков',
+      img: mdiScaleBalance,
+      type: 'riskReview',
+      dataSourceDescription:
+          '#### Особенности визуализации: \n'
+          + '- Приведенные ниже поля являются примерами, их наименования можно изменить в настройках визуализации!\n'
+          + '- Подписи и заголовок первой основной метрики располагается - слева, второй - справа!\n'
+          + '- Элементы списка(текс+значение) внутри блока метрик, значения которых равны нулю или отсутствуют - будут автоматически скрыты!\n'
+          + '#### Обязательные поля:\n'
+          + '- ```[first/second_metric_name]``` - Первая/вторая основная метрика, число\n'
+          + '#### Дополнительные поля:\n'
+          + '- ```[first/second_metric_name][title_suffix]``` - Заголовок блока первой/вторая основной метрики(Значение должно быть идентичным у всех строк в запросе), строка\n'
+          + '- ```[first/second_metric_name][list_title_suffix]``` - Заголовок списка внутри блока первой/второй основной метрики, строка\n'
+          + '- ```[first/second_metric_name][list_text_suffix]_[порядковый номер от 0]``` - Текст элемента списка внутри блока первой/второй основной метрики, строка\n'
+          + '- ```[first/second_metric_name][list_value_suffix]_[порядковый номер от 0]``` - Значение элемента списка внутри блока первой/второй основной метрики, число\n'
+          + '- ```[metric_name]``` - Дополнительная метрика(подтягивается на график автоматически из полей данных), число\n'
+          + '- ```[residual]``` - Остаточное влияние, число\n'
+          + '- ```_order``` - Поле для сортировки элементов, число\n'
+          + '#### Пример данных:\n'
+          + '- Значения полей в примере данных:\n'
+          + '-- first_metric_name=left\n'
+          + '-- second_metric_name=right\n'
+          + '-- title_suffix=_title\n'
+          + '-- list_title_suffix=_list_title\n'
+          + '-- list_text_suffix=_list_text\n'
+          + '-- list_value_suffix=_list_value\n'
+          + '-- residual=residual\n'
+          + '| left | right | _order | left_title | right_title | left_list_title | right_list_title | left_list_text_0 | right_list_text_0 | left_list_value_0 | right_list_value_0 | residual |\n'
+          + '| -100 | 250 | 0 | "Заголовок 1" | Заголовок 2 | "Заголовок списка 1" | "Заголовок списка 2" | "Текст в списке 1" | "Текст в списке 2" | -100 | 250 | 150 |\n'
+          + '| -100 | 250 | 1 | "Заголовок 1" | Заголовок 2 | "Заголовок списка 1" | "Заголовок списка 2" | "Текст в списке 1" | "Текст в списке 2" | :-- | :-- | :-- |\n'
+          + '| -100 | 250 | 2 | "Заголовок 1" | Заголовок 2 | "Заголовок списка 1" | "Заголовок списка 2" | :-- | :-- | :-- | :-- | :-- |\n'
+          + '| -100 | 250 | 3 | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |\n',
+    },
     {
       name: 'Спидометр',
       img: mdiGauge,
@@ -484,22 +517,14 @@ export default {
     waterfall: [
     ],
     riskReview: [
-      'visibleResidualImpactPanel',
-      'leftTitle',
-      'rightTitle',
-      'leftValueColor',
-      'rightValueColor',
-      'fieldsGroup',
-      'titleColName',
-      'listColName',
-      'listColValue',
-      'secondTitleColName',
-      'secondListColName',
-      'secondListColValue',
-      'residualEffectField',
-      'primitives',
-      'primitivesLibrary',
-      'hideLegend',
+      'customizingFields',
+      'firstMainMetric',
+      'secondMainMetric',
+      'titleSuffix',
+      'listTitleSuffix',
+      'listTextSuffix',
+      'listValueSuffix',
+      'residualMetric',
     ],
   },
   optionFields: [
@@ -1268,110 +1293,57 @@ export default {
 
     // riskReview
     {
-      option: 'visibleResidualImpactPanel',
-      description: 'Вкл/выкл отображение панели с остаточным влиянием',
-      elem: 'switch',
-      default: false,
-    },
-    {
-      option: 'hideLegend',
-      description: 'Скрыть легенду',
-      elem: 'switch',
-      default: false,
-    },
-    {
-      option: 'leftTitle',
-      elem: 'text-field',
-      description: 'Заголовок левого блока',
-      default: '',
-    },
-    {
-      option: 'rightTitle',
-      elem: 'text-field',
-      description: 'Заголовок правого блока',
-      default: '',
-    },
-    {
-      option: 'leftValueColor',
-      elem: 'text-field',
-      description: 'Цвет значения в левом столбце',
-      placeholder: 'red/#000000/rgb(255,255,255)',
-      default: '',
-    },
-    {
-      option: 'rightValueColor',
-      elem: 'text-field',
-      description: 'Цвет значения в правом столбце',
-      placeholder: 'red/#000000/rgb(255,255,255)',
-      default: '',
-    },
-
-    {
       group: 'Настройка полей',
-      option: 'fieldsGroup',
+      option: 'customizingFields',
     },
-
     {
-      optionGroup: 'fieldsGroup',
-      option: 'titleColName',
-      default: 'risk_name',
-      description: 'Имя поля в OTL для заголовка текстового блока(слева)',
+      option: 'firstMainMetric',
+      optionGroup: 'customizingFields',
       elem: 'text-field',
+      description: 'Название поля первой метрики',
+      default: 'left',
     },
-
     {
-      optionGroup: 'fieldsGroup',
-      option: 'listColName',
-      default: 'riskfactor_name',
-      description: 'Имя поля в OTL для элемента списка в текстовом блоке(слева)',
+      option: 'secondMainMetric',
+      optionGroup: 'customizingFields',
       elem: 'text-field',
+      description: 'Название поля второй метрики',
+      default: 'right',
     },
     {
-      optionGroup: 'fieldsGroup',
-      option: 'listColValue',
-      default: 'riskfactor_value',
-      description: 'Имя поля в OTL для значения в списке, внутри текстового блоке(слева)',
+      option: 'titleSuffix',
+      optionGroup: 'customizingFields',
       elem: 'text-field',
+      description: 'Суффикс для поля заголовка блока метрики([firstMetricName][title_suffix]',
+      default: '_title',
     },
     {
-      optionGroup: 'fieldsGroup',
-      option: 'secondTitleColName',
-      default: '',
-      description: 'Имя поля в OTL для заголовка текстового блока(справа)',
+      option: 'listTitleSuffix',
+      optionGroup: 'customizingFields',
       elem: 'text-field',
+      description: 'Суффикс для поля заголовка списка внутри блока метрики([firstMetricName][list_title_suffix]',
+      default: '_list_title',
     },
     {
-      optionGroup: 'fieldsGroup',
-      option: 'secondListColName',
-      default: 'measure_name',
-      description: 'Имя поля в OTL для элемента списка в текстовом блоке(справа)',
+      option: 'listTextSuffix',
+      optionGroup: 'customizingFields',
       elem: 'text-field',
+      description: 'Суффикс для поля текста в списке списка внутри блока метрики([firstMetricName][list_text_suffix]_[порядковый номер от 0]',
+      default: '_list_text',
     },
     {
-      optionGroup: 'fieldsGroup',
-      option: 'secondListColValue',
-      default: 'measure_value',
-      description: 'Имя поля в OTL для значения в списке, внутри текстового блоке(справа)',
+      option: 'listValueSuffix',
+      optionGroup: 'customizingFields',
       elem: 'text-field',
+      description: 'Суффикс для поля значения в списке списка внутри блока метрики([firstMetricName][list_value_suffix]_[порядковый номер от 0]',
+      default: '_list_value',
     },
     {
-      optionGroup: 'fieldsGroup',
-      option: 'residualEffectField',
+      option: 'residualMetric',
+      optionGroup: 'customizingFields',
+      elem: 'text-field',
+      description: 'Название поля для остаточного влияния',
       default: 'residual',
-      description: 'Имя поля в OTL для значения остаточного влияния',
-      elem: 'text-field',
-    },
-
-    // fullWidthGroup
-    {
-      group: 'Библиотека примитивов',
-      option: 'primitives',
-    },
-    {
-      optionGroup: 'primitives',
-      option: 'primitivesLibrary',
-      elem: 'code-editor',
-      isFullWidth: true,
     },
     // formGenerator
     {
