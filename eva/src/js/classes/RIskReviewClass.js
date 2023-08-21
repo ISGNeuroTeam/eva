@@ -8,7 +8,7 @@ export default class RIskReviewClass {
 
     height = null;
 
-    marginX = 10;
+    marginX = 0;
 
     marginY = 0;
 
@@ -42,29 +42,50 @@ export default class RIskReviewClass {
     svg = null;
 
     // Проверка данных на валидность
-    static validateData(dataRest, barParts, isLoading) {
+    static validateData(dataRest, requiredFields, isLoading) {
       if (dataRest.length <= 0) {
         if (isLoading) {
-          return { isValid: false, error: 'Загрузка' };
+          return { isValid: false, error: 'Загрузка...' };
         }
-        return { isValid: false, error: 'Нет данных для построения' };
-      }
-
-      if (barParts.length <= 0) {
-        return { isValid: false, error: 'Не указаны части столбцов' };
+        return { isValid: false, error: 'Нет данных для построения.' };
       }
 
       // eslint-disable-next-line no-restricted-syntax
       for (const dsItem of dataRest) {
         const dsCols = Object.keys(dsItem);
         // eslint-disable-next-line no-restricted-syntax
-        for (const bar of barParts) {
-          if (!dsCols.includes(bar.id)) {
-            return { isValid: false, error: `Отсутствует столбец данных "${bar.id}"` };
+        for (const field of requiredFields) {
+          if (!dsCols.includes(field)) {
+            return {
+              isValid: false,
+              error: `Отсутствует столбец данных "${field}"`,
+            };
           }
         }
       }
 
+      // eslint-disable-next-line no-underscore-dangle
+      const orderList = dataRest.map((el, index) => (typeof el._order !== 'undefined'
+      // eslint-disable-next-line no-underscore-dangle
+        ? el._order
+        : index)).sort();
+      let counter = 0;
+      const uniqueOrderList = [...new Set(orderList)];
+      if (orderList.length !== uniqueOrderList.length) {
+        return {
+          isValid: false,
+          error: 'Некорректно заполнено поле "_order".\n '
+              + 'Поле должно быть заполнено начиная с 0, без пропусков.',
+        };
+      }
+      if (Math.min(orderList) > 0) {
+        return { isValid: false, error: 'Некорректно заполнено поле "_order"' };
+      }
+      // eslint-disable-next-line no-restricted-syntax
+      for (const order of orderList) {
+        if (order !== counter) return { isValid: false, error: 'Некорректно заполнено поле "_order"' };
+        counter += 1;
+      }
       return { isValid: true, error: '' };
     }
 
@@ -133,7 +154,6 @@ export default class RIskReviewClass {
       paddingInner,
       setTokenFn = null,
       onClickFn = null,
-      marginX,
       marginY,
       toDivideFn,
     }) {
@@ -143,7 +163,6 @@ export default class RIskReviewClass {
       this.options = options;
       if (paddingOuter) this.paddingOuter = paddingOuter;
       if (paddingInner) this.paddingInner = paddingInner;
-      if (marginX) this.marginX = marginX;
       if (marginY) this.marginY = marginY;
       this.setTokenFn = setTokenFn;
       this.onClickFn = onClickFn;
@@ -176,8 +195,10 @@ export default class RIskReviewClass {
     fitContent() {
       const gBox = d3.select(this.svgContainer).select('.content-g').node().getBBox();
       const containerWidth = this.svgContainer.offsetWidth;
-      if ((containerWidth - gBox.x - gBox.width) < 0) {
-        this.marginX += Math.abs(containerWidth - gBox.x - gBox.width) * 4;
+      const gWidth = gBox.width + Math.abs(gBox.x);
+      const updatedWidth = gWidth + (gWidth * 0.005);
+      if (containerWidth < updatedWidth) {
+        this.marginX = (updatedWidth - containerWidth);
         this.render(true);
       }
     }
@@ -251,18 +272,22 @@ export default class RIskReviewClass {
           textOffset,
           yPosition,
           value,
+          type,
           startValue,
+          isFullHeight,
         } = element;
+        const { barHeight } = this;
         const getHorizontalAnchor = (anchor = 'default') => {
           const anchorList = {
             default: startValue ? startValue + value : value,
-            center: startValue ? (startValue / 2) + value : value / 2,
+            center: startValue ? startValue + (value / 2) : value / 2,
           };
           if (anchorList[anchor]) {
             return anchorList[anchor];
           }
           return anchorList.default;
         };
+        // const textXPosition = this.xScale(startValue ? startValue + value : value);
         const textXPosition = textPosX
           ? this.xScale(getHorizontalAnchor(textPosX))
           : this.xScale(getHorizontalAnchor());
@@ -272,20 +297,49 @@ export default class RIskReviewClass {
         this.svg
           .append('text')
           .text(() => `${Number(value) >= 0 ? '+' : ''}${this.toDivide(value)}`)
-          .attr('y', yPosition + this.barHeight / 2)
+          .attr('y', () => {
+            const yPositions = {
+              top: yPosition,
+              center: yPosition + this.barHeight / 2,
+              bottom: yPosition + this.barHeight,
+            };
+            return yPositions[textPosY];
+          })
           .attr('class', 'bar-text-caption')
           .attr('fill', textColor)
           .attr('text-anchor', value >= 0 ? 'start' : 'end')
-          .attr('x', textXPositionWithOffset)
+          .attr('x', textPosX === 'center' ? textXPosition : textXPositionWithOffset)
         // eslint-disable-next-line func-names
           .attr('dy', function () {
             const textHeight = this.getBBox().height;
             const textPositionsY = {
-              top: textHeight - (textHeight * 3),
-              bottom: textHeight * 2.5,
-              center: textHeight / 3,
+              line: {
+                top: textHeight - (textHeight * 1.15),
+                bottom: textHeight * 0.6,
+                center: textHeight * 0.3,
+              },
+              bar: {
+                top: isFullHeight
+                  ? textHeight - (textHeight * 1)
+                  : textHeight - (textHeight * 1),
+                bottom: isFullHeight
+                  ? textHeight * 0.6
+                  : textHeight - (textHeight * 2.2),
+                center: isFullHeight
+                  ? textHeight * 0.3
+                  : textHeight * 1.25 * -1,
+              },
             };
-            return textPosY ? textPositionsY[textPosY] : textHeight / 3;
+            return textPositionsY[type][textPosY];
+          })
+        // eslint-disable-next-line func-names
+          .attr('dx', function () {
+            const textWidth = this.getBBox().width;
+            const textDX = {
+              default: 0,
+              center: value >= 0 ? (textWidth / 2) * -1 : textWidth / 2,
+            };
+            return type === 'line' ? textDX.default : textDX[textPosX];
           });
       }
     }
@@ -298,6 +352,9 @@ export default class RIskReviewClass {
       xPosition,
       yPosition,
       value,
+      startValue,
+      isFullHeight = true,
+      type,
       id,
     }) {
       this.textBlocks.push({
@@ -308,6 +365,9 @@ export default class RIskReviewClass {
         xPosition,
         yPosition,
         value,
+        startValue,
+        isFullHeight,
+        type,
         id,
       });
     }
@@ -332,6 +392,7 @@ export default class RIskReviewClass {
         id,
         fill = 'var(--main_text)',
         textColor,
+        type,
         isTitleShow = true,
         hideZeroValue = false,
         textPosY = 'center',
@@ -371,6 +432,7 @@ export default class RIskReviewClass {
               xPosition,
               yPosition,
               value,
+              type,
               id,
             });
           }
@@ -388,6 +450,7 @@ export default class RIskReviewClass {
         textColor,
         textOffset = 10,
         hideZeroValue = false,
+        type,
         fill = 'var(--main_text)',
         isTitleShow = false,
         isFullHeight = true,
@@ -438,7 +501,9 @@ export default class RIskReviewClass {
               textOffset,
               yPosition,
               xPosition,
+              isFullHeight,
               value,
+              type,
               startValue: data[idStart],
               id,
             });
