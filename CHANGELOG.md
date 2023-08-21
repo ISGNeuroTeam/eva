@@ -8,16 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Sorting data sources
 - Mouse middle click by group tile and dashboard tile
 - Table event OnDataCompare: 
   - Ability use the token in the value
   - Ability to use regular expressions in the column name
+- Notify on data source error
+- Optional notify on data source finished
 - Risk-review: Added auto-generated options for metric
 - Risk-review: Added documentation on create visualisation
 - Risk-review: Added options panel
 
 ### Changed
 - removed libraries yFiles and license from project
+- Data source design
 - Risk-review: Delete primitives library
 - Risk-review: Changed fields naming for metrics from 'risk, measure, riskfactor' to '\[main_metric_1], \[main_metric_2]'+suffixes '_title, _list_title, \_list_text\_\[0-1-2...], \_list_value\_\[0-1-2...]'
 

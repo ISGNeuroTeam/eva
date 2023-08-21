@@ -23,6 +23,7 @@
           v-for="sear in searches"
           :key="sear.id"
           class="searches-one"
+          style="position: relative"
           @click="selectSearch($event, sear)"
         >
           <div
@@ -30,10 +31,9 @@
             :style="{
               color: '#FFFFFF',
               background: theme.$accent_ui_color,
-              border: `2px solid ${theme.$accent_ui_color}`,
             }"
           >
-            {{ checkSid(sear.sid) }}
+            {{ sear.sid }}
           </div>
           <div
             class="search-query"
@@ -177,19 +177,13 @@ export default {
       // и делаем ему обводку
       elem.style = `box-shadow: 0px 0px 4px 3px  ${this.theme.$accent_ui_color}`;
     },
-    checkSid(sid) {
-      let newSid = sid;
-      // если там больше 10 символов
-      if (sid.length > 5) {
-        // обрезаем и добовляем троеточие
-        newSid = `${sid.substring(0, 5)}...`;
-      }
-      return newSid;
-    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
 @import '../sass/modalSearch.sass';
+.searches-one {
+  position: relative !important;
+}
 </style>
