@@ -290,6 +290,40 @@ export default new Vuex.Store({
         });
       }
     },
+    tokenAction(state, {
+      idDash,
+      elem,
+      action,
+      value: objectValue,
+      capture: clickedField = null,
+    }) {
+      if (!state[idDash]?.tockens) {
+        return;
+      }
+      state[idDash].tockens
+        .filter((token) => token.elem === elem && token.action === action)
+        .forEach((token) => {
+          let value = objectValue;
+          if (typeof objectValue === 'object') {
+            if (token.capture && token.capture in objectValue) {
+              value = objectValue[token.capture];
+            } else if (clickedField) {
+              value = objectValue[clickedField];
+            }
+          }
+          const {
+            prefix = '',
+            sufix = '',
+          } = token;
+          if (value !== undefined && value !== null) {
+            value = `${prefix}${value}${sufix}`;
+          }
+          if (value === undefined || value === null) {
+            value = token.defaultValue;
+          }
+          this.commit('setTocken', { idDash, token, value });
+        });
+    },
     // TODO refactor
     // сохранение токена в хранилище
     setTocken(state, { token, idDash, value }) {
