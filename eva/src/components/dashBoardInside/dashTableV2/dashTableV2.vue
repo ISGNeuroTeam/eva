@@ -748,14 +748,14 @@ export default {
     },
     changeColumnColor(column, color) {
       column.getCells().forEach((el) => {
-        el.getElement().style.backgroundColor = color;
+        el.getElement().style.setProperty('background-color', color, 'important');
       });
     },
     changeRowColor(row, color) {
-      row.getElement().style.backgroundColor = color;
+      row.getElement().style.setProperty('background-color', color, 'important');
     },
     changeCellColor(cell, color) {
-      cell.getElement().style.backgroundColor = color;
+      cell.getElement().style.setProperty('background-color', color, 'important');
     },
     updateDataInTable(data) {
       this.tableData = structuredClone(data);
