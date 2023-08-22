@@ -427,7 +427,7 @@ export default {
         }
         result.metricOptions = resultMetricList.filter((metric) => metric.id !== '_order'
             && metric.id !== '_time'
-            && metric.id !== 'residual');
+            && metric.id !== this.metricKeys.residualMetric);
       } else {
         // Для новой визуализации, генерим метрики
         result.metricOptions = this.barParts;
@@ -572,7 +572,7 @@ export default {
         const params = {};
         // Убираем поле _time, residual, _order
         const fieldList = Object.keys(element).filter((field) => field !== '_time'
-            && field !== 'residual'
+            && field !== this.metricKeys.residualMetric
             && field !== '_order');
         // Список элементов (text\value) для первой основной метрики
         const firstList = {
@@ -601,7 +601,7 @@ export default {
             } else if (field.startsWith(metricKeys.secondTitle)) {
               // Достаем заголовок блока второй основной метрики
               params[metricKeys.secondTitle] = element[field];
-            } else if (field.indexOf('list') !== -1) {
+            } else {
               if (field.startsWith(metricKeys.firstListTitle)) {
                 // Достаем заголовок для списка в блоке первой основной метрики
                 firstList[metricKeys.firstListTitle] = element[field];
@@ -872,7 +872,7 @@ export default {
         }
         result.metricOptions = resultMetricList.filter((metric) => metric.id !== '_order'
             && metric.id !== '_time'
-            && metric.id !== 'residual');
+            && metric.id !== this.metricKeys.residualMetric);
       } else {
         // Для новой визуализации, генерим метрики
         result.metricOptions = this.barParts;

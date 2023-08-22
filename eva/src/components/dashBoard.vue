@@ -530,6 +530,7 @@
         class="card-text"
       >
         <div
+          v-if="toolSettings && toolSettings.dataSourceDescription"
           class="source-descr"
           :style="{
             height: `${bigSizeMode ? fullScreenHeight : height - 128}px`,
@@ -537,7 +538,6 @@
           }"
         >
           <vue-markdown
-            v-if="toolSettings && toolSettings.dataSourceDescription"
             class="source-descr__markdown"
           >
             {{ toolSettings.dataSourceDescription }}
