@@ -76,7 +76,7 @@
                           :style="{
                             color: leftValueColor,
                           }"
-                        >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
+                        >{{ listItem.value >= 0 ? '+' : '' }}{{ toDivide(listItem.value) }}</span>)
                       </span>
                     </div>
                   </template>
@@ -140,7 +140,7 @@
                           :style="{
                             color: rightValueColor,
                           }"
-                        >{{ listItem.value >= 0 ? '+' : '' }}{{ listItem.value }}</span>)
+                        >{{ listItem.value >= 0 ? '+' : '' }}{{ toDivide(listItem.value) }}</span>)
                       </span>
                     </div>
                   </template>
