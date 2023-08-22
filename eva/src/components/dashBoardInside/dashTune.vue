@@ -222,6 +222,9 @@ export default {
         .sort((a, b) => a - b);
       return list.filter((item, pos) => list.indexOf(item) === pos); // filter duplicates
     },
+    objValue() {
+      return this.dataRestFrom[this.sliderValue];
+    },
     minValue() {
       return this.values ? this.values[0] : 0;
     },
@@ -394,18 +397,12 @@ export default {
       });
     },
     setToken() {
-      this.$store.state[this.idDashFrom]?.tockens?.forEach((token) => {
-        if (token.elem === this.idFrom && token.action === 'change') {
-          this.$store.commit('setTocken', {
-            token: {
-              name: token.name,
-              action: 'change',
-              capture: '',
-            },
-            idDash: this.idDashFrom,
-            value: this.value,
-          });
-        }
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: 'change',
+        value: this.objValue,
+        capture: this.dataField,
       });
     },
     loadSelectedValue() {
