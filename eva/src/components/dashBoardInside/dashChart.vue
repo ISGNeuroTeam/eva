@@ -348,28 +348,20 @@ export default {
       if (!this.tokensStore) {
         return;
       }
-      const { id, idDash } = this;
-      const tokens = this.tokensStore
-        .filter(({ elem, action }) => (elem === id && action === actionName));
+      const { idDash } = this;
       const values = {
         pointX: point[0],
         pointY: point[1],
         start: point[0],
         end: point[1],
       };
-      tokens.forEach(({ action, name, capture }) => {
-        const token = {
-          name,
-          action,
-          capture,
-          filterParam: this.xMetric,
-        };
-        this.$store.commit('setTocken', {
-          token,
-          value: values[capture],
-          idDash,
-        });
+      this.$store.commit('tokenAction', {
+        idDash,
+        elem: this.idFrom,
+        action: actionName,
+        value: values,
       });
+
       const events = this.eventsStore({
         idDash,
         event: 'onclick',
