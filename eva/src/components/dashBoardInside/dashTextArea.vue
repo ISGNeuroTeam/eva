@@ -299,29 +299,13 @@ export default {
       }
     },
     setTocken() {
-      const { tockens } = this.$store.state[this.idDash];
-      if (tockens) {
-        let name = '';
-        let currentTokenValue = '';
-        tockens.forEach((token) => {
-          if (token.elem === this.id && token.action === 'accept') {
-            name = token.name;
-            currentTokenValue = token?.value || '';
-          }
-        });
-        const textarea = this.replaceLineWrapForToken(`${this.textarea}`);
-        const token = {
-          name,
-          action: 'accept',
-          capture: '',
-        };
-        this.$store.commit('setTocken', {
-          token,
-          idDash: this.idDash,
-          value: textarea,
-          store: this.$store,
-        });
-      }
+      const value = this.replaceLineWrapForToken(`${this.textarea}`);
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: 'accept',
+        value,
+      });
     },
   },
 };
