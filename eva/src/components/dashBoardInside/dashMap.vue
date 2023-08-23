@@ -426,64 +426,28 @@ export default {
       }
     },
     updateTokenOnClickAction(value) {
-      if (this.getTokens?.length) {
-        const filteredTokenKeys = structuredClone(this.getTokens)
-          .filter((token) => token.action === 'click' && token.elem === this.idFrom);
-
-        filteredTokenKeys.forEach((token) => {
-          this.$store.commit('setTocken', {
-            token,
-            idDash: this.idDash,
-            value: value[token.capture],
-            store: this.$store,
-          });
-        });
-      }
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: 'click',
+        value,
+      });
     },
     updateToken(value) {
-      const tokens = this.$store.state[this.idDash]?.tockens || {};
-      Object.keys(tokens).forEach((i) => {
-        if (
-          tokens[i].elem === this.element
-          && tokens[i].action === 'button'
-          && tokens[i].capture === 'zoom_level'
-        ) {
-          this.$store.commit('setTocken', {
-            token: tokens[i],
-            idDash: this.idDash,
-            value,
-            store: this.$store,
-          });
-        } else if (
-          tokens[i].elem === this.element
-          && tokens[i].action === 'button'
-          && tokens[i].capture === 'top_left_point'
-        ) {
-          this.$store.commit('setTocken', {
-            token: tokens[i],
-            idDash: this.idDash,
-            value: this.leftBottom[1],
-            store: this.$store,
-          });
-        } else if (
-          tokens[i].elem === this.element
-          && tokens[i].action === 'button'
-          && tokens[i].capture === 'bottom_right_point'
-        ) {
-          this.$store.commit('setTocken', {
-            token: tokens[i],
-            idDash: this.idDash,
-            value: this.rightTop[1],
-            store: this.$store,
-          });
-        }
+      const valueObj = {
+        zoom_level: value,
+        top_left_point: this.leftBottom[1],
+        bottom_right_point: this.rightTop[1],
+      };
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: 'button',
+        value: { ...value, ...valueObj },
       });
     },
     createTokens() {
       const captures = ['top_left_point', 'bottom_right_point', 'zoom_level', 'dash_id'];
-      if (this.dataRestFrom.length) {
-        captures.push(...Object.keys(this.dataRestFrom[0]));
-      }
       this.actions.forEach((item, i) => {
         this.$set(this.actions[i], 'capture', captures);
       });
