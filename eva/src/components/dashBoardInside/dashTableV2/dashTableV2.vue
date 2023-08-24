@@ -748,14 +748,14 @@ export default {
     },
     changeColumnColor(column, color) {
       column.getCells().forEach((el) => {
-        el.getElement().style.setProperty('background-color', color, 'important');
+        el.getElement().style.setProperty('background-color', color);
       });
     },
     changeRowColor(row, color) {
-      row.getElement().style.setProperty('background-color', color, 'important');
+      row.getElement().style.setProperty('background-color', color);
     },
     changeCellColor(cell, color) {
-      cell.getElement().style.setProperty('background-color', color, 'important');
+      cell.getElement().style.setProperty('background-color', color);
     },
     updateDataInTable(data) {
       this.tableData = structuredClone(data);
@@ -1530,9 +1530,8 @@ export default {
   .tabulator-row{
     display: flex;
     align-items: stretch !important;
-    color: var(--main_text)!important;
+    color: var(--main_text);
     background-color: transparent;
-    transition: background-color .3s, color .3s;
     border-bottom: 1px solid var(--main_border);
     &.on-data-compare-color {
       background-color: transparent;
@@ -1540,7 +1539,7 @@ export default {
 
     /*Color even rows*/
     &:nth-child(even) {
-      background-color: transparent!important;
+      background-color: transparent;
       &.on-data-compare-color {
         background-color: transparent;
       }
@@ -1551,7 +1550,6 @@ export default {
       align-items: center;
       text-align: center;
       justify-content: center;
-      transition: background-color .3s;
       height: auto !important;
       white-space: normal;
       &.tabulator-frozen {
@@ -1563,6 +1561,7 @@ export default {
       cursor: pointer;
       color: var(--main_bg) !important;
       .tabulator-cell {
+        color: var(--main_bg) !important;
         background-color: var(--main_text) !important;
       }
     }
@@ -1572,6 +1571,7 @@ export default {
         cursor: pointer;
         color: var(--main_bg) !important;
         .tabulator-cell {
+          color: var(--main_bg) !important;
           background-color: var(--main_text) !important;
         }
       }
@@ -1597,7 +1597,6 @@ export default {
       background-color: var(--main_bg);
       border: 1px solid var(--main_border);
       border-radius: 4.44px;
-      //padding: 5px 25px 5px 12px;
       color: var(--main_text);
       transition: border-color 0.3s, background-color 0.3s;
       font-size: 13px;
