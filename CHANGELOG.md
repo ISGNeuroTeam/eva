@@ -10,8 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Risk-review: Changed color-picker in options panel.
 
 ### Fixed
+- TableV2: Fixed color on hover\select row
 
 ## [1.147.0]
 
