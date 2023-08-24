@@ -243,7 +243,7 @@ export default {
           { key: 'thisYear', label: 'текущий год', value: 'year' },
           { key: 'lastYear', label: 'пред. год', value: '-year' },
         ];
-      },  
+      },
     },
     fullScreenMode: {
       type: Boolean,
@@ -435,7 +435,7 @@ export default {
       if (data.range != null) {
         if (data.range.hasOwnProperty('shortcut')) {
           this.commitTokenValue()
-        } else { 
+        } else {
           this.range = data.range;
         }
 
@@ -643,34 +643,17 @@ export default {
       this.curDate = this.calcCurrentDate();
       this.openHidden();
     },
-    commitTokenValue(){
-      const tockens = this.$store.state[this.idDash].tockens || {};
-      let tocken = {};
-
-      const setTocken = (value) => {
-        this.$store.commit('setTocken', {
-          token: tocken,
-          idDash: this.idDash,
-          value,
-          store: this.$store,
-        });
-      };
-
-      Object.keys(tockens).forEach((i) => {
-        tocken = {
-          name: tockens[i].name,
-          action: tockens[i].action,
-          capture: tockens[i].capture,
-        };
-        if (tockens[i].elem === this.id && tockens[i].action === 'select') {
-          if (tockens[i].capture === 'start') {
-            setTocken(this.startForStore || '');
-          } else if (tockens[i].capture === 'end') {
-            setTocken(this.endForStore || '');
-          }
-        }
+    commitTokenValue() {
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: 'select',
+        value: {
+          start: this.startForStore || '',
+          end: this.endForStore || '',
+        },
       });
-    }
+    },
   },
 };
 </script>
