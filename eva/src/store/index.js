@@ -301,7 +301,13 @@ export default new Vuex.Store({
         return;
       }
       state[idDash].tockens
-        .filter((token) => token.elem === elem && token.action === action)
+        .filter((token) => {
+          if (token.elem !== elem) return false;
+          if (Array.isArray(action)) {
+            return action.includes(token.action);
+          }
+          return token.action === action;
+        })
         .forEach((token) => {
           let value = objectValue;
           if (typeof objectValue === 'object') {
