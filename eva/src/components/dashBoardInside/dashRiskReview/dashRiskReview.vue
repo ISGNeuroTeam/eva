@@ -397,16 +397,18 @@ export default {
         isLegendShow,
       } = this.optionsFromStore;
       const isResidual = typeof this.optionsFromStore[this.metricKeys.residualMetric] !== 'undefined';
+      const firstTitle = this.barParts[0][this.metricKeys.firstTitle] || '';
+      const secondTitle = this.barParts[0][this.metricKeys.secondTitle] || '';
       const result = {
         isLegendShow: typeof isLegendShow !== 'undefined' ? isLegendShow : false,
         [this.metricKeys.residualMetric]: isResidual
           ? this.optionsFromStore[this.metricKeys.residualMetric]
           : false,
         [this.metricKeys.firstTitle]: this.optionsFromStore[this.metricKeys.firstTitle]
-        || '',
+        || firstTitle || '',
         leftValueColor: this.leftValueColor,
         [this.metricKeys.secondTitle]: this.optionsFromStore[this.metricKeys.secondTitle]
-        || '',
+        || secondTitle || '',
         rightValueColor: this.rightValueColor,
       };
       if (metricOptions) {
@@ -607,17 +609,17 @@ export default {
               // Добавляем вторую основную метрику в список метрик, если её там еще нет
               metricList.push(secondMainMetric);
             }
-            if (field.startsWith(metricKeys.firstTitle)) {
+            if (field === metricKeys.firstTitle) {
               // Достаем заголовок блока первой основной метрики
               params[metricKeys.firstTitle] = element[field];
-            } else if (field.startsWith(metricKeys.secondTitle)) {
+            } else if (field === metricKeys.secondTitle) {
               // Достаем заголовок блока второй основной метрики
               params[metricKeys.secondTitle] = element[field];
             } else {
-              if (field.startsWith(metricKeys.firstListTitle)) {
+              if (field === metricKeys.firstListTitle) {
                 // Достаем заголовок для списка в блоке первой основной метрики
                 firstList[metricKeys.firstListTitle] = element[field];
-              } else if (field.startsWith(metricKeys.secondListTitle)) {
+              } else if (field === metricKeys.secondListTitle) {
                 // Достаем заголовок для списка в блоке второй основной метрики
                 secondList[metricKeys.secondListTitle] = element[field];
               }
