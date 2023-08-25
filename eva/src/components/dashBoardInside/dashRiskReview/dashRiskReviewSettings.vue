@@ -25,12 +25,12 @@
           v-if="typeof localOptions[metricKeys.residualMetric] !== 'undefined'"
           align="center"
         >
-          <v-col cols="6">
+          <v-col :cols="leftColumnSize">
             <h3>
               Отображать блок остаточного влияния:
             </h3>
           </v-col>
-          <v-col cols="6">
+          <v-col :cols="rightColumnSize">
             <v-switch
               v-model="localOptions[metricKeys.residualMetric]"
               class="risk-review-settings__switch mt-0 mb-0"
@@ -44,12 +44,12 @@
           v-if="typeof localOptions.isLegendShow !== 'undefined'"
           align="center"
         >
-          <v-col cols="6">
+          <v-col :cols="leftColumnSize">
             <h3>
               Отображать легенду:
             </h3>
           </v-col>
-          <v-col cols="6">
+          <v-col :cols="rightColumnSize">
             <v-switch
               v-model="localOptions.isLegendShow"
               class="risk-review-settings__switch mt-0 mb-0"
@@ -63,12 +63,12 @@
           v-if="typeof localOptions[metricKeys.firstTitle] !== 'undefined'"
           align="center"
         >
-          <v-col cols="6">
+          <v-col :cols="leftColumnSize">
             <h3>
               Заголовок левого блока:
             </h3>
           </v-col>
-          <v-col cols="6">
+          <v-col :cols="rightColumnSize">
             <v-text-field
               v-model="localOptions[metricKeys.firstTitle]"
               outlined
@@ -83,12 +83,12 @@
           v-if="typeof localOptions[metricKeys.secondTitle] !== 'undefined'"
           align="center"
         >
-          <v-col cols="6">
+          <v-col :cols="leftColumnSize">
             <h3>
               Заголовок правого блока:
             </h3>
           </v-col>
-          <v-col cols="6">
+          <v-col :cols="rightColumnSize">
             <v-text-field
               v-model="localOptions[metricKeys.secondTitle]"
               outlined
@@ -103,32 +103,40 @@
           v-if="typeof localOptions.leftValueColor !== 'undefined'"
           align="center"
         >
-          <v-col cols="6">
+          <v-col :cols="leftColumnSize">
             <h3>
               Цвет значений в левом столбце:
             </h3>
           </v-col>
-          <v-col cols="6">
-            <v-color-picker
-              v-model="localOptions.leftValueColor"
-              hide-inputs
-              hide-sliders
-              width="50"
-              canvas-height="50"
-              flat
-              class="risk-review-settings__color-picker float-left mt-1"
-              @update:color="isChanged = true"
-            />
-            <v-color-picker
-              v-model="localOptions.leftValueColor"
-              hide-inputs
-              hide-canvas
-              width="250"
-              canvas-height="50"
-              flat
-              class="risk-review-settings__color-picker"
-              @update:color="isChanged = true"
-            />
+          <v-col :cols="rightColumnSize">
+            <v-menu
+              top
+              offset-x
+              :close-on-content-click="false"
+              z-index="1000"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  :style="{
+                    'background-color': localOptions.leftValueColor,
+                  }"
+                  dark
+                  v-bind="attrs"
+                  v-on="on"
+                />
+              </template>
+
+              <v-color-picker
+                :value="localOptions.leftValueColor"
+                dot-size="12"
+                class="risk-review-settings__color-picker"
+                @input="setWithThrottle(
+                  localOptions,
+                  'leftValueColor',
+                  $event)"
+                @update:color="isChanged = true"
+              />
+            </v-menu>
           </v-col>
         </v-row>
         <!--rightValueColor(color-picker)-->
@@ -136,32 +144,40 @@
           v-if="typeof localOptions.rightValueColor !== 'undefined'"
           align="center"
         >
-          <v-col cols="6">
+          <v-col :cols="leftColumnSize">
             <h3>
               Цвет значений в правом столбце:
             </h3>
           </v-col>
-          <v-col cols="6">
-            <v-color-picker
-              v-model="localOptions.rightValueColor"
-              hide-inputs
-              hide-sliders
-              width="50"
-              canvas-height="50"
-              flat
-              class="risk-review-settings__color-picker float-left mt-1"
-              @update:color="isChanged = true"
-            />
-            <v-color-picker
-              v-model="localOptions.rightValueColor"
-              hide-inputs
-              hide-canvas
-              width="250"
-              canvas-height="50"
-              flat
-              class="risk-review-settings__color-picker"
-              @update:color="isChanged = true"
-            />
+          <v-col :cols="rightColumnSize">
+            <v-menu
+              top
+              offset-x
+              :close-on-content-click="false"
+              z-index="1000"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  :style="{
+                    'background-color': localOptions.rightValueColor,
+                  }"
+                  dark
+                  v-bind="attrs"
+                  v-on="on"
+                />
+              </template>
+
+              <v-color-picker
+                :value="localOptions.rightValueColor"
+                dot-size="12"
+                class="risk-review-settings__color-picker"
+                @input="setWithThrottle(
+                  localOptions,
+                  'rightValueColor',
+                  $event)"
+                @update:color="isChanged = true"
+              />
+            </v-menu>
           </v-col>
         </v-row>
         <!--metricOptions-->
@@ -184,7 +200,7 @@
                 class="risk-review-settings__draggable"
               >
                 <v-expansion-panel
-                  v-for="(item) in localOptions.metricOptions"
+                  v-for="(item, index) in localOptions.metricOptions"
                   :key="item.id"
                   class="risk-review-settings__expansion-panel"
                 >
@@ -219,12 +235,12 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Название стартовой метрики:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
+                      <v-col :cols="rightColumnSize">
                         <v-select
                           v-model="item.idStart"
                           :items="item.idStartList"
@@ -244,12 +260,12 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Отображать элемент в легенде:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
+                      <v-col :cols="rightColumnSize">
                         <v-switch
                           v-model="item.isLegendShow"
                           dense
@@ -265,12 +281,12 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Наименование для легенды:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
+                      <v-col :cols="rightColumnSize">
                         <v-text-field
                           v-model="item.legend"
                           dense
@@ -286,12 +302,12 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Тип:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
+                      <v-col :cols="rightColumnSize">
                         <v-select
                           v-model="item.type"
                           item-value="value"
@@ -310,32 +326,40 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Цвет заливки:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
-                        <v-color-picker
-                          v-model="item.fill"
-                          hide-inputs
-                          hide-sliders
-                          width="50"
-                          canvas-height="50"
-                          flat
-                          class="risk-review-settings__color-picker float-left mt-1"
-                          @update:color="isChanged = true"
-                        />
-                        <v-color-picker
-                          v-model="item.fill"
-                          hide-inputs
-                          hide-canvas
-                          width="250"
-                          canvas-height="50"
-                          flat
-                          class="risk-review-settings__color-picker"
-                          @update:color="isChanged = true"
-                        />
+                      <v-col :cols="rightColumnSize">
+                        <v-menu
+                          top
+                          offset-x
+                          :close-on-content-click="false"
+                          z-index="1000"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                              :style="{
+                                'background-color': item.fill,
+                              }"
+                              dark
+                              v-bind="attrs"
+                              v-on="on"
+                            />
+                          </template>
+
+                          <v-color-picker
+                            :value="item.fill"
+                            dot-size="12"
+                            class="risk-review-settings__color-picker"
+                            @input="setWithThrottle(
+                              localOptions.metricOptions[index],
+                              'fill',
+                              $event)"
+                            @update:color="isChanged = true"
+                          />
+                        </v-menu>
                       </v-col>
                     </v-row>
                     <!--textColor(color-picker)-->
@@ -344,32 +368,40 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Цвет текста:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
-                        <v-color-picker
-                          v-model="item.textColor"
-                          hide-inputs
-                          hide-sliders
-                          width="50"
-                          canvas-height="50"
-                          flat
-                          class="risk-review-settings__color-picker float-left mt-1"
-                          @update:color="isChanged = true"
-                        />
-                        <v-color-picker
-                          v-model="item.textColor"
-                          hide-inputs
-                          hide-canvas
-                          width="250"
-                          canvas-height="50"
-                          flat
-                          class="risk-review-settings__color-picker"
-                          @update:color="isChanged = true"
-                        />
+                      <v-col :cols="rightColumnSize">
+                        <v-menu
+                          top
+                          offset-x
+                          :close-on-content-click="false"
+                          z-index="1000"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                              :style="{
+                                'background-color': item.textColor,
+                              }"
+                              dark
+                              v-bind="attrs"
+                              v-on="on"
+                            />
+                          </template>
+
+                          <v-color-picker
+                            :value="item.textColor"
+                            dot-size="12"
+                            class="risk-review-settings__color-picker"
+                            @input="setWithThrottle(
+                              localOptions.metricOptions[index],
+                              'textColor',
+                              $event)"
+                            @update:color="isChanged = true"
+                          />
+                        </v-menu>
                       </v-col>
                     </v-row>
                     <!--textOffset(text-field\slider)-->
@@ -378,12 +410,12 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Отступ текста от элемента:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
+                      <v-col :cols="rightColumnSize">
                         <v-row align="center">
                           <v-col cols="4">
                             <v-text-field
@@ -414,12 +446,12 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Вертикальная позиция текста:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
+                      <v-col :cols="rightColumnSize">
                         <v-select
                           v-model="item.textPosY"
                           :items="item.textPosYItems"
@@ -438,12 +470,12 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Горизонтальная позиция текста:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
+                      <v-col :cols="rightColumnSize">
                         <v-select
                           v-model="item.textPosX"
                           :items="item.textPosXItems"
@@ -462,12 +494,12 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Отображать подпись:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
+                      <v-col :cols="rightColumnSize">
                         <v-switch
                           v-model="item.isTitleShow"
                           dense
@@ -483,12 +515,12 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Отрисовать в полную высоту:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
+                      <v-col :cols="rightColumnSize">
                         <v-switch
                           v-model="item.isFullHeight"
                           dense
@@ -503,12 +535,12 @@
                       align-content="center"
                       class="pa-3"
                     >
-                      <v-col cols="6">
+                      <v-col :cols="leftColumnSize">
                         <h3>
                           Скрыть значения равные нулю:
                         </h3>
                       </v-col>
-                      <v-col cols="6">
+                      <v-col :cols="rightColumnSize">
                         <v-switch
                           v-model="item.hideZeroValue"
                           dense
@@ -563,6 +595,7 @@ import {
   mdiMenu,
 } from '@mdi/js';
 import draggable from 'vuedraggable';
+import { throttle } from '@/js/utils/throttle';
 
 export default {
   name: 'DashRiskReviewSettings',
@@ -590,6 +623,8 @@ export default {
   data: () => ({
     isChanged: false,
     localOptions: null,
+    leftColumnSize: 7,
+    rightColumnSize: 5,
     mdiMenu,
   }),
   computed: {
@@ -624,16 +659,16 @@ export default {
       }
     },
   },
+  mounted() {
+    this.setWithThrottle = throttle(this.setWithThrottle, 100);
+  },
   methods: {
+    setWithThrottle(object, field, value) {
+      this.$set(object, field, value);
+    },
     updateIdListInMetricOptions(metricOptions) {
       if (metricOptions?.length > 0) {
         const updatedMetricOptions = [];
-        const allSelectedIdStart = metricOptions
-          .map((el) => ({
-            idStart: el.idStart,
-            id: el.id,
-          }))
-          .filter((el) => !!el.idStart);
         // eslint-disable-next-line no-restricted-syntax
         for (const metric of metricOptions) {
           const idStartList = metricOptions
@@ -716,6 +751,13 @@ export default {
   &__color-picker::v-deep {
     .v-color-picker__controls {
       background-color: var(--main_bg) !important;
+      .v-color-picker__input input, .v-color-picker__input span {
+        color: var(--main_text) !important;
+        border-color: var(--main_border) !important;
+      }
+      .v-icon__svg {
+        fill: var(--main_text) !important;
+      }
     }
   }
   &__text-field::v-deep {

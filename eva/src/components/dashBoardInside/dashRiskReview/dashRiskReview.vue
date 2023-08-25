@@ -416,7 +416,11 @@ export default {
         // eslint-disable-next-line no-restricted-syntax
         for (const metric of metricOptions) {
           if (metricIDListFromData.includes(metric.id)) {
-            resultMetricList.push(metric);
+            resultMetricList.push({
+              ...metric,
+              fill: this.hexToHexa(metric.fill),
+              textColor: this.hexaToHex(metric.textColor),
+            });
           }
         }
         // eslint-disable-next-line no-restricted-syntax
@@ -435,9 +439,17 @@ export default {
       return structuredClone(result);
     },
     leftValueColor() {
-      return this.optionsFromStore.leftValueColor || '#FF0000';
+      const color = this.optionsFromStore.leftValueColor;
+      if (color) {
+        return this.hexaToHex(color);
+      }
+      return '#FF0000';
     },
     rightValueColor() {
+      const color = this.optionsFromStore.rightValueColor;
+      if (color) {
+        return this.hexaToHex(color);
+      }
       return this.optionsFromStore.rightValueColor || '#00FF00';
     },
     isListValid() {
@@ -670,8 +682,12 @@ export default {
               value: 'line',
             },
           ],
-          fill: oldSettings?.fill || savedSettings?.fill || defaultMetricFill,
-          textColor: oldSettings?.textColor || savedSettings?.textColor || defaultMetricFill,
+          fill: this.hexToHexa(oldSettings?.fill)
+              || this.hexToHexa(savedSettings?.fill)
+              || this.hexToHexa(defaultMetricFill),
+          textColor: this.hexaToHex(oldSettings?.textColor)
+              || this.hexaToHex(savedSettings?.textColor)
+              || this.hexaToHex(defaultMetricFill),
           textOffset: oldSettings?.textOffset || savedSettings?.textOffset || 10,
           textPosY: oldSettings?.textPosY || savedSettings?.textPosY || 'center',
           textPosYItems: [
@@ -967,6 +983,24 @@ export default {
           });
         }
       });
+    },
+
+    hexToHexa(color) {
+      if (color && typeof color === 'string') {
+        if (color.startsWith('#') && color.length === 7) {
+          return `${color}FF`;
+        }
+      }
+      return color;
+    },
+
+    hexaToHex(color) {
+      if (color && typeof color === 'string') {
+        if (color.startsWith('#') && color.length === 9) {
+          return color.substring(0, color.length - 2);
+        }
+      }
+      return color;
     },
 
     setTokens(data) {
