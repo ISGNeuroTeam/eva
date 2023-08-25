@@ -2244,7 +2244,6 @@ export default new Vuex.Store({
         (state) => ({
           app: state.app,
           auth: state.auth,
-          notify: state.notify,
           theme: state.theme,
           form: state.form,
           logError: state.logError,
