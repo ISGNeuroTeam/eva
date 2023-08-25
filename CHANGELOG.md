@@ -11,9 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - notify modal
 
 ### Changed
+- Risk-review: Changed color-picker in options panel.
 - remove saving notify between sessions
 
 ### Fixed
+- TableV2: Fixed color on hover\select row
 
 ## [1.147.0]
 
