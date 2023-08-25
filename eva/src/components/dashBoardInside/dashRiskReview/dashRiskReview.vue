@@ -371,6 +371,16 @@ export default {
     optionsFromStore() {
       return this.dashFromStore[this.idFrom].options;
     },
+    firstTitleFromOtl() {
+      return this.dataRestFromWIthOrder?.length > 0
+        ? (this.dataRestFromWIthOrder[0][this.metricKeys.firstTitle] || '')
+        : '';
+    },
+    secondTitleFromOtl() {
+      return this.dataRestFromWIthOrder?.length > 0
+        ? (this.dataRestFromWIthOrder[0][this.metricKeys.secondTitle] || '')
+        : '';
+    },
     isVisibleResidualImpactPanel() {
       return this.optionsFromStore[this.metricKeys.residualMetric];
     },
@@ -397,18 +407,16 @@ export default {
         isLegendShow,
       } = this.optionsFromStore;
       const isResidual = typeof this.optionsFromStore[this.metricKeys.residualMetric] !== 'undefined';
-      const firstTitle = this.barParts[0][this.metricKeys.firstTitle] || '';
-      const secondTitle = this.barParts[0][this.metricKeys.secondTitle] || '';
       const result = {
         isLegendShow: typeof isLegendShow !== 'undefined' ? isLegendShow : false,
         [this.metricKeys.residualMetric]: isResidual
           ? this.optionsFromStore[this.metricKeys.residualMetric]
           : false,
         [this.metricKeys.firstTitle]: this.optionsFromStore[this.metricKeys.firstTitle]
-        || firstTitle || '',
+        || this.firstTitleFromOtl || '',
         leftValueColor: this.leftValueColor,
         [this.metricKeys.secondTitle]: this.optionsFromStore[this.metricKeys.secondTitle]
-        || secondTitle || '',
+        || this.secondTitleFromOtl || '',
         rightValueColor: this.rightValueColor,
       };
       if (metricOptions) {
@@ -767,8 +775,11 @@ export default {
       if (this.optionsFromStore[this.metricKeys.firstTitle]) {
         return this.optionsFromStore[this.metricKeys.firstTitle];
       }
-      if (this.getDataForHtmlTemplate) {
+      if (this.getDataForHtmlTemplate && this.getDataForHtmlTemplate[this.metricKeys.firstTitle]) {
         return this.getDataForHtmlTemplate[this.metricKeys.firstTitle];
+      }
+      if (this.firstTitleFromOtl) {
+        return this.firstTitleFromOtl;
       }
       return '';
     },
@@ -776,8 +787,11 @@ export default {
       if (this.optionsFromStore[this.metricKeys.secondTitle]) {
         return this.optionsFromStore[this.metricKeys.secondTitle];
       }
-      if (this.getDataForHtmlTemplate) {
+      if (this.getDataForHtmlTemplate && this.getDataForHtmlTemplate[this.metricKeys.secondTitle]) {
         return this.getDataForHtmlTemplate[this.metricKeys.secondTitle];
+      }
+      if (this.secondTitleFromOtl) {
+        return this.secondTitleFromOtl;
       }
       return '';
     },
@@ -866,10 +880,12 @@ export default {
           ? this.optionsFromStore[this.metricKeys.residualMetric]
           : false,
         [this.metricKeys.firstTitle]: this.optionsFromStore[this.metricKeys.firstTitle]
-        || '',
+            || this.firstTitleFromOtl
+            || '',
         leftValueColor: this.leftValueColor,
         [this.metricKeys.secondTitle]: this.optionsFromStore[this.metricKeys.secondTitle]
-        || '',
+            || this.secondTitleFromOtl
+            || '',
         rightValueColor: this.rightValueColor,
       };
       if (metricOptions) {

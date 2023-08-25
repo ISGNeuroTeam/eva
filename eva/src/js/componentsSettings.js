@@ -102,11 +102,11 @@ export default {
           + '- Приведенные ниже поля являются примерами, их наименования можно изменить в настройках визуализации!\n'
           + '- Подписи и заголовок первой основной метрики располагается - слева, второй - справа!\n'
           + '- Элементы списка(текс+значение) внутри блока метрик, значения которых равны нулю или отсутствуют - будут автоматически скрыты!\n'
-          + '- Наименования полей не должны содержать кириллицу, т.к. это может привести к ошибкам.'
+          + '- Наименования полей не должны содержать кириллицу, т.к. это может привести к ошибкам.\n'
           + '#### Обязательные поля:\n'
           + '- ```[first/second_metric_name]``` - Первая/вторая основная метрика, число\n'
           + '#### Дополнительные поля:\n'
-          + '- ```[first/second_metric_name][title_suffix]``` - Заголовок блока первой/вторая основной метрики(Значение должно быть идентичным у всех строк в запросе), строка\n'
+          + '- ```[first/second_metric_name][title_suffix]``` - Заголовок блока первой/второй основной метрики(Значение должно быть идентичным у всех строк в запросе), строка\n'
           + '- ```[first/second_metric_name][list_title_suffix]``` - Заголовок списка внутри блока первой/второй основной метрики, строка\n'
           + '- ```[first/second_metric_name][list_text_suffix]_[порядковый номер от 0]``` - Текст элемента списка внутри блока первой/второй основной метрики, строка\n'
           + '- ```[first/second_metric_name][list_value_suffix]_[порядковый номер от 0]``` - Значение элемента списка внутри блока первой/второй основной метрики, число\n'
@@ -1302,6 +1302,7 @@ export default {
       optionGroup: 'customizingFields',
       elem: 'text-field',
       description: 'Название поля первой метрики',
+      placeholder: 'left',
       default: 'left',
     },
     {
@@ -1309,6 +1310,7 @@ export default {
       optionGroup: 'customizingFields',
       elem: 'text-field',
       description: 'Название поля второй метрики',
+      placeholder: 'right',
       default: 'right',
     },
     {
@@ -1316,6 +1318,7 @@ export default {
       optionGroup: 'customizingFields',
       elem: 'text-field',
       description: 'Суффикс для поля заголовка блока метрики([firstMetricName][title_suffix]',
+      placeholder: '_title',
       default: '_title',
     },
     {
@@ -1323,6 +1326,7 @@ export default {
       optionGroup: 'customizingFields',
       elem: 'text-field',
       description: 'Суффикс для поля заголовка списка внутри блока метрики([firstMetricName][list_title_suffix]',
+      placeholder: '_list_title',
       default: '_list_title',
     },
     {
@@ -1330,6 +1334,7 @@ export default {
       optionGroup: 'customizingFields',
       elem: 'text-field',
       description: 'Суффикс для поля текста в списке списка внутри блока метрики([firstMetricName][list_text_suffix]_[порядковый номер от 0]',
+      placeholder: '_list_text',
       default: '_list_text',
     },
     {
@@ -1337,6 +1342,7 @@ export default {
       optionGroup: 'customizingFields',
       elem: 'text-field',
       description: 'Суффикс для поля значения в списке списка внутри блока метрики([firstMetricName][list_value_suffix]_[порядковый номер от 0]',
+      placeholder: '_list_value',
       default: '_list_value',
     },
     {
@@ -1344,6 +1350,7 @@ export default {
       optionGroup: 'customizingFields',
       elem: 'text-field',
       description: 'Название поля для остаточного влияния',
+      placeholder: 'residual',
       default: 'residual',
     },
     // formGenerator
