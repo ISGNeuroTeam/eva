@@ -371,6 +371,16 @@ export default {
     optionsFromStore() {
       return this.dashFromStore[this.idFrom].options;
     },
+    firstTitleFromOtl() {
+      return this.dataRestFromWIthOrder?.length > 0
+        ? (this.dataRestFromWIthOrder[0][this.metricKeys.firstTitle] || '')
+        : '';
+    },
+    secondTitleFromOtl() {
+      return this.dataRestFromWIthOrder?.length > 0
+        ? (this.dataRestFromWIthOrder[0][this.metricKeys.secondTitle] || '')
+        : '';
+    },
     isVisibleResidualImpactPanel() {
       return this.optionsFromStore[this.metricKeys.residualMetric];
     },
@@ -403,10 +413,10 @@ export default {
           ? this.optionsFromStore[this.metricKeys.residualMetric]
           : false,
         [this.metricKeys.firstTitle]: this.optionsFromStore[this.metricKeys.firstTitle]
-        || '',
+        || this.firstTitleFromOtl || '',
         leftValueColor: this.leftValueColor,
         [this.metricKeys.secondTitle]: this.optionsFromStore[this.metricKeys.secondTitle]
-        || '',
+        || this.secondTitleFromOtl || '',
         rightValueColor: this.rightValueColor,
       };
       if (metricOptions) {
@@ -607,17 +617,17 @@ export default {
               // Добавляем вторую основную метрику в список метрик, если её там еще нет
               metricList.push(secondMainMetric);
             }
-            if (field.startsWith(metricKeys.firstTitle)) {
+            if (field === metricKeys.firstTitle) {
               // Достаем заголовок блока первой основной метрики
               params[metricKeys.firstTitle] = element[field];
-            } else if (field.startsWith(metricKeys.secondTitle)) {
+            } else if (field === metricKeys.secondTitle) {
               // Достаем заголовок блока второй основной метрики
               params[metricKeys.secondTitle] = element[field];
             } else {
-              if (field.startsWith(metricKeys.firstListTitle)) {
+              if (field === metricKeys.firstListTitle) {
                 // Достаем заголовок для списка в блоке первой основной метрики
                 firstList[metricKeys.firstListTitle] = element[field];
-              } else if (field.startsWith(metricKeys.secondListTitle)) {
+              } else if (field === metricKeys.secondListTitle) {
                 // Достаем заголовок для списка в блоке второй основной метрики
                 secondList[metricKeys.secondListTitle] = element[field];
               }
@@ -765,8 +775,11 @@ export default {
       if (this.optionsFromStore[this.metricKeys.firstTitle]) {
         return this.optionsFromStore[this.metricKeys.firstTitle];
       }
-      if (this.getDataForHtmlTemplate) {
+      if (this.getDataForHtmlTemplate && this.getDataForHtmlTemplate[this.metricKeys.firstTitle]) {
         return this.getDataForHtmlTemplate[this.metricKeys.firstTitle];
+      }
+      if (this.firstTitleFromOtl) {
+        return this.firstTitleFromOtl;
       }
       return '';
     },
@@ -774,8 +787,11 @@ export default {
       if (this.optionsFromStore[this.metricKeys.secondTitle]) {
         return this.optionsFromStore[this.metricKeys.secondTitle];
       }
-      if (this.getDataForHtmlTemplate) {
+      if (this.getDataForHtmlTemplate && this.getDataForHtmlTemplate[this.metricKeys.secondTitle]) {
         return this.getDataForHtmlTemplate[this.metricKeys.secondTitle];
+      }
+      if (this.secondTitleFromOtl) {
+        return this.secondTitleFromOtl;
       }
       return '';
     },
@@ -864,10 +880,12 @@ export default {
           ? this.optionsFromStore[this.metricKeys.residualMetric]
           : false,
         [this.metricKeys.firstTitle]: this.optionsFromStore[this.metricKeys.firstTitle]
-        || '',
+            || this.firstTitleFromOtl
+            || '',
         leftValueColor: this.leftValueColor,
         [this.metricKeys.secondTitle]: this.optionsFromStore[this.metricKeys.secondTitle]
-        || '',
+            || this.secondTitleFromOtl
+            || '',
         rightValueColor: this.rightValueColor,
       };
       if (metricOptions) {
