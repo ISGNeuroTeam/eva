@@ -8,12 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-
+- Risk-review: Added placeholder on field options
 ### Changed
 - Risk-review: Changed color-picker in options panel.
 
 ### Fixed
 - TableV2: Fixed color on hover\select row
+- Risk-review: Fixed suffixed \[_title], \[_list_title] 
+
 
 ## [1.147.0]
 
