@@ -155,6 +155,8 @@ Vue.component('modal-report', () => import('./components/modalReports.vue'));
 Vue.component('modal-delete-profile', () => import('./components/autorization/modalDeleteProfile.vue'));
 // модалка для вывода лога
 Vue.component('modal-log', require('./components/autorization/modalLog.vue').default);
+// модалка для вывода лога
+Vue.component('modal-notify', require('./components/autorization/modalNotify.vue').default);
 //  компонент для получения данных для пользователя
 Vue.component('data-profile', () => import('./components/autorization/dataForProfile.vue'));
 //  компонент для загрузки svg
