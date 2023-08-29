@@ -1093,6 +1093,12 @@ export default {
 
   &__svg {
     grid-area: svg;
+    .bar-elem {
+      cursor: pointer;
+    }
+    .bar-text-caption {
+      pointer-events: none;
+    }
   }
 
   &__right-description {

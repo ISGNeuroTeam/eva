@@ -415,6 +415,7 @@ export default class RIskReviewClass {
             .append('g')
             .attr('class', `element-${id}`)
             .append('path')
+            .attr('class', 'line-elem')
             .attr('stroke', strokeColor)
             .attr('stroke-width', strokeWidth)
             .attr('d', line(
@@ -422,7 +423,12 @@ export default class RIskReviewClass {
                 [xPosition, yPosition - 5],
                 [xPosition, yPosition + this.barHeight + 5],
               ],
-            ));
+            ))
+            .on('click', () => {
+              if (this.setTokenFn) {
+                this.setTokenFn(data);
+              }
+            });
           if (isTitleShow) {
             this.prepareTextBlock({
               textPosY,
@@ -483,14 +489,15 @@ export default class RIskReviewClass {
           this.svg.append('g')
             .attr('class', `element-${id}`)
             .append('rect')
+            .attr('class', 'bar-elem')
             .attr('x', xPosition)
             .attr('y', yPosition)
             .attr('fill', fill)
             .attr('height', height)
             .attr('width', width)
-            .on('click', (event) => {
+            .on('click', () => {
               if (this.setTokenFn) {
-                this.setTokenFn(event);
+                this.setTokenFn(data);
               }
             });
           if (isTitleShow) {
