@@ -174,6 +174,12 @@ export default class ChartClass {
           .tickValues((ticksEnabled && ticks === 0) ? this.data.map((item) => `${item[this.xMetric]}`) : null),
       );
 
+    // если ось х вышла за границу слева
+    const { x } = this.svg.select('g.xAxis').node().getBBox();
+    if (x < 0) {
+      this.maxYLeftAxisWidth = -x + 22;
+    }
+
     const rotate = options.xAxis.textRotate ? ` rotate(${options.xAxis.textRotate})` : '';
 
     // rotate x axis text
