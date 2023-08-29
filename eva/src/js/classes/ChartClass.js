@@ -876,7 +876,13 @@ export default class ChartClass {
       .attr('cy', (d) => this.y[metric.yAxisLink || metric.name](d[metric.name]))
       .attr('r', metric.dotSize)
       .attr('fill', metric.color)
-      .on('click', (d) => this.clickChart([d[this.xMetric], d[metric.name]]))
+      .on('click', (d) => this.clickChart({
+        ...d,
+        pointX: d[this.xMetric],
+        pointY: d[metric.name],
+        start: d[this.xMetric],
+        end: d[metric.name],
+      }))
       .on('mouseover', (d, i, elems) => {
         d3.select(elems[i]).style('opacity', 1);
         const lineXPos = this.x(d[this.xMetric]);
@@ -1183,7 +1189,13 @@ export default class ChartClass {
         return Math.abs(this.y[yName](d[0]) - this.y[yName](d[1]));
       })
       .attr('width', barWidth)
-      .on('click', (d) => this.clickChart([d.data[this.xMetric], d[1] - d[0]]))
+      .on('click', (d) => this.clickChart({
+        ...d.data,
+        pointX: d.data[this.xMetric],
+        pointY: d[1] - d[0],
+        start: d.data[this.xMetric],
+        end: d[1] - d[0],
+      }))
       .on('mouseleave', () => {
         this.hideTooltip();
         this.hideLineDot();
@@ -1270,7 +1282,13 @@ export default class ChartClass {
           : (zeroHeight - valHeight);
       })
       .attr('fill', (d) => d.color)
-      .on('click', (d) => this.clickChart([d.data[this.xMetric], d.value]))
+      .on('click', (d) => this.clickChart({
+        ...d.data,
+        pointX: d.data[this.xMetric],
+        pointY: d.value,
+        start: d.data[this.xMetric],
+        end: d.value,
+      }))
       .on('mousemove', (d) => {
         const { metric } = d;
         const lineXPos = this.x(d.data[this.xMetric]);

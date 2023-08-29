@@ -50,7 +50,6 @@ export default {
 
     addNotification({ commit }, payload) {
       // commit('removeOldNotifications');
-      console.log('addNotification', payload);
       const time = moment().unix();
       const newItem = {
         ...payload,

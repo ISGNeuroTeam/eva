@@ -349,12 +349,12 @@ export default {
         return;
       }
       const { idDash } = this;
-      const values = {
+      const values = Array.isArray(point) ? {
         pointX: point[0],
         pointY: point[1],
         start: point[0],
         end: point[1],
-      };
+      } : { ...point };
       this.$store.commit('tokenAction', {
         idDash,
         elem: this.idFrom,
