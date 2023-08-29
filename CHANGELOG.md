@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- notify modal
+
 - Risk-review: Added placeholder on field options
 ### Changed
 - Risk-review: Changed color-picker in options panel.
+- remove saving notify between sessions
 
 ### Fixed
 - TableV2: Fixed color on hover\select row

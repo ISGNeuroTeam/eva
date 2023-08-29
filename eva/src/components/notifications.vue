@@ -4,18 +4,18 @@
     class="ma-3"
   >
     <template
-      v-for="(item, index) in alerts"
+      v-for="item in alerts"
     >
       <v-alert
         v-if="!item.read"
-        :key="`${index}/${item}`"
+        :key="item.id+item.time"
         :value="!!item"
         dismissible
         dense
         :type="item.type || 'warning'"
         class="mb-3"
         :icon="item.icon || mdiSyncAlert"
-        @input="dismissAllert(index)"
+        @input="dismissAlert(item.id)"
       >
         {{ item.message }}
       </v-alert>
@@ -24,6 +24,7 @@
 </template>
 <script>
 import { mdiSyncAlert } from '@mdi/js';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'Notifications',
@@ -40,8 +41,8 @@ export default {
     },
   },
   methods: {
-    dismissAllert(index) {
-      this.$store.commit('notify/dismiss', index);
+    dismissAlert(id) {
+      this.$store.commit('notify/dismiss', id);
     },
   },
 };
