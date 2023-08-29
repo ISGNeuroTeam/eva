@@ -129,7 +129,7 @@ Vue.component('dash-constructorSchemes', () => import('./components/dashBoardIns
 Vue.component('dash-constructor-schemes-settings', () => import('./components/dashBoardInside/dashConstructorScheme/dashConstructorSchemesSettings.vue'));
 Vue.component('dash-constructor-schemes-keymap', () => import('./components/dashBoardInside/dashConstructorScheme/dashConstructorSchemesKeymap.vue'));
 // компонент детализация рисков
-Vue.component('dash-riskReview', () => import('./components/dashBoardInside/dashRiskReview.vue'));
+Vue.component('dash-riskReview', () => import('./components/dashBoardInside/dashRiskReview/dashRiskReview.vue'));
 // компонент Single Value
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
 // компонент Accumulators
@@ -155,6 +155,8 @@ Vue.component('modal-report', () => import('./components/modalReports.vue'));
 Vue.component('modal-delete-profile', () => import('./components/autorization/modalDeleteProfile.vue'));
 // модалка для вывода лога
 Vue.component('modal-log', require('./components/autorization/modalLog.vue').default);
+// модалка для вывода лога
+Vue.component('modal-notify', require('./components/autorization/modalNotify.vue').default);
 //  компонент для получения данных для пользователя
 Vue.component('data-profile', () => import('./components/autorization/dataForProfile.vue'));
 //  компонент для загрузки svg

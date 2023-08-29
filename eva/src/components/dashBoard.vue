@@ -529,12 +529,20 @@
         v-show="!showElement"
         class="card-text"
       >
-        <vue-markdown
+        <div
           v-if="toolSettings && toolSettings.dataSourceDescription"
           class="source-descr"
+          :style="{
+            height: `${bigSizeMode ? fullScreenHeight : height - 128}px`,
+            width: `${bigSizeMode ? fullScreenWidth : width - 50}px`,
+          }"
         >
-          {{ toolSettings.dataSourceDescription }}
-        </vue-markdown>
+          <vue-markdown
+            class="source-descr__markdown"
+          >
+            {{ toolSettings.dataSourceDescription }}
+          </vue-markdown>
+        </div>
         <button
           class="selectDS"
           :style="{ color: '#FFFFFF', background: theme.$primary_button }"
@@ -1426,12 +1434,14 @@ export default {
 @import '../sass/dashBoard.sass'
 </style>
 <style lang="sass" scoped>
-.source-descr::v-deep
-  margin: 8px 16px 0
-  color: var(--main_text)
-  text-align: left
-  table
-    width: 100%
+.source-descr
+  overflow: auto
+  .source-descr__markdown::v-deep
+    margin: 8px 16px 0
+    color: var(--main_text)
+    text-align: left
+    table
+      width: 100%
 </style>
 <style lang="sass">
 .settings-dash

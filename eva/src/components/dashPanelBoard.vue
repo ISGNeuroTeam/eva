@@ -226,6 +226,24 @@
             </template>
             <span>Открыть окно логов</span>
           </v-tooltip>
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon
+                class="control-button theme--dark"
+                :color="
+                  hasNewNotify ? theme.$primary_button : theme.$secondary_text
+                "
+                v-on="on"
+                @click="openNotify"
+              >
+                {{ notifyIcon }}
+              </v-icon>
+            </template>
+            <span>Открыть окно уведомлений</span>
+          </v-tooltip>
         </div>
         <v-menu
           :nudge-width="100"
@@ -908,6 +926,7 @@
         :data-sid-from="scheduleSid"
       />
       <modal-log v-model="modalActive" />
+      <modal-notify v-model="modalNotify" />
       <dash-settings
         :gear-from="gearShow"
         :permissions-from="permissions"
@@ -965,7 +984,7 @@ import {
   mdiVariable,
   mdiFileTree,
   mdiCloudUpload,
-  mdiDragHorizontalVariant,
+  mdiDragHorizontalVariant, mdiBellRingOutline,
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
 import draggable from 'vuedraggable';
@@ -1046,6 +1065,7 @@ export default {
       exim: mdiSwapVerticalBold,
       home: mdiHomeVariantOutline,
       logIcon: mdiScriptTextOutline,
+      notifyIcon: mdiBellRingOutline,
       iconTree: mdiFileTree,
       openhelp: false,
       newDashBoard: {},
@@ -1111,6 +1131,7 @@ export default {
         },
       },
       activeModal: false,
+      modalNotify: false,
       paleteShow: false,
       activeSchedule: false,
       scheduleSid: -1,
@@ -1151,6 +1172,9 @@ export default {
         ]);
       }
       return this.$store.state.logError;
+    },
+    hasNewNotify() {
+      return this.$store.state.notify.hasNewNotify;
     },
     idDash() {
       return this.idDashFrom;
@@ -1375,6 +1399,10 @@ export default {
     openLogs() {
       this.modalActive = true;
       this.$store.commit('setErrorLogs', false);
+    },
+    openNotify() {
+      this.modalNotify = true;
+      this.$store.commit('notify/hasNewNotify', false);
     },
     toBackward() {
       this.$router.go(-1);

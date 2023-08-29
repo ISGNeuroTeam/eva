@@ -144,7 +144,7 @@ export default {
       this.message = '';
       if (res.status === 'ok' && res?.notifications) {
         this.file = null;
-        this.$store.commit('notify/addNotifications', res.notifications);
+        this.$store.dispatch('notify/addNotifications', res.notifications);
         setTimeout(() => {
           this.$emit('updateModalValue', false);
         }, 1000);
