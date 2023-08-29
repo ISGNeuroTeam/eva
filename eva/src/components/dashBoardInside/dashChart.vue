@@ -360,6 +360,7 @@ export default {
         elem: this.idFrom,
         action: actionName,
         value: values,
+        capture: ('pointX' in values) ? 'pointX' : this.xMetric,
       });
 
       const events = this.eventsStore({
