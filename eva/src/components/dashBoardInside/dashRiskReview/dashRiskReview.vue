@@ -1022,26 +1022,12 @@ export default {
     },
 
     setTokens(data) {
-      const { tockens: tokens } = this.$store.state[this.idDashFrom];
-      if (tokens) {
-        tokens.forEach(({
-          name,
-          action,
-          capture,
-          elem,
-        }) => {
-          if (elem === this.idFrom) {
-            if (action === 'click' && data[capture]) {
-              this.$store.commit('setTocken', {
-                token: { name, action, capture },
-                idDash: this.idDashFrom,
-                value: data[capture],
-                store: this.$store,
-              });
-            }
-          }
-        });
-      }
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: 'click',
+        value: data,
+      });
     },
 
     toDivide(value) {
