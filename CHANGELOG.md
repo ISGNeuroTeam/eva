@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - TableV2: Fixed color on hover\select row
 - Risk-review: Fixed suffixed \[_title], \[_list_title] 
+- Risk-review: Fixed work of tokens
 
 
 ## [1.147.0]
