@@ -330,7 +330,12 @@ class ElementCreator {
     id,
   }) {
     const createdNode = graph.createNode({
-      layout: new Rect(location.x - 1.5, location.y - 1.5, 3, 3),
+      layout: new Rect(
+        location.x - 1.5,
+        location.y - 1.5,
+        3,
+        3,
+      ),
       style: new ShapeNodeStyle({
         shape: 'ellipse',
         fill: 'transparent',
