@@ -69,6 +69,7 @@ import SchemeUpdater from './SchemeUpdater.js';
 import elementTemplates from './elementTemplates.js';
 import ElementCreator from '@/js/classes/ConstructorSchemes/ElementCreator';
 import GenerateElementsFromSearch from '@/js/classes/ConstructorSchemes/GenerateElementsFromSearch';
+import CopyPasteClass from '@/js/classes/ConstructorSchemes/CopyPasteClass';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -589,16 +590,6 @@ class ConstructorSchemesClass {
     // old
     // Сохранение через GraphML
     this.initializeIO();
-    if (this.savedGraph) {
-      this.loadGraph().then(() => {
-        this.updateDataNodeTemplate();
-        // Выравнивание графа, инициализация dnd панели
-        this.updateViewport().then(() => {
-          this.dndPanelElem = dndPanelElem;
-          this.initializeDnDPanel();
-        });
-      });
-    }
 
     this.schemeUpdater = null;
     if (this.savedGraphObject && !this.savedGraph) {
@@ -614,6 +605,9 @@ class ConstructorSchemesClass {
     if (isBridgesEnable) {
       this.enableBridges();
     }
+    this.copyPasteClass = new CopyPasteClass({
+      graph: this.graphComponent.graph,
+    });
   }
 
   disableResizeInvisibleNodes() {
@@ -1082,39 +1076,48 @@ class ConstructorSchemesClass {
   }
 
   getOffsetSelectedElements() {
-    const selectedElements = this.graphComponent.selection.toArray();
-    let minX = selectedElements[0].layout.x;
-    let minY = selectedElements[0].layout.y;
-    let { maxX } = selectedElements[0].layout;
-    let maxY = selectedElements[0].layout.y;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const item of selectedElements) {
-      if (item instanceof INode && item.tag.dataType !== 'invisible') {
-        if (minX > item.layout.x) minX = item.layout.x;
-        if (minY > item.layout.y) minY = item.layout.y;
-        if (maxX < item.layout.maxX) maxX = item.layout.maxX;
-        if (maxY < item.layout.maxY) maxY = item.layout.maxY;
+    const selectedElements = this.graphComponent.selection.toArray()
+      .filter((el) => el instanceof INode && el?.tag?.dataType !== 'invisible');
+    if (selectedElements?.length > 0) {
+      let minX = selectedElements[0].layout.x;
+      let minY = selectedElements[0].layout.y;
+      let { maxX } = selectedElements[0].layout;
+      let maxY = selectedElements[0].layout.y;
+      // eslint-disable-next-line no-restricted-syntax
+      for (const item of selectedElements) {
+        if (item instanceof INode && item.tag.dataType !== 'invisible') {
+          if (minX > item.layout.x) minX = item.layout.x;
+          if (minY > item.layout.y) minY = item.layout.y;
+          if (maxX < item.layout.maxX) maxX = item.layout.maxX;
+          if (maxY < item.layout.maxY) maxY = item.layout.maxY;
+        }
       }
+      const width = maxX - minX;
+      const height = maxY - minY;
+      return {
+        x: width / 2,
+        y: height / 2,
+      };
     }
-    const width = maxX - minX;
-    const height = maxY - minY;
     return {
-      x: width / 2,
-      y: height / 2,
+      x: 0,
+      y: 0,
     };
   }
 
   getTemplateElementsForCopy() {
     const offset = this.getOffsetSelectedElements();
     return this.graphComponent.selection.toArray().map((el) => {
+      const isNode = el instanceof INode && el?.tag?.dataType !== 'invisible';
+      const isEdge = el instanceof IEdge || el?.tag?.dataType === 'invisible';
       // TODO: Пока сделано только для узлов
-      if (el instanceof INode && el.tag.dataType !== 'invisible') {
+      if (isNode) {
         const xPos = el.layout.x + (el.layout.width / 2);
         const yPos = el.layout.y + (el.layout.height / 2);
         const node = {
           location: {
-            x: xPos + offset.x,
-            y: yPos + offset.y,
+            x: xPos + (offset?.x || 0),
+            y: yPos + (offset?.y || 0),
           },
           layout: {
             width: el.layout.width,
@@ -1132,6 +1135,9 @@ class ConstructorSchemesClass {
         }
         return node;
       }
+      if (isEdge) {
+        return null;
+      }
       return null;
     }).filter((el) => el !== null);
   }
@@ -1141,21 +1147,24 @@ class ConstructorSchemesClass {
     this.copiedElements = null;
     // Сохраняем новые
     this.copiedElements = this.getTemplateElementsForCopy();
+    const selectedElements = this.graphComponent.selection.toArray();
+    this.copyPasteClass.copy(selectedElements);
   }
 
   async pasteElement() {
+    this.copyPasteClass.paste();
     if (this.copiedElements?.length > 0) {
       this.graphComponent.selection.clear();
-      await Promise.all(this.copiedElements.map((element) => this.nodeCreator({
-        dropData: element,
-        dropLocation: element?.location,
-      }))).then((createdElements) => {
-        createdElements.forEach((el) => {
-          this.graphComponent.inputMode.setSelected(el, true);
-          this.copyElement();
-        });
-        this.graphComponent.updateVisual();
-      });
+      // await Promise.all(this.copiedElements.map((element) => this.nodeCreator({
+      //   dropData: element,
+      //   dropLocation: element?.location,
+      // }))).then((createdElements) => {
+      //   createdElements.forEach((el) => {
+      //     this.graphComponent.inputMode.setSelected(el, true);
+      //     this.copyElement();
+      //   });
+      //   this.graphComponent.updateVisual();
+      // });
     }
   }
 
@@ -1168,7 +1177,7 @@ class ConstructorSchemesClass {
       elements: [],
     });
     return new Promise((resolve) => {
-      elementCreator.createNode({
+      const element = {
         layout: {
           width: dropData.layout.width,
           height: dropData.layout.height,
@@ -1180,6 +1189,11 @@ class ConstructorSchemesClass {
           ...dropData.tag,
           nodeId: dropData?.id || dropData?.hashCode(),
         },
+      };
+      ElementCreator.createNode({
+        element,
+        graph: this.graphComponent.graph,
+        elementTemplates,
       }).then((createdElement) => {
         resolve(createdElement);
       });
