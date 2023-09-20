@@ -28,10 +28,22 @@ class ElementCreator {
       try {
         this.graph.clear();
         const { graph } = this;
-        const nodeList = this.getElementsByType('node');
-        const edgesList = this.getElementsByType('edge');
-        const portsList = this.getElementsByType('port');
-        const labelsList = this.getElementsByType('label');
+        const nodeList = ElementCreator.getElementsByType(
+          this.elements,
+          'node',
+        );
+        const edgesList = ElementCreator.getElementsByType(
+          this.elements,
+          'edge',
+        );
+        const portsList = ElementCreator.getElementsByType(
+          this.elements,
+          'port',
+        );
+        const labelsList = ElementCreator.getElementsByType(
+          this.elements,
+          'label',
+        );
         ElementCreator.createNodes({
           graph,
           nodeList,
@@ -40,7 +52,10 @@ class ElementCreator {
           portsList,
         })
           .then(() => {
-            const updatedPortsList = this.getElementsByType('port');
+            const updatedPortsList = ElementCreator.getElementsByType(
+              this.elements,
+              'port',
+            );
             const portsFromGraph = this.graph.ports.toArray();
             return ElementCreator.createPorts({
               graph,
@@ -93,8 +108,8 @@ class ElementCreator {
     });
   }
 
-  getElementsByType(type) {
-    return this.elements.filter((el) => el.type === type);
+  static getElementsByType(elements, type) {
+    return elements.filter((el) => el.type === type);
   }
 
   static getTargetPort({
@@ -112,7 +127,7 @@ class ElementCreator {
     sourcePortId,
   }) {
     if (graph.ports.toArray()?.length > 0) {
-      return graph.ports.toArray().find(({ tag }) => tag.portId === sourcePortId);
+      return graph.ports.toArray().find(({ tag }) => tag?.portId === sourcePortId);
     }
     return null;
   }
@@ -123,15 +138,18 @@ class ElementCreator {
   }) {
     return new Promise((resolve, reject) => {
       try {
+        const createdEdgesList = [];
         if (edgesList?.length > 0) {
           edgesList.forEach(({ data }) => {
             ElementCreator.createEdge({
               graph,
               edge: data,
+            }).then((createdEdge) => {
+              createdEdgesList.push(createdEdge);
             });
           });
         }
-        resolve();
+        resolve(createdEdgesList);
       } catch (e) {
         reject(e);
       }
@@ -146,6 +164,7 @@ class ElementCreator {
     portsList,
   }) {
     return new Promise((resolve, reject) => {
+      const createdNodes = [];
       try {
         nodeList.forEach((element) => {
           ElementCreator.createNode({
@@ -159,9 +178,10 @@ class ElementCreator {
               element: createdNode,
               portsList,
             });
+            createdNodes.push(createdNode);
           });
         });
-        resolve();
+        resolve(createdNodes);
       } catch (e) {
         reject(e);
       }
@@ -372,7 +392,7 @@ class ElementCreator {
     graph,
     edge,
   }) {
-    new Promise((resolve) => {
+    return new Promise((resolve) => {
       let targetPort = typeof edge?.target?.port?.id === 'number'
         ? ElementCreator.getTargetPort({
           graph,
@@ -390,7 +410,8 @@ class ElementCreator {
         targetNode = targetPort?.owner;
       } else {
         targetNode = graph.nodes.toArray()
-          .find((el) => el.tag.nodeId === edge.target.node.nodeId);
+          .find((el) => el.tag.nodeId === edge.target.node);
+        console.log('1', targetNode);
         if (
           !targetPort
             && (edge?.target?.port?.location
@@ -415,7 +436,7 @@ class ElementCreator {
         sourceNode = sourcePort?.owner;
       } else {
         sourceNode = graph.nodes.toArray()
-          .find((el) => el.tag.nodeId === edge.source.node.nodeId);
+          .find((el) => el.tag.nodeId === edge.source.node);
         if (
           !sourcePort
             && (typeof edge?.source?.port?.id === 'string'

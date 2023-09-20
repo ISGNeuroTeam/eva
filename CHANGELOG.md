@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - notify modal
-
+- Constructor-schemes: Copy\paste edges
+- Constructor-schemes: Auto-select copied elements
 - Risk-review: Added placeholder on field options
 - Added auto-resize dashboard tree panel
 ### Changed

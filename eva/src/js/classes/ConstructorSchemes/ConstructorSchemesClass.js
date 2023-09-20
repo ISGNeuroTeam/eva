@@ -1152,20 +1152,17 @@ class ConstructorSchemesClass {
   }
 
   async pasteElement() {
-    this.copyPasteClass.paste();
-    if (this.copiedElements?.length > 0) {
-      this.graphComponent.selection.clear();
-      // await Promise.all(this.copiedElements.map((element) => this.nodeCreator({
-      //   dropData: element,
-      //   dropLocation: element?.location,
-      // }))).then((createdElements) => {
-      //   createdElements.forEach((el) => {
-      //     this.graphComponent.inputMode.setSelected(el, true);
-      //     this.copyElement();
-      //   });
-      //   this.graphComponent.updateVisual();
-      // });
-    }
+    this.copyPasteClass.paste(this.savedGraphObject).then((newSelectedElements) => {
+      if (this.copiedElements?.length > 0) {
+        this.graphComponent.selection.clear();
+        if (newSelectedElements?.length > 0) {
+          newSelectedElements.forEach((element) => {
+            this.graphComponent.selection.setSelected(element, true);
+          });
+          this.graphComponent.updateVisual();
+        }
+      }
+    });
   }
 
   async nodeCreator({
@@ -1625,7 +1622,9 @@ class ConstructorSchemesClass {
   }
 
   refreshDnDPanel(updatedPrimitives) {
-    this.dragAndDropPanel.clearDnDPanel();
+    if (this.dragAndDropPanel) {
+      this.dragAndDropPanel.clearDnDPanel();
+    }
     this.initializeDnDPanel(updatedPrimitives);
   }
 
