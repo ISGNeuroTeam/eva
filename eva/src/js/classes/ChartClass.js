@@ -327,13 +327,26 @@ export default class ChartClass {
         addClassName += ` axis-y-${item.n}`;
       });
 
-      const minYMetric = ChartClass.canBeNumber(metric.lowerBound) && +metric.lowerBound < min
-        ? +metric.lowerBound
-        : min;
+      let minYMetric = min;
+      let maxYMetric = max;
+      const { canBeNumber } = ChartClass;
 
-      const maxYMetric = ChartClass.canBeNumber(metric.upperBound) && metric.upperBound > max
-        ? +metric.upperBound
-        : max;
+      if (metric.hasPaddings) {
+        const range = max - min;
+        if (canBeNumber(metric.paddingBottom) && +metric.paddingBottom > 0) {
+          minYMetric = min - range * (metric.paddingBottom / 100);
+        }
+        if (canBeNumber(metric.paddingTop) && +metric.paddingTop > 0) {
+          maxYMetric = max + range * (metric.paddingTop / 100);
+        }
+      } else {
+        if (canBeNumber(metric.lowerBound) && +metric.lowerBound < min) {
+          minYMetric = +metric.lowerBound;
+        }
+        if (canBeNumber(metric.upperBound) && metric.upperBound > max) {
+          maxYMetric = +metric.upperBound;
+        }
+      }
 
       this.yMinMax[metric.name] = [minYMetric, maxYMetric];
       this.y[metric.name] = d3.scaleLinear()

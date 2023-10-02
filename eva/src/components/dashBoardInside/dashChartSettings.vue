@@ -385,12 +385,6 @@
                             :search-input.sync="metric.lastDotSearch"
                           />
                         </div>
-                      </div>
-
-                      <div
-                        v-if="metric.type === 'line'"
-                        class="row my-1"
-                      >
                         <div class="col">
                           <v-autocomplete
                             v-model="metric.yAxisLink"
@@ -416,7 +410,28 @@
                             clearable
                           />
                         </div>
+                      </div>
+
+                      <div
+                        v-if="metric.type === 'line'"
+                        class="row my-1"
+                      >
                         <div class="col">
+                          <v-checkbox
+                            v-if="metric.type === 'line'"
+                            v-model="metric.hasPaddings"
+                            label="Отступы"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            color="blue"
+                          />
+                        </div>
+                        <div
+                          v-if="!metric.hasPaddings"
+                          class="col"
+                        >
                           <v-text-field
                             v-model="metric.lowerBound"
                             :disabled="metric.type === 'barplot'"
@@ -430,7 +445,10 @@
                             hide-details
                           />
                         </div>
-                        <div class="col">
+                        <div
+                          v-if="!metric.hasPaddings"
+                          class="col"
+                        >
                           <v-text-field
                             v-model="metric.upperBound"
                             :disabled="metric.type === 'barplot'"
@@ -438,6 +456,40 @@
                             clearable
                             :min="metric.lowerBound"
                             label="Верхняя граница"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                          />
+                        </div>
+                        <div
+                          v-if="metric.hasPaddings"
+                          class="col"
+                        >
+                          <v-text-field
+                            v-model="metric.paddingBottom"
+                            :disabled="metric.type === 'barplot'"
+                            type="number"
+                            clearable
+                            :min="0"
+                            label="Отступ снизу (%)"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                          />
+                        </div>
+                        <div
+                          v-if="metric.hasPaddings"
+                          class="col"
+                        >
+                          <v-text-field
+                            v-model="metric.paddingTop"
+                            :disabled="metric.type === 'barplot'"
+                            type="number"
+                            clearable
+                            :min="0"
+                            label="Отступ сверху (%)"
                             persistent-placeholder
                             dense
                             outlined
