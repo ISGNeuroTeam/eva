@@ -477,6 +477,7 @@
                             dense
                             outlined
                             hide-details
+                            @change="onChangePadding(metric, 'paddingBottom')"
                           />
                         </div>
                         <div
@@ -494,6 +495,7 @@
                             dense
                             outlined
                             hide-details
+                            @change="onChangePadding(metric, 'paddingTop')"
                           />
                         </div>
                       </div>
@@ -978,6 +980,11 @@ export default {
         }
       }
       return max;
+    },
+    onChangePadding(metric, field) {
+      if (metric[field] && +metric[field] > 1000) {
+        this.$set(metric, field, 1000);
+      }
     },
   },
 };
