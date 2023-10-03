@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- GridGroup: Added the ability to query data for visualizations from dynamic visualizations
 
 ### Changed
 

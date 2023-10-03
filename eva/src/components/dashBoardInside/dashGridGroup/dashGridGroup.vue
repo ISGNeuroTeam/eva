@@ -70,7 +70,11 @@
               :width-from="(box.width - 56) * (colNum >= item.w ? colNum / item.w : 1)"
               :search-rep="true"
               :data-report="true"
-              :data-rest-from="(item.dataRest ? item.dataRest.data : [])"
+              :data-rest-from="(
+                dataForVisualizations[item.visualizationId]
+                  ? item.dataRest.data
+                  : item.dataRest
+              ) || [] "
               :current-settings="settings[item.visualizationId]"
               :update-settings="(val) => updateSettings(val, item.visualizationId)"
               :data-mode-from="dataModeFrom"
@@ -255,6 +259,7 @@ export default {
         colNum: 10,
         rowHeight: 60,
       },
+      dataForVisualizations: {},
     };
   },
   computed: {
@@ -361,6 +366,11 @@ export default {
             if (!vizOptions) {
               return;
             }
+            if (!this.dataForVisualizations[visualizationId]) {
+              this.updateDataRestVisualizations(item, visualizationId);
+            } else if (this.dataForVisualizations[visualizationId].data.length === 0) {
+              this.updateDataRestVisualizations(item, visualizationId);
+            }
             const params = {
               row: item,
               i: item.id,
@@ -371,7 +381,7 @@ export default {
               dash: `dash-${vizOptions.dash}`,
               visualizationId,
               optionKey,
-              dataRest: this.dataSourcesBySid.find((obj) => obj.sid === item.source),
+              dataRest: this.dataForVisualizations[visualizationId],
               hasSettings: !!vizOptions.mainSettings,
             };
             if (!this.settings[visualizationId]) {
@@ -408,6 +418,13 @@ export default {
         obj[item.id] = this.$store.state[this.idDash][visualizationId]?.options;
         return obj;
       }, {});
+    },
+  },
+  watch: {
+    loading(val) {
+      if (val) {
+        this.dataForVisualizations = {};
+      }
     },
   },
   methods: {
@@ -451,6 +468,42 @@ export default {
         path: this.idDash,
         element: item.visualizationId,
       });
+    },
+    getDataRest(item, visualizationId) {
+      this.$store.dispatch('getDataApi', {
+        idDash: this.idDash,
+        search: {
+          sid: null,
+          original_otl: item.source,
+          limit: 1000,
+          parametrs: {
+            tws: 0,
+            twf: 0,
+            username: this.$store.state.auth.userName,
+            timeout: 60,
+            preview: false,
+            field_extraction: false,
+            cache_ttl: 60,
+          },
+        },
+      }).then((res) => {
+        this.$set(
+          this.dataForVisualizations,
+          visualizationId,
+          structuredClone({ data: res.data, schema: res.schema }),
+        );
+      });
+    },
+    updateDataRestVisualizations(item, visualizationId) {
+      if (!item.source.includes('|')) {
+        this.$set(
+          this.dataForVisualizations,
+          visualizationId,
+          structuredClone(this.dataSourcesBySid.find((obj) => obj.sid === item.source)),
+        );
+      } else {
+        this.getDataRest(item, visualizationId);
+      }
     },
   },
 };
