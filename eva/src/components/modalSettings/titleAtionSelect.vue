@@ -59,6 +59,19 @@
                 dense
                 hide-details
               />
+              <v-checkbox
+                v-model="element.runOnOpen"
+                hide-details
+                class="ml-5"
+                style="margin-top: 0; padding-top: 0 "
+                :color="theme.$primary_button"
+              >
+                <template v-slot:label>
+                  <span :style="`color: ${theme.$secondary_text} !important`">
+                    Запускать ИД при открытии
+                  </span>
+                </template>
+              </v-checkbox>
             </div>
             <div
               v-else
@@ -67,7 +80,7 @@
               <v-text-field
                 v-model="element.title"
                 clearable
-                placeholder="Введите название ссылки"
+                placeholder="Введите название ссылки" 
                 :color="theme.$primary_button"
                 :style="{
                   color: theme.$main_text,
@@ -139,7 +152,7 @@
       <v-select
         v-model="val"
         :color="theme.$primary_button"
-        :style="{ color: theme.$main_text, fill: theme.$main_text }"
+        :style="{ color: theme.$main_text, fill: theme.$main_text, width: '350px' }"
         placeholder="Выберите тип события"
         :attach="true"
         class="subnumber"
