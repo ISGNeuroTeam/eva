@@ -986,8 +986,8 @@ export default {
       return max;
     },
     onChangePadding(metric, field) {
-      if (metric[field] && +metric[field] > 1000) {
-        this.$set(metric, field, 1000);
+      if (metric[field] && +metric[field] > 10000) {
+        this.$set(metric, field, 10000);
       }
       if (metric[field] && +metric[field] < 0) {
         this.$set(metric, field, 0);
