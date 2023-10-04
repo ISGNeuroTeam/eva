@@ -469,6 +469,7 @@
                           <v-text-field
                             v-model="metric.paddingBottom"
                             :disabled="metric.type === 'barplot'"
+                            :rules="[rules.min, rules.max]"
                             type="number"
                             clearable
                             :min="0"
@@ -476,7 +477,6 @@
                             persistent-placeholder
                             dense
                             outlined
-                            hide-details
                             @change="onChangePadding(metric, 'paddingBottom')"
                           />
                         </div>
@@ -487,6 +487,7 @@
                           <v-text-field
                             v-model="metric.paddingTop"
                             :disabled="metric.type === 'barplot'"
+                            :rules="[rules.min, rules.max]"
                             type="number"
                             clearable
                             :min="0"
@@ -494,7 +495,6 @@
                             persistent-placeholder
                             dense
                             outlined
-                            hide-details
                             @change="onChangePadding(metric, 'paddingTop')"
                           />
                         </div>
@@ -812,6 +812,10 @@ export default {
       { value: '10', text: 'Указать число' },
     ],
     commonAxisY: false,
+    rules: {
+      min: (v) => v >= 0 || v === undefined || 'Минимум 0',
+      max: (v) => v <= 10000 || v === undefined || 'Максимум 10000',
+    },
   }),
   computed: {
     isOpen: {
@@ -984,6 +988,9 @@ export default {
     onChangePadding(metric, field) {
       if (metric[field] && +metric[field] > 1000) {
         this.$set(metric, field, 1000);
+      }
+      if (metric[field] && +metric[field] < 0) {
+        this.$set(metric, field, 0);
       }
     },
   },
