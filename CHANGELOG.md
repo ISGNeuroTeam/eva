@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Multiline: X-axis inscriptions are cut off if the legend is large
+- Multiline: Not all signatures on barplots are displayed
 
 ## [1.152.0]
 
