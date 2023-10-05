@@ -28,7 +28,7 @@ npm run license
 Then for run dev-server (work with app - update, fix, create some and etc.)
 
 ```
-npm run dev
+npm run serve
 ```
 
 Or for create "build" version of app (folder "dist")
