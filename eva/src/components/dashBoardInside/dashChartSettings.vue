@@ -426,6 +426,7 @@
                             outlined
                             hide-details
                             color="blue"
+                            :disabled="!!metric.yAxisLink"
                           />
                         </div>
                         <div
@@ -468,7 +469,7 @@
                         >
                           <v-text-field
                             v-model="metric.paddingBottom"
-                            :disabled="metric.type === 'barplot'"
+                            :disabled="metric.type === 'barplot' || !!metric.yAxisLink"
                             :rules="[rules.min, rules.max]"
                             type="number"
                             clearable
@@ -486,7 +487,7 @@
                         >
                           <v-text-field
                             v-model="metric.paddingTop"
-                            :disabled="metric.type === 'barplot'"
+                            :disabled="metric.type === 'barplot' || !!metric.yAxisLink"
                             :rules="[rules.min, rules.max]"
                             type="number"
                             clearable

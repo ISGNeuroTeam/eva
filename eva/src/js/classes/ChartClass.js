@@ -331,7 +331,7 @@ export default class ChartClass {
       let maxYMetric = max;
       const { canBeNumber } = ChartClass;
 
-      if (metric.hasPaddings) {
+      if (metric.hasPaddings && !metric.yAxisLink) {
         const range = max - min;
         if (canBeNumber(metric.paddingBottom) && +metric.paddingBottom > 0) {
           minYMetric = min - range * (metric.paddingBottom / 100);
