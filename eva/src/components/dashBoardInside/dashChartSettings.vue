@@ -991,15 +991,12 @@ export default {
         this.$set(metric, field, val);
         return;
       }
-      console.log(val)
       if (!Number.isFinite(val) && val !== '') {
         val = '';
         this.$set(metric, field, val);
       }
-      console.log(metric[field], val)
       if (`${val}` !== metric[field]) {
         this.$set(metric, field, val);
-        console.log('set', val)
       }
       if (val > 10000) {
         this.$set(metric, field, 10000);
