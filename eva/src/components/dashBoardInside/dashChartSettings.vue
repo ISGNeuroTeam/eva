@@ -471,7 +471,6 @@
                             v-model="metric.paddingBottom"
                             :disabled="metric.type === 'barplot' || !!metric.yAxisLink"
                             :rules="[rules.min, rules.max]"
-                            type="number"
                             clearable
                             :min="0"
                             label="Отступ снизу (%)"
@@ -489,7 +488,6 @@
                             v-model="metric.paddingTop"
                             :disabled="metric.type === 'barplot' || !!metric.yAxisLink"
                             :rules="[rules.min, rules.max]"
-                            type="number"
                             clearable
                             :min="0"
                             label="Отступ сверху (%)"
@@ -987,10 +985,25 @@ export default {
       return max;
     },
     onChangePadding(metric, field) {
-      if (metric[field] && +metric[field] > 10000) {
-        this.$set(metric, field, 10000);
+      let val = Number(metric[field]);
+      if (val === 0) {
+        val = '';
+        this.$set(metric, field, val);
+        return;
       }
-      if (metric[field] && +metric[field] < 0) {
+      console.log(val)
+      if (!Number.isFinite(val) && val !== '') {
+        val = '';
+        this.$set(metric, field, val);
+      }
+      console.log(metric[field], val)
+      if (`${val}` !== metric[field]) {
+        this.$set(metric, field, val);
+        console.log('set', val)
+      }
+      if (val > 10000) {
+        this.$set(metric, field, 10000);
+      } else if (val < 0) {
         this.$set(metric, field, 0);
       }
     },
