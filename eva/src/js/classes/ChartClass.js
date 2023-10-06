@@ -327,13 +327,26 @@ export default class ChartClass {
         addClassName += ` axis-y-${item.n}`;
       });
 
-      const minYMetric = ChartClass.canBeNumber(metric.lowerBound) && +metric.lowerBound < min
-        ? +metric.lowerBound
-        : min;
+      let minYMetric = min;
+      let maxYMetric = max;
+      const { canBeNumber } = ChartClass;
 
-      const maxYMetric = ChartClass.canBeNumber(metric.upperBound) && metric.upperBound > max
-        ? +metric.upperBound
-        : max;
+      if (metric.hasPaddings && !metric.yAxisLink) {
+        const range = max - min;
+        if (canBeNumber(metric.paddingBottom) && +metric.paddingBottom > 0) {
+          minYMetric = min - range * (metric.paddingBottom / 100);
+        }
+        if (canBeNumber(metric.paddingTop) && +metric.paddingTop > 0) {
+          maxYMetric = max + range * (metric.paddingTop / 100);
+        }
+      } else {
+        if (canBeNumber(metric.lowerBound) && +metric.lowerBound < min) {
+          minYMetric = +metric.lowerBound;
+        }
+        if (canBeNumber(metric.upperBound) && metric.upperBound > max) {
+          maxYMetric = +metric.upperBound;
+        }
+      }
 
       this.yMinMax[metric.name] = [minYMetric, maxYMetric];
       this.y[metric.name] = d3.scaleLinear()
@@ -1071,11 +1084,16 @@ export default class ChartClass {
       // add dots
       this.renderPeakDots(chartGroup, metric, height, num, line);
 
-      // add text
-      if (metric.showText) {
+      // add text (old logic)
+      /* if (metric.showText) {
         this.renderPeakTexts(chartGroup, metric, line);
-      }
+      } */
     });
+
+    // add text (new logic)
+    if (metric.showText) {
+      this.renderPeakTexts(chartGroup, metric, this.data.filter((item) => item[name] !== null));
+    }
   }
 
   addScatterDots(chartGroup, metric, height, num) {
@@ -1252,6 +1270,7 @@ export default class ChartClass {
     const metricByKeys = this.metricByKeys();
     const { length } = this.data;
 
+    let numBar = -1;
     chartGroup.append('g')
       .selectAll('g')
       .data(this.data)
@@ -1259,14 +1278,14 @@ export default class ChartClass {
       .append('g')
       .attr('transform', (d) => `translate(${this.x(d[this.xMetric]) - barWidth / 2},0)`)
       .selectAll('rect')
-      .data((d, i) => subgroups.map((key) => ({
+      .data((d) => subgroups.map((key) => ({
         key,
         value: d[key],
         color: metricByKeys[key].color,
         n: metricByKeys[key].n,
         metric: metricByKeys[key],
         data: d,
-        _pn: i,
+        _pn: numBar += +(d[key] !== null),
       })))
       .enter()
       .append('rect')

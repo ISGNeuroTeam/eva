@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.153.0]
+
+### Added
+- Multiline: added possibility to customize Y-axis indents
+
+### Fixed
+- Multiline: 
+  - X-axis inscriptions are cut off if the legend is large
+  - Not all signatures on barplots are displayed
+
 ## [1.152.0]
 
 ### Added
