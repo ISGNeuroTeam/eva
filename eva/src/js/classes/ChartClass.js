@@ -1084,11 +1084,16 @@ export default class ChartClass {
       // add dots
       this.renderPeakDots(chartGroup, metric, height, num, line);
 
-      // add text
-      if (metric.showText) {
+      // add text (old logic)
+      /* if (metric.showText) {
         this.renderPeakTexts(chartGroup, metric, line);
-      }
+      } */
     });
+
+    // add text (new logic)
+    if (metric.showText) {
+      this.renderPeakTexts(chartGroup, metric, this.data.filter((item) => item[name] !== null));
+    }
   }
 
   addScatterDots(chartGroup, metric, height, num) {
@@ -1265,6 +1270,7 @@ export default class ChartClass {
     const metricByKeys = this.metricByKeys();
     const { length } = this.data;
 
+    let numBar = -1;
     chartGroup.append('g')
       .selectAll('g')
       .data(this.data)
@@ -1272,14 +1278,14 @@ export default class ChartClass {
       .append('g')
       .attr('transform', (d) => `translate(${this.x(d[this.xMetric]) - barWidth / 2},0)`)
       .selectAll('rect')
-      .data((d, i) => subgroups.map((key) => ({
+      .data((d) => subgroups.map((key) => ({
         key,
         value: d[key],
         color: metricByKeys[key].color,
         n: metricByKeys[key].n,
         metric: metricByKeys[key],
         data: d,
-        _pn: i,
+        _pn: numBar += +(d[key] !== null),
       })))
       .enter()
       .append('rect')

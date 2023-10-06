@@ -131,6 +131,7 @@ export default {
         key: '',
         value: 0,
       },
+      legendHeight: 0,
     };
   },
   computed: {
@@ -278,7 +279,7 @@ export default {
       const { width, height } = sizeFrom;
       return {
         width: Math.round(width - 42),
-        height: Math.round(height - 55) - 45,
+        height: Math.round(height) - this.legendHeight - 70,
       };
     },
 
@@ -304,11 +305,17 @@ export default {
   watch: {
     box(val, old) {
       if (JSON.stringify(val) !== JSON.stringify(old)) {
+        this.updateLegendHeight();
         this.updateBox();
       }
     },
     dataRestFrom() {
       this.updateData();
+    },
+    metricsByGroup() {
+      this.$nextTick(() => {
+        this.updateLegendHeight();
+      });
     },
     fullScreenMode() {
       this.$nextTick(() => {
@@ -329,10 +336,16 @@ export default {
   mounted() {
     const { id, idDash, actions } = this;
     this.$store.commit('setActions', { id, idDash, actions });
+    this.updateLegendHeight();
     this.createChart();
     this.updateData();
   },
   methods: {
+    updateLegendHeight() {
+      if (this.$refs.legend) {
+        this.legendHeight = Math.round(this.$refs.legend.clientHeight);
+      }
+    },
     createChart() {
       const { width, height } = this.box;
       const { numberFormat = false } = this.userSettings;
