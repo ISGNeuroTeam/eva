@@ -65,6 +65,7 @@
                 class="ml-5"
                 style="margin-top: 0; padding-top: 0 "
                 :color="theme.$primary_button"
+                :disabled="!element.search"
               >
                 <template v-slot:label>
                   <span :style="`color: ${theme.$secondary_text} !important`">

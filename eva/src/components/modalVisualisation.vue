@@ -53,7 +53,7 @@
             <div
               :style="{ borderColor: theme.$main_border, opacity: '0.2' }"
               class="loading-divider"
-              :class="{ loading: this.data.length === 0 }"
+              :class="{ loading: this.visualisationModal.search && this.data.length === 0 }"
             >
               <div
                 class="loading-bar"
@@ -132,7 +132,7 @@ export default {
   },
   watch: {
     visualisationModal(){
-      if(this.visualisationModal && this.visualisationModal.runOnOpen){
+      if(this.visualisationModal?.search && this.visualisationModal?.runOnOpen){
         this.$store.commit('updateSearchStatus', {
           idDash: this.idDash,
           sid: this.visualisationModal.search.sid,
