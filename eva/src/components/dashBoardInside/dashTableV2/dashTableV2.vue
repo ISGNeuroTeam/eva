@@ -1593,7 +1593,7 @@ export default {
        }
       }
       &[data-page="first"]:before {
-        content: "\e919";
+        content: "\e919" !important;
       }
       &[data-page="last"]:before {
         content: "\e91a";
