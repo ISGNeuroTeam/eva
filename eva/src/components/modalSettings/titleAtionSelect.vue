@@ -62,9 +62,12 @@
               <v-checkbox
                 v-model="element.runOnOpen"
                 hide-details
+                dense
+                outlined
+                persistent-placeholder
                 class="ml-5"
                 style="margin-top: 0; padding-top: 0 "
-                :color="theme.$primary_button"
+                color="blue"
                 :disabled="!element.search"
               >
                 <template v-slot:label>

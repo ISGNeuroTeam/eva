@@ -5,6 +5,7 @@
     :is-confirm="isChanged"
     :persistent="isChanged"
     :theme="theme"
+    :dark="isDarkTheme"
     @cancelModal="checkOnCancel"
   >
     <div class="settings-modal-block">
@@ -1093,6 +1094,9 @@ export default {
     };
   },
   computed: {
+    isDarkTheme() {
+      return this.$store.getters.getThemeTitle.indexOf('light') === -1;
+    },
     cSvgBgName() {
       return this.csvgBg?.name || this.csvgBgErrorMessage || 'Выбрать изображение';
     },
