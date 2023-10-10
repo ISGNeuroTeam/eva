@@ -368,7 +368,7 @@ export default {
             }
             if (!this.dataForVisualizations[visualizationId]) {
               this.updateDataRestVisualizations(item, visualizationId);
-            } else if (this.dataForVisualizations[visualizationId].data.length === 0) {
+            } else if (this.dataForVisualizations[visualizationId]?.data?.length === 0) {
               this.updateDataRestVisualizations(item, visualizationId);
             }
             const params = {
@@ -470,6 +470,11 @@ export default {
       });
     },
     getDataRest(item, visualizationId) {
+      this.$set(
+        this.dataForVisualizations,
+        visualizationId,
+        {},
+      );
       this.$store.dispatch('getDataApi', {
         idDash: this.idDash,
         search: {
