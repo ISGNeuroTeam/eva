@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed a problem with incorrect token window size detection
+- yGraph: Fixed old color handling through the palette.
 
 ## [1.153.0]
 

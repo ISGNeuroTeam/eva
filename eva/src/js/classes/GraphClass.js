@@ -61,6 +61,14 @@ class GraphClass {
     });
   }
 
+  static checkColorFn(colorStr) {
+    const preparedColorStr = colorStr.toLowerCase();
+    return checkColorRegEx.hex.test(preparedColorStr)
+        || checkColorRegEx.rgb.test(preparedColorStr)
+        || checkColorRegEx.rgba.test(preparedColorStr)
+        || checkColorRegEx.hsla.test(preparedColorStr);
+  }
+
   options = {
     labelStyleList: {}, // варианты labelStyle
     edgeStyleList: {},
@@ -388,45 +396,6 @@ class GraphClass {
     return ICommand.FIT_GRAPH_BOUNDS.execute(null, this.graphComponent);
   }
 
-  colorEdges() {
-    const { edges } = this.graphComponent.graph;
-    edges.forEach((edge) => {
-      if (edge.tag === '-') {
-        this.graphComponent.graph.setStyle(
-          edge,
-          this.edgeStyle(this.startFinishColor),
-        );
-      } else if (edge.tag === '-1') {
-        this.graphComponent.graph.setStyle(
-          edge,
-          this.edgeStyle(this.errorColor),
-        );
-      } else if (edge.tag.color) {
-        const colorStr = edge.tag.color.toLowerCase();
-        if (
-          checkColorRegEx.hex.test(colorStr)
-            || checkColorRegEx.rgb.test(colorStr)
-            || checkColorRegEx.rgba.test(colorStr)
-            || checkColorRegEx.hsla.test(colorStr)) {
-          this.graphComponent.graph.setStyle(
-            edge,
-            this.edgeStyle(edge.tag.color),
-          );
-        } else {
-          this.graphComponent.graph.setStyle(
-            edge,
-            this.edgeStyle(this.startFinishColor),
-          );
-        }
-      } else {
-        this.graphComponent.graph.setStyle(
-          edge,
-          this.edgeStyle(this.colors[edge.tag.color % this.colors.length]),
-        );
-      }
-    });
-  }
-
   async generateNodesEdges(dataRest, callback) {
     await new Promise((resolve) => {
       const allNodes = [];
@@ -590,48 +559,62 @@ class GraphClass {
     return this.labelStyleList[key];
   }
 
+  setNodeColor(node, color) {
+    this.graphComponent.graph.setStyle(
+      node,
+      GraphClass.nodeStyle(color),
+    );
+  }
+
+  setEdgeColor(edge, color) {
+    this.graphComponent.graph.setStyle(
+      edge,
+      this.edgeStyle(color),
+    );
+  }
+
   colorNodes() {
     const { nodes } = this.graphComponent.graph;
     nodes.forEach((node) => {
-      if (
-        typeof node.tag.node_color === 'string'
-        && (node.tag.node_color.toLowerCase() === 'start'
-          || node.tag.node_color.toLowerCase() === 'finish')
-      ) {
-        this.graphComponent.graph.setStyle(
-          node,
-          GraphClass.nodeStyle(this.startFinishColor),
-        );
-      } else if (node.tag.node_color === '-1') {
-        this.graphComponent.graph.setStyle(
-          node,
-          GraphClass.nodeStyle(this.errorColor),
-        );
-      } if (typeof node.tag.node_color === 'string') {
-        const colorStr = node.tag.node_color.toLowerCase();
-        if (
-          checkColorRegEx.hex.test(colorStr)
-            || checkColorRegEx.rgb.test(colorStr)
-            || checkColorRegEx.rgba.test(colorStr)
-            || checkColorRegEx.hsla.test(colorStr)) {
-          this.graphComponent.graph.setStyle(
-            node,
-            GraphClass.nodeStyle(colorStr),
-          );
+      const color = node.tag.node_color;
+      const isStartFinishColor = typeof color === 'string'
+          && (color.toLowerCase() === 'start' || color.toLowerCase() === 'finish');
+      if (isStartFinishColor) {
+        this.setNodeColor(node, this.startFinishColor);
+      } else if (color === '-1') {
+        this.setNodeColor(node, this.errorColor);
+      } else if (Number.isNaN(+color)) {
+        const isCorrectColor = GraphClass.checkColorFn(color);
+        if (isCorrectColor) {
+          this.setNodeColor(node, color);
         } else {
-          this.graphComponent.graph.setStyle(
-            node,
-            GraphClass.nodeStyle(this.startFinishColor),
-          );
+          this.setNodeColor(node, this.startFinishColor);
         }
       } else {
-        this.graphComponent.graph.setStyle(
-          node,
-          GraphClass.nodeStyle(
-            this.colors[node.tag.node_color - 1]
-            || this.startFinishColor,
-          ),
-        );
+        this.setNodeColor(node, this.colors[color - 1]
+            || this.startFinishColor);
+      }
+    });
+  }
+
+  colorEdges() {
+    const { edges } = this.graphComponent.graph;
+    edges.forEach((edge) => {
+      if (edge.tag === '-') {
+        this.setEdgeColor(edge, this.startFinishColor);
+      } else if (edge.tag === '-1') {
+        this.setEdgeColor(edge, this.errorColor);
+      } else if (edge.tag.color) {
+        if (Number.isNaN(+edge.tag.color)) {
+          const isCorrectColor = GraphClass.checkColorFn(edge.tag.color);
+          if (isCorrectColor) {
+            this.setEdgeColor(edge, edge.tag.color);
+          } else {
+            this.setEdgeColor(edge, this.startFinishColor);
+          }
+        } else {
+          this.setEdgeColor(edge, this.colors[edge.tag.color % this.colors.length]);
+        }
       }
     });
   }

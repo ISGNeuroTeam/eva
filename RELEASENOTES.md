@@ -8,6 +8,7 @@
 
 ### Fixed
 - Addressed an issue with the incorrect detection of token window size.
+- yGraph: Fixed old color handling through the palette.
 
 # [1.153.0] - 2023-10-06
 
