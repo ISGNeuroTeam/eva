@@ -1,3 +1,12 @@
+# [1.154.0] - 2023-10-12
+
+### Added
+- In yGraph, added support for processing hex, rgb, rgba, and hsla colors.
+- For GridGroup, added the capability to query data for visualizations from dynamic visualizations.
+
+### Fixed
+- Addressed an issue with the incorrect detection of token window size.
+
 # [1.153.0] - 2023-10-06
 
 ### Added

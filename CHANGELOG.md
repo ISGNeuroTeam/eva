@@ -8,10 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- yGraph: Added hex\rgb\rgba\hsla color processing
-- GridGroup: Added the ability to query data for visualizations from dynamic visualizations
 
 ### Changed
+
+### Fixed
+
+## [1.154.0]
+
+### Added
+- yGraph: Added hex\rgb\rgba\hsla color processing
+- GridGroup: Added the ability to query data for visualizations from dynamic visualizations
 
 ### Fixed
 - Fixed a problem with incorrect token window size detection
