@@ -247,6 +247,7 @@ export default {
       return result;
     },
     setClick(item, openNewTab = false) {
+      console.log('setClick', { item, openNewTab })
       this.$store.commit('tokenAction', {
         idDash: this.idDashFrom,
         elem: this.idFrom,
