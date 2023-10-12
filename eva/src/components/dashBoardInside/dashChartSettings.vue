@@ -385,12 +385,6 @@
                             :search-input.sync="metric.lastDotSearch"
                           />
                         </div>
-                      </div>
-
-                      <div
-                        v-if="metric.type === 'line'"
-                        class="row my-1"
-                      >
                         <div class="col">
                           <v-autocomplete
                             v-model="metric.yAxisLink"
@@ -416,7 +410,29 @@
                             clearable
                           />
                         </div>
+                      </div>
+
+                      <div
+                        v-if="metric.type === 'line'"
+                        class="row my-1"
+                      >
                         <div class="col">
+                          <v-checkbox
+                            v-if="metric.type === 'line'"
+                            v-model="metric.hasPaddings"
+                            label="Отступы"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            color="blue"
+                            :disabled="!!metric.yAxisLink"
+                          />
+                        </div>
+                        <div
+                          v-if="!metric.hasPaddings"
+                          class="col"
+                        >
                           <v-text-field
                             v-model="metric.lowerBound"
                             :disabled="metric.type === 'barplot'"
@@ -430,7 +446,10 @@
                             hide-details
                           />
                         </div>
-                        <div class="col">
+                        <div
+                          v-if="!metric.hasPaddings"
+                          class="col"
+                        >
                           <v-text-field
                             v-model="metric.upperBound"
                             :disabled="metric.type === 'barplot'"
@@ -442,6 +461,40 @@
                             dense
                             outlined
                             hide-details
+                          />
+                        </div>
+                        <div
+                          v-if="metric.hasPaddings"
+                          class="col"
+                        >
+                          <v-text-field
+                            v-model="metric.paddingBottom"
+                            :disabled="metric.type === 'barplot' || !!metric.yAxisLink"
+                            :rules="[rules.min, rules.max]"
+                            clearable
+                            :min="0"
+                            label="Отступ снизу (%)"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            @change="onChangePadding(metric, 'paddingBottom')"
+                          />
+                        </div>
+                        <div
+                          v-if="metric.hasPaddings"
+                          class="col"
+                        >
+                          <v-text-field
+                            v-model="metric.paddingTop"
+                            :disabled="metric.type === 'barplot' || !!metric.yAxisLink"
+                            :rules="[rules.min, rules.max]"
+                            clearable
+                            :min="0"
+                            label="Отступ сверху (%)"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            @change="onChangePadding(metric, 'paddingTop')"
                           />
                         </div>
                       </div>
@@ -758,6 +811,10 @@ export default {
       { value: '10', text: 'Указать число' },
     ],
     commonAxisY: false,
+    rules: {
+      min: (v) => v >= 0 || v === undefined || 'Минимум 0',
+      max: (v) => v <= 10000 || v === undefined || 'Максимум 10000',
+    },
   }),
   computed: {
     isOpen: {
@@ -925,6 +982,26 @@ export default {
         }
       }
       return max;
+    },
+    onChangePadding(metric, field) {
+      let val = Number(metric[field]);
+      if (val === 0) {
+        val = '';
+        this.$set(metric, field, val);
+        return;
+      }
+      if (!Number.isFinite(val) && val !== '') {
+        val = '';
+        this.$set(metric, field, val);
+      }
+      if (`${val}` !== metric[field]) {
+        this.$set(metric, field, val);
+      }
+      if (val > 10000) {
+        this.$set(metric, field, 10000);
+      } else if (val < 0) {
+        this.$set(metric, field, 0);
+      }
     },
   },
 };
