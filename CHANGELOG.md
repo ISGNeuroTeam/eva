@@ -9,9 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - DTPicker: added button for select time period equal last day
+- yGraph: Added hex\rgb\rgba\hsla color processing
+- GridGroup: Added the ability to query data for visualizations from dynamic visualizations
+
 ### Changed
 
 ### Fixed
+- Fixed a problem with incorrect token window size detection
 
 ## [1.153.0]
 
