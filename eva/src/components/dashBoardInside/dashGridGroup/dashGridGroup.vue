@@ -500,14 +500,14 @@ export default {
       });
     },
     updateDataRestVisualizations(item, visualizationId) {
-      if (!item.source.includes('|')) {
+      if (item.source.includes('|')) {
+        this.getDataRest(item, visualizationId);
+      } else {
         this.$set(
           this.dataForVisualizations,
           visualizationId,
           structuredClone(this.dataSourcesBySid.find((obj) => obj.sid === item.source)),
         );
-      } else {
-        this.getDataRest(item, visualizationId);
       }
     },
   },

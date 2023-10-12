@@ -1,3 +1,13 @@
+# [1.153.0] - 2023-10-06
+
+### Added
+- Multiline: Added the ability to customize Y-axis indents.
+
+### Fixed
+- Multiline:
+  - X-axis labels were being cut off when the legend was large.
+  - Not all labels on barplots were being displayed.
+
 # [1.152.0] - 2023-09-28
 
 ### Added

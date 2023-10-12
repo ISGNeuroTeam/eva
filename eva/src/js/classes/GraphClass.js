@@ -45,6 +45,13 @@ const labelFontBOLD = new Font({
   fontWeight: 'BOLD',
 });
 
+const checkColorRegEx = {
+  hex: /^#([\dA-Fa-f]{6})$/,
+  rgb: /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/,
+  rgba: /^rgba\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*([\d.]+)\)$/,
+  hsla: /^hsla\((\d{1,3}),\s*(\d{1,3})%,\s*(\d{1,3})%,\s*([\d.]+)\)$/,
+};
+
 class GraphClass {
   static nodeStyle(color) {
     return new ShapeNodeStyle({
@@ -394,6 +401,23 @@ class GraphClass {
           edge,
           this.edgeStyle(this.errorColor),
         );
+      } else if (edge.tag.color) {
+        const colorStr = edge.tag.color.toLowerCase();
+        if (
+          checkColorRegEx.hex.test(colorStr)
+            || checkColorRegEx.rgb.test(colorStr)
+            || checkColorRegEx.rgba.test(colorStr)
+            || checkColorRegEx.hsla.test(colorStr)) {
+          this.graphComponent.graph.setStyle(
+            edge,
+            this.edgeStyle(edge.tag.color),
+          );
+        } else {
+          this.graphComponent.graph.setStyle(
+            edge,
+            this.edgeStyle(this.startFinishColor),
+          );
+        }
       } else {
         this.graphComponent.graph.setStyle(
           edge,
@@ -583,6 +607,23 @@ class GraphClass {
           node,
           GraphClass.nodeStyle(this.errorColor),
         );
+      } if (typeof node.tag.node_color === 'string') {
+        const colorStr = node.tag.node_color.toLowerCase();
+        if (
+          checkColorRegEx.hex.test(colorStr)
+            || checkColorRegEx.rgb.test(colorStr)
+            || checkColorRegEx.rgba.test(colorStr)
+            || checkColorRegEx.hsla.test(colorStr)) {
+          this.graphComponent.graph.setStyle(
+            node,
+            GraphClass.nodeStyle(colorStr),
+          );
+        } else {
+          this.graphComponent.graph.setStyle(
+            node,
+            GraphClass.nodeStyle(this.startFinishColor),
+          );
+        }
       } else {
         this.graphComponent.graph.setStyle(
           node,
