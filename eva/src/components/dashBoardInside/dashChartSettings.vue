@@ -834,7 +834,6 @@ export default {
     isDarkTheme() {
       return this.$store.getters.getThemeTitle.indexOf('light') === -1;
     },
-
     metricsByGroupNoEmpty() {
       return this.metricsByGroup.filter((group) => group.length);
     },

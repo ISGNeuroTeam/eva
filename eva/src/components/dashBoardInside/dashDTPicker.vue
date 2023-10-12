@@ -50,7 +50,10 @@
               border: `1px solid ${theme.$main_border}`
             }"
           >
-            <div v-if="options.showLastTimeBlock">
+            <div
+              v-if="options.showLastTimeBlock"
+              class="last-time-block"
+            >
               <div
                 class="name-of-picker"
                 :style="{ color: theme.$title }"
@@ -72,6 +75,13 @@
                 />
               </div>
               <div class="choose-time">
+                <v-chip
+                  :color="theme[color.day]"
+                  class="time"
+                  @click="setTime('day')"
+                >
+                  День
+                </v-chip>
                 <v-chip
                   :color="theme[color.hour]"
                   class="time"
@@ -269,6 +279,7 @@ export default {
         time: '',
       },
       color: {
+        day: '$accent_ui_color',
         hour: '$accent_ui_color',
         minute: '$accent_ui_color',
         second: '$accent_ui_color',
@@ -391,10 +402,12 @@ export default {
       };
     },
   },
-  created(){
+  created() {
     const data = this.getPickerDate;
-    if (data.range != null && data.range.hasOwnProperty('shortcut') ) {
-      this.shortcut = this.DTPickerCustomShortcuts.find(sc => sc.value === data.range.shortcut).key
+    if (data.range != null && data.range.hasOwnProperty('shortcut')) {
+      this.shortcut = this.DTPickerCustomShortcuts.find(
+        (sc) => sc.value === data.range.shortcut,
+      ).key;
     }
   },
   mounted() {
@@ -403,6 +416,11 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
+    if (this.getPickerDate?.last) {
+      this.last = this.getPickerDate.last;
+      this.setTime(this.getPickerDate.last.time);
+    }
+    this.date = this.getPickerDate;
     this.$emit('hideDS', this.id);
     this.curDate = this.calcCurrentDate();
   },
@@ -434,7 +452,7 @@ export default {
 
       if (data.range != null) {
         if (data.range.hasOwnProperty('shortcut')) {
-          this.commitTokenValue()
+          this.commitTokenValue();
         } else {
           this.range = data.range;
         }
@@ -486,6 +504,9 @@ export default {
               break;
             case 'hour':
               time = 'часов';
+              break;
+            case 'day':
+              time = 'дней';
               break;
             default:
               break;
@@ -604,6 +625,9 @@ export default {
             case 'hour':
               period = Number(this.last.every) * 1000 * 3600;
               break;
+            case 'day':
+              period = Number(this.last.every) * 1000 * 3600 * 24;
+              break;
             default:
               break;
           }
@@ -637,7 +661,7 @@ export default {
         this.setTocken(this.lastControlElement);
       }
 
-      this.commitTokenValue()
+      this.commitTokenValue();
 
       this.showCurrent();
       this.curDate = this.calcCurrentDate();

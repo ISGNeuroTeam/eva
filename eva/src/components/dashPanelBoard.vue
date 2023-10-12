@@ -611,13 +611,13 @@
               :color="theme.$accent_ui_color"
             />
           </div>
-          <p
+          <div
             class="tocken-view"
             :class="{ showView: lookTockens[i].show }"
             :color="theme.$main_text"
           >
             <span class="backlight-tkn">{{ tocken.value }}</span>
-          </p>
+          </div>
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
@@ -2374,5 +2374,9 @@ export default {
 }
 .user-control-panel {
   display: inline-flex;
+}
+.tocken-view {
+    height: 45px;
+    overflow: auto;
 }
 </style>
