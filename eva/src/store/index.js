@@ -68,7 +68,6 @@ export default new Vuex.Store({
       });
     },
     pushPreloadTokens(state, { id, tokens }) {
-      console.log('pushPreloadTokens', id, tokens)
       state.preloadTokens.unshift({ id, tokens });
     },
     removePreloadTokens(state, id) {
@@ -81,23 +80,17 @@ export default new Vuex.Store({
     setTokens(state, { id, tokens, updateComponentValue = false }) {
       state[id].tockens?.forEach((token) => {
         const newToken = tokens.find((item) => item.name === token.name);
-        console.log('-- setTokens', { tokens, token, newToken })
         if (newToken) {
           Vue.set(token, 'value', newToken.value);
           if (updateComponentValue) {
-            console.log('updateComponentValue', { token, newToken })
             state[id].elements
               .filter((name) => name === token.elem)
               .every((element) => {
-                console.log(element)
                 const [, component] = element.match(/^([\w-]+[\D])(-(\d+))?$/) || [];
-                console.log(component)
                 if (component === 'select') {
-                  console.log('state[id][element]', { ...state[id][element] })
-                  console.log('token.value', token.value)
-                  Vue.set(state[id][element].selected, 'elemDeep', token.value)
+                  Vue.set(state[id][element].selected, 'elemDeep', token.value);
                 }
-                return true
+                return true;
               });
           }
         }
@@ -530,7 +523,6 @@ export default new Vuex.Store({
     setSelected(state, {
       idDash, id, element, value,
     }) {
-      console.log('[sm] setSelected', value)
       // храним выбранные пользователем данные
       if (!state[idDash][id].selected) {
         state[idDash][id].selected = {
@@ -1306,7 +1298,6 @@ export default new Vuex.Store({
     },
     async updatePreloadTokens({ state, commit, dispatch }, id) {
       const tokens = await dispatch('pullOutPreloadTokens', id);
-      console.log('pullOutPreloadTokens', { ...tokens })
       commit('setTokens', { id, tokens, updateComponentValue: true });
       commit('removePreloadTokens', id);
       return tokens;

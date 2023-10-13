@@ -362,6 +362,12 @@ export default {
           prop: String(this.multiple),
           value: String(this.multiple) === 'true' ? [] : '',
         }]);
+      } else if (String(this.selectedElem) !== String(val)) {
+        this.$store.commit('setState', [{
+          object: this.elemDeep,
+          prop: String(this.multiple),
+          value: String(this.multiple) === 'true' ? [val] : val,
+        }]);
       }
     },
     selectedElemLink() {
