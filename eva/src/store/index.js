@@ -1388,7 +1388,7 @@ export default new Vuex.Store({
         otl += `|head ${search.limit}`;
       }
 
-      otl = otl.replace(/\r|\n/g, '');
+      otl = otl.replace(/\r|\n/g, ' ');
 
       // формируем объект для передачи RESTу
       const formData = new FormData();
