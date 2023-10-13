@@ -49,6 +49,18 @@
           class="full-screen-dialog"
           :style="{ height: '80vh' }"
         >
+          <div class="loading-block" >
+            <div
+              :style="{ borderColor: theme.$main_border, opacity: '0.2' }"
+              class="loading-divider"
+              :class="{ loading: this.visualisationModal.search && this.data.length === 0 }"
+            >
+              <div
+                class="loading-bar"
+                :style="{ background: theme.$primary_button }"
+              />
+            </div>
+          </div>
           <visualisation
             space-name="modal"
             :element="visualisationModal.tool"
@@ -118,6 +130,18 @@ export default {
       });
     },
   },
+  watch: {
+    visualisationModal(){
+      if(this.visualisationModal?.search && this.visualisationModal?.runOnOpen){
+        this.$store.commit('updateSearchStatus', {
+          idDash: this.idDash,
+          sid: this.visualisationModal.search.sid,
+          status: 'empty',
+        });
+      }
+    }
+  }
+
 };
 </script>
 
@@ -125,4 +149,36 @@ export default {
   .card-title
     display: flex
     justify-content: flex-end
+
+  .loading-block
+    overflow: hidden
+    height: 3px
+    margin: 0 auto
+
+    .loading-divider
+        position: relative
+        width: 100%
+        border-bottom: 1px solid
+
+        .loading-bar
+            position: absolute
+            top: 0
+            left: 0
+            width: 100%
+            height: 3px
+            transform: translateX(-100%)
+            transition: all 0.4s ease
+
+    .loading
+        opacity: 0.5 !important
+
+        .loading-bar
+            animation: loading 1.5s ease infinite
+
+
+  @keyframes loading
+    from
+        transform: translateX(-100%)
+    to
+        transform: translateX(100%)
 </style>

@@ -1,3 +1,15 @@
+# [1.154.0] - 2023-10-12
+
+### Added
+- In DTPicker, added a button to select a time period equal to the last day.
+- Added a checkbox for running searches when the modal is opened by clicking on the header.
+- In yGraph, added support for processing hex, rgb, rgba, and hsla colors.
+- For GridGroup, added the capability to query data for visualizations from dynamic visualizations.
+
+### Fixed
+- Addressed an issue with the incorrect detection of token window size.
+- yGraph: Fixed old color handling through the palette.
+
 # [1.153.0] - 2023-10-06
 
 ### Added
