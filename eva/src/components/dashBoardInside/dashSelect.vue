@@ -387,6 +387,8 @@ export default {
     },
     dataRestDeep() {
       this.updateSelectAllItem();
+    },
+    dataFromRest() {
       const {
         defaultSourceDataUpdates = false,
       } = this.dashFromStore.options;
@@ -435,13 +437,18 @@ export default {
   methods: {
     setDefaultValue() {
       const defaultValue = this.getDefaultValue();
-      const {
-        multiple,
-      } = this;
       if (defaultValue != null && this.dataRestDeep.includes(defaultValue)) {
-        this.elemDeep[String(multiple)] = multiple
+        /* this.elemDeep[String(multiple)] = multiple
           ? [defaultValue]
-          : defaultValue;
+          : defaultValue; */
+
+        if (this.multiple) {
+          if (this.elemDeep[String(this.multiple)].length === 0) {
+            this.elemDeep[String(this.multiple)] = [defaultValue];
+          }
+        } else if (!this.elemDeep[String(this.multiple)]) {
+          this.elemDeep[String(this.multiple)] = defaultValue;
+        }
       }
     },
     updateSelectAllItem() {
@@ -604,16 +611,7 @@ export default {
       if (this.loading !== false) {
         return;
       }
-      const defaultValue = this.getDefaultValue();
-      if (defaultValue != null && this.dataRestDeep.includes(defaultValue)) {
-        if (this.multiple) {
-          if (this.elemDeep[String(this.multiple)].length === 0) {
-            this.elemDeep[String(this.multiple)] = [defaultValue];
-          }
-        } else if (!this.elemDeep[String(this.multiple)]) {
-          this.elemDeep[String(this.multiple)] = defaultValue;
-        }
-      }
+      this.setDefaultValue();
       let elemDeepValue = this.elemDeep[String(this.multiple)];
       if (this.getOptions?.resetValuesWhichAreNot) {
         const existsItems = this.dataReady.map((item) => item[this.elem]);

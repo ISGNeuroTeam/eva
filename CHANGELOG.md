@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- The token does not change when changing the select value if the function responsible for the default value from the data source is enabled.
 
 ## [1.154.0]
 
