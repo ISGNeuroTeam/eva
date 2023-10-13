@@ -368,6 +368,7 @@ export default {
       if (this.selectedElemLink.elemlink === '') {
         this.elemlink = 'Выберите связанный столбец данных';
       }
+      this.setTocken();
     },
     selectedElem(elem) {
       if (elem === '') {
