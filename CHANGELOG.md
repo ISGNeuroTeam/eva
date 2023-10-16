@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Patapicker: Errors when loading the dashboard, and when adding a datapicker and then setting the time
 
 ## [1.154.0]
 

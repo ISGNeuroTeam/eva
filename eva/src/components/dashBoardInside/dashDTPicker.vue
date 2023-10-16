@@ -420,7 +420,7 @@ export default {
       this.last = this.getPickerDate.last;
       this.setTime(this.getPickerDate.last.time);
     }
-    this.date = this.getPickerDate;
+    this.date = structuredClone(this.getPickerDate);
     this.$emit('hideDS', this.id);
     this.curDate = this.calcCurrentDate();
   },
@@ -458,8 +458,8 @@ export default {
         }
 
         current = [
-          moment(this.range.start).format(this.dateTimeFormat),
-          moment(this.range.end).format(this.dateTimeFormat),
+          moment(data.range.start).format(this.dateTimeFormat),
+          moment(data.range.end).format(this.dateTimeFormat),
         ].join(' - ');
       }
 
