@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+
+## [1.154.1]
+
+### Fixed
 - DatePicker: 
   - Errors when loading the dashboard
   - Errors when adding a datepicker and then setting the time
