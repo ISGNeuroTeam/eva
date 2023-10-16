@@ -416,11 +416,11 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
-    if (this.getPickerDate?.last) {
+    if (this.getPickerDate?.last?.time) {
       this.last = this.getPickerDate.last;
       this.setTime(this.getPickerDate.last.time);
     }
-    this.date = this.getPickerDate;
+    this.date = structuredClone(this.getPickerDate);
     this.$emit('hideDS', this.id);
     this.curDate = this.calcCurrentDate();
   },
