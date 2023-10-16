@@ -12,7 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
-- Patapicker: Errors when loading the dashboard, and when adding a datapicker and then setting the time
+- DatePicker: 
+  - Errors when loading the dashboard
+  - Errors when adding a datepicker and then setting the time
+  - Saved dates are not displayed
 
 ## [1.154.0]
 
