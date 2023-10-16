@@ -1,3 +1,12 @@
+# [1.154.1] - 2023-10-16
+
+### Fixed
+- DatePicker:
+  - Resolved errors that occurred when loading the dashboard.
+  - Fixed errors when adding a datepicker and then setting the time.
+  - Corrected the issue where saved dates were not displayed.
+- Fixed the problem where the token did not change when altering the select value, particularly when the function responsible for the default value from the data source was enabled.
+
 # [1.154.0] - 2023-10-12
 
 ### Added
