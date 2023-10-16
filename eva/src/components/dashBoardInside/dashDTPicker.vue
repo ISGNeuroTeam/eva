@@ -416,7 +416,7 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
-    if (this.getPickerDate?.last) {
+    if (this.getPickerDate?.last?.time) {
       this.last = this.getPickerDate.last;
       this.setTime(this.getPickerDate.last.time);
     }
@@ -458,8 +458,8 @@ export default {
         }
 
         current = [
-          moment(data.range.start).format(this.dateTimeFormat),
-          moment(data.range.end).format(this.dateTimeFormat),
+          moment(this.range.start).format(this.dateTimeFormat),
+          moment(this.range.end).format(this.dateTimeFormat),
         ].join(' - ');
       }
 
