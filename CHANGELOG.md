@@ -13,8 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Select:
-  - The token does not change when changing the select value if the function responsible for the default value from the data source is enabled.
-  - Fixed an issue where the select value was not updating when the token was updated
+    - The token does not change when changing the select value if the function responsible for the default value from the data source is enabled.
+    - Fixed an issue where the select value was not updating when the token was updated
+
+## [1.154.1]
+
+### Fixed
+- DatePicker: 
+  - Errors when loading the dashboard
+  - Errors when adding a datepicker and then setting the time
+  - Saved dates are not displayed
+- The token does not change when changing the select value if the function responsible for the default value from the data source is enabled.
 
 ## [1.154.0]
 
