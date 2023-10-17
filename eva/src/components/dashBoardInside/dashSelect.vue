@@ -433,7 +433,11 @@ export default {
         this.openSelect();
       }
       if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
-        this.elemDeep[String(this.multiple)] = selected.elemDeep;
+        let val = selected.elemDeep
+        if (!isNaN(parseFloat(selected.elemDeep)) && isFinite(selected.elemDeep)) {
+          val = parseFloat(selected.elemDeep)
+        }
+        this.elemDeep[String(this.multiple)] = val;
       }
     }
   },
