@@ -68,6 +68,7 @@ export default new Vuex.Store({
       });
     },
     pushPreloadTokens(state, { id, tokens }) {
+      console.log(id, tokens)
       state.preloadTokens.unshift({ id, tokens });
     },
     removePreloadTokens(state, id) {
@@ -79,20 +80,22 @@ export default new Vuex.Store({
     },
     setTokens(state, { id, tokens, updateComponentValue = false }) {
       state[id].tockens?.forEach((token) => {
-        const newToken = tokens.find((item) => item.name === token.name);
-        if (newToken) {
-          Vue.set(token, 'value', newToken.value);
-          if (updateComponentValue) {
-            state[id].elements
-              .filter((name) => name === token.elem)
-              .every((element) => {
-                const [, component] = element.match(/^([\w-]+[\D])(-(\d+))?$/) || [];
-                if (component === 'select') {
-                  Vue.set(state[id][element].selected, 'elemDeep', token.value);
-                }
-                return true;
-              });
-          }
+        const newTokens = tokens.filter((item) => item.name === token.name);
+        if (newTokens) {
+          newTokens.forEach(newToken => {
+            Vue.set(token, 'value', newToken.value);
+            if (updateComponentValue) {
+              state[id].elements
+                .filter((name) => name === token.elem)
+                .every((element) => {
+                  const [, component] = element.match(/^([\w-]+[\D])(-(\d+))?$/) || [];
+                  if (component === 'select') {
+                    Vue.set(state[id][element].selected, 'elemDeep', token.value);
+                  }
+                  return true;
+                });
+            }
+          })
         }
       });
     },
