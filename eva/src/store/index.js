@@ -89,8 +89,12 @@ export default new Vuex.Store({
                 .filter((name) => name === token.elem)
                 .every((element) => {
                   const [, component] = element.match(/^([\w-]+[\D])(-(\d+))?$/) || [];
+                  let val = token.value
                   if (component === 'select') {
-                    Vue.set(state[id][element].selected, 'elemDeep', token.value);
+                    if (!isNaN(parseFloat(token.value)) && isFinite(token.value)) {
+                      val = parseFloat(token.value)
+                    }
+                    Vue.set(state[id][element].selected, 'elemDeep', val);
                   }
                   return true;
                 });
