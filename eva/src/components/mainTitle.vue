@@ -448,7 +448,7 @@ export default {
       if (this.loadingDash || !this.dashFromStore.currentTab) {
         return 1;
       }
-      return this.dashFromStore.currentTab;
+      return +this.dashFromStore.currentTab;
     },
     searches() {
       if (this.loadingDash) {

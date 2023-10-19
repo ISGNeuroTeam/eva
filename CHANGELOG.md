@@ -13,6 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.155.0]
+
+### Added
+- DatePicker: added possibility to specify a template for relative time functionality
+
+### Changed
+- otl query new line replacement to space instead of empty string
+
+### Fixed
+- Select:
+    - The token does not change when changing the select value if the function responsible for the default value from the data source is enabled.
+    - Fixed an issue where the select value was not updating when the token was updated
+
 ## [1.154.1]
 
 ### Fixed

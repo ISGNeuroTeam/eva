@@ -1,3 +1,16 @@
+# [1.155.0] - 2023-10-19
+
+### Added
+- In DatePicker, added the ability to specify a template for relative time functionality.
+
+### Changed
+- For OTL query, newline characters are now replaced with spaces instead of empty strings.
+
+### Fixed
+- Select:
+  - Resolved the issue where the token did not change when altering the select value, especially when the function responsible for the default value from the data source was enabled.
+  - Fixed a problem where the select value was not updating when the token was updated.
+
 # [1.154.1] - 2023-10-16
 
 ### Fixed

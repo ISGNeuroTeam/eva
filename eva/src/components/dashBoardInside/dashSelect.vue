@@ -362,6 +362,12 @@ export default {
           prop: String(this.multiple),
           value: String(this.multiple) === 'true' ? [] : '',
         }]);
+      } else if (String(this.selectedElem) !== String(val)) {
+        this.$store.commit('setState', [{
+          object: this.elemDeep,
+          prop: String(this.multiple),
+          value: String(this.multiple) === 'true' ? [val] : val,
+        }]);
       }
     },
     selectedElemLink() {
@@ -375,8 +381,7 @@ export default {
         this.elem = 'Выберите столбец данных';
       }
     },
-    dataReady(dataReady) {
-      this.updateActions(dataReady);
+    dataReady() {
       if (this.getOptions?.resetValuesWhichAreNot) {
         this.setTocken();
       }
@@ -413,9 +418,6 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
-    if (this.dataReady.length > 0) {
-      this.updateActions(this.dataReady);
-    }
     const selected = this.getSelected;
     if (selected) {
       if (selected.elem) {
@@ -431,7 +433,11 @@ export default {
         this.openSelect();
       }
       if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
-        this.elemDeep[String(this.multiple)] = selected.elemDeep;
+        let val = selected.elemDeep
+        if (!isNaN(parseFloat(selected.elemDeep)) && isFinite(selected.elemDeep)) {
+          val = parseFloat(selected.elemDeep)
+        }
+        this.elemDeep[String(this.multiple)] = val;
       }
     }
   },
@@ -515,29 +521,6 @@ export default {
         }, 30);
       }
       return true;
-    },
-    updateActions(dataReady) {
-      let data = [];
-      if (dataReady.length > 0) {
-        data = Object.keys(dataReady);
-        this.show = true;
-        if (Object.keys(dataReady).length !== 0) {
-          if (dataReady.error) {
-            this.message = dataReady.error;
-            this.show = false;
-          } else {
-            data = Object.keys(dataReady[0]);
-          }
-        }
-        this.dataFromRest = data;
-        this.actions.forEach((action) => {
-          this.$store.commit('setState', [{
-            object: action,
-            prop: 'capture',
-            value: data,
-          }]);
-        });
-      }
     },
     getItem(element) {
       switch (element) {
