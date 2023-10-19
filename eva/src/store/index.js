@@ -2015,7 +2015,7 @@ export default new Vuex.Store({
         id = item.target;
       }
 
-      if (id) await dispatch('loader', { id });
+      if (id && !openNewTab) await dispatch('loader', { id });
 
       let tockensTarget = [];
       Object.keys(state).forEach((key) => {
@@ -2144,10 +2144,12 @@ export default new Vuex.Store({
         event.route.push(`/dashboards/${id}/${newCurrentTabValue}`);
       }
 
-      commit('changeCurrentTab', {
-        idDash: id,
-        tab: newCurrentTabValue,
-      });
+      if (!openNewTab) {
+        commit('changeCurrentTab', {
+          idDash: id,
+          tab: newCurrentTabValue,
+        });
+      }
       const { searches } = state[id];
 
       if (searches) {
