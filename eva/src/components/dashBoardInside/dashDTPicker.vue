@@ -402,6 +402,26 @@ export default {
       };
     },
   },
+  watch: {
+    options(val, oldVal) {
+      if (this.lastControlElement === 'time') {
+        const newOpts = {
+          useLastTimeTemplate: val.useLastTimeTemplate,
+          lastTimeTemplateStart: val.lastTimeTemplateStart,
+          lastTimeTemplateEnd: val.lastTimeTemplateEnd,
+        };
+        const oldOpts = {
+          useLastTimeTemplate: oldVal.useLastTimeTemplate,
+          lastTimeTemplateStart: oldVal.lastTimeTemplateStart,
+          lastTimeTemplateEnd: oldVal.lastTimeTemplateEnd,
+        };
+        if (JSON.stringify(newOpts) !== JSON.stringify(oldOpts)) {
+          this.setTocken('time')
+          this.commitTokenValue()
+        }
+      }
+    },
+  },
   created() {
     const data = this.getPickerDate;
     if (data.range != null && data.range.hasOwnProperty('shortcut')) {
@@ -631,8 +651,22 @@ export default {
             default:
               break;
           }
+          const {
+            useLastTimeTemplate,
+            lastTimeTemplateStart,
+            lastTimeTemplateEnd,
+          } = this.options;
           this.startForStore = this.formatDateToResult(Date.now() - period);
           this.endForStore = this.formatDateToResult(Date.now());
+          if (useLastTimeTemplate) {
+            const secPeriod = (period/1000).toFixed();
+            if (lastTimeTemplateStart) {
+              this.startForStore = lastTimeTemplateStart.replace('${sec}', secPeriod);
+            }
+            if (lastTimeTemplateEnd) {
+              this.endForStore = lastTimeTemplateEnd.replace('${sec}', secPeriod);
+            }
+          }
           this.start = null;
           this.end = null;
           this.range = null;
