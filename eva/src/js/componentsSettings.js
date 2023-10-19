@@ -797,7 +797,7 @@ export default {
       relation: ['useLastTimeTemplate'],
       elem: 'text-field',
       default: 'now() - ${sec}',
-      placeholder: 'now() - ${sec}',
+      placeholder: 'Пример: now() - ${sec}',
     },
     {
       option: 'lastTimeTemplateEnd',
@@ -805,7 +805,7 @@ export default {
       relation: ['useLastTimeTemplate'],
       elem: 'text-field',
       default: 'now()',
-      placeholder: 'now()',
+      placeholder: 'Пример: now()',
     },
 
     // dashSingle

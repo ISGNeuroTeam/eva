@@ -405,7 +405,17 @@ export default {
   watch: {
     options(val, oldVal) {
       if (this.lastControlElement === 'time') {
-        if (val.useLastTimeTemplate !== oldVal.useLastTimeTemplate) {
+        const newOpts = {
+          useLastTimeTemplate: val.useLastTimeTemplate,
+          lastTimeTemplateStart: val.lastTimeTemplateStart,
+          lastTimeTemplateEnd: val.lastTimeTemplateEnd,
+        };
+        const oldOpts = {
+          useLastTimeTemplate: oldVal.useLastTimeTemplate,
+          lastTimeTemplateStart: oldVal.lastTimeTemplateStart,
+          lastTimeTemplateEnd: oldVal.lastTimeTemplateEnd,
+        };
+        if (JSON.stringify(newOpts) !== JSON.stringify(oldOpts)) {
           this.setTocken('time')
           this.commitTokenValue()
         }
@@ -646,13 +656,16 @@ export default {
             lastTimeTemplateStart,
             lastTimeTemplateEnd,
           } = this.options;
+          this.startForStore = this.formatDateToResult(Date.now() - period);
+          this.endForStore = this.formatDateToResult(Date.now());
           if (useLastTimeTemplate) {
             const secPeriod = (period/1000).toFixed();
-            this.startForStore = lastTimeTemplateStart.replace('${sec}', secPeriod);
-            this.endForStore = lastTimeTemplateEnd.replace('${sec}', secPeriod);
-          } else {
-            this.startForStore = this.formatDateToResult(Date.now() - period);
-            this.endForStore = this.formatDateToResult(Date.now());
+            if (lastTimeTemplateStart) {
+              this.startForStore = lastTimeTemplateStart.replace('${sec}', secPeriod);
+            }
+            if (lastTimeTemplateEnd) {
+              this.endForStore = lastTimeTemplateEnd.replace('${sec}', secPeriod);
+            }
           }
           this.start = null;
           this.end = null;
