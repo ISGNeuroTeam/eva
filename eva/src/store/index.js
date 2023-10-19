@@ -77,13 +77,29 @@ export default new Vuex.Store({
         state.preloadTokens.splice(idx, 1);
       } */
     },
-    setTokens(state, { id, tokens }) {
+    setTokens(state, { id, tokens, updateComponentValue = false }) {
       state[id].tockens?.forEach((token) => {
-        tokens.forEach(({ name, value }) => {
-          if (token.name === name) {
-            Vue.set(token, 'value', value);
-          }
-        });
+        const newTokens = tokens.filter((item) => item.name === token.name);
+        if (newTokens) {
+          newTokens.forEach(newToken => {
+            Vue.set(token, 'value', newToken.value);
+            if (updateComponentValue) {
+              state[id].elements
+                .filter((name) => name === token.elem)
+                .every((element) => {
+                  const [, component] = element.match(/^([\w-]+[\D])(-(\d+))?$/) || [];
+                  let val = token.value
+                  if (component === 'select') {
+                    if (!isNaN(parseFloat(token.value)) && isFinite(token.value)) {
+                      val = parseFloat(token.value)
+                    }
+                    Vue.set(state[id][element].selected, 'elemDeep', val);
+                  }
+                  return true;
+                });
+            }
+          })
+        }
       });
     },
     setDefaultOptions(state, { idDash, id }) {
@@ -1288,7 +1304,7 @@ export default new Vuex.Store({
     },
     async updatePreloadTokens({ state, commit, dispatch }, id) {
       const tokens = await dispatch('pullOutPreloadTokens', id);
-      commit('setTokens', { id, tokens });
+      commit('setTokens', { id, tokens, updateComponentValue: true });
       commit('removePreloadTokens', id);
       return tokens;
     },
