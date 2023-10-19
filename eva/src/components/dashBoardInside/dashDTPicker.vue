@@ -402,6 +402,16 @@ export default {
       };
     },
   },
+  watch: {
+    options(val, oldVal) {
+      if (this.lastControlElement === 'time') {
+        if (val.useLastTimeTemplate !== oldVal.useLastTimeTemplate) {
+          this.setTocken('time')
+          this.commitTokenValue()
+        }
+      }
+    },
+  },
   created() {
     const data = this.getPickerDate;
     if (data.range != null && data.range.hasOwnProperty('shortcut')) {
@@ -631,8 +641,19 @@ export default {
             default:
               break;
           }
-          this.startForStore = this.formatDateToResult(Date.now() - period);
-          this.endForStore = this.formatDateToResult(Date.now());
+          const {
+            useLastTimeTemplate,
+            lastTimeTemplateStart,
+            lastTimeTemplateEnd,
+          } = this.options;
+          if (useLastTimeTemplate) {
+            const secPeriod = (period/1000).toFixed();
+            this.startForStore = lastTimeTemplateStart.replace('${sec}', secPeriod);
+            this.endForStore = lastTimeTemplateEnd.replace('${sec}', secPeriod);
+          } else {
+            this.startForStore = this.formatDateToResult(Date.now() - period);
+            this.endForStore = this.formatDateToResult(Date.now());
+          }
           this.start = null;
           this.end = null;
           this.range = null;

@@ -391,6 +391,9 @@ export default {
       'showCustomInputBlock',
       'timeOutputFormat',
       'hideTimeSelect',
+      'useLastTimeTemplate',
+      'lastTimeTemplateStart',
+      'lastTimeTemplateEnd',
     ],
     graph: [
       'boxShadow',
@@ -781,6 +784,28 @@ export default {
       description: 'Скрыть выбор времени в календаре',
       elem: 'switch',
       default: false,
+    },
+    {
+      option: 'useLastTimeTemplate',
+      description: 'Использовать шаблон для функционала последнего времени',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'lastTimeTemplateStart',
+      description: 'Шаблон стартового времени',
+      relation: ['useLastTimeTemplate'],
+      elem: 'text-field',
+      default: 'now() - ${sec}',
+      placeholder: 'now() - ${sec}',
+    },
+    {
+      option: 'lastTimeTemplateEnd',
+      description: 'Шаблон конечного времени',
+      relation: ['useLastTimeTemplate'],
+      elem: 'text-field',
+      default: 'now()',
+      placeholder: 'now()',
     },
 
     // dashSingle

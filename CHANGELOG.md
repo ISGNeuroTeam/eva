@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- DatePicker: added possibility to specify a template for relative time functionality
 
 ### Changed
 - otl query new line replacement to space instead of empty string
