@@ -68,7 +68,6 @@ export default new Vuex.Store({
       });
     },
     pushPreloadTokens(state, { id, tokens }) {
-      console.log(id, tokens)
       state.preloadTokens.unshift({ id, tokens });
     },
     removePreloadTokens(state, id) {
