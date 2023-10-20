@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Constructor-schemes: "Dynamic image" - Fixed incorrect processing of numeric values.
 
 ## [1.155.0]
 
