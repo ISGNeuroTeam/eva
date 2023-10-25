@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Select: Fixed multiselect operation
+- Select: Fixed handling of 0/false/null values
 
 ## [1.155.0]
 

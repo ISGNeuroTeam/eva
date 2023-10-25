@@ -57,7 +57,7 @@
         >
           <v-autocomplete
             ref="multiselect"
-            v-model="elemDeep[String(multiple)]"
+            v-model="elemDeep[`${multiple}`]"
             :items="dataRestDeep"
             solo
             flat
@@ -108,7 +108,7 @@
                 <v-col class="flex-grow-0">
                   <v-icon
                     :color="
-                      elemDeep[String(multiple)].length > 0
+                      elemDeep[`${multiple}`].length > 0
                         ? theme.$primary_button
                         : theme.$main_text
                     "
@@ -270,7 +270,8 @@ export default {
     },
     dataRestDeep() {
       let res = [];
-      if (this.dataReady.length > 0 && this.dataReady[0][this.elem]) {
+      const validValue = typeof this.dataReady[0][this.elem] !== 'undefined';
+      if (this.dataReady.length > 0 && validValue) {
         const data = this.dataReady;
         res = Object.values(data).map((item) => item[this.elem]);
 
@@ -359,14 +360,14 @@ export default {
       if (val === null || val.elemDeep === '') {
         this.$store.commit('setState', [{
           object: this.elemDeep,
-          prop: String(this.multiple),
-          value: String(this.multiple) === 'true' ? [] : '',
+          prop: `${this.multiple}`,
+          value: `${this.multiple}` === 'true' ? [] : '',
         }]);
-      } else if (String(this.selectedElem) !== String(val)) {
+      } else if (`${this.selectedElem}` !== `${val}`) {
         this.$store.commit('setState', [{
           object: this.elemDeep,
-          prop: String(this.multiple),
-          value: String(this.multiple) === 'true' ? [val] : val,
+          prop: `${this.multiple}`,
+          value: `${this.multiple}` === 'true' ? [...val] : val,
         }]);
       }
     },
@@ -433,11 +434,11 @@ export default {
         this.openSelect();
       }
       if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
-        let val = selected.elemDeep
-        if (!isNaN(parseFloat(selected.elemDeep)) && isFinite(selected.elemDeep)) {
-          val = parseFloat(selected.elemDeep)
+        let val = selected.elemDeep;
+        if (!Number.isNaN(parseFloat(selected.elemDeep)) && Number.isFinite(selected.elemDeep)) {
+          val = parseFloat(selected.elemDeep);
         }
-        this.elemDeep[String(this.multiple)] = val;
+        this.elemDeep[`${this.multiple}`] = val;
       }
     }
   },
@@ -450,11 +451,11 @@ export default {
           : defaultValue; */
 
         if (this.multiple) {
-          if (this.elemDeep[String(this.multiple)].length === 0) {
-            this.elemDeep[String(this.multiple)] = [defaultValue];
+          if (this.elemDeep[`${this.multiple}`].length === 0) {
+            this.elemDeep[`${this.multiple}`] = [defaultValue];
           }
-        } else if (!this.elemDeep[String(this.multiple)]) {
-          this.elemDeep[String(this.multiple)] = defaultValue;
+        } else if (!this.elemDeep[`${this.multiple}`]) {
+          this.elemDeep[`${this.multiple}`] = defaultValue;
         }
       }
     },
@@ -596,7 +597,7 @@ export default {
         return;
       }
       this.setDefaultValue();
-      let elemDeepValue = this.elemDeep[String(this.multiple)];
+      let elemDeepValue = this.elemDeep[`${this.multiple}`];
       if (this.getOptions?.resetValuesWhichAreNot) {
         const existsItems = this.dataReady.map((item) => item[this.elem]);
         if (elemDeepValue.filter) {
@@ -620,7 +621,7 @@ export default {
 
             let value = [];
 
-            if (String(this.multiple) === 'true') {
+            if (`${this.multiple}` === 'true') {
               elemDeepValue.forEach((elem) => {
                 const addValues = data.filter((x) => elem === x[this.elem])
                   .map((x) => x[curTocken.capture])
@@ -628,11 +629,11 @@ export default {
                 value.push(...addValues);
               });
             } else {
-              if (elemDeepValue !== null) {
+              if (elemDeepValue !== undefined) {
                 if (Array.isArray(elemDeepValue)) {
-                  value = [...[], ...String(elemDeepValue)];
+                  value = [...[], ...`${elemDeepValue}`];
                 } else if (!this.getOptions?.resetValuesWhichAreNot) {
-                  value = [String(elemDeepValue)];
+                  value = [`${elemDeepValue}`];
                 }
               }
               for (let i = 0; i < data.length; i += 1) {
