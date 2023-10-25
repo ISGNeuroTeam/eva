@@ -17,21 +17,8 @@
           {{ iconClose }}
         </v-icon>
       </button>
-      <div class="dash-constructor-schemes-keymap__tab-list">
-        <div
-          v-for="(item, index) in tabs"
-          :key="index"
-          class="dash-constructor-schemes-keymap__tab-item"
-          :class="{
-            'dash-constructor-schemes-keymap__tab-item--active': activeTab === item.value,
-          }"
-          @click="setActiveTab(item.value)"
-        >
-          {{ item.label }}
-        </div>
-      </div>
-      <div class="dash-constructor-schemes-keymap__row row">
-        <div class="col-5">
+      <div class="d-flex flex-wrap align-center">
+        <div class="column align-center text-left">
           <div class="dash-constructor-schemes-keymap__title">
             Горячие клавиши
           </div>
@@ -39,22 +26,31 @@
             (работают только в режиме редактирования)
           </div>
         </div>
-        <div class="col-5" />
-      </div>
-      <div class="dash-constructor-schemes-keymap__row row">
-        <div
-          v-for="(groupItem, groupIndex) in activeTabContent"
-          :key="`tab-group-items-${groupIndex}`"
-          class=" col-5"
-        >
+        <div class="dash-constructor-schemes-keymap__tab-list">
           <div
-            v-for="(item, index) in groupItem"
-            :key="`tab-content-item-${index}`"
-            class="dash-constructor-schemes-keymap__item d-flex justify-space-between align-center"
+            v-for="(item, index) in tabs"
+            :key="index"
+            class="dash-constructor-schemes-keymap__tab-item"
+            :class="{
+              'dash-constructor-schemes-keymap__tab-item--active': activeTab === item.value,
+            }"
+            @click="setActiveTab(item.value)"
           >
-            <div class="column">
+            {{ item.label }}
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-constructor-schemes-keymap__row justify-space-between px-4">
+        <div
+          v-for="(item, index) in activeTabContent"
+          :key="index"
+          class="dash-constructor-schemes-keymap__item"
+        >
+          <div class="d-flex mb-2">
+            <div class="column text-left">
               <div class="dash-constructor-schemes-keymap__label">
-                {{ item.label }}
+                {{ item.label }}:
               </div>
               <div
                 v-if="item.secondLabel"
@@ -63,6 +59,8 @@
                 {{ item.secondLabel }}
               </div>
             </div>
+          </div>
+          <div class="d-flex">
             <div class="d-flex justify-space-between align-center">
               <template v-for="(keyItem, keyIndex) in item.keys">
                 <div
@@ -82,10 +80,6 @@
             </div>
           </div>
         </div>
-        <div
-          v-if="activeTabContent.length === 1"
-          class="col-5"
-        />
       </div>
     </div>
   </div>
@@ -222,7 +216,7 @@ export default {
         }
       });
       tabContent.push([...arr]);
-      return tabContent;
+      return this.tabs[this.activeTab].content;
     },
   },
   methods: {
@@ -271,11 +265,8 @@ export default {
     position: relative;
   }
   &__tab-list {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 22px;
-    z-index: 1;
+    width: fit-content;
+    margin: 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -286,31 +277,31 @@ export default {
   &__tab-item {
     padding: 0 20px;
     margin-right: 2px;
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 16px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 20px;
     color: var(--main_text);
     cursor: pointer;
     transition: .3s cubic-bezier(.25,.8,.5,1);
     position: relative;
+    white-space: nowrap;
     &:last-child {
       margin-right: 0;
     }
     &:after {
       bottom: 0;
       content: "";
-      opacity: 0;
       pointer-events: none;
       position: absolute;
       top: 0;
-      z-index: -1;
-      background-color: var(--primary_button);
+      z-index: 1;
+      border: 1px solid transparent;
       border-radius: 6px;
       transition: .3s cubic-bezier(.25,.8,.5,1);
     }
     &--active {
       &:after {
-        opacity: 1;
+        border: 1px solid var(--primary_button);
         left: 0;
         right: 0;
       }
@@ -319,6 +310,12 @@ export default {
   &__row {
     display: flex;
     justify-content: space-evenly;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 40px 50px;
+    height: 325px;
+    overflow: auto;
   }
   &__title {
     color: var(--accent_ui_color);
@@ -328,20 +325,19 @@ export default {
   }
   &__subtitle {
     color: var(--main_border);
-    font-weight: 400;
+    font-weight: 500;
     font-size: 15px;
     line-height: 18px;
   }
   &__item {
-    margin-bottom: 30px;
-    &:last-child {
-      margin-bottom: 0;
-    }
+    min-width: 600px;
+    gap: 0px 30px;
   }
   &__label {
     font-weight: 600;
-    font-size: 24px;
+    font-size: 20px;
     line-height: 29px;
+    white-space: nowrap;
     color: var(--main_text);
   }
   &__second-label {
@@ -351,10 +347,10 @@ export default {
     color: var(--main_text);
   }
   &__button {
-    padding: 10px 20px;
+    padding: 0 8px;
     font-weight: 600;
-    font-size: 24px;
-    line-height: 29px;
+    font-size: 20px;
+    line-height: 28px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -366,8 +362,8 @@ export default {
   }
   &__separator {
     font-weight: 400;
-    font-size: 42px;
-    line-height: 51px;
+    font-size: 40px;
+    line-height: 24px;
     display: flex;
     align-items: center;
     text-align: center;
