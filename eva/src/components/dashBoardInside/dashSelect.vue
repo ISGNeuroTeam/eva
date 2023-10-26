@@ -4,6 +4,7 @@
     :disabled="!fullScreenMode"
   >
     <div
+      :id="`select-block-${idFrom}`"
       class="dash-select"
       :style="customStyle"
       :class="customClass"
@@ -21,8 +22,12 @@
         />
         <div
           class="source"
-          :class="{ source_show: source_show }"
-          :style="{ width: widthInput }"
+          :class="{
+            source_show: source_show
+          }"
+          :style="{
+            width: widthInput
+          }"
         >
           <v-select
             v-model="elem"
@@ -52,8 +57,13 @@
         <div
           ref="targetBlock"
           class="target"
-          :style="{ width: widthInput, borderColor: theme.$main_border }"
-          :class="{ select_show: select_show }"
+          :style="{
+            width: widthInput,
+            borderColor: theme.$main_border,
+          }"
+          :class="{
+            select_show: select_show,
+          }"
         >
           <v-autocomplete
             ref="multiselect"
@@ -64,8 +74,15 @@
             :filter="onFilterItems"
             :multiple="multiple"
             :color="theme.$accent_ui_color"
-            :style="{ color: theme.$main_text, fill: theme.$main_text }"
-            :menu-props="{zIndex: 100}"
+            :style="{
+              color: theme.$main_text,
+              fill: theme.$main_text,
+            }"
+            :menu-props="{
+              zIndex: 100,
+              attach: `#select-block-${idFrom}`,
+              offsetOverflow: false,
+            }"
             hide-details
             class="select theme--dark"
             label="Значение"
@@ -244,7 +261,10 @@ export default {
         return [];
       }
       if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+        this.$store.commit('setDefaultOptions', {
+          id: this.id,
+          idDash: this.idDash,
+        });
       }
 
       return this.dashFromStore.options;
@@ -270,12 +290,15 @@ export default {
     },
     dataRestDeep() {
       let res = [];
-      const validValue = this.dataReady.length > 0 && typeof this.dataReady[0][this.elem] !== 'undefined';
+      const validValue = this.dataReady.length > 0
+          && typeof this.dataReady[0][this.elem] !== 'undefined';
       if (validValue) {
         const data = this.dataReady;
         res = Object.values(data).map((item) => item[this.elem]);
 
-        res = this.filterSelect(res, this.multiple ? this.elemDeep.true : [this.elemDeep.false]);
+        res = this.filterSelect(res, this.multiple
+          ? this.elemDeep.true
+          : [this.elemDeep.false]);
       }
 
       return [...new Set(res)];
@@ -341,8 +364,22 @@ export default {
     isMenuActive(val, oldVal) {
       if (val !== oldVal) {
         if (val) {
-          this.autocomplite.$el.dispatchEvent(new Event('mousedown', { bubbles: true }));
-          this.autocomplite.$el.dispatchEvent(new Event('mouseup', { bubbles: true }));
+          this.autocomplite.$el.dispatchEvent(
+            new Event(
+              'mousedown',
+              {
+                bubbles: true,
+              },
+            ),
+          );
+          this.autocomplite.$el.dispatchEvent(
+            new Event(
+              'mouseup',
+              {
+                bubbles: true,
+              },
+            ),
+          );
         } else {
           this.setTockenDelay('closemenu');
         }
@@ -361,13 +398,17 @@ export default {
         this.$store.commit('setState', [{
           object: this.elemDeep,
           prop: `${this.multiple}`,
-          value: `${this.multiple}` === 'true' ? [] : '',
+          value: `${this.multiple}` === 'true'
+            ? []
+            : '',
         }]);
       } else if (`${this.selectedElem}` !== `${val}`) {
         this.$store.commit('setState', [{
           object: this.elemDeep,
           prop: `${this.multiple}`,
-          value: `${this.multiple}` === 'true' ? [...val] : val,
+          value: `${this.multiple}` === 'true'
+            ? [...val]
+            : val,
         }]);
       }
     },
