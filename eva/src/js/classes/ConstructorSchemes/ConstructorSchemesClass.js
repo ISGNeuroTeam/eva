@@ -1738,7 +1738,7 @@ class ConstructorSchemesClass {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
-            value: targetData.value || '-',
+            value: `${targetData.value}` || '-',
           };
           this.updateDynamicImageNode(node);
         }
