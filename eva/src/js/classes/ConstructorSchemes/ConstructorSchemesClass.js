@@ -1930,7 +1930,7 @@ class ConstructorSchemesClass {
         }));
         const activeImageFromNode = node.tag.activeImage;
         const activeImageFromData = imageListFromIconClass
-          .find((el) => el.value === node.tag.value);
+          .find((el) => `${el.value}` === `${node.tag.value}`);
         const activeImageIsChanged = activeImageFromData?.image !== activeImageFromNode?.image;
         if (activeImageFromData) {
           if (activeImageIsChanged) {

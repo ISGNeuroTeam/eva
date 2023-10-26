@@ -490,18 +490,31 @@ export default {
       this.listIndex = index;
     },
     setDefaultValue() {
+      // Значение "по-умолчанию"
       const defaultValue = this.getDefaultValue();
+      // Если оно корректно и есть в датасете
       if (defaultValue != null && this.dataRestDeep.includes(defaultValue)) {
-        /* this.elemDeep[String(multiple)] = multiple
-          ? [defaultValue]
-          : defaultValue; */
-
+        const value = this.elemDeep[`${this.multiple}`];
+        // Если это мультиселект
         if (this.multiple) {
-          if (this.elemDeep[`${this.multiple}`].length === 0) {
-            this.elemDeep[`${this.multiple}`] = [defaultValue];
+          // Если нет значения(в селекте)
+          if (value.length === 0) {
+            this.$set(this.elemDeep, `${this.multiple}`, [defaultValue]);
+          } else {
+            const filteredValue = value.filter((el) => this.dataRestDeep.includes(el));
+            // Если значения(в селекте) отсутствуют в датасете
+            if (filteredValue.length === 0) {
+              this.$set(this.elemDeep, `${this.multiple}`, [defaultValue]);
+            }
           }
-        } else if (!this.elemDeep[`${this.multiple}`]) {
-          this.elemDeep[`${this.multiple}`] = defaultValue;
+          // Если нет значения(в селекте) ИЛИ оно отсутствует в датасете
+        } else if (
+          value === undefined
+            || value === null
+            || value === ''
+            || !this.dataRestDeep.includes(value)
+        ) {
+          this.$set(this.elemDeep, `${this.multiple}`, defaultValue);
         }
       }
     },

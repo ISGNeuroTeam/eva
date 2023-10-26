@@ -12,11 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
-- Constructor-schemes: "Dynamic image" - Fixed incorrect processing of numeric values.
-- Select: Fixed multiselect operation
-- Select: Fixed handling of 0/false values
-- Select: Fixed dropdown list positioning
-- Select: Fixed selection of items with arrows
+
+## [1.156.0]
+
+### Fixed
+- Constructor-schemes: "Dynamic image":
+  - Fixed incorrect processing of numeric values.
+- Select:
+  - Fixed multiselect operation.
+  - Fixed handling of 0/false values.
+  - Fixed dropdown list positioning.
+  - Fixed selection of items with arrows.
 
 ## [1.155.0]
 

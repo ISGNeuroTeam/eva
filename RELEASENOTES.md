@@ -1,3 +1,14 @@
+## [1.156.0] - 2023-10-26
+
+### Fixed
+- Constructor Schemes: "Dynamic Image":
+  - Corrected the handling of numeric values.
+- Select:
+  - Resolved the issue with multiselect operation.
+  - Now correctly handles 0/false values.
+  - Improved dropdown list positioning.
+  - Fixed the item selection using arrow keys.
+
 # [1.155.0] - 2023-10-19
 
 ### Added
