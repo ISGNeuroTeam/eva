@@ -4,6 +4,7 @@
     :disabled="!fullScreenMode"
   >
     <div
+      :id="`select-block-${idFrom}`"
       class="dash-select"
       :style="customStyle"
       :class="customClass"
@@ -21,8 +22,12 @@
         />
         <div
           class="source"
-          :class="{ source_show: source_show }"
-          :style="{ width: widthInput }"
+          :class="{
+            source_show: source_show
+          }"
+          :style="{
+            width: widthInput
+          }"
         >
           <v-select
             v-model="elem"
@@ -52,8 +57,13 @@
         <div
           ref="targetBlock"
           class="target"
-          :style="{ width: widthInput, borderColor: theme.$main_border }"
-          :class="{ select_show: select_show }"
+          :style="{
+            width: widthInput,
+            borderColor: theme.$main_border,
+          }"
+          :class="{
+            select_show: select_show,
+          }"
         >
           <v-autocomplete
             ref="multiselect"
@@ -64,8 +74,15 @@
             :filter="onFilterItems"
             :multiple="multiple"
             :color="theme.$accent_ui_color"
-            :style="{ color: theme.$main_text, fill: theme.$main_text }"
-            :menu-props="{zIndex: 100}"
+            :style="{
+              color: theme.$main_text,
+              fill: theme.$main_text,
+            }"
+            :menu-props="{
+              zIndex: 100,
+              attach: `#select-block-${idFrom}`,
+              offsetOverflow: false,
+            }"
             hide-details
             class="select theme--dark"
             label="Значение"
@@ -74,6 +91,7 @@
             @mouseover="setTockenDelay('mouseover')"
             @keydown.enter="onPressEnter"
             @keydown.backspace="onPressBackspace"
+            @update:list-index="updateListIndex"
           >
             <template v-slot:item="{ item, attrs, on }">
               <v-list-item
@@ -217,6 +235,7 @@ export default {
         { name: 'closemenu', capture: [] },
       ],
       autocomplite: false,
+      listIndex: -1,
     };
   },
   computed: {
@@ -244,7 +263,10 @@ export default {
         return [];
       }
       if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+        this.$store.commit('setDefaultOptions', {
+          id: this.id,
+          idDash: this.idDash,
+        });
       }
 
       return this.dashFromStore.options;
@@ -270,12 +292,15 @@ export default {
     },
     dataRestDeep() {
       let res = [];
-      const validValue = typeof this.dataReady[0][this.elem] !== 'undefined';
-      if (this.dataReady.length > 0 && validValue) {
+      const validValue = this.dataReady.length > 0
+          && typeof this.dataReady[0][this.elem] !== 'undefined';
+      if (validValue) {
         const data = this.dataReady;
         res = Object.values(data).map((item) => item[this.elem]);
 
-        res = this.filterSelect(res, this.multiple ? this.elemDeep.true : [this.elemDeep.false]);
+        res = this.filterSelect(res, this.multiple
+          ? this.elemDeep.true
+          : [this.elemDeep.false]);
       }
 
       return [...new Set(res)];
@@ -341,8 +366,22 @@ export default {
     isMenuActive(val, oldVal) {
       if (val !== oldVal) {
         if (val) {
-          this.autocomplite.$el.dispatchEvent(new Event('mousedown', { bubbles: true }));
-          this.autocomplite.$el.dispatchEvent(new Event('mouseup', { bubbles: true }));
+          this.autocomplite.$el.dispatchEvent(
+            new Event(
+              'mousedown',
+              {
+                bubbles: true,
+              },
+            ),
+          );
+          this.autocomplite.$el.dispatchEvent(
+            new Event(
+              'mouseup',
+              {
+                bubbles: true,
+              },
+            ),
+          );
         } else {
           this.setTockenDelay('closemenu');
         }
@@ -361,13 +400,17 @@ export default {
         this.$store.commit('setState', [{
           object: this.elemDeep,
           prop: `${this.multiple}`,
-          value: `${this.multiple}` === 'true' ? [] : '',
+          value: `${this.multiple}` === 'true'
+            ? []
+            : '',
         }]);
       } else if (`${this.selectedElem}` !== `${val}`) {
         this.$store.commit('setState', [{
           object: this.elemDeep,
           prop: `${this.multiple}`,
-          value: `${this.multiple}` === 'true' ? [...val] : val,
+          value: `${this.multiple}` === 'true'
+            ? [...val]
+            : val,
         }]);
       }
     },
@@ -443,6 +486,9 @@ export default {
     }
   },
   methods: {
+    updateListIndex(index) {
+      this.listIndex = index;
+    },
     setDefaultValue() {
       const defaultValue = this.getDefaultValue();
       if (defaultValue != null && this.dataRestDeep.includes(defaultValue)) {
@@ -504,9 +550,8 @@ export default {
           this.$refs.multiselect.$refs.menu.listIndex = -1;
         }
       } else if (filteredItems.length > 1) {
-        const idxFind = filteredItems.findIndex((val) => val === this.$refs.multiselect.lazySearch);
-        if (idxFind > -1) {
-          this.$refs.multiselect.selectItem(filteredItems[idxFind]);
+        if (this.listIndex > -1) {
+          this.$refs.multiselect.selectItem(filteredItems[this.listIndex]);
           this.$refs.multiselect.lazySearch = '';
           if (this.multiple) {
             this.$refs.multiselect.$refs.menu.listIndex = -1;
@@ -629,7 +674,11 @@ export default {
                 value.push(...addValues);
               });
             } else {
-              if (elemDeepValue !== undefined) {
+              if (
+                elemDeepValue !== undefined
+                  && elemDeepValue !== null
+                  && elemDeepValue !== ''
+              ) {
                 if (Array.isArray(elemDeepValue)) {
                   value = [...[], ...`${elemDeepValue}`];
                 } else if (!this.getOptions?.resetValuesWhichAreNot) {
