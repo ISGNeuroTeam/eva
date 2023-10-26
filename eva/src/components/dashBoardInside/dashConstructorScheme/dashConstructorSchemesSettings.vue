@@ -480,15 +480,15 @@
               :key="`${dataObject.nodeId}-${index}`"
               class="column dash-constructor-schemes__data-type-3"
             >
-              <div class="row align-center">
+              <div class="row align-start flex-nowrap">
                 <v-text-field
                   v-model="element.image"
                   label="Изображение"
-                  :class="dataObject.imageList.length > 1 ? 'col-10' : 'col-11'"
+                  :class="dataObject.imageList.length > 1 ? 'col-10' : 'col-10'"
                 />
                 <v-icon
                   v-if="dataObject.imageList.length > 1"
-                  class="control-button edit-icon theme--dark col-2"
+                  class="control-button edit-icon theme--dark col-2 px-0 py-1"
                   :style="{ color: theme.$secondary_text }"
                   @click="deleteLine(index, 'imageList')"
                 >
@@ -1041,6 +1041,7 @@ export default {
     border-radius: 5px;
     padding: 15px 8px;
     margin-bottom: 24px;
+    background-color: var(--secondary_bg);
   }
   .dash-constructor-schemes__slider {
     .dash-constructor-schemes__slider-title {

@@ -1,3 +1,7 @@
+$selectMaxHeight: 80px
+$selectSlotMaxHeight: 78px
+$selectInputMaxHeight: 74px
+
 .v-menu__content
     box-shadow: none
     border: 1px solid
@@ -5,10 +9,10 @@
     .v-icon
         color: inherit
 
-.dash-select 
+.dash-select
     margin-top: 15px
     position: relative
-    
+
     .select-with-data
         display: flex
         flex-flow: row nowrap
@@ -42,6 +46,9 @@
                         opacity: 0.5
 
                     .v-select__slot
+                        max-height: $selectSlotMaxHeight !important
+                        padding-top: 2px
+                        padding-bottom: 2px
 
                         label
                             color: inherit
@@ -62,9 +69,8 @@
 
         .target
             position: absolute
-            max-height: 65px
+            max-height: $selectMaxHeight
             opacity: 0
-            overflow: auto
             visibility: hidden
             border: 1px solid
             border-radius: 4px
@@ -78,6 +84,7 @@
 
                 .v-input__control
                     min-height: 40px
+                    max-height: $selectMaxHeight
 
                     .v-input__slot
                         background: inherit
@@ -87,7 +94,9 @@
                         opacity: 0.5
 
                     .v-select__slot
-
+                        max-height: $selectSlotMaxHeight !important
+                        padding-top: 2px
+                        padding-bottom: 2px
                         label
                             color: inherit
 
@@ -110,7 +119,7 @@
             visibility: visible
             position: relative
             cursor: pointer
-            //height: 65px 
+            //height: 65px
             .select
                 .v-input__control
                     input
@@ -128,14 +137,19 @@
             opacity: 1
             visibility: visible
             position: relative
-            //height: 100px
+        //height: 100px
 
         .v-input__slot
             min-height: 40px !important
+            max-height: $selectSlotMaxHeight !important
+            padding-top: 2px
+            padding-bottom: 2px
             border-color: inherit !important
-        
-        .v-select__slot
 
+        .v-select__slot
+            max-height: $selectSlotMaxHeight !important
+            padding-top: 2px
+            padding-bottom: 2px
             .v-label
                 font-size: 14px !important
                 top: 15px !important
@@ -145,7 +159,9 @@
                 top: 18px  !important
 
             .v-select__selections
+                overflow: auto
                 padding: 4px 0 !important
+                max-height: $selectInputMaxHeight !important
                 color: inherit
 
             .v-input__append-inner
@@ -161,7 +177,7 @@
 
 @media screen and (max-width: 2560px)  and (min-width: 1920px)
 
-    .dash-select 
+    .dash-select
         margin-top: 25px
 
         .select-with-data
@@ -176,7 +192,9 @@
                 max-height: 150px
 
             .v-select__slot
-
+                max-height: $selectSlotMaxHeight !important
+                padding-top: 2px
+                padding-bottom: 2px
                 .v-label
                     font-size: 16px !important
                     top: 14px !important
@@ -185,6 +203,8 @@
                     top: 18px !important
 
                 .v-select__selections
+                    overflow: auto
+                    max-height: $selectInputMaxHeight !important
                     font-size: 20px
 
 
@@ -199,7 +219,7 @@
 
 @media screen and (max-width: 1600px)
 
-    .dash-select 
+    .dash-select
         margin-top: 0
 
         .select-with-data
@@ -211,6 +231,9 @@
                 min-height: 34px !important
 
             .v-select__slot
+                max-height: $selectSlotMaxHeight !important
+                padding-top: 2px
+                padding-bottom: 2px
 
                 .v-label
                     font-size: 12px !important
@@ -220,6 +243,8 @@
                     top: 18px !important
 
                 .v-select__selections
+                    overflow: auto
+                    max-height: $selectInputMaxHeight !important
                     font-size: 14px
 
                     .v-select__selection--comma
@@ -238,11 +263,11 @@
 
 @media screen and (max-width: 1400px)
 
-    .dash-select 
+    .dash-select
         margin-top: 0px
 
         .select-with-data
-            
+
             .source
                 height: 80px
 
@@ -250,7 +275,9 @@
                     min-height: 25px !important
 
                 .v-select__slot
-
+                    max-height: $selectSlotMaxHeight !important
+                    padding-top: 2px
+                    padding-bottom: 2px
                     .v-label
                         font-size: 11px !important
                         top: 8px !important
@@ -259,6 +286,8 @@
                         top: 18px !important
 
                     .v-select__selections
+                        overflow: auto
+                        max-height: $selectInputMaxHeight !important
                         padding: 0 !important
                         font-size: 12px
 
@@ -273,8 +302,10 @@
             .v-input__control
                 min-height: 30px !important
 
-            .v-select__slot 
-                
+            .v-select__slot
+                max-height: $selectSlotMaxHeight !important
+                padding-top: 2px
+                padding-bottom: 2px
                 .v-label
                     top: 6px !important
 

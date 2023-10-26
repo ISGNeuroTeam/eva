@@ -1738,7 +1738,7 @@ class ConstructorSchemesClass {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
-            value: targetData.value || '-',
+            value: `${targetData.value}` || '-',
           };
           this.updateDynamicImageNode(node);
         }
@@ -1930,7 +1930,7 @@ class ConstructorSchemesClass {
         }));
         const activeImageFromNode = node.tag.activeImage;
         const activeImageFromData = imageListFromIconClass
-          .find((el) => el.value === node.tag.value);
+          .find((el) => `${el.value}` === `${node.tag.value}`);
         const activeImageIsChanged = activeImageFromData?.image !== activeImageFromNode?.image;
         if (activeImageFromData) {
           if (activeImageIsChanged) {
