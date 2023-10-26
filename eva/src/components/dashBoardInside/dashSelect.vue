@@ -91,6 +91,7 @@
             @mouseover="setTockenDelay('mouseover')"
             @keydown.enter="onPressEnter"
             @keydown.backspace="onPressBackspace"
+            @update:list-index="updateListIndex"
           >
             <template v-slot:item="{ item, attrs, on }">
               <v-list-item
@@ -234,6 +235,7 @@ export default {
         { name: 'closemenu', capture: [] },
       ],
       autocomplite: false,
+      listIndex: -1,
     };
   },
   computed: {
@@ -484,6 +486,9 @@ export default {
     }
   },
   methods: {
+    updateListIndex(index) {
+      this.listIndex = index;
+    },
     setDefaultValue() {
       const defaultValue = this.getDefaultValue();
       if (defaultValue != null && this.dataRestDeep.includes(defaultValue)) {
@@ -545,9 +550,8 @@ export default {
           this.$refs.multiselect.$refs.menu.listIndex = -1;
         }
       } else if (filteredItems.length > 1) {
-        const idxFind = filteredItems.findIndex((val) => val === this.$refs.multiselect.lazySearch);
-        if (idxFind > -1) {
-          this.$refs.multiselect.selectItem(filteredItems[idxFind]);
+        if (this.listIndex > -1) {
+          this.$refs.multiselect.selectItem(filteredItems[this.listIndex]);
           this.$refs.multiselect.lazySearch = '';
           if (this.multiple) {
             this.$refs.multiselect.$refs.menu.listIndex = -1;
@@ -670,7 +674,11 @@ export default {
                 value.push(...addValues);
               });
             } else {
-              if (elemDeepValue !== undefined) {
+              if (
+                elemDeepValue !== undefined
+                  && elemDeepValue !== null
+                  && elemDeepValue !== ''
+              ) {
                 if (Array.isArray(elemDeepValue)) {
                   value = [...[], ...`${elemDeepValue}`];
                 } else if (!this.getOptions?.resetValuesWhichAreNot) {
