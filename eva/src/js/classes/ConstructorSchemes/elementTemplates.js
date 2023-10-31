@@ -325,34 +325,53 @@ const templates = {
         />
         <!--Bg-second-->
         <template v-if="tag.items.length && tag.items.length > 0">
-          <template v-for="(item, index) in tag.items">
-            <rect
-              :key="index + '-bg-' + tag.nodeId"
-              x="0"
-              :y="index > 0
-               ? tag.getPosition(index, layout)
-               : 0"
-              :width="layout.width"
-              :height="tag.getHeight(layout, index)"
-              :fill="item.bgColor.rgbaString"
-              :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-              :transform="tag.getTransform(layout)"
-            />
+          
+          <template v-if="tag.summaryValueHeight">
+            <template v-for="(item, index) in tag.items.map((el) => el).reverse()">
+              <rect
+                :key="index + '-bg-' + tag.nodeId"
+                x="0"
+                :y="index > 0
+                 ? tag.getPosition(index, layout, tag.summaryValueHeight, true)
+                 : 0"
+                :width="layout.width"
+                :height="tag.getHeight(layout, index, true)"
+                :fill="item.bgColor.rgbaString"
+                :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+                :transform="tag.getTransform(layout)"
+              />
+            </template>
           </template>
-          <template v-for="(item, index) in tag.items.map((el) => el).reverse()">
+          <template v-else>
+            <template v-for="(item, index) in tag.items">
+              <rect
+                :key="index + '-bg-' + tag.nodeId"
+                x="0"
+                :y="index > 0
+                 ? tag.getPosition(index, layout, tag.summaryValueHeight)
+                 : 0"
+                :width="layout.width"
+                :height="tag.getHeight(layout, index)"
+                :fill="item.bgColor.rgbaString"
+                :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+                :transform="tag.getTransform(layout)"
+              />
+            </template>
+          </template>
+          <template v-for="(item, index) in tag.items">
             <text
-                :key="index + '-text-' + tag.nodeId"
-                class="b-data-node__text"
-                :dx="layout.width / 2"
-                :dy="tag.getDy(layout, index)"
-                alignment-baseline="middle"
-                text-anchor="middle"
-                :fill="item.textColor.rgbaString"
-                :font-family="tag.fontFamily || ''"
-                :font-size="tag.fontSize + 'px'"
-              >
-                {{ item.value === '-' ? 0 : item.value }}
-              </text>
+              :key="index + '-text-' + tag.nodeId"
+              class="b-data-node__text"
+              :dx="layout.width / 2"
+              :dy="tag.getDy(layout, index)"
+              alignment-baseline="middle"
+              text-anchor="middle"
+              :fill="item.textColor.rgbaString"
+              :font-family="tag.fontFamily || ''"
+              :font-size="tag.fontSize + 'px'"
+            >
+              {{ item.value === '-' ? 0 : item.value }}
+            </text>
           </template>
         </template>
       </g>
@@ -367,6 +386,7 @@ const templates = {
       id: '',
       templateType: 'template-2',
       maxValue: 1,
+      summaryValueHeight: false,
       mainBgColor: {
         rgbaString: 'rgba(0, 0, 0, 1)',
         rgbaObject: {
@@ -378,9 +398,9 @@ const templates = {
       },
       // Methods
       // Обязательно удалять эти поля при сохранении схемы
-      getHeight(layout, index) {
-        const roundedValue = this.items[index].value;
-        return Math.round(((layout.height / 100) * (roundedValue * (100 / this.maxValue))));
+      getHeight(layout, index, isReverse) {
+        const roundedValue = isReverse ? [...this.items].reverse()[index].value : this.items[index].value;
+        return ((layout.height / 100) * (roundedValue * (100 / this.maxValue)));
       },
       getTransform(layout) {
         return `translate(${layout.width},${layout.height}), rotate(180)`;
@@ -389,14 +409,20 @@ const templates = {
         return this.items?.length > 1 ? (((layout.height / this.items.length) * (index + 1))
             - ((layout.height / this.items.length) / 2)) : layout.height / 2;
       },
-      getPosition(index, layout) {
-        let sum = this.items?.length === 1 ? this.items[0].value : 0;
-        this.items.forEach((el, i) => {
-          if (i < index) {
-            sum += el.value === '-' ? 0 : el.value;
-          }
-        });
-        return Math.round(((layout.height / 100) * (sum * (100 / this.maxValue))));
+      getPosition(index, layout, summaryValueHeight, isReverse) {
+        if (!summaryValueHeight) {
+          return 0;
+        }
+        let sum = 0;
+
+        for (let i = 0; i < index; i += 1) {
+          const el = isReverse ? [...this.items].reverse()[i] : this.items[i];
+          const numericValue = el.value === '-' ? 0 : parseFloat(el.value);
+          const itemHeight = (layout.height / 100) * (numericValue * (100 / this.maxValue));
+          sum += itemHeight;
+        }
+
+        return Math.round(sum * 100) / 100;
       },
       items: [
         {
