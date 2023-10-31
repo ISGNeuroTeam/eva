@@ -3,6 +3,7 @@
     v-if="visualisationModal && visualisationModal.open"
     :value="visualisationModal.open"
     width="100%"
+    transition="fade-transition"
     @click:outside="visualisationModal = {}"
     @keydown.esc="visualisationModal = {}"
   >
@@ -62,7 +63,7 @@
             </div>
           </div>
           <visualisation
-            space-name="modal"
+            :space-name="spaceName"
             :element="visualisationModal.tool"
             :data="data"
             :mode="mode"
@@ -119,6 +120,10 @@ export default {
     },
     data() {
       return this.getElementData(this.visualisationModal.search || {});
+    },
+    spaceName() {
+      const { tool, elemName } = this.visualisationModal;
+      return elemName.replace(tool + '-', '');
     },
   },
   methods: {

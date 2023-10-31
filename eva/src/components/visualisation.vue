@@ -2,7 +2,7 @@
   <div :options="String(options)">
     <v-card-text
       :is="currentElem"
-      v-if="idFrom && dashFromStore"
+      v-if="idFrom && dashFromStore && popupOpened"
       custom-class="card-text element-itself"
       :color-from="theme"
       :custom-style="{
@@ -75,8 +75,9 @@ export default {
   },
   data: () => ({
     loading: false,
-    fullScreenHeight: 0.8 * window.innerHeight,
-    fullScreenWidth: 0.8 * window.innerWidth,
+    popupOpened: false,
+    fullScreenHeight: 0.85 * window.innerHeight,
+    fullScreenWidth: window.innerWidth - 40,
     newDashBoard: {},
     storeDash: null,
     settings: {
@@ -132,6 +133,11 @@ export default {
 
       return options.change;
     },
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.popupOpened = true;
+    })
   },
   methods: {
     updateSettings(localSettings) {
