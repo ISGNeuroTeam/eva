@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Changed visualization list for output in the functionality: Links and events for the panel
 
 ### Fixed
 - Fixed a problem with the size of the visualization in the popup
