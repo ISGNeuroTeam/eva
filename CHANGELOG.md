@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed a problem with the size of the visualization in the popup
 - Fixed an issue with individual visualization settings in the popup
+- Fixed an issue with saving visualization options in a popup window
 
 ## [1.156.0]
 

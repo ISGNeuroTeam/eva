@@ -1,5 +1,5 @@
 <template>
-  <div :options="String(options)">
+  <div>
     <v-card-text
       :is="currentElem"
       v-if="idFrom && dashFromStore && popupOpened"
@@ -22,7 +22,7 @@
       }"
       :width-from="width"
       :height-from="height"
-      :options="props.currentOptions"
+      :options="localOptions"
       :current-settings="settings"
       :update-settings="updateSettings"
       :is-full-screen="isFullScreen"
@@ -79,17 +79,15 @@ export default {
     fullScreenHeight: 0.85 * window.innerHeight,
     fullScreenWidth: window.innerWidth - 40,
     newDashBoard: {},
+    localOptions: {
+      visible: true,
+      change: false,
+      level: 1,
+      boxShadow: false,
+    },
     storeDash: null,
     settings: {
       showTitle: true,
-    },
-    props: {
-      currentOptions: {
-        visible: true,
-        change: false,
-        level: 1,
-        boxShadow: false,
-      },
     },
   }),
   computed: {
@@ -127,26 +125,24 @@ export default {
 
       return this.dashFromStore.options;
     },
-    options() {
-      const options = this.getOptions;
-      this.setOptionsItems(options);
-
-      return options.change;
-    },
   },
   mounted() {
     this.$nextTick(() => {
       this.popupOpened = true;
     })
   },
+  watch: {
+    getOptions: {
+      deep: true,
+      immediate: true,
+      handler(options) {
+        this.localOptions = options;
+      }
+    },
+  },
   methods: {
     updateSettings(localSettings) {
       this.settings = structuredClone(localSettings);
-    },
-    setOptionsItems(options) {
-      Object.keys(options).forEach((item) => {
-        this.props.currentOptions[item] = options[item];
-      });
     },
   },
 };
