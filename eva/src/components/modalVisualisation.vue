@@ -85,6 +85,7 @@
             :space-name="spaceName"
             :element="visualisationModal.tool"
             :data="data"
+            :search-schema="searchSchema"
             :mode="mode"
           />
         </div>
@@ -144,6 +145,12 @@ export default {
     },
     data() {
       return this.getElementData(this.visualisationModal.search || {});
+    },
+    searchSchema() {
+      const search = this.$store.state[this.idDash].searches
+          .find((element) => element?.sid === this.visualisationModal.search.sid)
+      if (search?.schema) return search.schema;
+      return {};
     },
     spaceName() {
       const { tool, elemName } = this.visualisationModal;

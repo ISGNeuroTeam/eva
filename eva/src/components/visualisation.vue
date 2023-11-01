@@ -12,6 +12,7 @@
       :id-from="idFrom"
       :id-dash-from="idDash"
       :data-rest-from="sData"
+      :search-schema="searchSchema"
       :data-mode-from="mode"
       :loading="loading"
       :time-format-from="''"
@@ -68,6 +69,10 @@ export default {
     data: {
       type: Array,
       default: () => ([]),
+    },
+    searchSchema: {
+      type: Object,
+      default: () => ({}),
     },
     spaceName: {
       type: String,
