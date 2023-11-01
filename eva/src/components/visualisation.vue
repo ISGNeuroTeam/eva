@@ -30,6 +30,8 @@
       :table-per-page="tablePerPage"
       :table-page="tablePage"
       :selected-pie-index="selectedPieindex"
+      @SetRange="sDataRange = $event"
+      @resetRange="sDataRange = null"
     />
   </div>
 </template>
@@ -76,9 +78,10 @@ export default {
   data: () => ({
     loading: false,
     popupOpened: false,
-    fullScreenHeight: 0.85 * window.innerHeight,
-    fullScreenWidth: window.innerWidth - 40,
+    fullScreenHeight: 0.82 * window.innerHeight,
+    fullScreenWidth: window.innerWidth - 85,
     newDashBoard: {},
+    sDataRange: null,
     localOptions: {
       visible: true,
       change: false,
@@ -95,7 +98,15 @@ export default {
       return this.spaceName ? `${this.element}-${this.spaceName}` : this.element;
     },
     sData() {
-      return this.data;
+      if (!this.sDataRange) {
+        return this.data;
+      }
+      const { xMetric } = this.sDataRange;
+      const [start, end] = this.sDataRange.range;
+      return this.data.filter((item) => {
+        const xValue = item[xMetric];
+        return (xValue >= start && xValue <= end);
+      });
     },
     theme() {
       return this.$store.getters.getTheme;
