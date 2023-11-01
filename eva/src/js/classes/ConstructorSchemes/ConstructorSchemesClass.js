@@ -116,13 +116,15 @@ class ConstructorSchemesClass {
       };
     }
     dataNode.style = new VuejsNodeStyle(data.template);
+    const width = data.dataRest.dataType === 'data-type-4'
+      ? data.dataRest.types[data.dataRest.type].initialWidth : data.width;
+    const height = data.dataRest.dataType === 'data-type-4'
+      ? data.dataRest.types[data.dataRest.type].initialHeight : data.height;
     dataNode.layout = new Rect(
       0,
       0,
-      data?.width,
-      data?.height
-        ? data.height
-        : data.rowHeight * (data?.dataRest?.items?.length || 1),
+      width,
+      height || data.rowHeight * (data?.dataRest?.items?.length || 1),
     );
     return dataNode;
   }
@@ -1013,7 +1015,16 @@ class ConstructorSchemesClass {
       ) {
         const filteredElementTag = Utils.deleteFieldsFromObject(
           evt.item.tag,
-          ['getTransform', 'getDy', 'getPosition', 'getHeight', 'getActiveImage'],
+          [
+            'getTransform',
+            'getDy',
+            'getPosition',
+            'getHeight',
+            'getActiveImage',
+            'calculateScale',
+            'getElementSize',
+            'getTextStyles',
+          ],
         );
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
