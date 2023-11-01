@@ -35,6 +35,7 @@
               v-model="element.id"
               :style="{ color: theme.$main_text }"
               :items="dataRestFrom"
+              :attach="true"
               item-value="TagName"
               item-text="Description"
               label="Значение"
@@ -174,6 +175,7 @@
               v-model="dataObject.id"
               :items="dataRestFrom"
               item-value="TagName"
+              :attach="true"
               item-text="Description"
               label="Данные для строки"
               :filter="tagNameAutocompleteFilter"
@@ -464,6 +466,7 @@
                 item-value="TagName"
                 item-text="Description"
                 label="Значение"
+                :attach="true"
                 :filter="tagNameAutocompleteFilter"
                 class="col-11"
                 :menu-props="{
@@ -551,6 +554,247 @@
         >
           Применить
         </v-btn>
+      </template>
+      <template v-if="dataType === 'data-type-4'">
+        <!--data-type-4-->
+        <div class="column">
+          <div class="column dash-constructor-schemes__data-type-4">
+            <div class="text-left mb-2">
+              Первая метрика:
+            </div>
+            <div class="row align-center">
+              <v-autocomplete
+                v-model="dataObject.textFirstId"
+                :style="{ color: theme.$main_text }"
+                :items="dataRestFrom"
+                item-value="TagName"
+                item-text="Description"
+                label="Значение"
+                :attach="true"
+                :filter="tagNameAutocompleteFilter"
+                class="col-11"
+                :menu-props="{
+                  'z-index': 1000,
+                }"
+              >
+                <template v-slot:item="{ item, on }">
+                  <v-list-item
+                    ripple
+                    class="v-list-item&#45;&#45;link dash-constructor-schemes__data-panel-select"
+                    v-on="on"
+                  >
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ item.Description }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
+                        {{ item.NameObject }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+            </div>
+            <div class="row align-center">
+              <div class="col-12">
+                <v-text-field
+                  v-model="dataObject.textFirstSize"
+                  label="Размер шрифта"
+                  dense
+                  class="px-0"
+                />
+              </div>
+            </div>
+            <div class="row align-center">
+              <div class="col-12">
+                <v-select
+                  v-model="dataObject.textFirstPosition"
+                  :items="dataObject.textFirstPositionList"
+                  item-text="label"
+                  item-value="value"
+                  hide-details
+                  :attach="true"
+                  :menu-props="{
+                    'z-index': 1000,
+                    offsetY: true,
+                  }"
+                  dense
+                  :style="{ color: theme.$main_text }"
+                  label="Позиция текста:"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="column dash-constructor-schemes__data-type-4">
+            <div class="text-left mb-2">
+              Вторая метрика:
+            </div>
+            <div class="row align-center mb-2">
+              <v-autocomplete
+                v-model="dataObject.id"
+                :style="{ color: theme.$main_text }"
+                :items="dataRestFrom"
+                item-value="TagName"
+                item-text="Description"
+                label="Значение"
+                :attach="true"
+                :filter="tagNameAutocompleteFilter"
+                class="col-11"
+                :menu-props="{
+                  'z-index': 1000,
+                }"
+              >
+                <template v-slot:item="{ item, on }">
+                  <v-list-item
+                    ripple
+                    class="v-list-item&#45;&#45;link dash-constructor-schemes__data-panel-select"
+                    v-on="on"
+                  >
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ item.Description }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
+                        {{ item.NameObject }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+            </div>
+            <div class="row align-center mb-2">
+              <div class="col-8">
+                <div class="text-left mb-2">
+                  Цвета:
+                </div>
+              </div>
+              <div class="col-4">
+                <v-btn
+                  ripple
+                  small
+                  height="36"
+                  width="64"
+                  color="transparent"
+                  @click="addLine(
+                    elementTemplates['data-type-4'].dataRest.colors[0],
+                    'colors'
+                  )"
+                >
+                  <v-icon
+                    class="control-button edit-icon theme--dark"
+                    :style="{ color: theme.$main_text }"
+                  >
+                    {{ mdiPlus }}
+                  </v-icon>
+                </v-btn>
+              </div>
+            </div>
+            <div class="column">
+              <div
+                v-for="(item, index) in dataObject.colors"
+                :key="`${dataObject.nodeId}-${index}`"
+                class="dash-constructor-schemes__data-type-4 dash-constructor-schemes__data-type-4--alt-bg"
+              >
+                <div class="row align-center justify-start align-content-start">
+                  <div class="col-4">
+                    <v-menu
+                      top
+                      offset-x
+                      :close-on-content-click="false"
+                      z-index="100"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                          :style="{
+                            'background-color': `${item.color.rgbaString}`,
+                          }"
+                          dark
+                          v-bind="attrs"
+                          v-on="on"
+                        />
+                      </template>
+
+                      <v-color-picker
+                        :value="item.color.rgbaObject"
+                        dot-size="12"
+                        mode="rgba"
+                        @update:color="updateSelectedNodeColor($event, 'color', index, 'colors')"
+                      />
+                    </v-menu>
+                  </div>
+                  <div class="col-5">
+                    <v-text-field
+                      v-model="item.value"
+                      label="Значение"
+                      dense
+                      class="px-0"
+                    />
+                  </div>
+
+                  <div class="col-3">
+                    <v-btn
+                      :disabled="dataObject.colors.length < 2"
+                      ripple
+                      small
+                      width="28"
+                      min-width="28"
+                      class="px-0 py-1"
+                      color="transparent"
+                    >
+                      <v-icon
+                        class="control-button edit-icon theme--dark pa-0"
+                        size="18px"
+                        :color="theme.$main_text"
+                        :style="{ color: theme.$main_text }"
+                        @click="deleteLine(index, 'colors')"
+                      >
+                        {{ closeIcon }}
+                      </v-icon>
+                    </v-btn>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="column dash-constructor-schemes__data-type-4">
+            <div class="text-left mb-4">
+              Общие настройки:
+            </div>
+            <div class="row align-center mb-4">
+              <v-text-field
+                v-model="dataObject.textSecondValue"
+                label="Подпись"
+                class="col-12"
+              />
+            </div>
+            <div class="row align-center mb-4">
+              <v-select
+                v-model="dataObject.type"
+                :items="dataObject.types"
+                item-text="label"
+                item-value="value"
+                hide-details
+                :attach="true"
+                :menu-props="{
+                  'z-index': 1000,
+                  offsetY: true,
+                }"
+                dense
+                :style="{ color: theme.$main_text }"
+                label="Положение элемента:"
+                class="col-12"
+              />
+            </div>
+          </div>
+          <v-btn
+            small
+            outlined
+            :color="theme.$main_text"
+            @click="updateModelValue(dataObject)"
+          >
+            Применить
+          </v-btn>
+        </div>
       </template>
       <template v-if="dataType === 'label-type-0'">
         <!--label-type-0-->
@@ -837,6 +1081,7 @@
               v-model="dataObject.shape"
               :items="shapeNodeStyleList"
               item-value="id"
+              :attach="true"
               item-text="label"
               label="Фигура"
               :menu-props="{
@@ -918,7 +1163,11 @@
 </template>
 
 <script>
-import { mdiClose, mdiTableRowPlusAfter } from '@mdi/js';
+import {
+  mdiClose,
+  mdiTableRowPlusAfter,
+  mdiPlus,
+} from '@mdi/js';
 import { throttle } from '@/js/utils/throttle';
 import elementTemplates from '@/js/classes/ConstructorSchemes/elementTemplates';
 
@@ -960,6 +1209,7 @@ export default {
       // Icons
       closeIcon: mdiClose,
       addLineIcon: mdiTableRowPlusAfter,
+      mdiPlus,
       test12345: 50,
       textMode: false,
       elementTemplates: elementTemplates.templates,
@@ -994,16 +1244,16 @@ export default {
       }
       return false;
     },
-    updateSelectedNodeColor(evt, field, index) {
+    updateSelectedNodeColor(evt, field, index, listField = 'items') {
       const updateValue = typeof index !== 'undefined'
-        ? structuredClone(this.dataObject.items[index])
+        ? structuredClone(this.dataObject[listField][index])
         : structuredClone(this.dataObject);
       updateValue[field] = {
         rgbaObject: evt.rgba,
         rgbaString: `rgba(${evt.rgba.r}, ${evt.rgba.g}, ${evt.rgba.b}, ${evt.rgba.a})`,
       };
       if (typeof index !== 'undefined') {
-        this.$set(this.dataObject, 'items', this.dataObject.items.map((item, i) => {
+        this.$set(this.dataObject, listField, this.dataObject[listField].map((item, i) => {
           if (i === index) {
             return updateValue;
           }
@@ -1049,12 +1299,34 @@ export default {
   }
   .dash-constructor-schemes__data-type-0,
   .dash-constructor-schemes__data-type-2,
-  .dash-constructor-schemes__data-type-3 {
+  .dash-constructor-schemes__data-type-3,
+  .dash-constructor-schemes__data-type-4 {
     border: 1px solid var(--main_border);
     border-radius: 5px;
     padding: 15px 8px;
     margin-bottom: 24px;
     background-color: var(--secondary_bg);
+    &--alt-bg {
+      position: relative;
+      background-color: transparent;
+      opacity: 1;
+      z-index: 1;
+      &:last-child {
+        margin-bottom: 0;
+      }
+      &::after {
+        content: "";
+        z-index: -1;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        background-color: var(--main_bg);
+        opacity: 0.4;
+        border-radius: 5px;
+      }
+    }
   }
   .dash-constructor-schemes__slider {
     .dash-constructor-schemes__slider-title {

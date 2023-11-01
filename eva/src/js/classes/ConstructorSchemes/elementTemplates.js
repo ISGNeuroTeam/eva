@@ -522,7 +522,7 @@ const templates = {
       <g class="b-data-node">
         <g :transform="tag.calculateScale(tag.type, layout).stringResult">
           <!--Type-1-->
-          <template v-if="tag.type === 1">
+          <template v-if="tag.type === 0">
             <path 
               d="M55.15 60.337H54.25V55.8587H55.15H55.65V55.3587V55.25H58.85V55.3587V55.8587H59.35H60.25V60.337H59.35H58.85V60.837V61.25H55.65V60.837V60.337H55.15Z" 
               fill="url(#paint1_radial_809_1590)" 
@@ -600,20 +600,20 @@ const templates = {
               font-weight="600"
             >
               <text
-                :font-size="tag.textFirst.size"
+                :font-size="tag.textFirstSize"
                 :dx="tag.getElementSize(tag.type, layout).width / 2"
-                :dy="tag.getElementSize(tag.type, layout).height * 0.15  + (tag.textFirst.size / 3)"
-                :fill="tag.textFirst.color.rgbaString"
+                :dy="tag.getElementSize(tag.type, layout).height * 0.15  + (tag.textFirstSize / 3)"
+                :fill="tag.textFirstColor.rgbaString"
               >
-                {{ tag.textFirst.value || '' }}
+                {{ tag.textFirstValue || '' }}
               </text>
               <text
-                :font-size="tag.textSecond.size"
+                :font-size="tag.textSecondSize"
                 :dx="tag.getElementSize(tag.type, layout).width / 2"
-                :dy="tag.getElementSize(tag.type, layout).height * 0.85  + (tag.textSecond.size / 3)"
-                :fill="tag.textSecond.color.rgbaString"
+                :dy="tag.getElementSize(tag.type, layout).height * 0.85  + (tag.textSecondSize / 3)"
+                :fill="tag.textSecondColor.rgbaString"
               >
-                {{ tag.textSecond.value  || '' }}
+                {{ tag.textSecondValue  || '' }}
               </text>
             </g>
             <defs>
@@ -758,7 +758,7 @@ const templates = {
               </linearGradient>
             </defs>
           </template>
-          <template v-if="tag.type === 2">
+          <template v-if="tag.type === 1">
             <g :fill="tag.color.rgbaString">
               <path
                 d="M51.5 71.5L51.5 68.5L50.5 68.5L50.5 67.5L41.5 67.5L41.5 68.5L40 68.5L40 71.5L41.5 71.5L41.5 72.5L50.5 72.5L50.5 71.5L51.5 71.5Z"
@@ -834,21 +834,21 @@ const templates = {
               font-weight="600" 
             >
               <text
-                :font-size="tag.textFirst.size"
+                :font-size="tag.textFirstSize"
                 :dx="tag.getElementSize(tag.type, layout).width * 0.75"
-                :dy="tag.getElementSize(tag.type, layout).height / 2 + (tag.textFirst.size / 3)"
-                :fill="tag.textFirst.color.rgbaString"
+                :dy="tag.getElementSize(tag.type, layout).height / 2 + (tag.textFirstSize / 3)"
+                :fill="tag.textFirstColor.rgbaString"
               >
-                {{ tag.textFirst.value || '' }}
+                {{ tag.textFirstValue || '' }}
               </text>
               <text
-                :font-size="tag.textSecond.size"
-                :dx="15 + (tag.textSecond.size / 4)"
+                :font-size="tag.textSecondSize"
+                :dx="15 + (tag.textSecondSize / 4)"
                 :dy="tag.getElementSize(tag.type, layout).height / 2"
                 style="writing-mode: tb; glyph-orientation-vertical: 90;"
-                :fill="tag.textSecond.color.rgbaString"
+                :fill="tag.textSecondColor.rgbaString"
               >
-                {{ tag.textSecond.value  || '' }}
+                {{ tag.textSecondValue  || '' }}
               </text>
             </g>
             <defs>
@@ -993,7 +993,7 @@ const templates = {
               </linearGradient>
             </defs>
           </template>
-          <template v-if="tag.type === 3">
+          <template v-if="tag.type === 2">
             <g :fill="tag.color.rgbaString">
               <path
                 d="M143 40.5L143 43.5L144 43.5L144 44.5L153 44.5L153 43.5L154.5 43.5L154.5 40.5L153 40.5L153 39.5L144 39.5L144 40.5L143 40.5Z"
@@ -1241,18 +1241,23 @@ const templates = {
       fontFamily,
       fontSize: 16,
       id: '',
+      value: '',
       templateType: 'template-4',
-      type: 2,
-      types: {
-        1: {
+      type: 0,
+      types: [
+        {
+          value: 0,
+          label: 'Горизонтальный',
           initialWidth: 112,
           initialHeight: 145,
         },
-        2: {
+        {
+          value: 1,
+          label: 'Вертикальный',
           initialWidth: 195,
           initialHeight: 112,
         },
-      },
+      ],
       color: {
         rgbaString: 'rgba(255, 255, 0, 1)',
         rgbaObject: {
@@ -1276,40 +1281,48 @@ const templates = {
           },
         },
       ],
-      textFirst: {
-        id: '',
-        color: {
-          rgbaString: 'rgba(255, 255, 255, 1)',
-          rgbaObject: {
-            r: 255,
-            g: 255,
-            b: 255,
-            a: 1,
-          },
-        },
-        size: 24,
-        value: '1234',
-        position: 1,
-        positionList: {
-          1: 'top',
-          2: 'left',
-          3: 'right',
-          4: 'bottom',
+      textFirstId: '',
+      textFirstColor: {
+        rgbaString: 'rgba(255, 255, 255, 1)',
+        rgbaObject: {
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 1,
         },
       },
-      textSecond: {
-        color: {
-          rgbaString: 'rgba(0, 0, 0, 1)',
-          rgbaObject: {
-            r: 0,
-            g: 0,
-            b: 0,
-            a: 1,
-          },
+      textFirstSize: 24,
+      textFirstValue: '1234',
+      textFirstPosition: 1,
+      textFirstPositionList: [
+        {
+          label: 'Сверху',
+          value: 1,
         },
-        size: 24,
-        value: '4321',
+        // {
+        //   label: 'Снизу',
+        //   value: 2,
+        // },
+        // {
+        //   label: 'Слева',
+        //   value: 3,
+        // },
+        // {
+        //   label: 'Справа',
+        //   value: 4,
+        // },
+      ],
+      textSecondColor: {
+        rgbaString: 'rgba(0, 0, 0, 1)',
+        rgbaObject: {
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 1,
+        },
       },
+      textSecondSize: 24,
+      textSecondValue: '4321',
       calculateScale(type, layout) {
         const { initialWidth, initialHeight } = this.types[type];
         const finalWidth = layout.width;
