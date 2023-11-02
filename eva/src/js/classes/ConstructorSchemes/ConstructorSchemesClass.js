@@ -1738,7 +1738,7 @@ class ConstructorSchemesClass {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
-            value: `${targetData.value}` || '-',
+            value: `${targetData?.value || '-'}`,
           };
           this.updateDynamicImageNode(node);
         }
@@ -1774,14 +1774,27 @@ class ConstructorSchemesClass {
         textSecond: dataFromComponent?.description || this.getDataItemById(dataFromComponent.id)?.Description || '-',
       };
     } else if (dataType === 'data-type-2') {
+      const updatedItems = dataFromComponent.items.map((item) => ({
+        ...item,
+        value: this.getDataItemById(item.id)?.value || item?.value || '-',
+      }));
+      if (!dataFromComponent?.summaryValueHeight) {
+        updatedItems.sort((a, b) => {
+          // Сортировка по полю 'value' как строковых значений
+          if (a.value > b.value) {
+            return -1;
+          } if (a.value < b.value) {
+            return 1;
+          }
+          return 0;
+        });
+      }
       updatedData = {
         mainBgColor: dataFromComponent?.mainBgColor,
         maxValue: dataFromComponent?.maxValue,
         fontSize: dataFromComponent?.fontSize,
-        items: dataFromComponent.items.map((item) => ({
-          ...item,
-          value: this.getDataItemById(item.id)?.value || item?.value || '-',
-        })),
+        summaryValueHeight: dataFromComponent?.summaryValueHeight,
+        items: updatedItems,
       };
     } else if (dataType === 'data-type-3') {
       const mainImageFromNode = this.targetDataNode.tag.defaultImage;

@@ -225,7 +225,7 @@
         </div>
       </template>
       <template v-if="dataType === 'data-type-2'">
-        <!--data-type-3-->
+        <!--data-type-2-->
         <div class="row align-center">
           <div class="col-12">
             <div
@@ -233,12 +233,13 @@
               :key="`${dataObject.nodeId}-${index}`"
               class="column dash-constructor-schemes__data-type-2"
             >
-              <div class="row align-center">
+              <div class="row align-center flex-nowrap">
                 <v-autocomplete
                   v-model="element.id"
                   :style="{ color: theme.$main_text }"
                   :items="dataRestFrom"
                   item-value="TagName"
+                  :attach="true"
                   item-text="Description"
                   label="Значение"
                   :filter="tagNameAutocompleteFilter"
@@ -266,7 +267,7 @@
                 </v-autocomplete>
                 <v-icon
                   v-if="dataObject.items.length > 1"
-                  class="control-button edit-icon theme--dark col-2"
+                  class="control-button edit-icon theme--dark col-2 pa-0"
                   :style="{ color: theme.$secondary_text }"
                   @click="deleteLine(index, 'items')"
                 >
@@ -414,6 +415,18 @@
                 <v-text-field
                   v-model="dataObject.fontSize"
                   label=""
+                  :color="theme.$main_text"
+                  hide-details
+                  dense
+                  style="margin-bottom: 10px"
+                />
+              </div>
+              <div class="col-8 text-left">
+                Суммировать высоту элементов:
+              </div>
+              <div class="col-4">
+                <v-switch
+                  v-model="dataObject.summaryValueHeight"
                   :color="theme.$main_text"
                   hide-details
                   dense

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Constructor-schemes: The "data-type-2" element (level/storage) now has the ability to display them overlapping instead of summarizing the height of nested elements. 
 
 ### Changed
 
