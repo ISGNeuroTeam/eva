@@ -1722,6 +1722,8 @@ class ConstructorSchemesClass {
       updatedData = dataFromComponent;
     } else if (dataFromComponent.dataType === 'label') {
       this.updateLabelVisual(dataFromComponent);
+    } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
+      updatedData = dataFromComponent;
     } else if (elementTemplates.templates[dataType]) {
       updatedData = elementTemplates.templates[dataType].dataRest.updateSettings(
         this.dataRest,
