@@ -1849,11 +1849,11 @@ class ConstructorSchemesClass {
         : '';
       let colorByValue = null;
       if (secondMetricById) {
-        colorByValue = dataFromComponent.colors.find((el) => `${el.value}` === `${secondMetricById}`).color;
+        colorByValue = dataFromComponent.colors.find((el) => `${el.value}` === `${secondMetricById}`);
       }
       updatedData = {
         ...dataFromComponent,
-        color: colorByValue || null,
+        color: colorByValue?.color || null,
         value: secondMetricById,
         textFirstValue: firstMetricById || '',
       };

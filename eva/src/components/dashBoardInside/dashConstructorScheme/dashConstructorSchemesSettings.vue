@@ -792,6 +792,13 @@
               />
             </div>
             <div class="row align-center mb-4">
+              <v-text-field
+                v-model="dataObject.textSecondSize"
+                label="Размер шрифта подписи:"
+                class="col-12"
+              />
+            </div>
+            <div class="row align-center mb-4">
               <v-select
                 v-model="dataObject.type"
                 :items="dataObject.types"
