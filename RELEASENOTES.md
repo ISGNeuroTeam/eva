@@ -2,6 +2,7 @@
 
 ### Added
 - In Constructor-schemes, the "data-type-2" element (level/storage) now has the ability to display overlapping elements instead of summarizing the height of nested elements.
+- Constructor-schemes: Added element "gate valve"(data-type-4)
 
 ### Changed
 - Updated the visualization list for functionality output, specifically for links and events in the panel.
