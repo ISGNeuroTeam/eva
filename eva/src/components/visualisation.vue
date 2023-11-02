@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div :style="`height: 100%`">
     <v-card-text
       :is="currentElem"
       v-if="idFrom && dashFromStore && popupOpened"
-      custom-class="card-text element-itself"
+      custom-class="card-text card-text-viz element-itself"
       :color-from="theme"
       :custom-style="{
         color: theme.$main_text,
@@ -165,5 +165,7 @@ export default {
 </script>
 
 <style>
-
+.card-text-viz {
+  line-height: normal;
+}
 </style>

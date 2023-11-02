@@ -147,9 +147,11 @@ export default {
       return this.getElementData(this.visualisationModal.search || {});
     },
     searchSchema() {
-      const search = this.$store.state[this.idDash].searches
-          .find((element) => element?.sid === this.visualisationModal.search.sid)
-      if (search?.schema) return search.schema;
+      if (this.visualisationModal.search?.sid) {
+        const search = this.$store.state[this.idDash].searches
+            .find((element) => element?.sid === this.visualisationModal.search.sid)
+        if (search?.schema) return search.schema;
+      }
       return {};
     },
     spaceName() {
