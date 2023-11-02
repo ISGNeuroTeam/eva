@@ -1,4 +1,23 @@
-## [1.156.0] - 2023-10-26
+# [1.157.0] - 2023-11-02
+
+### Added
+- In Constructor-schemes:
+  - The "data-type-2" element (level/storage) now offers the capability to display overlapping elements instead of summarizing the height of nested elements.
+  - Added a new element, "gate valve" (data-type-4).
+
+### Changed
+- Updated the visualization list for functionality output, specifically for links and events in the panel.
+
+### Fixed
+- Popup Visualization Issues:
+  - Resolved an issue with the size of the visualization.
+  - Addressed problems with individual settings.
+  - Fixed issues related to saving visualization options.
+  - Corrected problems with zooming in multiline visualizations.
+  - Fixed problems with drawing table visualizations.
+
+
+# [1.156.0] - 2023-10-26
 
 ### Fixed
 - Constructor Schemes: "Dynamic Image":

@@ -236,7 +236,7 @@ export default {
     tools() {
       return settings.tools
         .filter(
-          (elem) => !settings.excludes.fromTitleActions.some(
+          (elem) => settings.toolsTypesForPopup.some(
             (item) => item === elem.type,
           ),
         )
