@@ -720,13 +720,14 @@ const templates = {
               alignment-baseline="middle"
               text-anchor="middle"
               font-weight="600"
+              :transform="tag.calculateBackwardScale(tag.type, layout)"
             >
               <!--Default-value-1-->
               <text
                 v-if="tag.textFirstUseDefaultValue && !tag.textFirstValue"
                 :font-size="tag.textFirstSize"
-                :dx="tag.getElementSize(tag.type, layout).width / 2"
-                :dy="tag.getElementSize(tag.type, layout).height * 0.15  + (tag.textFirstSize / 3)"
+                :x="layout.width / 2"
+                :y="tag.getYPositionBySvgBg(tag.textFirstSize, layout, 'top')"
                 fill="white"
               >
                 {{ tag.textFirstDefaultValue }}
@@ -735,8 +736,8 @@ const templates = {
               <text
                 v-else
                 :font-size="tag.textFirstSize"
-                :dx="tag.getElementSize(tag.type, layout).width / 2"
-                :dy="tag.getElementSize(tag.type, layout).height * 0.15  + (tag.textFirstSize / 3)"
+                :x="layout.width / 2"
+                :y="tag.getYPositionBySvgBg(tag.textFirstSize, layout, 'top')"
                 fill="white"
               >
                 {{ tag.textFirstValue || '' }}
@@ -744,8 +745,8 @@ const templates = {
               <!--Value-2-->
               <text
                 :font-size="tag.textSecondSize"
-                :dx="tag.getElementSize(tag.type, layout).width / 2"
-                :dy="tag.getElementSize(tag.type, layout).height * 0.85  + (tag.textSecondSize / 3)"
+                :x="layout.width / 2"
+                :y="tag.getYPositionBySvgBg(tag.textSecondSize, layout, 'bottom')"
                 fill="black"
               >
                 {{ tag.textSecondValue  || '' }}
@@ -892,8 +893,9 @@ const templates = {
               <text
                 v-if="tag.textFirstUseDefaultValue && !tag.textFirstValue"
                 :font-size="tag.textFirstSize"
-                :dx="tag.getElementSize(tag.type, layout).width * 0.75"
-                :dy="tag.getElementSize(tag.type, layout).height / 2 + (tag.textFirstSize / 3)"
+                :x="tag.getYPositionBySvgBg(tag.textSecondSize, layout, 'right')"
+                :y="layout.height * 0.55"
+                :transform="tag.calculateBackwardScale(tag.type, layout)"
                 fill="white"
               >
                 {{ tag.textFirstDefaultValue }}
@@ -902,8 +904,9 @@ const templates = {
               <text
                 v-else
                 :font-size="tag.textFirstSize"
-                :dx="tag.getElementSize(tag.type, layout).width * 0.75"
-                :dy="tag.getElementSize(tag.type, layout).height / 2 + (tag.textFirstSize / 3)"
+                :x="tag.getYPositionBySvgBg(tag.textSecondSize, layout, 'right')"
+                :y="layout.height * 0.55"
+                :transform="tag.calculateBackwardScale(tag.type, layout)"
                 fill="white"
               >
                 {{ tag.textFirstValue || '' }}
@@ -911,8 +914,9 @@ const templates = {
               <!--Value-2-->
               <text
                 :font-size="tag.textSecondSize"
-                :dx="15 + (tag.textSecondSize / 4)"
-                :dy="tag.getElementSize(tag.type, layout).height / 2"
+                :x="tag.getYPositionBySvgBg(tag.textSecondSize, layout, 'left')"
+                :y="layout.height / 2"
+                :transform="tag.calculateBackwardScale(tag.type, layout)"
                 style="writing-mode: tb; glyph-orientation-vertical: 90;"
                 fill="black"
               >
@@ -1044,13 +1048,14 @@ const templates = {
             <g
               alignment-baseline="middle"
               text-anchor="middle"
-              font-weight="600" 
+              font-weight="600"
             >
               <text
                 v-if="tag.textFirstUseDefaultValue && !tag.textFirstValue"
                 :font-size="tag.textFirst.size"
                 :dx="18"
                 :dy="tag.getElementSize(tag.type, layout).height / 2"
+                :transform="tag.calculateBackwardScale(tag.type, layout)"
                 fill="white"
               >
                 {{ tag.textFirstDefaultValue }}
@@ -1060,6 +1065,7 @@ const templates = {
                 :font-size="tag.textFirst.size"
                 :dx="18"
                 :dy="tag.getElementSize(tag.type, layout).height / 2"
+                :transform="tag.calculateBackwardScale(tag.type, layout)"
                 fill="white"
               >
                 {{ tag.textFirstValue || '' }}
@@ -1068,6 +1074,7 @@ const templates = {
                 :font-size="tag.textFirst.size"
                 :dx="tag.getElementSize(tag.type, layout).width"
                 :dy="tag.getElementSize(tag.type, layout).height / 3"
+                :transform="tag.calculateBackwardScale(tag.type, layout)"
                 :style="tag.getTextStyles(layout)"
                 text-anchor="end"
                 fill="black"
@@ -1226,6 +1233,10 @@ const templates = {
           scaleY,
         };
       },
+      calculateBackwardScale(type, layout) {
+        const { scaleX, scaleY } = this.calculateScale(type, layout);
+        return `scale(${1 / scaleX} ${1 / scaleY})`;
+      },
       getElementSize(type, layout) {
         const scaledSizes = this.calculateScale(type, layout);
         return {
@@ -1238,6 +1249,22 @@ const templates = {
       },
       addNodeIdToStr(nodeId, prefix, suffix = '') {
         return `${prefix}${nodeId}${suffix}`;
+      },
+      getYPositionBySvgBg(fontSize, layout, position) {
+        // TODO: По возможности заменить адекватными значениями
+        if (position === 'top') {
+          return layout.height * 0.18;
+        }
+        if (position === 'bottom') {
+          return layout.height * 0.9;
+        }
+        if (position === 'left') {
+          return layout.width * 0.10;
+        }
+        if (position === 'right') {
+          return layout.width * 0.76;
+        }
+        return layout.height;
       },
       // Обязательные методы
       updateSettings(dataRest, options) {
@@ -1396,6 +1423,8 @@ const fieldsForDelete = [
   'getElementSize',
   'getTextStyles',
   'addNodeIdToStr',
+  'calculateBackwardScale',
+  'getYPositionBySvgBg',
   'updateSettings',
   'updateData',
 ];

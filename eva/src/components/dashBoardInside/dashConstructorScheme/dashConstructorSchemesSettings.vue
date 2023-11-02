@@ -555,7 +555,7 @@
         <div class="column">
           <div class="column dash-cs__data-type-4">
             <div class="text-left mb-2">
-              Первая метрика:
+              Подпись данных для задвижки:
             </div>
             <div class="row align-center">
               <v-autocomplete
@@ -650,7 +650,7 @@
           </div>
           <div class="column dash-cs__data-type-4">
             <div class="text-left mb-2">
-              Вторая метрика(опционально):
+              Окраска задвижки:
             </div>
             <div class="row align-center mb-2">
               <v-autocomplete
