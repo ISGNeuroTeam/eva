@@ -1696,66 +1696,15 @@ class ConstructorSchemesClass {
     });
   }
 
-  getDataItemById(dataId) {
-    return this.dataRest.find((dataItem) => dataItem.TagName === dataId);
-  }
-
   updateDataInNode(updatedData) {
     new Promise((resolve) => {
       this.graphComponent.graph.nodes.forEach((node) => {
         const { dataType } = node.tag;
-        if (dataType === 'data-type-0' || dataType === 'data-type-2') {
-          const updatedItems = node.tag.items.map((nodeDataItem) => {
-            const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
-            if (targetData) {
-              nodeDataItem = {
-                ...nodeDataItem,
-                [
-                dataType === 'data-type-0'
-                  ? 'textRight'
-                  : 'value'
-                ]: typeof targetData?.value === 'number'
-                  || typeof targetData?.value === 'string'
-                  ? targetData.value
-                  : '-',
-              };
-            }
-            return nodeDataItem;
-          });
-          node.tag = {
-            ...node.tag,
-            items: updatedItems,
-          };
-        }
-        if (dataType === 'data-type-1') {
-          const targetData = updatedData.find((item) => item.TagName === node.tag.id);
-          node.tag = {
-            ...node.tag,
-            textFirst: typeof targetData?.value === 'number'
-            || typeof targetData?.value === 'string'
-              ? targetData.value
-              : '-',
-            valueColor: targetData?.value_color || null,
-          };
+        if (elementTemplates.templates[dataType]) {
+          elementTemplates.templates[dataType].dataRest.updateData(node, updatedData);
         }
         if (dataType === 'data-type-3') {
-          const targetData = updatedData.find((item) => item.TagName === node.tag.id);
-          node.tag = {
-            ...node.tag,
-            value: `${targetData?.value || '-'}`,
-          };
           this.updateDynamicImageNode(node);
-        }
-        if (dataType === 'data-type-4') {
-          const metricForText = updatedData.find((item) => item.TagName === node.tag.textFirstId);
-          const metricForColor = updatedData.find((item) => item.TagName === node.tag.id);
-          const updatedColor = node.tag.colors.find((el) => `${el?.value}` === `${metricForColor?.value}`);
-          node.tag = {
-            ...node.tag,
-            color: updatedColor?.color ? updatedColor.color : null,
-            textFirstValue: `${metricForText?.value || ''}`,
-            value: `${metricForColor?.value || ''}`,
-          };
         }
       });
       resolve();
@@ -1765,105 +1714,20 @@ class ConstructorSchemesClass {
   }
 
   updateSelectedNode(dataFromComponent) {
-    // TODO: Разбить на отдельные методы, вынести их в elementTemplates
     let updatedData = null;
     const dataType = this.targetDataNode.tag?.dataType;
-    if (dataType === 'data-type-0') {
-      updatedData = {
-        widthLeft: dataFromComponent?.widthLeft,
-        items: dataFromComponent.items.map((item) => ({
-          ...item,
-          textLeft: item?.description || this.getDataItemById(item.id)?.Description || '-',
-          textRight: typeof this.getDataItemById(item.id)?.value === 'number'
-          || typeof this.getDataItemById(item.id)?.value === 'string'
-            ? this.getDataItemById(item.id).value
-            : '-',
-        })),
-      };
-    } else if (dataType === 'data-type-1') {
-      updatedData = {
-        ...dataFromComponent,
-        textFirst: typeof this.getDataItemById(dataFromComponent.id)?.value === 'number'
-        || typeof this.getDataItemById(dataFromComponent.id)?.value === 'string'
-          ? this.getDataItemById(dataFromComponent.id).value
-          : '-',
-        textSecond: dataFromComponent?.description || this.getDataItemById(dataFromComponent.id)?.Description || '-',
-      };
-    } else if (dataType === 'data-type-2') {
-      const updatedItems = dataFromComponent.items.map((item) => ({
-        ...item,
-        value: this.getDataItemById(item.id)?.value || item?.value || '-',
-      }));
-      if (!dataFromComponent?.summaryValueHeight) {
-        updatedItems.sort((a, b) => {
-          // Сортировка по полю 'value' как строковых значений
-          if (a.value > b.value) {
-            return -1;
-          } if (a.value < b.value) {
-            return 1;
-          }
-          return 0;
-        });
-      }
-      updatedData = {
-        mainBgColor: dataFromComponent?.mainBgColor,
-        maxValue: dataFromComponent?.maxValue,
-        fontSize: dataFromComponent?.fontSize,
-        summaryValueHeight: dataFromComponent?.summaryValueHeight,
-        items: updatedItems,
-      };
-    } else if (dataType === 'data-type-3') {
-      const mainImageFromNode = this.targetDataNode.tag.defaultImage;
-      const mainImageFromData = dataFromComponent.defaultImage;
-      const mainImageIsChange = mainImageFromNode !== mainImageFromData;
-      if (mainImageIsChange && mainImageFromNode) {
-        updatedData = {
-          imageLayout: null,
-          defaultImagePath: '',
-          defaultImage: dataFromComponent.defaultImage,
-          activeImage: '',
-          id: dataFromComponent?.id,
-          value: this.getDataItemById(dataFromComponent.id)?.value
-              || dataFromComponent?.value
-              || '-',
-          imageList: dataFromComponent.imageList,
-        };
-      } else {
-        updatedData = {
-          defaultImage: dataFromComponent.defaultImage,
-          id: dataFromComponent?.id,
-          value: this.getDataItemById(dataFromComponent.id)?.value
-              || dataFromComponent?.value
-              || '-',
-          imageList: dataFromComponent.imageList,
-        };
-      }
-    } else if (dataType === 'data-type-4') {
-      const firstMetricById = typeof this.getDataItemById(dataFromComponent.textFirstId)?.value === 'number'
-      || typeof this.getDataItemById(dataFromComponent.textFirstId)?.value === 'string'
-        ? this.getDataItemById(dataFromComponent.textFirstId).value
-        : '';
-      const secondMetricById = typeof this.getDataItemById(dataFromComponent.id)?.value === 'number'
-          || typeof this.getDataItemById(dataFromComponent.id)?.value === 'string'
-        ? this.getDataItemById(dataFromComponent.id).value
-        : '';
-      let colorByValue = null;
-      if (secondMetricById) {
-        colorByValue = dataFromComponent.colors.find((el) => `${el.value}` === `${secondMetricById}`);
-      }
-      updatedData = {
-        ...dataFromComponent,
-        color: colorByValue?.color || null,
-        value: secondMetricById,
-        textFirstValue: firstMetricById || '',
-      };
-    } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
-      updatedData = dataFromComponent;
-    } else if (dataFromComponent.dataType === 'edge') {
+    updatedData = dataFromComponent;
+    if (dataFromComponent.dataType === 'edge') {
       this.updateEdgeVisual(dataFromComponent);
       updatedData = dataFromComponent;
     } else if (dataFromComponent.dataType === 'label') {
       this.updateLabelVisual(dataFromComponent);
+    } else if (elementTemplates.templates[dataType]) {
+      updatedData = elementTemplates.templates[dataType].dataRest.updateSettings(
+        this.dataRest,
+        dataFromComponent,
+        this.targetDataNode,
+      );
     }
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,

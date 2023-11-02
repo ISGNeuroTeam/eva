@@ -1,3 +1,5 @@
+import Utils from './Utils';
+
 const fontFamily = '"ProximaNova", sans-serif';
 const templates = {
   'shape-type-0': {
@@ -221,6 +223,44 @@ const templates = {
           textRight: '-',
         },
       ],
+      // Обязательные методы
+      updateSettings(dataRest, options) {
+        return {
+          widthLeft: options?.widthLeft,
+          items: options.items.map((item) => {
+            const dataItem = Utils.getDataItemById(dataRest, item.id);
+            const textLeft = dataItem?.Description || '-';
+            const textRight = typeof dataItem?.value === 'number'
+            || typeof dataItem?.value === 'string'
+              ? dataItem.value
+              : '-';
+            return {
+              ...item,
+              textLeft,
+              textRight,
+            };
+          }),
+        };
+      },
+      updateData(node, updatedData) {
+        const updatedItems = node.tag.items.map((nodeDataItem) => {
+          const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
+          if (targetData) {
+            nodeDataItem = {
+              ...nodeDataItem,
+              textRight: typeof targetData?.value === 'number'
+              || typeof targetData?.value === 'string'
+                ? targetData.value
+                : '-',
+            };
+          }
+          return nodeDataItem;
+        });
+        node.tag = {
+          ...node.tag,
+          items: updatedItems,
+        };
+      },
     },
   },
   'data-type-1': {
@@ -295,6 +335,30 @@ const templates = {
       id: '',
       textFirst: '-',
       textSecond: '-',
+      // Обязательные методы
+      updateSettings(dataRest, options) {
+        const dataItem = Utils.getDataItemById(dataRest, options.id);
+        const textFirst = typeof dataItem === 'number' || typeof dataItem === 'string'
+          ? dataItem.value
+          : '-';
+        const textSecond = options?.description || dataItem?.Description || '-';
+        return {
+          ...options,
+          textFirst,
+          textSecond,
+        };
+      },
+      updateData(node, updatedData) {
+        const targetData = updatedData.find((item) => item.TagName === node.tag.id);
+        node.tag = {
+          ...node.tag,
+          textFirst: typeof targetData?.value === 'number'
+          || typeof targetData?.value === 'string'
+            ? targetData.value
+            : '-',
+          valueColor: targetData?.value_color || null,
+        };
+      },
     },
   },
   'data-type-2': {
@@ -452,6 +516,30 @@ const templates = {
           },
         },
       ],
+      // Обязательные методы
+      updateSettings(dataRest, options) {
+        const dataItem = Utils.getDataItemById(dataRest, options.id);
+        const textFirst = typeof dataItem === 'number' || typeof dataItem === 'string'
+          ? dataItem.value
+          : '-';
+        const textSecond = options?.description || dataItem?.Description || '-';
+        return {
+          ...options,
+          textFirst,
+          textSecond,
+        };
+      },
+      updateData(node, updatedData) {
+        const targetData = updatedData.find((item) => item.TagName === node.tag.id);
+        node.tag = {
+          ...node.tag,
+          textFirst: typeof targetData?.value === 'number'
+          || typeof targetData?.value === 'string'
+            ? targetData.value
+            : '-',
+          valueColor: targetData?.value_color || null,
+        };
+      },
     },
   },
   'data-type-3': {
@@ -515,6 +603,40 @@ const templates = {
         }
         return !!(this.imageList.find((item) => item.image === this.activeImage));
       },
+      // Обязательные методы
+      updateSettings(dataRest, options, node) {
+        const mainImageFromNode = node.tag.defaultImage;
+        const mainImageFromData = options.defaultImage;
+        const mainImageIsChange = mainImageFromNode !== mainImageFromData;
+        const dataItem = Utils.getDataItemById(dataRest, options.id);
+        const value = dataItem?.value
+                || options?.value
+                || '-';
+        if (mainImageIsChange && mainImageFromNode) {
+          return {
+            imageLayout: null,
+            defaultImagePath: '',
+            defaultImage: options.defaultImage,
+            activeImage: '',
+            id: options?.id,
+            value,
+            imageList: options.imageList,
+          };
+        }
+        return {
+          defaultImage: options.defaultImage,
+          id: options?.id,
+          value,
+          imageList: options.imageList,
+        };
+      },
+      updateData(node, updatedData) {
+        const targetData = updatedData.find((item) => item.TagName === node.tag.id);
+        node.tag = {
+          ...node.tag,
+          value: `${targetData?.value || '-'}`,
+        };
+      },
     },
   },
   'data-type-4': {
@@ -557,11 +679,10 @@ const templates = {
               :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-5',')')"
               stroke="black"
             />
-            <path
-              :id="'text-bg'+tag.nodeId"
+            <path 
+              d="M104.5 46.5L7.5 46.5L7.5 0.5L104.5 0.5L104.5 46.5Z" 
               fill="black" 
               stroke="black"
-              d="M104.5 46.5L7.5 46.5L7.5 0.5L104.5 0.5L104.5 46.5Z"
             />
             <!--Color-changing elements-->
             <g :fill="tag.color ? tag.color.rgbaString : tag.defaultColor.rgbaString">
@@ -576,7 +697,6 @@ const templates = {
               <path
                 d="M12.5 140L12.5 109H16.25H17V108.25V105.5H99V108.25V109H99.75H103.5V140H99.75H99V140.75V143.5H17L17 140.75V140H16.25H12.5Z"
                 stroke="black"
-                :id="'text-2-bg'+tag.nodeId"
                 stroke-width="1.5"
               />
               <path
@@ -1146,6 +1266,40 @@ const templates = {
         }
         return layout.height;
       },
+      // Обязательные методы
+      updateSettings(dataRest, options) {
+        const dataItemFirst = Utils.getDataItemById(dataRest, options.textFirstId);
+        const dataItemSecond = Utils.getDataItemById(dataRest, options.id);
+        const firstMetricById = typeof dataItemFirst?.value === 'number'
+        || typeof dataItemFirst?.value === 'string'
+          ? dataItemFirst.value
+          : '';
+        const secondMetricById = typeof dataItemSecond?.value === 'number'
+        || typeof dataItemSecond?.value === 'string'
+          ? dataItemSecond.value
+          : '';
+        let colorByValue = null;
+        if (secondMetricById) {
+          colorByValue = options.colors.find((el) => `${el.value}` === `${secondMetricById}`);
+        }
+        return {
+          ...options,
+          color: colorByValue?.color || null,
+          value: secondMetricById,
+          textFirstValue: firstMetricById || '',
+        };
+      },
+      updateData(node, updatedData) {
+        const metricForText = updatedData.find((item) => item.TagName === node.tag.textFirstId);
+        const metricForColor = updatedData.find((item) => item.TagName === node.tag.id);
+        const updatedColor = node.tag.colors.find((el) => `${el?.value}` === `${metricForColor?.value}`);
+        node.tag = {
+          ...node.tag,
+          color: updatedColor?.color ? updatedColor.color : null,
+          textFirstValue: `${metricForText?.value || ''}`,
+          value: `${metricForColor?.value || ''}`,
+        };
+      },
     },
   },
   'label-type-0': {
@@ -1269,6 +1423,8 @@ const fieldsForDelete = [
   'getElementSize',
   'getTextStyles',
   'addNodeIdToStr',
+  'updateSettings',
+  'updateData',
   'calculateBackwardScale',
   'getYPositionBySvgBg',
 ];
