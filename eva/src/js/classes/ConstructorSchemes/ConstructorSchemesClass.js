@@ -1700,7 +1700,7 @@ class ConstructorSchemesClass {
     new Promise((resolve) => {
       this.graphComponent.graph.nodes.forEach((node) => {
         const { dataType } = node.tag;
-        if (elementTemplates.templates[dataType]) {
+        if (elementTemplates.templates[dataType]?.dataRest?.updateData) {
           elementTemplates.templates[dataType].dataRest.updateData(node, updatedData);
         }
         if (dataType === 'data-type-3') {

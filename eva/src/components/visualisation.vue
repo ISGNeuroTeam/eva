@@ -1,9 +1,9 @@
 <template>
-  <div :options="String(options)">
+  <div :style="`height: 100%`">
     <v-card-text
       :is="currentElem"
-      v-if="idFrom && dashFromStore"
-      custom-class="card-text element-itself"
+      v-if="idFrom && dashFromStore && popupOpened"
+      custom-class="card-text card-text-viz element-itself"
       :color-from="theme"
       :custom-style="{
         color: theme.$main_text,
@@ -12,6 +12,7 @@
       :id-from="idFrom"
       :id-dash-from="idDash"
       :data-rest-from="sData"
+      :search-schema="searchSchema"
       :data-mode-from="mode"
       :loading="loading"
       :time-format-from="''"
@@ -22,7 +23,7 @@
       }"
       :width-from="width"
       :height-from="height"
-      :options="props.currentOptions"
+      :options="localOptions"
       :current-settings="settings"
       :update-settings="updateSettings"
       :is-full-screen="isFullScreen"
@@ -30,6 +31,8 @@
       :table-per-page="tablePerPage"
       :table-page="tablePage"
       :selected-pie-index="selectedPieindex"
+      @SetRange="sDataRange = $event"
+      @resetRange="sDataRange = null"
     />
   </div>
 </template>
@@ -67,6 +70,10 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    searchSchema: {
+      type: Object,
+      default: () => ({}),
+    },
     spaceName: {
       type: String,
       default: '',
@@ -75,20 +82,20 @@ export default {
   },
   data: () => ({
     loading: false,
-    fullScreenHeight: 0.8 * window.innerHeight,
-    fullScreenWidth: 0.8 * window.innerWidth,
+    popupOpened: false,
+    fullScreenHeight: 0.82 * window.innerHeight,
+    fullScreenWidth: window.innerWidth - 85,
     newDashBoard: {},
+    sDataRange: null,
+    localOptions: {
+      visible: true,
+      change: false,
+      level: 1,
+      boxShadow: false,
+    },
     storeDash: null,
     settings: {
       showTitle: true,
-    },
-    props: {
-      currentOptions: {
-        visible: true,
-        change: false,
-        level: 1,
-        boxShadow: false,
-      },
     },
   }),
   computed: {
@@ -96,7 +103,15 @@ export default {
       return this.spaceName ? `${this.element}-${this.spaceName}` : this.element;
     },
     sData() {
-      return this.data;
+      if (!this.sDataRange) {
+        return this.data;
+      }
+      const { xMetric } = this.sDataRange;
+      const [start, end] = this.sDataRange.range;
+      return this.data.filter((item) => {
+        const xValue = item[xMetric];
+        return (xValue >= start && xValue <= end);
+      });
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -126,26 +141,31 @@ export default {
 
       return this.dashFromStore.options;
     },
-    options() {
-      const options = this.getOptions;
-      this.setOptionsItems(options);
-
-      return options.change;
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.popupOpened = true;
+    })
+  },
+  watch: {
+    getOptions: {
+      deep: true,
+      immediate: true,
+      handler(options) {
+        this.localOptions = options;
+      }
     },
   },
   methods: {
     updateSettings(localSettings) {
       this.settings = structuredClone(localSettings);
     },
-    setOptionsItems(options) {
-      Object.keys(options).forEach((item) => {
-        this.props.currentOptions[item] = options[item];
-      });
-    },
   },
 };
 </script>
 
 <style>
-
+.card-text-viz {
+  line-height: normal;
+}
 </style>

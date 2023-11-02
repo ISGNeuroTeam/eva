@@ -3,11 +3,30 @@
     v-if="visualisationModal && visualisationModal.open"
     :value="visualisationModal.open"
     width="100%"
+    transition="fade-transition"
     @click:outside="visualisationModal = {}"
     @keydown.esc="visualisationModal = {}"
   >
     <v-card :style="{ background: theme.$main_bg }">
       <v-card-title class="card-title">
+        <v-tooltip
+            v-if="mode && hasZoomIcon"
+            bottom
+            :color="theme.$accent_ui_color"
+            :open-delay="tooltipOpenDelay"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+                class="option"
+                :color="theme.$main_border"
+                v-on="on"
+                @click="$refs.viz.sDataRange = null"
+            >
+              {{ zoomIcon }}
+            </v-icon>
+          </template>
+          <span>Сбросить зум</span>
+        </v-tooltip>
         <v-tooltip
           v-if="mode"
           bottom
@@ -62,9 +81,11 @@
             </div>
           </div>
           <visualisation
-            space-name="modal"
+            ref="viz"
+            :space-name="spaceName"
             :element="visualisationModal.tool"
             :data="data"
+            :search-schema="searchSchema"
             :mode="mode"
           />
         </div>
@@ -74,7 +95,11 @@
 </template>
 
 <script>
-import { mdiSettings, mdiClose } from '@mdi/js';
+import {
+  mdiSettings,
+  mdiClose,
+  mdiMagnifyMinusOutline
+} from '@mdi/js';
 
 import Visualisation from './visualisation.vue';
 
@@ -99,6 +124,7 @@ export default {
   data: () => ({
     settingsIcon: mdiSettings,
     closeIcon: mdiClose,
+    zoomIcon: mdiMagnifyMinusOutline,
     showModal: false,
   }),
   computed: {
@@ -119,6 +145,21 @@ export default {
     },
     data() {
       return this.getElementData(this.visualisationModal.search || {});
+    },
+    searchSchema() {
+      if (this.visualisationModal.search?.sid) {
+        const search = this.$store.state[this.idDash].searches
+            .find((element) => element?.sid === this.visualisationModal.search.sid)
+        if (search?.schema) return search.schema;
+      }
+      return {};
+    },
+    spaceName() {
+      const { tool, elemName } = this.visualisationModal;
+      return elemName.replace(tool + '-', '');
+    },
+    hasZoomIcon() {
+      return this.visualisationModal && this.visualisationModal.tool.includes('multiLine')
     },
   },
   methods: {

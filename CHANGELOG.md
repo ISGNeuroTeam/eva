@@ -12,8 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Constructor-schemes: Added element "gate valve"(data-type-4)
 
 ### Changed
+- Changed visualization list for output in the functionality: Links and events for the panel
 
 ### Fixed
+- Fixed a problem with the size of the visualization in the popup
+- Fixed an issue with individual visualization settings in the popup
+- Fixed an issue with saving visualization options in a popup window
+- Fixed a problem with zooming a multiline visualization in a popup window
+- Fixed a problem with drawing a table visualization in a popup window
 
 ## [1.156.0]
 
