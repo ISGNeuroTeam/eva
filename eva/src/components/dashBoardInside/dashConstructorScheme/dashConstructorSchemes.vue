@@ -197,7 +197,7 @@
         </v-tooltip>
       </div>
       <div
-        v-if="dashboardEditMode"
+        v-if="false"
         class="dash-constructor-schemes__keymap-button"
       >
         <v-tooltip
