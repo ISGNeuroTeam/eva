@@ -338,7 +338,7 @@ const templates = {
       // Обязательные методы
       updateSettings(dataRest, options) {
         const dataItem = Utils.getDataItemById(dataRest, options.id);
-        const textFirst = typeof dataItem === 'number' || typeof dataItem === 'string'
+        const textFirst = typeof dataItem.value === 'number' || typeof dataItem.value === 'string'
           ? dataItem.value
           : '-';
         const textSecond = options?.description || dataItem?.Description || '-';
@@ -518,26 +518,47 @@ const templates = {
       ],
       // Обязательные методы
       updateSettings(dataRest, options) {
-        const dataItem = Utils.getDataItemById(dataRest, options.id);
-        const textFirst = typeof dataItem === 'number' || typeof dataItem === 'string'
-          ? dataItem.value
-          : '-';
-        const textSecond = options?.description || dataItem?.Description || '-';
+        const updatedItems = options.items.map((item) => ({
+          ...item,
+          value: Utils.getDataItemById(dataRest, item.id)?.value || item?.value || '-',
+        }));
+        if (!options?.summaryValueHeight) {
+          updatedItems.sort((a, b) => {
+            // Сортировка по полю 'value' как строковых значений
+            if (a.value > b.value) {
+              return -1;
+            } if (a.value < b.value) {
+              return 1;
+            }
+            return 0;
+          });
+        }
         return {
-          ...options,
-          textFirst,
-          textSecond,
+          mainBgColor: options?.mainBgColor,
+          maxValue: options?.maxValue,
+          fontSize: options?.fontSize,
+          summaryValueHeight: options?.summaryValueHeight,
+          items: updatedItems,
         };
       },
       updateData(node, updatedData) {
-        const targetData = updatedData.find((item) => item.TagName === node.tag.id);
+        const updatedItems = node.tag.items.map((nodeDataItem) => {
+          const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
+          const value = typeof targetData?.value === 'number'
+              || typeof targetData?.value === 'string'
+            ? targetData.value
+            : '-';
+          if (targetData) {
+            nodeDataItem = {
+              ...nodeDataItem,
+              value,
+            };
+          }
+          return nodeDataItem;
+        });
         node.tag = {
           ...node.tag,
-          textFirst: typeof targetData?.value === 'number'
-          || typeof targetData?.value === 'string'
-            ? targetData.value
-            : '-',
-          valueColor: targetData?.value_color || null,
+          items: updatedItems,
         };
       },
     },
