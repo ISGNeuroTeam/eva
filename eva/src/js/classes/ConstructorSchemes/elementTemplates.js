@@ -525,21 +525,45 @@ const templates = {
           <template v-if="tag.type === 0">
             <path 
               d="M55.15 60.337H54.25V55.8587H55.15H55.65V55.3587V55.25H58.85V55.3587V55.8587H59.35H60.25V60.337H59.35H58.85V60.837V61.25H55.65V60.837V60.337H55.15Z" 
-              fill="url(#paint1_radial_809_1590)" 
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-1',')')" 
               stroke="black"
             />
             <path 
               d="M64.95 92.75H59.55V93.7935H57.75V103.185H59.55V104.75H64.95V103.185H66.75V93.7935H64.95V92.75Z" 
-              fill="url(#paint3_radial_809_1590)" 
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-2',')')" 
               stroke="black"
             />
             <path 
               d="M54.95 92.75H49.55V93.7935H47.75V103.185H49.55V104.75H54.95V103.185H56.75V93.7935H54.95V92.75Z" 
-              fill="url(#paint4_radial_809_1590)" 
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-3',')')" 
+              stroke="black"
+            />
+            <path 
+              d="M41.35 98.75H23.4611L13.75 89.8438L14.2611 62.6562L23.9722 53.75H59.75" 
+              stroke="black" 
+              fill="none"
+              stroke-width="2"
+            />
+            <rect 
+              x="104.25" 
+              y="110.25" 
+              width="7" 
+              height="28" 
+             :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-4',')')" 
+              stroke="black"
+            />
+            <path 
+              d="M4.75 113.75V110.25H11.75L11.75 138.25H4.75V134.75V134.25H4.25H1.25L1.25 129.75H4.25H4.75V129.25V119.25V118.75H4.25H1.25L1.25 114.25H4.25H4.75V113.75Z" 
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-5',')')"
+              stroke="black"
+            />
+            <path 
+              d="M104.5 46.5L7.5 46.5L7.5 0.5L104.5 0.5L104.5 46.5Z" 
+              fill="black" 
               stroke="black"
             />
             <!--Color-changing elements-->
-            <g :fill="tag.color.rgbaString">
+            <g :fill="tag.color ? tag.color.rgbaString : tag.defaultColor.rgbaString">
               <path
                 d="M71.75 92.75H68.75V93.75H67.75V102.75H68.75V104.25H71.75V102.75H72.75V93.75H71.75V92.75Z"
                 stroke="black"
@@ -569,68 +593,45 @@ const templates = {
                 stroke-width="1.5"
               />
             </g>
-            <path 
-              d="M41.35 98.75H23.4611L13.75 89.8438L14.2611 62.6562L23.9722 53.75H59.75" 
-              stroke="black" 
-              fill="none"
-              stroke-width="2"
-            />
-            <rect 
-              x="104.25" 
-              y="110.25" 
-              width="7" 
-              height="28" 
-              fill="url(#paint9_linear_809_1590)" 
-              stroke="black"
-            />
-            <path 
-              d="M4.75 113.75V110.25H11.75L11.75 138.25H4.75V134.75V134.25H4.25H1.25L1.25 129.75H4.25H4.75V129.25V119.25V118.75H4.25H1.25L1.25 114.25H4.25H4.75V113.75Z" 
-              fill="url(#paint10_linear_809_1590)" 
-              stroke="black"
-            />
-            <path 
-              d="M104.5 46.5L7.5 46.5L7.5 0.5L104.5 0.5L104.5 46.5Z" 
-              fill="black" 
-              stroke="black"
-            />
             <!--Text elements-->
             <g 
               alignment-baseline="middle"
               text-anchor="middle"
               font-weight="600"
             >
+              <!--Default-value-1-->
               <text
+                v-if="tag.textFirstUseDefaultValue && !tag.textFirstValue"
                 :font-size="tag.textFirstSize"
                 :dx="tag.getElementSize(tag.type, layout).width / 2"
                 :dy="tag.getElementSize(tag.type, layout).height * 0.15  + (tag.textFirstSize / 3)"
-                :fill="tag.textFirstColor.rgbaString"
+                fill="white"
+              >
+                {{ tag.textFirstDefaultValue }}
+              </text>
+              <!--Value-1-->
+              <text
+                v-else
+                :font-size="tag.textFirstSize"
+                :dx="tag.getElementSize(tag.type, layout).width / 2"
+                :dy="tag.getElementSize(tag.type, layout).height * 0.15  + (tag.textFirstSize / 3)"
+                fill="white"
               >
                 {{ tag.textFirstValue || '' }}
               </text>
+              <!--Value-2-->
               <text
                 :font-size="tag.textSecondSize"
                 :dx="tag.getElementSize(tag.type, layout).width / 2"
                 :dy="tag.getElementSize(tag.type, layout).height * 0.85  + (tag.textSecondSize / 3)"
-                :fill="tag.textSecondColor.rgbaString"
+                fill="black"
               >
                 {{ tag.textSecondValue  || '' }}
               </text>
             </g>
             <defs>
-              <linearGradient 
-                id="paint0_linear_809_1590" 
-                x1="73.25" 
-                y1="97.25" 
-                x2="67.25" 
-                y2="97.25" 
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="#6D6263"/>
-                <stop offset="0.479167" stop-color="#D1D1D1"/>
-                <stop offset="0.916667" stop-color="#6D6263"/>
-              </linearGradient>
               <radialGradient 
-                id="paint1_radial_809_1590" 
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-1')"
                 cx="0" 
                 cy="0" 
                 r="1" 
@@ -640,20 +641,8 @@ const templates = {
                 <stop stop-color="#9D459D"/>
                 <stop offset="1" stop-color="#531544"/>
               </radialGradient>
-              <linearGradient 
-                id="paint2_linear_809_1590" 
-                x1="47.25" 
-                y1="97.25" 
-                x2="41.25" 
-                y2="97.25" 
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="#6D6263"/>
-                <stop offset="0.479167" stop-color="#D1D1D1"/>
-                <stop offset="0.916667" stop-color="#6D6263"/>
-              </linearGradient>
               <radialGradient 
-                id="paint3_radial_809_1590" 
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-2')" 
                 cx="0" 
                 cy="0" 
                 r="1" 
@@ -664,7 +653,7 @@ const templates = {
                 <stop offset="1" stop-color="#01817F"/>
               </radialGradient>
               <radialGradient 
-                id="paint4_radial_809_1590" 
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-3')" 
                 cx="0" 
                 cy="0" 
                 r="1" 
@@ -675,63 +664,7 @@ const templates = {
                 <stop offset="1" stop-color="#01817F"/>
               </radialGradient>
               <linearGradient 
-                id="paint5_linear_809_1590" 
-                x1="58" 
-                y1="104.75" 
-                x2="58" 
-                y2="144.25" 
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.0364583" stop-color="#80792C"/>
-                <stop offset="0.0772133" stop-color="#F6F16D"/>
-                <stop offset="0.520833" stop-color="#EAE57F"/>
-                <stop offset="0.897851" stop-color="#F6F170"/>
-                <stop offset="1" stop-color="#796D23"/>
-              </linearGradient>
-              <linearGradient 
-                id="paint6_linear_809_1590" 
-                x1="57.75" 
-                y1="60.75" 
-                x2="57.75" 
-                y2="66.75" 
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.203125" stop-color="#767218"/>
-                <stop offset="0.380208" stop-color="#D1CD4C"/>
-                <stop offset="0.520833" stop-color="#E3DF54"/>
-                <stop offset="0.661458" stop-color="#D5D24E"/>
-                <stop offset="0.84375" stop-color="#837E1B"/>
-              </linearGradient>
-              <linearGradient 
-                id="paint7_linear_809_1590" 
-                x1="57.75" 
-                y1="86.75" 
-                x2="57.75" 
-                y2="92.75" 
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.229167" stop-color="#767218"/>
-                <stop offset="0.380208" stop-color="#D1CD4C"/>
-                <stop offset="0.520833" stop-color="#E3DF54"/>
-                <stop offset="0.661458" stop-color="#C0BC41"/>
-                <stop offset="0.75" stop-color="#837E1B"/>
-              </linearGradient>
-              <linearGradient 
-                id="paint8_linear_809_1590" 
-                x1="57.75" 
-                y1="66.75" 
-                x2="57.75" 
-                y2="86.75" 
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.03125" stop-color="#767218"/>
-                <stop offset="0.28125" stop-color="#D1CD4C"/>
-                <stop offset="0.520833" stop-color="#E3DF54"/>
-                <stop offset="0.760417" stop-color="#D5D24E"/>
-                <stop offset="1" stop-color="#837E1B"/>
-              </linearGradient>
-              <linearGradient 
-                id="paint9_linear_809_1590" 
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-4')" 
                 x1="107.75" 
                 y1="109.75" 
                 x2="107.75" 
@@ -744,7 +677,7 @@ const templates = {
                 <stop offset="1" stop-color="#4261E5"/>
               </linearGradient>
               <linearGradient 
-                id="paint10_linear_809_1590" 
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-5')" 
                 x1="8.25" 
                 y1="106.75" 
                 x2="8.25" 
@@ -759,7 +692,7 @@ const templates = {
             </defs>
           </template>
           <template v-if="tag.type === 1">
-            <g :fill="tag.color.rgbaString">
+            <g :fill="tag.color ? tag.color.rgbaString : tag.defaultColor.rgbaString">
               <path
                 d="M51.5 71.5L51.5 68.5L50.5 68.5L50.5 67.5L41.5 67.5L41.5 68.5L40 68.5L40 71.5L41.5 71.5L41.5 72.5L50.5 72.5L50.5 71.5L51.5 71.5Z"
                 stroke="black"
@@ -795,12 +728,12 @@ const templates = {
             </g>
             <path
               d="M51.5 64.7L51.5 59.3L50.4565 59.3L50.4565 57.5L41.0652 57.5L41.0652 59.3L39.5 59.3L39.5 64.7L41.0652 64.7L41.0652 66.5L50.4565 66.5L50.4565 64.7L51.5 64.7Z"
-              fill="url(#paint3_radial_809_1588)"
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-6',')')"
               stroke="black"
             />
             <path
               d="M51.5 54.7L51.5 49.3L50.4565 49.3L50.4565 47.5L41.0652 47.5L41.0652 49.3L39.5 49.3L39.5 54.7L41.0652 54.7L41.0652 56.5L50.4565 56.5L50.4565 54.7L51.5 54.7Z"
-              fill="url(#paint4_radial_809_1588)"
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-7',')')"
               stroke="black"
             />
             <path
@@ -815,12 +748,12 @@ const templates = {
               width="7"
               height="28"
               transform="rotate(90 34 104)"
-              fill="url(#paint9_linear_809_1588)"
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-8',')')"
               stroke="black"
             />
             <path
               d="M30.5 4.5L34 4.5L34 11.5L6 11.5L6 4.5L9.5 4.5L10 4.5L10 4L10 0.999999L14.5 0.999999L14.5 4L14.5 4.5L15 4.5L25 4.5L25.5 4.5L25.5 4L25.5 1L30 1L30 4L30 4.5L30.5 4.5Z"
-              fill="url(#paint10_linear_809_1588)"
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-9',')')"
               stroke="black"
             />
             <path
@@ -833,62 +766,40 @@ const templates = {
               text-anchor="middle"
               font-weight="600" 
             >
+              <!--Default-value-1-->
               <text
+                v-if="tag.textFirstUseDefaultValue && !tag.textFirstValue"
                 :font-size="tag.textFirstSize"
                 :dx="tag.getElementSize(tag.type, layout).width * 0.75"
                 :dy="tag.getElementSize(tag.type, layout).height / 2 + (tag.textFirstSize / 3)"
-                :fill="tag.textFirstColor.rgbaString"
+                fill="white"
+              >
+                {{ tag.textFirstDefaultValue }}
+              </text>
+              <!--Value-1-->
+              <text
+                v-else
+                :font-size="tag.textFirstSize"
+                :dx="tag.getElementSize(tag.type, layout).width * 0.75"
+                :dy="tag.getElementSize(tag.type, layout).height / 2 + (tag.textFirstSize / 3)"
+                fill="white"
               >
                 {{ tag.textFirstValue || '' }}
               </text>
+              <!--Value-2-->
               <text
                 :font-size="tag.textSecondSize"
                 :dx="15 + (tag.textSecondSize / 4)"
                 :dy="tag.getElementSize(tag.type, layout).height / 2"
                 style="writing-mode: tb; glyph-orientation-vertical: 90;"
-                :fill="tag.textSecondColor.rgbaString"
+                fill="black"
               >
-                {{ tag.textSecondValue  || '' }}
+                {{ tag.textSecondValue || '' }}
               </text>
             </g>
             <defs>
-              <linearGradient
-                id="paint0_linear_809_1588"
-                x1="47"
-                y1="73"
-                x2="47"
-                y2="67"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="#6D6263"/>
-                <stop offset="0.479167" stop-color="#D1D1D1"/>
-                <stop offset="0.916667" stop-color="#6D6263"/>
-              </linearGradient>
               <radialGradient
-                id="paint1_radial_809_1588"
-                cx="0"
-                cy="0"
-                r="1"
-                gradientUnits="userSpaceOnUse"
-                gradientTransform="translate(86 57) rotate(-180) scale(3.5 5.01165)"
-              >
-                <stop stop-color="#9D459D"/>
-                <stop offset="1" stop-color="#531544"/>
-              </radialGradient>
-              <linearGradient
-                id="paint2_linear_809_1588"
-                x1="47"
-                y1="47"
-                x2="47"
-                y2="41"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="#6D6263"/>
-                <stop offset="0.479167" stop-color="#D1D1D1"/>
-                <stop offset="0.916667" stop-color="#6D6263"/>
-              </linearGradient>
-              <radialGradient
-                id="paint3_radial_809_1588"
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-6')"
                 cx="0"
                 cy="0"
                 r="1"
@@ -899,7 +810,7 @@ const templates = {
                 <stop offset="1" stop-color="#01817F"/>
               </radialGradient>
               <radialGradient
-                id="paint4_radial_809_1588"
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-7')"
                 cx="0"
                 cy="0"
                 r="1"
@@ -910,63 +821,7 @@ const templates = {
                 <stop offset="1" stop-color="#01817F"/>
               </radialGradient>
               <linearGradient
-                id="paint5_linear_809_1588"
-                x1="39.5"
-                y1="57.75"
-                x2="-2.02165e-06"
-                y2="57.75"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.0364583" stop-color="#80792C"/>
-                <stop offset="0.0772133" stop-color="#F6F16D"/>
-                <stop offset="0.520833" stop-color="#EAE57F"/>
-                <stop offset="0.897851" stop-color="#F6F170"/>
-                <stop offset="1" stop-color="#796D23"/>
-              </linearGradient>
-              <linearGradient
-                id="paint6_linear_809_1588"
-                x1="83.5"
-                y1="57.5"
-                x2="77.5"
-                y2="57.5"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.203125" stop-color="#767218"/>
-                <stop offset="0.380208" stop-color="#D1CD4C"/>
-                <stop offset="0.520833" stop-color="#E3DF54"/>
-                <stop offset="0.661458" stop-color="#D5D24E"/>
-                <stop offset="0.84375" stop-color="#837E1B"/>
-              </linearGradient>
-              <linearGradient
-                id="paint7_linear_809_1588"
-                x1="57.5"
-                y1="57.5"
-                x2="51.5"
-                y2="57.5"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.229167" stop-color="#767218"/>
-                <stop offset="0.380208" stop-color="#D1CD4C"/>
-                <stop offset="0.520833" stop-color="#E3DF54"/>
-                <stop offset="0.661458" stop-color="#C0BC41"/>
-                <stop offset="0.75" stop-color="#837E1B"/>
-              </linearGradient>
-              <linearGradient
-                id="paint8_linear_809_1588"
-                x1="77.5"
-                y1="57.5"
-                x2="57.5"
-                y2="57.5"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.03125" stop-color="#767218"/>
-                <stop offset="0.28125" stop-color="#D1CD4C"/>
-                <stop offset="0.520833" stop-color="#E3DF54"/>
-                <stop offset="0.760417" stop-color="#D5D24E"/>
-                <stop offset="1" stop-color="#837E1B"/>
-              </linearGradient>
-              <linearGradient
-                id="paint9_linear_809_1588"
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-8')"
                 x1="38.5"
                 y1="103.5"
                 x2="38.5"
@@ -979,7 +834,7 @@ const templates = {
                 <stop offset="1" stop-color="#4261E5"/>
               </linearGradient>
               <linearGradient
-                id="paint10_linear_809_1588"
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-9')"
                 x1="37.5"
                 y1="8"
                 x2="8.5"
@@ -994,7 +849,7 @@ const templates = {
             </defs>
           </template>
           <template v-if="tag.type === 2">
-            <g :fill="tag.color.rgbaString">
+            <g :fill="tag.color ? tag.color.rgbaString : tag.defaultColor.rgbaString">
               <path
                 d="M143 40.5L143 43.5L144 43.5L144 44.5L153 44.5L153 43.5L154.5 43.5L154.5 40.5L153 40.5L153 39.5L144 39.5L144 40.5L143 40.5Z"
                 stroke="black"
@@ -1026,17 +881,17 @@ const templates = {
             </g>
             <path
               d="M110.587 57.1L110.587 58L106.109 58L106.109 57.1L106.109 56.6L105.609 56.6L105.5 56.6L105.5 53.4L105.609 53.4L106.109 53.4L106.109 52.9L106.109 52L110.587 52L110.587 52.9L110.587 53.4L111.087 53.4L111.5 53.4L111.5 56.6L111.087 56.6L110.587 56.6L110.587 57.1Z"
-              fill="url(#paint1_radial_809_1589)"
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-10',')')"
               stroke="black"
             />
             <path
               d="M143 47.3L143 52.7L144.043 52.7L144.043 54.5L153.435 54.5L153.435 52.7L155 52.7L155 47.3L153.435 47.3L153.435 45.5L144.043 45.5L144.043 47.3L143 47.3Z"
-              fill="url(#paint3_radial_809_1589)"
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-11',')')"
               stroke="black"
             />
             <path
               d="M143 57.3L143 62.7L144.043 62.7L144.043 64.5L153.435 64.5L153.435 62.7L155 62.7L155 57.3L153.435 57.3L153.435 55.5L144.043 55.5L144.043 57.3L143 57.3Z"
-              fill="url(#paint4_radial_809_1589)"
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-12',')')"
               stroke="black"
             />
             <path
@@ -1051,12 +906,12 @@ const templates = {
               width="7"
               height="28"
               transform="rotate(-90 160.5 8)"
-              fill="url(#paint9_linear_809_1589)"
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-13',')')"
               stroke="black"
             />
             <path
               d="M164 107.5L160.5 107.5L160.5 100.5L188.5 100.5L188.5 107.5L185 107.5L184.5 107.5L184.5 108L184.5 111L180 111L180 108L180 107.5L179.5 107.5L169.5 107.5L169 107.5L169 108L169 111L164.5 111L164.5 108L164.5 107.5L164 107.5Z"
-              fill="url(#paint10_linear_809_1589)"
+              :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-14',')')"
               stroke="black"
             />
             <path
@@ -1070,12 +925,22 @@ const templates = {
               font-weight="600" 
             >
               <text
+                v-if="tag.textFirstUseDefaultValue && !tag.textFirstValue"
                 :font-size="tag.textFirst.size"
                 :dx="18"
                 :dy="tag.getElementSize(tag.type, layout).height / 2"
-                :fill="tag.textFirst.color.rgbaString"
+                fill="white"
               >
-                {{ tag.textFirst.value || '' }}
+                {{ tag.textFirstDefaultValue }}
+              </text>
+              <text
+                v-else
+                :font-size="tag.textFirst.size"
+                :dx="18"
+                :dy="tag.getElementSize(tag.type, layout).height / 2"
+                fill="white"
+              >
+                {{ tag.textFirstValue || '' }}
               </text>
               <text
                 :font-size="tag.textFirst.size"
@@ -1083,26 +948,14 @@ const templates = {
                 :dy="tag.getElementSize(tag.type, layout).height / 3"
                 :style="tag.getTextStyles(layout)"
                 text-anchor="end"
-                :fill="tag.textSecond.color.rgbaString"
+                fill="black"
               >
-                {{ tag.textSecond.value  || '' }}
+                {{ tag.textSecondValue || '' }}
               </text>
             </g>
             <defs>
-              <linearGradient
-                id="paint0_linear_809_1589"
-                x1="147.5"
-                y1="39"
-                x2="147.5"
-                y2="45"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="#6D6263"/>
-                <stop offset="0.479167" stop-color="#D1D1D1"/>
-                <stop offset="0.916667" stop-color="#6D6263"/>
-              </linearGradient>
               <radialGradient
-                id="paint1_radial_809_1589"
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-10')"
                 cx="0"
                 cy="0"
                 r="1"
@@ -1112,20 +965,8 @@ const templates = {
                 <stop stop-color="#9D459D"/>
                 <stop offset="1" stop-color="#531544"/>
               </radialGradient>
-              <linearGradient
-                id="paint2_linear_809_1589"
-                x1="147.5"
-                y1="65"
-                x2="147.5"
-                y2="71"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="#6D6263"/>
-                <stop offset="0.479167" stop-color="#D1D1D1"/>
-                <stop offset="0.916667" stop-color="#6D6263"/>
-              </linearGradient>
               <radialGradient
-                id="paint3_radial_809_1589"
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-11')"
                 cx="0"
                 cy="0"
                 r="1"
@@ -1136,7 +977,7 @@ const templates = {
                 <stop offset="1" stop-color="#01817F"/>
               </radialGradient>
               <radialGradient
-                id="paint4_radial_809_1589"
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-12')"
                 cx="0"
                 cy="0"
                 r="1"
@@ -1147,63 +988,7 @@ const templates = {
                 <stop offset="1" stop-color="#01817F"/>
               </radialGradient>
               <linearGradient
-                id="paint5_linear_809_1589"
-                x1="155"
-                y1="54.25"
-                x2="194.5"
-                y2="54.25"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.0364583" stop-color="#80792C"/>
-                <stop offset="0.0772133" stop-color="#F6F16D"/>
-                <stop offset="0.520833" stop-color="#EAE57F"/>
-                <stop offset="0.897851" stop-color="#F6F170"/>
-                <stop offset="1" stop-color="#796D23"/>
-              </linearGradient>
-              <linearGradient
-                id="paint6_linear_809_1589"
-                x1="111"
-                y1="54.5"
-                x2="117"
-                y2="54.5"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.203125" stop-color="#767218"/>
-                <stop offset="0.380208" stop-color="#D1CD4C"/>
-                <stop offset="0.520833" stop-color="#E3DF54"/>
-                <stop offset="0.661458" stop-color="#D5D24E"/>
-                <stop offset="0.84375" stop-color="#837E1B"/>
-              </linearGradient>
-              <linearGradient
-                id="paint7_linear_809_1589"
-                x1="137"
-                y1="54.5"
-                x2="143"
-                y2="54.5"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.229167" stop-color="#767218"/>
-                <stop offset="0.380208" stop-color="#D1CD4C"/>
-                <stop offset="0.520833" stop-color="#E3DF54"/>
-                <stop offset="0.661458" stop-color="#C0BC41"/>
-                <stop offset="0.75" stop-color="#837E1B"/>
-              </linearGradient>
-              <linearGradient
-                id="paint8_linear_809_1589"
-                x1="117"
-                y1="54.5"
-                x2="137"
-                y2="54.5"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop offset="0.03125" stop-color="#767218"/>
-                <stop offset="0.28125" stop-color="#D1CD4C"/>
-                <stop offset="0.520833" stop-color="#E3DF54"/>
-                <stop offset="0.760417" stop-color="#D5D24E"/>
-                <stop offset="1" stop-color="#837E1B"/>
-              </linearGradient>
-              <linearGradient
-                id="paint9_linear_809_1589"
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-13')"
                 x1="164"
                 y1="8.5"
                 x2="164"
@@ -1216,7 +1001,7 @@ const templates = {
                 <stop offset="1" stop-color="#4261E5"/>
               </linearGradient>
               <linearGradient
-                id="paint10_linear_809_1589"
+                :id="tag.addNodeIdToStr(tag.nodeId, 'gradient-14')"
                 x1="157"
                 y1="104"
                 x2="186"
@@ -1239,7 +1024,6 @@ const templates = {
       dataType: 'data-type-4',
       nodeId: 'template-4',
       fontFamily,
-      fontSize: 16,
       id: '',
       value: '',
       templateType: 'template-4',
@@ -1258,12 +1042,13 @@ const templates = {
           initialHeight: 112,
         },
       ],
-      color: {
-        rgbaString: 'rgba(255, 255, 0, 1)',
+      color: null,
+      defaultColor: {
+        rgbaString: 'rgb(157,157,157)',
         rgbaObject: {
-          r: 255,
-          g: 255,
-          b: 0,
+          r: 157,
+          g: 157,
+          b: 157,
           a: 1,
         },
       },
@@ -1282,17 +1067,10 @@ const templates = {
         },
       ],
       textFirstId: '',
-      textFirstColor: {
-        rgbaString: 'rgba(255, 255, 255, 1)',
-        rgbaObject: {
-          r: 255,
-          g: 255,
-          b: 255,
-          a: 1,
-        },
-      },
       textFirstSize: 24,
-      textFirstValue: '1234',
+      textFirstValue: '',
+      textFirstDefaultValue: '-',
+      textFirstUseDefaultValue: true,
       textFirstPosition: 1,
       textFirstPositionList: [
         {
@@ -1312,17 +1090,8 @@ const templates = {
         //   value: 4,
         // },
       ],
-      textSecondColor: {
-        rgbaString: 'rgba(0, 0, 0, 1)',
-        rgbaObject: {
-          r: 0,
-          g: 0,
-          b: 0,
-          a: 1,
-        },
-      },
       textSecondSize: 24,
-      textSecondValue: '4321',
+      textSecondValue: '',
       calculateScale(type, layout) {
         const { initialWidth, initialHeight } = this.types[type];
         const finalWidth = layout.width;
@@ -1344,6 +1113,9 @@ const templates = {
       },
       getTextStyles(layout) {
         return `writing-mode:vertical-rl;glyph-orientation-vertical:0; transform: rotate(180deg) translate(${layout.x}px ${layout.y}px)`;
+      },
+      addNodeIdToStr(nodeId, prefix, suffix = '') {
+        return `${prefix}${nodeId}${suffix}`;
       },
     },
   },
@@ -1457,8 +1229,20 @@ const templates = {
     },
   },
 };
-
+// Все методы обязательно должны быть перечислены
+const fieldsForDelete = [
+  'getTransform',
+  'getDy',
+  'getPosition',
+  'getHeight',
+  'getActiveImage',
+  'calculateScale',
+  'getElementSize',
+  'getTextStyles',
+  'addNodeIdToStr',
+];
 export default {
   templates,
   fontFamily,
+  fieldsForDelete,
 };

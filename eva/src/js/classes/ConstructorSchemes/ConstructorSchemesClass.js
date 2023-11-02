@@ -1015,16 +1015,7 @@ class ConstructorSchemesClass {
       ) {
         const filteredElementTag = Utils.deleteFieldsFromObject(
           evt.item.tag,
-          [
-            'getTransform',
-            'getDy',
-            'getPosition',
-            'getHeight',
-            'getActiveImage',
-            'calculateScale',
-            'getElementSize',
-            'getTextStyles',
-          ],
+          elementTemplates.fieldsForDelete,
         );
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
@@ -1735,7 +1726,8 @@ class ConstructorSchemesClass {
             ...node.tag,
             items: updatedItems,
           };
-        } else if (dataType === 'data-type-1') {
+        }
+        if (dataType === 'data-type-1') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
@@ -1745,13 +1737,25 @@ class ConstructorSchemesClass {
               : '-',
             valueColor: targetData?.value_color || null,
           };
-        } else if (dataType === 'data-type-3') {
+        }
+        if (dataType === 'data-type-3') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
             value: `${targetData?.value || '-'}`,
           };
           this.updateDynamicImageNode(node);
+        }
+        if (dataType === 'data-type-4') {
+          const metricForText = updatedData.find((item) => item.TagName === node.tag.textFirstId);
+          const metricForColor = updatedData.find((item) => item.TagName === node.tag.id);
+          const updatedColor = node.tag.colors.find((el) => `${el?.value}` === `${metricForColor?.value}`);
+          node.tag = {
+            ...node.tag,
+            color: updatedColor?.color ? updatedColor.color : null,
+            textFirstValue: `${metricForText?.value || ''}`,
+            value: `${metricForColor?.value || ''}`,
+          };
         }
       });
       resolve();
@@ -1761,6 +1765,7 @@ class ConstructorSchemesClass {
   }
 
   updateSelectedNode(dataFromComponent) {
+    // TODO: Разбить на отдельные методы, вынести их в elementTemplates
     let updatedData = null;
     const dataType = this.targetDataNode.tag?.dataType;
     if (dataType === 'data-type-0') {
@@ -1833,6 +1838,25 @@ class ConstructorSchemesClass {
           imageList: dataFromComponent.imageList,
         };
       }
+    } else if (dataType === 'data-type-4') {
+      const firstMetricById = typeof this.getDataItemById(dataFromComponent.textFirstId)?.value === 'number'
+      || typeof this.getDataItemById(dataFromComponent.textFirstId)?.value === 'string'
+        ? this.getDataItemById(dataFromComponent.textFirstId).value
+        : '';
+      const secondMetricById = typeof this.getDataItemById(dataFromComponent.id)?.value === 'number'
+          || typeof this.getDataItemById(dataFromComponent.id)?.value === 'string'
+        ? this.getDataItemById(dataFromComponent.id).value
+        : '';
+      let colorByValue = null;
+      if (secondMetricById) {
+        colorByValue = dataFromComponent.colors.find((el) => `${el.value}` === `${secondMetricById}`).color;
+      }
+      updatedData = {
+        ...dataFromComponent,
+        color: colorByValue || null,
+        value: secondMetricById,
+        textFirstValue: firstMetricById || '',
+      };
     } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
       updatedData = dataFromComponent;
     } else if (dataFromComponent.dataType === 'edge') {

@@ -6,6 +6,7 @@ import {
 } from 'yfiles';
 import Utils from './Utils.js';
 import ElementCreator from './ElementCreator.js';
+import elementTemplates from '@/js/classes/ConstructorSchemes/elementTemplates';
 
 class SchemeUpdater {
   constructor({ graph, elementsFromStore, updateStoreCallback }) {
@@ -110,16 +111,7 @@ class SchemeUpdater {
     }
     const filteredElementTagRest = Utils.deleteFieldsFromObject(
       element.tag,
-      [
-        'getTransform',
-        'getDy',
-        'getPosition',
-        'getHeight',
-        'getActiveImage',
-        'calculateScale',
-        'getElementSize',
-        'getTextStyles',
-      ],
+      elementTemplates.fieldsForDelete,
     );
     return {
       tag: {
