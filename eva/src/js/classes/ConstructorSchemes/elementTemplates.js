@@ -1423,6 +1423,8 @@ const fieldsForDelete = [
   'getElementSize',
   'getTextStyles',
   'addNodeIdToStr',
+  'calculateBackwardScale',
+  'getYPositionBySvgBg',
   'updateSettings',
   'updateData',
   'calculateBackwardScale',
