@@ -1,3 +1,9 @@
+# [1.157.1] - 2023-11-03
+
+### Fixed
+- Accumulator:
+  - Resolved an error that occurred when attaching data to the storage element.
+
 # [1.157.0] - 2023-11-02
 
 ### Added
