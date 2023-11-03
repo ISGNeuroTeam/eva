@@ -42,7 +42,7 @@ import {
   Rect,
   ShapeNodeStyle,
   SimpleEdge,
-  SimpleLabel,
+  GraphClipboard,
   SimpleNode,
   Size,
   StorageLocation,
@@ -69,7 +69,6 @@ import SchemeUpdater from './SchemeUpdater.js';
 import elementTemplates from './elementTemplates.js';
 import ElementCreator from '@/js/classes/ConstructorSchemes/ElementCreator';
 import GenerateElementsFromSearch from '@/js/classes/ConstructorSchemes/GenerateElementsFromSearch';
-import CopyPasteClass from '@/js/classes/ConstructorSchemes/CopyPasteClass';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -607,9 +606,6 @@ class ConstructorSchemesClass {
     if (isBridgesEnable) {
       this.enableBridges();
     }
-    this.copyPasteClass = new CopyPasteClass({
-      graph: this.graphComponent.graph,
-    });
   }
 
   disableResizeInvisibleNodes() {
@@ -916,11 +912,9 @@ class ConstructorSchemesClass {
       focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
-      // Выключены встроеные способы копирования т.к. работают не корректно, написан свой
-      allowPaste: false,
-      allowDuplicate: false,
+      allowPaste: true,
+      allowDuplicate: true,
       ignoreVoidStyles: true,
-      allowClipboardOperations: false,
       moveLabelInputMode: labelMode,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
@@ -1059,6 +1053,40 @@ class ConstructorSchemesClass {
       this.saveAnObject();
     });
 
+    // Событие копирования
+    this.graphComponent.clipboard.fromClipboardCopier.addNodeCopiedListener(
+      (sender, { copy, original }) => {
+        copy.tag = {
+          ...copy.tag,
+          nodeId: copy.hashCode(),
+        };
+        original.tag = {
+          ...original.tag,
+          nodeId: original.hashCode(),
+        };
+      },
+    );
+
+    // Событие дублирования
+    this.graphComponent.clipboard.duplicateCopier.addNodeCopiedListener(
+      (sender, { copy, original }) => {
+        copy.tag = {
+          ...copy.tag,
+          nodeId: copy.hashCode(),
+        };
+        original.tag = {
+          ...original.tag,
+          nodeId: original.hashCode(),
+        };
+      },
+    );
+
+    // События вставки
+    this.graphComponent.clipboard.addElementsPastedListener(() => {
+      this.orderTo('toFront');
+      this.setDefaultElementsOrder();
+    });
+
     // Событие редактирования положения\размеров узла
     this.graphComponent.graph.addNodeLayoutChangedListener(throttle(() => {
       // Сохранение в store
@@ -1075,96 +1103,6 @@ class ConstructorSchemesClass {
 
     // Сохранение inputMode
     this.graphComponent.inputMode = mode;
-  }
-
-  getOffsetSelectedElements() {
-    const selectedElements = this.graphComponent.selection.toArray()
-      .filter((el) => el instanceof INode && el?.tag?.dataType !== 'invisible');
-    if (selectedElements?.length > 0) {
-      let minX = selectedElements[0].layout.x;
-      let minY = selectedElements[0].layout.y;
-      let { maxX } = selectedElements[0].layout;
-      let maxY = selectedElements[0].layout.y;
-      // eslint-disable-next-line no-restricted-syntax
-      for (const item of selectedElements) {
-        if (item instanceof INode && item.tag.dataType !== 'invisible') {
-          if (minX > item.layout.x) minX = item.layout.x;
-          if (minY > item.layout.y) minY = item.layout.y;
-          if (maxX < item.layout.maxX) maxX = item.layout.maxX;
-          if (maxY < item.layout.maxY) maxY = item.layout.maxY;
-        }
-      }
-      const width = maxX - minX;
-      const height = maxY - minY;
-      return {
-        x: width / 2,
-        y: height / 2,
-      };
-    }
-    return {
-      x: 0,
-      y: 0,
-    };
-  }
-
-  getTemplateElementsForCopy() {
-    const offset = this.getOffsetSelectedElements();
-    return this.graphComponent.selection.toArray().map((el) => {
-      const isNode = el instanceof INode && el?.tag?.dataType !== 'invisible';
-      const isEdge = el instanceof IEdge || el?.tag?.dataType === 'invisible';
-      // TODO: Пока сделано только для узлов
-      if (isNode) {
-        const xPos = el.layout.x + (el.layout.width / 2);
-        const yPos = el.layout.y + (el.layout.height / 2);
-        const node = {
-          location: {
-            x: xPos + (offset?.x || 0),
-            y: yPos + (offset?.y || 0),
-          },
-          layout: {
-            width: el.layout.width,
-            height: el.layout.height,
-          },
-          labels: el.labels,
-          id: el.hashCode(),
-          tag: el.tag,
-        };
-        if (el.tag.dataType === 'image-node') {
-          return {
-            ...node,
-            style: el.style.clone(),
-          };
-        }
-        return node;
-      }
-      if (isEdge) {
-        return null;
-      }
-      return null;
-    }).filter((el) => el !== null);
-  }
-
-  copyElement() {
-    // Очищаем ранее скопированные элементы
-    this.copiedElements = null;
-    // Сохраняем новые
-    this.copiedElements = this.getTemplateElementsForCopy();
-    const selectedElements = this.graphComponent.selection.toArray();
-    this.copyPasteClass.copy(selectedElements);
-  }
-
-  async pasteElement() {
-    this.copyPasteClass.paste(this.savedGraphObject).then((newSelectedElements) => {
-      if (this.copiedElements?.length > 0) {
-        this.graphComponent.selection.clear();
-        if (newSelectedElements?.length > 0) {
-          newSelectedElements.forEach((element) => {
-            this.graphComponent.selection.setSelected(element, true);
-          });
-          this.graphComponent.updateVisual();
-        }
-      }
-    });
   }
 
   async nodeCreator({
@@ -1919,6 +1857,10 @@ class ConstructorSchemesClass {
     const edges = this.graphComponent.selection.selectedEdges;
     const elements = [...nodes.toArray(), ...edges.toArray()];
 
+    this.changeOrderElements(method, command, elements);
+  }
+
+  changeOrderElements(method, command, elements) {
     if (elements?.length > 0) {
       this.graphComponent.graphModelManager[method](elements);
       elements.forEach((element) => {
@@ -1930,14 +1872,18 @@ class ConstructorSchemesClass {
     }
   }
 
-  orderTo(key) {
+  orderTo(key, elements) {
     const orderCommands = {
       toFront: 'TO_FRONT',
       toBack: 'TO_BACK',
       raise: 'RAISE',
       lower: 'LOWER',
     };
-    this.changeOrderSelectedElements(key, orderCommands[key]);
+    if (elements) {
+      this.changeOrderElements(key, orderCommands[key], elements);
+    } else {
+      this.changeOrderSelectedElements(key, orderCommands[key]);
+    }
   }
 
   // TODO: Временное решения для выставления z-order по уполчанию

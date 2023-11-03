@@ -601,7 +601,6 @@
         :is="'div'"
         :ref="`graphComponent-${idFrom}`"
         class="dash-constructor-schemes__graph-component"
-        @keyup.ctrl="copyPaste"
       />
       <modal-confirm
         v-model="isConfirmModal"
@@ -1259,19 +1258,6 @@ export default {
       this.$nextTick().then(() => {
         this.panelBottomOffset = this.isKeymapOpen ? this.$refs.keymap.$el.clientHeight + 5 : 10;
       });
-    },
-    copyPaste(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      this.closeDataPanel();
-      // ctrl + c
-      if (e.keyCode === 67) {
-        this.constructorSchemes.copyElement();
-      }
-      // ctrl + v
-      if (e.keyCode === 86) {
-        this.constructorSchemes.pasteElement();
-      }
     },
     fitGraphContent() {
       this.constructorSchemes.fitGraphContent();
