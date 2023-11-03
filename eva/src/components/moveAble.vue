@@ -16,7 +16,6 @@
     :class-name-active="!dataMod && !dragRes || !dragRes ? 'none' : 'active'"
     :style="{
       outlineColor: theme.$accent_ui_color,
-      backgroundColor: panelBackHide ? null : theme.$accent_ui_color,
     }"
     @resizestop="sendSize"
     @dragstop="sendMove"
@@ -223,16 +222,18 @@ export default {
         idDash: this.idDash,
       });
 
-      const newWidth = Math.round(width / this.verticalCell);
-      const newHeight = Math.round(height / this.horizontalCell);
-      this.height = height;
-      this.width = width;
-      this.$store.commit('setSizeDash', {
-        width: newWidth,
-        height: newHeight,
-        id: this.id,
-        idDash: this.idDash,
-      });
+      if (width && height) {
+        const newWidth = Math.round(width / this.verticalCell);
+        const newHeight = Math.round(height / this.horizontalCell);
+        this.height = height;
+        this.width = width;
+        this.$store.commit('setSizeDash', {
+          width: newWidth,
+          height: newHeight,
+          id: this.id,
+          idDash: this.idDash,
+        });
+      }
     },
     changeOpacity(event) {
       this.opacity = event;

@@ -8,11 +8,152 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- notify modal
 - Constructor-schemes: Copy\paste edges
 - Constructor-schemes: Auto-select copied elements
+### Changed
+
+### Fixed
+
+## [1.157.0]
+
+### Added
+- Constructor-schemes: The "data-type-2" element (level/storage) now has the ability to display them overlapping instead of summarizing the height of nested elements. 
+- Constructor-schemes: Added element "gate valve"(data-type-4)
+
+### Changed
+- Changed visualization list for output in the functionality: Links and events for the panel
+
+### Fixed
+- Fixed a problem with the size of the visualization in the popup
+- Fixed an issue with individual visualization settings in the popup
+- Fixed an issue with saving visualization options in a popup window
+- Fixed a problem with zooming a multiline visualization in a popup window
+- Fixed a problem with drawing a table visualization in a popup window
+
+## [1.156.0]
+
+### Fixed
+- Constructor-schemes: "Dynamic image":
+  - Fixed incorrect processing of numeric values.
+- Select:
+  - Fixed multiselect operation.
+  - Fixed handling of 0/false values.
+  - Fixed dropdown list positioning.
+  - Fixed selection of items with arrows.
+
+## [1.155.0]
+
+### Added
+- DatePicker: added possibility to specify a template for relative time functionality
+
+### Changed
+- otl query new line replacement to space instead of empty string
+
+### Fixed
+- Select:
+    - The token does not change when changing the select value if the function responsible for the default value from the data source is enabled.
+    - Fixed an issue where the select value was not updating when the token was updated
+
+## [1.154.1]
+
+### Fixed
+- DatePicker: 
+  - Errors when loading the dashboard
+  - Errors when adding a datepicker and then setting the time
+  - Saved dates are not displayed
+- The token does not change when changing the select value if the function responsible for the default value from the data source is enabled.
+
+## [1.154.0]
+
+### Added
+- DTPicker: added button for select time period equal last day
+- checkbox for running searches while modal is being opened on header click
+- yGraph: Added hex\rgb\rgba\hsla color processing
+- GridGroup: Added the ability to query data for visualizations from dynamic visualizations
+
+### Fixed
+- Fixed a problem with incorrect token window size detection
+- yGraph: Fixed old color handling through the palette.
+
+## [1.153.0]
+
+### Added
+- Multiline: added possibility to customize Y-axis indents
+
+### Fixed
+- Multiline: 
+  - X-axis inscriptions are cut off if the legend is large
+  - Not all signatures on barplots are displayed
+
+## [1.152.0]
+
+### Added
+- TableV2: added number formatting for new column types (riskAcc, riskFact, riskSum)
+
+### Changed
+- Changed the position of input elements in the data source popup
+- Fixed the color of the search button in the text block
+- TableV2: Changed the color of values and graphs in the table to a brighter color
+- TableV2: Changed checking of values for graphs in the table, now you can specify values without floating point.
+
+### Fixed
+- Translated errors when uploading a file to the server
+- Data Research: Problem with reloading the selected visualization
+- TableV2: Fixed handling of null values in cells with charts.
+- TableV2: Fixed incorrect table behavior when saving a dashboard. (Column order was changed to default)
+- TableV2: Fixed the operation of moving columns.
+- TableV2: Fixed formatting of numbers.(previously applied not only to numbers)
+
+## [1.151.0]
+
+### Added
+- TableV2: handling "_columnOptions" in DS for setting columns options
+- TableV2: added new column types: riskAcc, riskFact, riskSum
+
+### Changed
+- The action buttons in the component settings are stuck to the bottom edge of the modal window
+- cSvg: reset image when there is no filename in the data source.
+
+### Fixed
+- Generation of component ID. The order of suffixes of the component ID suffixes added to the dashboard was incorrect in some cases.
+- cSvg component does not set the click token value.
+- Wrong text in the table when loading the dashboard "data is not displayed due to settings"
+- Table: Changing the token causes a reset to the first page.
+- Select, Textarea: If the component is on a different tab, the default value is not set.
+
+## [1.150.0]
+
+### Added
+- Event click for component accumulator
+- Event click for component frequency graph
+
+### Fixed
+- change color of log`s icon when DS has finish with error
+- fix panel background flickering when changing background to transparent
+
+## [1.149.0]
+
+### Added
+- word break to notify in notify modal
+- Multiline: added single y-axis
+- Gauge: added display in the labels of the value after the comma
+
+### Changed
+- textarea to code editor in DS's create modal
+
+### Fixed
+- Dash-options: The primitives library has been returned to the settings
+- Accumulators: sometimes the settings fly off and the size is reset
+- Printer page size and colors
+- RiskReview: fixed display of more than 10 elements
+
+## [1.148.0]
+
+### Added
+- notify modal
 - Risk-review: Added placeholder on field options
 - Added auto-resize dashboard tree panel
+
 ### Changed
 - Risk-review: Changed color-picker in options panel.
 - remove saving notify between sessions
@@ -20,7 +161,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - TableV2: Fixed color on hover\select row
 - Risk-review: Fixed suffixed \[_title], \[_list_title] 
+- Risk-review: Fixed work of tokens
 - Multiline: Data goes off the Y axis
+- Prefix and suffix not working on components: Gantt, Tables, PieChart, Multiline, Tune, Tiles, Heatmap, TextArea, timePicker, ScatterPlot, Map, YGraph
 
 
 ## [1.147.0]

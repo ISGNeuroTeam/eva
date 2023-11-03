@@ -545,20 +545,13 @@ export default {
       ]);
     },
     setToken(pieIndex) {
-      const tokens = this.$store.state[this.idDashFrom].tockens;
-      if (tokens?.length > 0) {
-        tokens.forEach((tocken) => {
-          if (tocken.elem === this.idFrom) {
-            const value = ` ${this.dataRestFrom[pieIndex][tocken.capture]} `;
-            this.$store.commit('setTocken', {
-              token: tocken,
-              value,
-              idDash: this.idDashFrom,
-              store: this.$store,
-            });
-          }
-        });
-      }
+      const value = this.dataRestFrom[pieIndex];
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: 'click',
+        value,
+      });
     },
     changePieChart() {
       this.createPieChartDash();

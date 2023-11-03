@@ -178,6 +178,10 @@ export default {
       type: Array,
       required: true,
     }, // данные полученые после выполнения запроса
+    loading: {
+      type: Boolean,
+      required: true,
+    },
     colorFrom: {
       type: Object,
       required: true,
@@ -380,10 +384,15 @@ export default {
             id: this.id,
           });
         }
+      } else if (!this.loading) {
+        this.resetSvg();
       }
       if (window.screen.width <= 1600) {
         this.marginBottom = 30;
       }
+    },
+    async resetSvg() {
+      this.svg = '';
     },
     async getSvg(svg) {
       this.$emit('setLoading', true);
@@ -615,37 +624,15 @@ export default {
       }
       return result;
     },
-    setClick(token, item) {
-      const { tockens } = this.$store.state[this.idDash];
-      let tocken = {};
+    setClick(data, item) {
       const id = this.$refs.tooltip.getAttribute('data-id');
-      if (tockens) {
-        Object.keys(tockens).forEach((i) => {
-          tocken = {
-            name: tockens[i].name,
-            action: tockens[i].action,
-            capture: tockens[i].capture,
-          };
 
-          if (tockens[i].elem === this.id && tockens[i].action === 'click') {
-            if (item === 'object') {
-              this.$store.commit('setTocken', {
-                token: tocken,
-                idDash: this.idDash,
-                value: token,
-                store: this.$store,
-              });
-            } else if (tockens[i].capture === token) {
-              this.$store.commit('setTocken', {
-                token: tocken,
-                idDash: this.idDash,
-                value: id,
-                store: this.$store,
-              });
-            }
-          }
-        });
-      }
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: 'click',
+        value: (item === 'object') ? data : id,
+      });
 
       if (item === 'object') {
         const events = this.getEvents({
@@ -790,23 +777,12 @@ export default {
     },
     clickSvg() {
       let token = '';
-      const events = this.getEvents({
-        event: 'onclick',
-        partelement: 'empty',
-      });
-      // TODO: пока решил оставить, возможно пригодится
-      // const id = event.target.getAttribute('id');
       const id = this.$refs.csvg.children[0].getAttribute('id');
       if (id && id.indexOf('overlay') !== -1) {
         [, token] = id.split('overlay_');
         this.setClick(token, 'object');
-      } else if (events.length && events[0].element === this.idFrom) {
-        this.noMsg = 2;
-        this.msgText = 'Отсутствует индификатор';
-        setTimeout(() => {
-          this.noMsg = 1;
-          this.msgText = '';
-        }, 1000);
+      } else {
+        this.setClick(this.dataRestFrom[0], 'object');
       }
     },
 

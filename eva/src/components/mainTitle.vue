@@ -78,26 +78,29 @@
                 repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`,
             }"
           />
-          <move-able
-            v-for="elem in elements"
-            :key="hash(elem.elem)"
-            :z-index="sorting.indexOf(elem.elem)"
-            :data-mode-from="mode"
-            :id-dash-from="idDash"
-            :data-elem="elem.elem"
-            :data-page-from="page"
-            :horizontal-cell="horizontalCell"
-            :vertical-cell="verticalCell"
-            :search-data="getElementData(elem)"
-            :search-schema="getElementSchema(elem)"
-            :data-source-id="elem.search"
-            :data-sources="dataObject"
-            :loading="checkLoading(elem)"
-            @downloadData="openModalDownload"
-            @SetRange="setRange($event, elem)"
-            @ResetRange="resetRange($event)"
-            @activated="onActivated(elem.elem)"
-          />
+          <template v-for="item in elements">
+            <move-able
+              v-if="item.mount"
+              v-show="item.visible"
+              :key="hash(item.elem)"
+              :z-index="sorting.indexOf(item.elem)"
+              :data-mode-from="mode"
+              :id-dash-from="idDash"
+              :data-elem="item.elem"
+              :data-page-from="page"
+              :horizontal-cell="horizontalCell"
+              :vertical-cell="verticalCell"
+              :search-data="getElementData(item)"
+              :search-schema="getElementSchema(item)"
+              :data-source-id="item.search"
+              :data-sources="dataObject"
+              :loading="checkLoading(item)"
+              @downloadData="openModalDownload"
+              @SetRange="setRange($event, item)"
+              @ResetRange="resetRange($event)"
+              @activated="onActivated(item.elem)"
+            />
+          </template>
           <modal-delete
             :color-from="theme"
             :id-dash-from="idDash"
@@ -287,6 +290,7 @@
 
 <script>
 import draggable from 'vuedraggable';
+import settings from '../js/componentsSettings';
 
 export default {
   name: 'MainTitle',
@@ -390,21 +394,22 @@ export default {
       return this.$route.params.id;
     },
     elements() {
-      // получаем название элемента  от родителя
-      // return this.loadingDash
-      //   ? []
-      //   : this.$store.getters.getElementsWithSearches(this.idDash);
-
       if (this.loadingDash || !this.dashFromStore?.elements) {
         return [];
       }
       return this.dashFromStore.elements
-        .filter(
-          (elem) => this.dashFromStore[elem].tab
-            === this.currentTab
-            || this.dashFromStore[elem].options?.pinned,
-        )
-        .map((elem) => ({ elem, search: this.dashFromStore[elem].search }));
+        .map((elemID) => {
+          const [, code] = elemID.match(/(\D+)(-\d+)?$/) || [];
+          const mountOnAnyTab = code && settings.mountableOnAnyTab.includes(code);
+          const { tab, options = {} } = this.dashFromStore[elemID];
+          const visibleOnCurrentTab = tab === this.currentTab || options?.pinned;
+          return {
+            elem: elemID,
+            mount: visibleOnCurrentTab || mountOnAnyTab,
+            visible: visibleOnCurrentTab,
+            search: this.dashFromStore[elemID].search,
+          };
+        });
     },
     headerTop() {
       return 0;
@@ -443,7 +448,7 @@ export default {
       if (this.loadingDash || !this.dashFromStore.currentTab) {
         return 1;
       }
-      return this.dashFromStore.currentTab;
+      return +this.dashFromStore.currentTab;
     },
     searches() {
       if (this.loadingDash) {

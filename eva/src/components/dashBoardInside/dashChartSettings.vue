@@ -27,8 +27,18 @@
               hide-details
               color="blue"
               class="float-end"
-            >
-            </v-checkbox>
+            />
+            <v-checkbox
+              v-model="commonAxisY"
+              label="Единая ось Y"
+              persistent-placeholder
+              :disabled="!useGroups"
+              dense
+              outlined
+              hide-details
+              color="blue"
+              class="float-end"
+            />
           </v-col>
         </v-row>
       </v-card-title>
@@ -53,8 +63,8 @@
           >
             <v-divider
               v-if="useGroups"
-              :color="theme.$main_bg"/>
-
+              :color="theme.$main_bg"
+            />
             <!-- Metrics -->
             <v-expansion-panels
               v-model="panelMetric[groupNumber]"
@@ -255,8 +265,8 @@
                       />
                       <div class="row mt-0 mb-1">
                         <div
-                          class="col col-auto py-0"
                           v-if="metric.type === 'line'"
+                          class="col col-auto py-0"
                         >
                           <v-checkbox
                             v-model="metric.showPeakDots"
@@ -375,12 +385,6 @@
                             :search-input.sync="metric.lastDotSearch"
                           />
                         </div>
-                      </div>
-
-                      <div
-                        v-if="metric.type === 'line'"
-                        class="row my-1"
-                      >
                         <div class="col">
                           <v-autocomplete
                             v-model="metric.yAxisLink"
@@ -406,7 +410,29 @@
                             clearable
                           />
                         </div>
+                      </div>
+
+                      <div
+                        v-if="metric.type === 'line'"
+                        class="row my-1"
+                      >
                         <div class="col">
+                          <v-checkbox
+                            v-if="metric.type === 'line'"
+                            v-model="metric.hasPaddings"
+                            label="Отступы"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            color="blue"
+                            :disabled="!!metric.yAxisLink"
+                          />
+                        </div>
+                        <div
+                          v-if="!metric.hasPaddings"
+                          class="col"
+                        >
                           <v-text-field
                             v-model="metric.lowerBound"
                             :disabled="metric.type === 'barplot'"
@@ -420,7 +446,10 @@
                             hide-details
                           />
                         </div>
-                        <div class="col">
+                        <div
+                          v-if="!metric.hasPaddings"
+                          class="col"
+                        >
                           <v-text-field
                             v-model="metric.upperBound"
                             :disabled="metric.type === 'barplot'"
@@ -432,6 +461,40 @@
                             dense
                             outlined
                             hide-details
+                          />
+                        </div>
+                        <div
+                          v-if="metric.hasPaddings"
+                          class="col"
+                        >
+                          <v-text-field
+                            v-model="metric.paddingBottom"
+                            :disabled="metric.type === 'barplot' || !!metric.yAxisLink"
+                            :rules="[rules.min, rules.max]"
+                            clearable
+                            :min="0"
+                            label="Отступ снизу (%)"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            @change="onChangePadding(metric, 'paddingBottom')"
+                          />
+                        </div>
+                        <div
+                          v-if="metric.hasPaddings"
+                          class="col"
+                        >
+                          <v-text-field
+                            v-model="metric.paddingTop"
+                            :disabled="metric.type === 'barplot' || !!metric.yAxisLink"
+                            :rules="[rules.min, rules.max]"
+                            clearable
+                            :min="0"
+                            label="Отступ сверху (%)"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            @change="onChangePadding(metric, 'paddingTop')"
                           />
                         </div>
                       </div>
@@ -567,7 +630,9 @@
                 <div class="col-8 py-0">
                   <v-checkbox
                     v-model="xAxis.ticksEnabled"
-                    :label="`Количество тиков оси X: ${xAxis.ticks === 0 ? 'каждая точка' : xAxis.ticks}`"
+                    :label="`Количество тиков оси X: ${
+                      xAxis.ticks === 0 ? 'каждая точка' : xAxis.ticks
+                    }`"
                     persistent-placeholder
                     dense
                     outlined
@@ -699,6 +764,10 @@ export default {
         { text: 'С накоплением', value: 'accumulation' },
       ]),
     },
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
   },
   data: () => ({
     mdiClose,
@@ -741,6 +810,11 @@ export default {
       { value: '3', text: 'Каждое 3' },
       { value: '10', text: 'Указать число' },
     ],
+    commonAxisY: false,
+    rules: {
+      min: (v) => v >= 0 || v === undefined || 'Минимум 0',
+      max: (v) => v <= 10000 || v === undefined || 'Максимум 10000',
+    },
   }),
   computed: {
     isOpen: {
@@ -760,7 +834,6 @@ export default {
     isDarkTheme() {
       return this.$store.getters.getThemeTitle.indexOf('light') === -1;
     },
-
     metricsByGroupNoEmpty() {
       return this.metricsByGroup.filter((group) => group.length);
     },
@@ -776,10 +849,25 @@ export default {
           });
         });
       }
+
+      if (this.commonAxisY) {
+        metricsByGroup.forEach((group, i) => {
+          const max = this.getMaxValueYAxis(this.dataRestFrom, metricsByGroup[i]);
+          group.forEach((metric) => {
+            if (!metric.yAxisLink && metric.yAxisLink !== metric.name) {
+              metric.yAxisLink = max.key;
+              if (metric.yAxisLink === metric.name) {
+                delete metric.yAxisLink;
+              }
+            }
+          });
+        });
+      }
       return {
         metricsByGroup,
         xAxis: { ...this.xAxis },
         useGroups: this.useGroups,
+        commonAxisY: this.commonAxisY,
       };
     },
 
@@ -813,6 +901,9 @@ export default {
 
     receivedSettings() {
       this.makeMetricsOrderList();
+    },
+    useGroups(val) {
+      if (!val) this.commonAxisY = false;
     },
   },
   mounted() {
@@ -864,12 +955,53 @@ export default {
         ...this.receivedSettings.xAxis,
       }));
       this.useGroups = !!this.receivedSettings.useGroups;
+      this.commonAxisY = !!this.receivedSettings.commonAxisY;
       this.metricsByGroup = [...JSON.parse(JSON.stringify(this.receivedSettings.metricsByGroup))];
       this.metricsByGroup.push([]);
     },
 
     colorPickerInputChange() {
       this.colorPickerInputMode = !this.colorPickerInputMode;
+    },
+    getMaxValueYAxis(dataRest, metricsByGroup) {
+      const max = {
+        key: '',
+        value: 0,
+      };
+      // eslint-disable-next-line no-restricted-syntax
+      for (const item of dataRest) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const key of Object.keys(item)) {
+          if (key !== '_time' && metricsByGroup.find((metric) => metric.name === key)) {
+            const value = item[key];
+            if (max.value < value) {
+              max.value = value;
+              max.key = key;
+            }
+          }
+        }
+      }
+      return max;
+    },
+    onChangePadding(metric, field) {
+      let val = Number(metric[field]);
+      if (val === 0) {
+        val = '';
+        this.$set(metric, field, val);
+        return;
+      }
+      if (!Number.isFinite(val) && val !== '') {
+        val = '';
+        this.$set(metric, field, val);
+      }
+      if (`${val}` !== metric[field]) {
+        this.$set(metric, field, val);
+      }
+      if (val > 10000) {
+        this.$set(metric, field, 10000);
+      } else if (val < 0) {
+        this.$set(metric, field, 0);
+      }
     },
   },
 };

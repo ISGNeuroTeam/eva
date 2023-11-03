@@ -4,6 +4,7 @@
     :disabled="!fullScreenMode"
   >
     <div
+      :id="`select-block-${idFrom}`"
       class="dash-select"
       :style="customStyle"
       :class="customClass"
@@ -21,8 +22,12 @@
         />
         <div
           class="source"
-          :class="{ source_show: source_show }"
-          :style="{ width: widthInput }"
+          :class="{
+            source_show: source_show
+          }"
+          :style="{
+            width: widthInput
+          }"
         >
           <v-select
             v-model="elem"
@@ -52,20 +57,32 @@
         <div
           ref="targetBlock"
           class="target"
-          :style="{ width: widthInput, borderColor: theme.$main_border }"
-          :class="{ select_show: select_show }"
+          :style="{
+            width: widthInput,
+            borderColor: theme.$main_border,
+          }"
+          :class="{
+            select_show: select_show,
+          }"
         >
           <v-autocomplete
             ref="multiselect"
-            v-model="elemDeep[String(multiple)]"
+            v-model="elemDeep[`${multiple}`]"
             :items="dataRestDeep"
             solo
             flat
             :filter="onFilterItems"
             :multiple="multiple"
             :color="theme.$accent_ui_color"
-            :style="{ color: theme.$main_text, fill: theme.$main_text }"
-            :menu-props="{zIndex: 100}"
+            :style="{
+              color: theme.$main_text,
+              fill: theme.$main_text,
+            }"
+            :menu-props="{
+              zIndex: 100,
+              attach: `#select-block-${idFrom}`,
+              offsetOverflow: false,
+            }"
             hide-details
             class="select theme--dark"
             label="Значение"
@@ -74,6 +91,7 @@
             @mouseover="setTockenDelay('mouseover')"
             @keydown.enter="onPressEnter"
             @keydown.backspace="onPressBackspace"
+            @update:list-index="updateListIndex"
           >
             <template v-slot:item="{ item, attrs, on }">
               <v-list-item
@@ -108,7 +126,7 @@
                 <v-col class="flex-grow-0">
                   <v-icon
                     :color="
-                      elemDeep[String(multiple)].length > 0
+                      elemDeep[`${multiple}`].length > 0
                         ? theme.$primary_button
                         : theme.$main_text
                     "
@@ -217,6 +235,7 @@ export default {
         { name: 'closemenu', capture: [] },
       ],
       autocomplite: false,
+      listIndex: -1,
     };
   },
   computed: {
@@ -244,7 +263,10 @@ export default {
         return [];
       }
       if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+        this.$store.commit('setDefaultOptions', {
+          id: this.id,
+          idDash: this.idDash,
+        });
       }
 
       return this.dashFromStore.options;
@@ -270,11 +292,15 @@ export default {
     },
     dataRestDeep() {
       let res = [];
-      if (this.dataReady.length > 0 && this.dataReady[0][this.elem]) {
+      const validValue = this.dataReady.length > 0
+          && typeof this.dataReady[0][this.elem] !== 'undefined';
+      if (validValue) {
         const data = this.dataReady;
         res = Object.values(data).map((item) => item[this.elem]);
 
-        res = this.filterSelect(res, this.multiple ? this.elemDeep.true : [this.elemDeep.false]);
+        res = this.filterSelect(res, this.multiple
+          ? this.elemDeep.true
+          : [this.elemDeep.false]);
       }
 
       return [...new Set(res)];
@@ -340,8 +366,22 @@ export default {
     isMenuActive(val, oldVal) {
       if (val !== oldVal) {
         if (val) {
-          this.autocomplite.$el.dispatchEvent(new Event('mousedown', { bubbles: true }));
-          this.autocomplite.$el.dispatchEvent(new Event('mouseup', { bubbles: true }));
+          this.autocomplite.$el.dispatchEvent(
+            new Event(
+              'mousedown',
+              {
+                bubbles: true,
+              },
+            ),
+          );
+          this.autocomplite.$el.dispatchEvent(
+            new Event(
+              'mouseup',
+              {
+                bubbles: true,
+              },
+            ),
+          );
         } else {
           this.setTockenDelay('closemenu');
         }
@@ -359,8 +399,18 @@ export default {
       if (val === null || val.elemDeep === '') {
         this.$store.commit('setState', [{
           object: this.elemDeep,
-          prop: String(this.multiple),
-          value: String(this.multiple) === 'true' ? [] : '',
+          prop: `${this.multiple}`,
+          value: `${this.multiple}` === 'true'
+            ? []
+            : '',
+        }]);
+      } else if (`${this.selectedElem}` !== `${val}`) {
+        this.$store.commit('setState', [{
+          object: this.elemDeep,
+          prop: `${this.multiple}`,
+          value: `${this.multiple}` === 'true'
+            ? [...val]
+            : val,
         }]);
       }
     },
@@ -368,14 +418,14 @@ export default {
       if (this.selectedElemLink.elemlink === '') {
         this.elemlink = 'Выберите связанный столбец данных';
       }
+      this.setTocken();
     },
     selectedElem(elem) {
       if (elem === '') {
         this.elem = 'Выберите столбец данных';
       }
     },
-    dataReady(dataReady) {
-      this.updateActions(dataReady);
+    dataReady() {
       if (this.getOptions?.resetValuesWhichAreNot) {
         this.setTocken();
       }
@@ -388,18 +438,19 @@ export default {
     dataRestDeep() {
       this.updateSelectAllItem();
     },
+    dataFromRest() {
+      const {
+        defaultSourceDataUpdates = false,
+      } = this.dashFromStore.options;
+      if (defaultSourceDataUpdates) {
+        this.setDefaultValue();
+        this.setTocken();
+      }
+    },
     // Загрузился ИД для дефотла
     changedDataDefaultLoading(val, oldVal) {
-      const {
-        multiple,
-      } = this;
       if (val === false && val !== oldVal) {
-        const defaultValue = this.getDefaultValue();
-        if (defaultValue != null && this.dataRestDeep.includes(defaultValue)) {
-          this.elemDeep[String(multiple)] = multiple
-            ? [defaultValue]
-            : defaultValue;
-        }
+        this.setDefaultValue();
         this.setTocken();
       }
     },
@@ -411,9 +462,6 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
-    if (this.dataReady.length > 0) {
-      this.updateActions(this.dataReady);
-    }
     const selected = this.getSelected;
     if (selected) {
       if (selected.elem) {
@@ -429,11 +477,47 @@ export default {
         this.openSelect();
       }
       if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
-        this.elemDeep[String(this.multiple)] = selected.elemDeep;
+        let val = selected.elemDeep;
+        if (!Number.isNaN(parseFloat(selected.elemDeep)) && Number.isFinite(selected.elemDeep)) {
+          val = parseFloat(selected.elemDeep);
+        }
+        this.elemDeep[`${this.multiple}`] = val;
       }
     }
   },
   methods: {
+    updateListIndex(index) {
+      this.listIndex = index;
+    },
+    setDefaultValue() {
+      // Значение "по-умолчанию"
+      const defaultValue = this.getDefaultValue();
+      // Если оно корректно и есть в датасете
+      if (defaultValue != null && this.dataRestDeep.includes(defaultValue)) {
+        const value = this.elemDeep[`${this.multiple}`];
+        // Если это мультиселект
+        if (this.multiple) {
+          // Если нет значения(в селекте)
+          if (value.length === 0) {
+            this.$set(this.elemDeep, `${this.multiple}`, [defaultValue]);
+          } else {
+            const filteredValue = value.filter((el) => this.dataRestDeep.includes(el));
+            // Если значения(в селекте) отсутствуют в датасете
+            if (filteredValue.length === 0) {
+              this.$set(this.elemDeep, `${this.multiple}`, [defaultValue]);
+            }
+          }
+          // Если нет значения(в селекте) ИЛИ оно отсутствует в датасете
+        } else if (
+          value === undefined
+            || value === null
+            || value === ''
+            || !this.dataRestDeep.includes(value)
+        ) {
+          this.$set(this.elemDeep, `${this.multiple}`, defaultValue);
+        }
+      }
+    },
     updateSelectAllItem() {
       if (this.multiple) {
         if (this.elemDeep.true.length !== this.dataRestDeep.length) {
@@ -479,9 +563,8 @@ export default {
           this.$refs.multiselect.$refs.menu.listIndex = -1;
         }
       } else if (filteredItems.length > 1) {
-        const idxFind = filteredItems.findIndex((val) => val === this.$refs.multiselect.lazySearch);
-        if (idxFind > -1) {
-          this.$refs.multiselect.selectItem(filteredItems[idxFind]);
+        if (this.listIndex > -1) {
+          this.$refs.multiselect.selectItem(filteredItems[this.listIndex]);
           this.$refs.multiselect.lazySearch = '';
           if (this.multiple) {
             this.$refs.multiselect.$refs.menu.listIndex = -1;
@@ -497,29 +580,6 @@ export default {
         }, 30);
       }
       return true;
-    },
-    updateActions(dataReady) {
-      let data = [];
-      if (dataReady.length > 0) {
-        data = Object.keys(dataReady);
-        this.show = true;
-        if (Object.keys(dataReady).length !== 0) {
-          if (dataReady.error) {
-            this.message = dataReady.error;
-            this.show = false;
-          } else {
-            data = Object.keys(dataReady[0]);
-          }
-        }
-        this.dataFromRest = data;
-        this.actions.forEach((action) => {
-          this.$store.commit('setState', [{
-            object: action,
-            prop: 'capture',
-            value: data,
-          }]);
-        });
-      }
     },
     getItem(element) {
       switch (element) {
@@ -594,17 +654,8 @@ export default {
       if (this.loading !== false) {
         return;
       }
-      const defaultValue = this.getDefaultValue();
-      if (defaultValue != null && this.dataRestDeep.includes(defaultValue)) {
-        if (this.multiple) {
-          if (this.elemDeep[String(this.multiple)].length === 0) {
-            this.elemDeep[String(this.multiple)] = [defaultValue];
-          }
-        } else if (!this.elemDeep[String(this.multiple)]) {
-          this.elemDeep[String(this.multiple)] = defaultValue;
-        }
-      }
-      let elemDeepValue = this.elemDeep[String(this.multiple)];
+      this.setDefaultValue();
+      let elemDeepValue = this.elemDeep[`${this.multiple}`];
       if (this.getOptions?.resetValuesWhichAreNot) {
         const existsItems = this.dataReady.map((item) => item[this.elem]);
         if (elemDeepValue.filter) {
@@ -628,7 +679,7 @@ export default {
 
             let value = [];
 
-            if (String(this.multiple) === 'true') {
+            if (`${this.multiple}` === 'true') {
               elemDeepValue.forEach((elem) => {
                 const addValues = data.filter((x) => elem === x[this.elem])
                   .map((x) => x[curTocken.capture])
@@ -636,11 +687,15 @@ export default {
                 value.push(...addValues);
               });
             } else {
-              if (elemDeepValue !== null) {
+              if (
+                elemDeepValue !== undefined
+                  && elemDeepValue !== null
+                  && elemDeepValue !== ''
+              ) {
                 if (Array.isArray(elemDeepValue)) {
-                  value = [...[], ...String(elemDeepValue)];
+                  value = [...[], ...`${elemDeepValue}`];
                 } else if (!this.getOptions?.resetValuesWhichAreNot) {
-                  value = [String(elemDeepValue)];
+                  value = [`${elemDeepValue}`];
                 }
               }
               for (let i = 0; i < data.length; i += 1) {

@@ -611,13 +611,13 @@
               :color="theme.$accent_ui_color"
             />
           </div>
-          <p
+          <div
             class="tocken-view"
             :class="{ showView: lookTockens[i].show }"
             :color="theme.$main_text"
           >
             <span class="backlight-tkn">{{ tocken.value }}</span>
-          </p>
+          </div>
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
@@ -1282,7 +1282,7 @@ export default {
           } = this.dashFromStore[elem].actions.find(({ name }) => name === action) || {};
           capture.forEach((item) => result.add(item));
         }
-        return [...result];
+        return [{ text: '--', value: null }, ...result];
       };
     },
     blockToolStyle() {
@@ -1580,7 +1580,7 @@ export default {
       this.activeModal = !this.activeModal;
       this.newSearch = {
         sid: null,
-        original_otl: null,
+        original_otl: '',
         limit: 1000,
         parametrs: {
           tws: 0,
@@ -2374,5 +2374,9 @@ export default {
 }
 .user-control-panel {
   display: inline-flex;
+}
+.tocken-view {
+    height: 45px;
+    overflow: auto;
 }
 </style>

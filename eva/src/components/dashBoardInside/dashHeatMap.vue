@@ -283,31 +283,17 @@ export default {
 
   methods: {
     onClickTd(x = null, y = null) {
-      let val = null;
+      let value = null;
       let row = null;
       if (x !== null && y !== null) {
-        val = this.filteredData[x][y]?.value;
+        value = this.filteredData[x][y]?.value;
         row = this.filteredData[x][y]?.row;
       }
-      const tokens = this.$store.state[this.idDash]?.tockens || [];
-      tokens.forEach((token) => {
-        if (token.elem === this.id && token.action === 'click') {
-          let value;
-          const { capture } = token;
-          const captureIdx = ['x', 'y', 'value'].indexOf(capture);
-          if (captureIdx !== -1) {
-            value = [x, y, val][captureIdx];
-          } else if (row && capture !== '') {
-            value = row[capture];
-          } else {
-            value = null;
-          }
-          this.$store.commit('setTocken', {
-            token,
-            idDash: this.idDash,
-            value,
-          });
-        }
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: 'click',
+        value: row || { x, y, value },
       });
     },
     getEvents({ event, partelement }) {

@@ -64,7 +64,7 @@
         <user-settings
           :fields="userSettings"
           @change="onChangeUserSettingsForm"
-        ></user-settings>
+        />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -143,7 +143,7 @@
               <user-settings
                 :fields="userSettings"
                 @change="onChangeUserSettingsForm"
-              ></user-settings>
+              />
             </v-col>
           </v-row>
           <data-profile
@@ -581,7 +581,7 @@ export default {
     },
     changeBtn(act) {
       let method = 'POST';
-      const formData = {}; // формируем объект для передачи RESTу
+      const formData = {}; // формируем объект для передачи RESTy
       let sameMsg = '';
       let forbiddenError = '';
       switch (this.keyFrom) {

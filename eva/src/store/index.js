@@ -77,13 +77,29 @@ export default new Vuex.Store({
         state.preloadTokens.splice(idx, 1);
       } */
     },
-    setTokens(state, { id, tokens }) {
+    setTokens(state, { id, tokens, updateComponentValue = false }) {
       state[id].tockens?.forEach((token) => {
-        tokens.forEach(({ name, value }) => {
-          if (token.name === name) {
-            Vue.set(token, 'value', value);
-          }
-        });
+        const newTokens = tokens.filter((item) => item.name === token.name);
+        if (newTokens) {
+          newTokens.forEach(newToken => {
+            Vue.set(token, 'value', newToken.value);
+            if (updateComponentValue) {
+              state[id].elements
+                .filter((name) => name === token.elem)
+                .every((element) => {
+                  const [, component] = element.match(/^([\w-]+[\D])(-(\d+))?$/) || [];
+                  let val = token.value
+                  if (component === 'select') {
+                    if (!isNaN(parseFloat(token.value)) && isFinite(token.value)) {
+                      val = parseFloat(token.value)
+                    }
+                    Vue.set(state[id][element].selected, 'elemDeep', val);
+                  }
+                  return true;
+                });
+            }
+          })
+        }
       });
     },
     setDefaultOptions(state, { idDash, id }) {
@@ -289,6 +305,46 @@ export default new Vuex.Store({
           }
         });
       }
+    },
+    tokenAction(state, {
+      idDash,
+      elem,
+      action,
+      value: objectValue,
+      capture: clickedField = null,
+    }) {
+      if (!state[idDash]?.tockens) {
+        return;
+      }
+      state[idDash].tockens
+        .filter((token) => {
+          if (token.elem !== elem) return false;
+          if (Array.isArray(action)) {
+            return action.includes(token.action);
+          }
+          return token.action === action;
+        })
+        .forEach((token) => {
+          let value = objectValue;
+          if (typeof objectValue === 'object') {
+            if (token.capture && token.capture in objectValue) {
+              value = objectValue[token.capture];
+            } else if (clickedField) {
+              value = objectValue[clickedField];
+            }
+          }
+          const {
+            prefix = '',
+            sufix = '',
+          } = token;
+          if (value !== undefined && value !== null) {
+            value = `${prefix}${value}${sufix}`;
+          }
+          if (value === undefined || value === null) {
+            value = token.defaultValue;
+          }
+          this.commit('setTocken', { idDash, token, value });
+        });
     },
     // TODO refactor
     // сохранение токена в хранилище
@@ -570,7 +626,7 @@ export default new Vuex.Store({
       const stateElements = spaceName
         ? state[idDash][`elements${spaceName}`]
         : state[idDash]?.elements;
-      const elements = stateElements.filter((item) => item.indexOf(id) !== -1);
+      const elements = stateElements.filter((item) => item.indexOf(id) === 0);
       // и если есть
       if (elements.length > 0) {
         // флаг чтобы понимать есть ли такой элемнет уже
@@ -904,14 +960,16 @@ export default new Vuex.Store({
     },
     createReportSearch(state) {
       if (!state.reports) {
-        Vue.set(state, 'reports', {});
-        Vue.set(state.reports, 'elements', settings.reporstElements);
-        Vue.set(state.reports, 'searches', {});
-        Vue.set(state.reports, 'userSettings', {});
+        Vue.set(state, 'reports', {
+          elements: settings.reporstElements,
+          searches: {},
+          userSettings: {},
+        });
         settings.reporstElements.forEach((item) => {
-          Vue.set(state.reports, item, {});
-          Vue.set(state.reports[item], 'search', '');
-          Vue.set(state.reports[item], 'should', false);
+          Vue.set(state.reports, item, {
+            search: '',
+            should: false,
+          });
         });
       }
     },
@@ -1246,7 +1304,7 @@ export default new Vuex.Store({
     },
     async updatePreloadTokens({ state, commit, dispatch }, id) {
       const tokens = await dispatch('pullOutPreloadTokens', id);
-      commit('setTokens', { id, tokens });
+      commit('setTokens', { id, tokens, updateComponentValue: true });
       commit('removePreloadTokens', id);
       return tokens;
     },
@@ -1348,7 +1406,7 @@ export default new Vuex.Store({
         otl += `|head ${search.limit}`;
       }
 
-      otl = otl.replace(/\r|\n/g, '');
+      otl = otl.replace(/\r|\n/g, ' ');
 
       // формируем объект для передачи RESTу
       const formData = new FormData();
@@ -1410,6 +1468,13 @@ export default new Vuex.Store({
         result.then((stateFrom) => {
           if (stateFrom && stateFrom?.name) {
             const dashBodyObj = JSON.parse(stateFrom?.body || '{}');
+            if (dashBodyObj.elements) {
+              dashBodyObj.elements.forEach((elem) => {
+                if (dashBodyObj[elem].search === undefined) {
+                  dashBodyObj[elem].search = -1;
+                }
+              });
+            }
             if (!state[id]) {
               commit('setState', [
                 {
@@ -1952,7 +2017,7 @@ export default new Vuex.Store({
         id = item.target;
       }
 
-      if (id) await dispatch('loader', { id });
+      if (id && !openNewTab) await dispatch('loader', { id });
 
       let tockensTarget = [];
       Object.keys(state).forEach((key) => {
@@ -2081,10 +2146,12 @@ export default new Vuex.Store({
         event.route.push(`/dashboards/${id}/${newCurrentTabValue}`);
       }
 
-      commit('changeCurrentTab', {
-        idDash: id,
-        tab: newCurrentTabValue,
-      });
+      if (!openNewTab) {
+        commit('changeCurrentTab', {
+          idDash: id,
+          tab: newCurrentTabValue,
+        });
+      }
       const { searches } = state[id];
 
       if (searches) {

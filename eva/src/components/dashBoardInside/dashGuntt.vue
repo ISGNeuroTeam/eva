@@ -134,9 +134,6 @@ export default {
     idDash() {
       return this.idDashFrom;
     },
-    getTockens() {
-      return this.$store.state[this.idDash].tockens;
-    },
   },
   watch: {
     dataRestFrom() {
@@ -436,23 +433,11 @@ export default {
     },
 
     setClick(item) {
-      const tockens = this.getTockens;
-      let tocken = {};
-
-      Object.keys(tockens).forEach((i) => {
-        tocken = {
-          name: tockens[i].name,
-          action: tockens[i].action,
-          capture: tockens[i].capture,
-        };
-        if (tockens[i].elem === this.id && tockens[i].action === 'click') {
-          this.$store.commit('setTocken', {
-            token: tocken,
-            idDash: this.idDash,
-            value: item[tockens[i].capture],
-            store: this.$store,
-          });
-        }
+      this.$store.commit('tokenAction', {
+        idDash: this.idDash,
+        elem: this.id,
+        action: 'click',
+        value: item,
       });
     },
     getPhasesColor(phases) {

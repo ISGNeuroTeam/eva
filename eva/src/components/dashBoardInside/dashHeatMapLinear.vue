@@ -93,6 +93,7 @@ export default {
 .progress-bar-linear
   min-width: 200px
   border-radius: 6px
+  -webkit-print-color-adjust: exact
 
   .title-text
     color: #060606

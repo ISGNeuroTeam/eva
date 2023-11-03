@@ -87,6 +87,10 @@ class Utils {
     });
     return result;
   }
+
+  static getDataItemById(dataRest, dataId) {
+    return dataRest.find((dataItem) => dataItem.TagName === dataId);
+  }
 }
 
 export default Utils;

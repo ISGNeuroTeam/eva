@@ -285,23 +285,14 @@ export default {
       if (!this.tokensStore) {
         return;
       }
-      const { id, idDash } = this;
-      const tokens = this.tokensStore
-        .filter(({ elem, action }) => (elem === id && action === 'click'));
-
-      tokens.forEach(({ action, name, capture }) => {
-        const token = {
-          name,
-          action,
-          capture,
-          filterParam: this.xMetric,
-        };
-        this.$store.commit('setTocken', {
-          token,
-          value: d[capture],
-          idDash,
-        });
+      const { idDash } = this;
+      this.$store.commit('tokenAction', {
+        idDash,
+        elem: this.id,
+        action: 'click',
+        value: d,
       });
+
       const events = this.eventsStore({
         idDash,
         event: 'onclick',
@@ -365,4 +356,5 @@ export default {
     width: 10px
     height: 10px
     margin-right: 4px
+    -webkit-print-color-adjust: exact
 </style>

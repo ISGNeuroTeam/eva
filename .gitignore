@@ -6,3 +6,4 @@ eva-*.tar.gz
 .DS_Store
 
 .vscode/
+.directory

@@ -3,6 +3,7 @@ import './fonts.css';
 import './scroll.css';
 import './sass/main.sass';
 import './scss/globalStyles.scss';
+import './scss/print.scss';
 
 // Подключаем кастомный мконочный шрифт
 import './fonts/eva-iconfont/style.css';

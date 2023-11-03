@@ -50,7 +50,10 @@
               border: `1px solid ${theme.$main_border}`
             }"
           >
-            <div v-if="options.showLastTimeBlock">
+            <div
+              v-if="options.showLastTimeBlock"
+              class="last-time-block"
+            >
               <div
                 class="name-of-picker"
                 :style="{ color: theme.$title }"
@@ -72,6 +75,13 @@
                 />
               </div>
               <div class="choose-time">
+                <v-chip
+                  :color="theme[color.day]"
+                  class="time"
+                  @click="setTime('day')"
+                >
+                  День
+                </v-chip>
                 <v-chip
                   :color="theme[color.hour]"
                   class="time"
@@ -243,7 +253,7 @@ export default {
           { key: 'thisYear', label: 'текущий год', value: 'year' },
           { key: 'lastYear', label: 'пред. год', value: '-year' },
         ];
-      },  
+      },
     },
     fullScreenMode: {
       type: Boolean,
@@ -269,6 +279,7 @@ export default {
         time: '',
       },
       color: {
+        day: '$accent_ui_color',
         hour: '$accent_ui_color',
         minute: '$accent_ui_color',
         second: '$accent_ui_color',
@@ -391,10 +402,32 @@ export default {
       };
     },
   },
-  created(){
+  watch: {
+    options(val, oldVal) {
+      if (this.lastControlElement === 'time') {
+        const newOpts = {
+          useLastTimeTemplate: val.useLastTimeTemplate,
+          lastTimeTemplateStart: val.lastTimeTemplateStart,
+          lastTimeTemplateEnd: val.lastTimeTemplateEnd,
+        };
+        const oldOpts = {
+          useLastTimeTemplate: oldVal.useLastTimeTemplate,
+          lastTimeTemplateStart: oldVal.lastTimeTemplateStart,
+          lastTimeTemplateEnd: oldVal.lastTimeTemplateEnd,
+        };
+        if (JSON.stringify(newOpts) !== JSON.stringify(oldOpts)) {
+          this.setTocken('time')
+          this.commitTokenValue()
+        }
+      }
+    },
+  },
+  created() {
     const data = this.getPickerDate;
-    if (data.range != null && data.range.hasOwnProperty('shortcut') ) {
-      this.shortcut = this.DTPickerCustomShortcuts.find(sc => sc.value === data.range.shortcut).key
+    if (data.range != null && data.range.hasOwnProperty('shortcut')) {
+      this.shortcut = this.DTPickerCustomShortcuts.find(
+        (sc) => sc.value === data.range.shortcut,
+      ).key;
     }
   },
   mounted() {
@@ -403,6 +436,11 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
+    if (this.getPickerDate?.last?.time) {
+      this.last = this.getPickerDate.last;
+      this.setTime(this.getPickerDate.last.time);
+    }
+    this.date = structuredClone(this.getPickerDate);
     this.$emit('hideDS', this.id);
     this.curDate = this.calcCurrentDate();
   },
@@ -434,8 +472,8 @@ export default {
 
       if (data.range != null) {
         if (data.range.hasOwnProperty('shortcut')) {
-          this.commitTokenValue()
-        } else { 
+          this.commitTokenValue();
+        } else {
           this.range = data.range;
         }
 
@@ -486,6 +524,9 @@ export default {
               break;
             case 'hour':
               time = 'часов';
+              break;
+            case 'day':
+              time = 'дней';
               break;
             default:
               break;
@@ -604,11 +645,28 @@ export default {
             case 'hour':
               period = Number(this.last.every) * 1000 * 3600;
               break;
+            case 'day':
+              period = Number(this.last.every) * 1000 * 3600 * 24;
+              break;
             default:
               break;
           }
+          const {
+            useLastTimeTemplate,
+            lastTimeTemplateStart,
+            lastTimeTemplateEnd,
+          } = this.options;
           this.startForStore = this.formatDateToResult(Date.now() - period);
           this.endForStore = this.formatDateToResult(Date.now());
+          if (useLastTimeTemplate) {
+            const secPeriod = (period/1000).toFixed();
+            if (lastTimeTemplateStart) {
+              this.startForStore = lastTimeTemplateStart.replace('${sec}', secPeriod);
+            }
+            if (lastTimeTemplateEnd) {
+              this.endForStore = lastTimeTemplateEnd.replace('${sec}', secPeriod);
+            }
+          }
           this.start = null;
           this.end = null;
           this.range = null;
@@ -637,40 +695,23 @@ export default {
         this.setTocken(this.lastControlElement);
       }
 
-      this.commitTokenValue()
+      this.commitTokenValue();
 
       this.showCurrent();
       this.curDate = this.calcCurrentDate();
       this.openHidden();
     },
-    commitTokenValue(){
-      const tockens = this.$store.state[this.idDash].tockens || {};
-      let tocken = {};
-
-      const setTocken = (value) => {
-        this.$store.commit('setTocken', {
-          token: tocken,
-          idDash: this.idDash,
-          value,
-          store: this.$store,
-        });
-      };
-
-      Object.keys(tockens).forEach((i) => {
-        tocken = {
-          name: tockens[i].name,
-          action: tockens[i].action,
-          capture: tockens[i].capture,
-        };
-        if (tockens[i].elem === this.id && tockens[i].action === 'select') {
-          if (tockens[i].capture === 'start') {
-            setTocken(this.startForStore || '');
-          } else if (tockens[i].capture === 'end') {
-            setTocken(this.endForStore || '');
-          }
-        }
+    commitTokenValue() {
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: 'select',
+        value: {
+          start: this.startForStore || '',
+          end: this.endForStore || '',
+        },
       });
-    }
+    },
   },
 };
 </script>

@@ -5,6 +5,7 @@
     :is-confirm="isChanged"
     :persistent="isChanged"
     :theme="theme"
+    :dark="isDarkTheme"
     @cancelModal="checkOnCancel"
   >
     <div class="settings-modal-block">
@@ -32,12 +33,13 @@
               @change="isChanged = true"
             />
           </div>
-          <div class="option-item">
+          <div class="option-item stack-top">
             <div
               class="name-option main item"
               :style="{
                 color: theme.$title,
                 borderBottom: `1px solid ${theme.$main_border}`,
+                borderColor: theme.$main_border,
               }"
             >
               Название
@@ -47,6 +49,7 @@
               :style="{
                 color: theme.$title,
                 borderBottom: `1px solid ${theme.$main_border}`,
+                borderColor: theme.$main_border,
               }"
             >
               Описание
@@ -1091,6 +1094,9 @@ export default {
     };
   },
   computed: {
+    isDarkTheme() {
+      return this.$store.getters.getThemeTitle.indexOf('light') === -1;
+    },
     cSvgBgName() {
       return this.csvgBg?.name || this.csvgBgErrorMessage || 'Выбрать изображение';
     },

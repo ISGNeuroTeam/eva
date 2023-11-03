@@ -117,13 +117,15 @@ class ConstructorSchemesClass {
       };
     }
     dataNode.style = new VuejsNodeStyle(data.template);
+    const width = data.dataRest.dataType === 'data-type-4'
+      ? data.dataRest.types[data.dataRest.type].initialWidth : data.width;
+    const height = data.dataRest.dataType === 'data-type-4'
+      ? data.dataRest.types[data.dataRest.type].initialHeight : data.height;
     dataNode.layout = new Rect(
       0,
       0,
-      data?.width,
-      data?.height
-        ? data.height
-        : data.rowHeight * (data?.dataRest?.items?.length || 1),
+      width,
+      height || data.rowHeight * (data?.dataRest?.items?.length || 1),
     );
     return dataNode;
   }
@@ -1007,7 +1009,7 @@ class ConstructorSchemesClass {
       ) {
         const filteredElementTag = Utils.deleteFieldsFromObject(
           evt.item.tag,
-          ['getTransform', 'getDy', 'getPosition', 'getHeight', 'getActiveImage'],
+          elementTemplates.fieldsForDelete,
         );
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
@@ -1707,52 +1709,14 @@ class ConstructorSchemesClass {
     });
   }
 
-  getDataItemById(dataId) {
-    return this.dataRest.find((dataItem) => dataItem.TagName === dataId);
-  }
-
   updateDataInNode(updatedData) {
     new Promise((resolve) => {
       this.graphComponent.graph.nodes.forEach((node) => {
         const { dataType } = node.tag;
-        if (dataType === 'data-type-0' || dataType === 'data-type-2') {
-          const updatedItems = node.tag.items.map((nodeDataItem) => {
-            const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
-            if (targetData) {
-              nodeDataItem = {
-                ...nodeDataItem,
-                [
-                dataType === 'data-type-0'
-                  ? 'textRight'
-                  : 'value'
-                ]: typeof targetData?.value === 'number'
-                  || typeof targetData?.value === 'string'
-                  ? targetData.value
-                  : '-',
-              };
-            }
-            return nodeDataItem;
-          });
-          node.tag = {
-            ...node.tag,
-            items: updatedItems,
-          };
-        } else if (dataType === 'data-type-1') {
-          const targetData = updatedData.find((item) => item.TagName === node.tag.id);
-          node.tag = {
-            ...node.tag,
-            textFirst: typeof targetData?.value === 'number'
-            || typeof targetData?.value === 'string'
-              ? targetData.value
-              : '-',
-            valueColor: targetData?.value_color || null,
-          };
-        } else if (dataType === 'data-type-3') {
-          const targetData = updatedData.find((item) => item.TagName === node.tag.id);
-          node.tag = {
-            ...node.tag,
-            value: targetData.value || '-',
-          };
+        if (elementTemplates.templates[dataType]?.dataRest?.updateData) {
+          elementTemplates.templates[dataType].dataRest.updateData(node, updatedData);
+        }
+        if (dataType === 'data-type-3') {
           this.updateDynamicImageNode(node);
         }
       });
@@ -1765,70 +1729,20 @@ class ConstructorSchemesClass {
   updateSelectedNode(dataFromComponent) {
     let updatedData = null;
     const dataType = this.targetDataNode.tag?.dataType;
-    if (dataType === 'data-type-0') {
-      updatedData = {
-        widthLeft: dataFromComponent?.widthLeft,
-        items: dataFromComponent.items.map((item) => ({
-          ...item,
-          textLeft: item?.description || this.getDataItemById(item.id)?.Description || '-',
-          textRight: typeof this.getDataItemById(item.id)?.value === 'number'
-          || typeof this.getDataItemById(item.id)?.value === 'string'
-            ? this.getDataItemById(item.id).value
-            : '-',
-        })),
-      };
-    } else if (dataType === 'data-type-1') {
-      updatedData = {
-        ...dataFromComponent,
-        textFirst: typeof this.getDataItemById(dataFromComponent.id)?.value === 'number'
-        || typeof this.getDataItemById(dataFromComponent.id)?.value === 'string'
-          ? this.getDataItemById(dataFromComponent.id).value
-          : '-',
-        textSecond: dataFromComponent?.description || this.getDataItemById(dataFromComponent.id)?.Description || '-',
-      };
-    } else if (dataType === 'data-type-2') {
-      updatedData = {
-        mainBgColor: dataFromComponent?.mainBgColor,
-        maxValue: dataFromComponent?.maxValue,
-        fontSize: dataFromComponent?.fontSize,
-        items: dataFromComponent.items.map((item) => ({
-          ...item,
-          value: this.getDataItemById(item.id)?.value || item?.value || '-',
-        })),
-      };
-    } else if (dataType === 'data-type-3') {
-      const mainImageFromNode = this.targetDataNode.tag.defaultImage;
-      const mainImageFromData = dataFromComponent.defaultImage;
-      const mainImageIsChange = mainImageFromNode !== mainImageFromData;
-      if (mainImageIsChange && mainImageFromNode) {
-        updatedData = {
-          imageLayout: null,
-          defaultImagePath: '',
-          defaultImage: dataFromComponent.defaultImage,
-          activeImage: '',
-          id: dataFromComponent?.id,
-          value: this.getDataItemById(dataFromComponent.id)?.value
-              || dataFromComponent?.value
-              || '-',
-          imageList: dataFromComponent.imageList,
-        };
-      } else {
-        updatedData = {
-          defaultImage: dataFromComponent.defaultImage,
-          id: dataFromComponent?.id,
-          value: this.getDataItemById(dataFromComponent.id)?.value
-              || dataFromComponent?.value
-              || '-',
-          imageList: dataFromComponent.imageList,
-        };
-      }
-    } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
-      updatedData = dataFromComponent;
-    } else if (dataFromComponent.dataType === 'edge') {
+    updatedData = dataFromComponent;
+    if (dataFromComponent.dataType === 'edge') {
       this.updateEdgeVisual(dataFromComponent);
       updatedData = dataFromComponent;
     } else if (dataFromComponent.dataType === 'label') {
       this.updateLabelVisual(dataFromComponent);
+    } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
+      updatedData = dataFromComponent;
+    } else if (elementTemplates.templates[dataType]) {
+      updatedData = elementTemplates.templates[dataType].dataRest.updateSettings(
+        this.dataRest,
+        dataFromComponent,
+        this.targetDataNode,
+      );
     }
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,
@@ -1943,7 +1857,7 @@ class ConstructorSchemesClass {
         }));
         const activeImageFromNode = node.tag.activeImage;
         const activeImageFromData = imageListFromIconClass
-          .find((el) => el.value === node.tag.value);
+          .find((el) => `${el.value}` === `${node.tag.value}`);
         const activeImageIsChanged = activeImageFromData?.image !== activeImageFromNode?.image;
         if (activeImageFromData) {
           if (activeImageIsChanged) {

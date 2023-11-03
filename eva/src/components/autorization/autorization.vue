@@ -118,11 +118,6 @@ export default {
         });
 
         if (response.status === 200) {
-          const result = await this.$store.dispatch('auth/getEssenceList', {
-            role: 1,
-            create: false,
-          });
-          const userId = result.find((item) => item.name === this.user.username);
           // если получилось
           await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект

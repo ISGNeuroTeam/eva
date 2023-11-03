@@ -86,6 +86,7 @@ export default {
     fields: {
       type: Object,
       require: true,
+      default: () => ({}),
     },
   },
   data() {

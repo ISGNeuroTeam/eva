@@ -27,6 +27,11 @@ import {
 } from '@mdi/js';
 
 export default {
+  // монтируются скрытыми если они находятся на не активной вкладке
+  mountableOnAnyTab: [
+    'textarea',
+    'select',
+  ],
   tools: [
     { name: 'Выпадающий список', img: mdiFormatListBulleted, type: 'select' },
     { name: 'Динамическая форма', img: mdiInboxMultipleOutline, type: 'dynamicForm' },
@@ -215,7 +220,7 @@ export default {
     },
     textarea: {
       width: 400,
-      height: 80,
+      height: 100,
     },
     tile: {
       width: 470,
@@ -359,6 +364,7 @@ export default {
     table: [
       'boxShadow',
       'tableOptions',
+      'headerMultiline',
       'selectableRow',
       'lastResult',
       'movableColumns',
@@ -385,6 +391,9 @@ export default {
       'showCustomInputBlock',
       'timeOutputFormat',
       'hideTimeSelect',
+      'useLastTimeTemplate',
+      'lastTimeTemplateStart',
+      'lastTimeTemplateEnd',
     ],
     graph: [
       'boxShadow',
@@ -776,6 +785,28 @@ export default {
       elem: 'switch',
       default: false,
     },
+    {
+      option: 'useLastTimeTemplate',
+      description: 'Использовать шаблон для функционала последнего времени',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'lastTimeTemplateStart',
+      description: 'Шаблон стартового времени',
+      relation: ['useLastTimeTemplate'],
+      elem: 'text-field',
+      default: 'now() - ${sec}',
+      placeholder: 'Пример: now() - ${sec}',
+    },
+    {
+      option: 'lastTimeTemplateEnd',
+      description: 'Шаблон конечного времени',
+      relation: ['useLastTimeTemplate'],
+      elem: 'text-field',
+      default: 'now()',
+      placeholder: 'Пример: now()',
+    },
 
     // dashSingle
     {
@@ -836,6 +867,13 @@ export default {
       option: 'enableDecimalPlacesLimits',
       optionGroup: 'tableOptions',
       description: 'Включить форматирование чисел',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'headerMultiline',
+      optionGroup: 'tableOptions',
+      description: 'Включить многострочные заголовки стоблцов',
       elem: 'switch',
       default: false,
     },
@@ -1353,6 +1391,17 @@ export default {
       placeholder: 'residual',
       default: 'residual',
     },
+    // fullWidthGroup
+    {
+      group: 'Библиотека примитивов',
+      option: 'primitives',
+    },
+    {
+      optionGroup: 'primitives',
+      option: 'primitivesLibrary',
+      elem: 'code-editor',
+      isFullWidth: true,
+    },
     // formGenerator
     {
       group: 'Исходные данные для формы',
@@ -1475,4 +1524,27 @@ export default {
       'dynamicForm',
     ],
   },
+  // Визуализации для вывода в функционале: Ссылки и события для панели
+  toolsTypesForPopup: [
+    'table',
+    'tableOld',
+    'piechart',
+    'multiLine',
+    'frequencyGraph',
+    'heatmap',
+    'tile',
+    'accumulators',
+    'scatterPlot',
+    'waterfall',
+    'singleValue',
+    'single',
+    'riskReview',
+    'gauge',
+    'guntt',
+    'csvg',
+    'map',
+    'dial',
+    'bush',
+    'ygraph',
+  ],
 };

@@ -656,23 +656,19 @@ export default {
                 event.target.parentElement.classList.add('selected');
               }
             }
-            const tokens = this.$store.state[this.idDash].tockens;
-            tokens.forEach((token) => {
-              if (
-                token.elem === this.id
-                    && token.action === 'click'
-              ) {
-                const { value } = [...event.target.parentElement.childNodes]
-                  .find((element) => element.dataset.type === token.capture)
-                  .attributes.value;
-                this.$store.commit('setTocken', {
-                  token,
-                  idDash: this.idDash,
-                  store: this.$store,
-                  value,
-                });
-              }
+
+            const value = {};
+            event.target.parentElement.childNodes.forEach(({ attributes }) => {
+              value[attributes['data-type'].value] = attributes.value.value;
             });
+            this.$store.commit('tokenAction', {
+              idDash: this.idDashFrom,
+              elem: this.idFrom,
+              action: 'click',
+              value,
+              capture: event.target.attributes['data-type'].value,
+            });
+
             const events = this.getEvents({
               event: 'onclick',
               partelement: 'row',

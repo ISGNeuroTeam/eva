@@ -171,7 +171,6 @@ export default {
           .filter((value, index, self) => (self.indexOf(value) === index))
           .sort((a, b) => ((a > b) ? 1 : (a < b) ? -1 : 0)),
         color: this.theme.$main_text, // Optional: Label text color
-        fractionDigits: 0, // Optional: Numerical precision. 0=round off.
       };
     },
     pointer() {
@@ -271,7 +270,7 @@ export default {
 
       // set zones
       const zones = data
-        .filter(({ color, min, max }) => (['string'].includes(typeof color) && color !== '' && !isNaN(+min) && !isNaN(+max)))
+        .filter(({ color, min, max }) => (['string'].includes(typeof color) && color !== '' && !Number.isNaN(+min) && !Number.isNaN(+max)))
         // eslint-disable-next-line no-nested-ternary
         .sort((a, b) => ((a.max > b.max) ? 1 : (a.max < b.max) ? -1 : 0));
       this.dsZones = zones?.length ? zones : [];

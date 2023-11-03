@@ -197,7 +197,7 @@
         </v-tooltip>
       </div>
       <div
-        v-if="dashboardEditMode"
+        v-if="false"
         class="dash-constructor-schemes__keymap-button"
       >
         <v-tooltip
@@ -567,12 +567,12 @@
       </div>
       <!--Settings-element-panel-->
       <div
-        class="dash-constructor-schemes__data-panel"
+        class="dash-constructor-schemes__data-panel pr-0"
         :class="{
           'dash-constructor-schemes__data-panel--active': dataPanel,
         }"
       >
-        <div class="row mb-3">
+        <div class="row">
           <div class="col-12">
             <div
               class="d-flex justify-content-right"
@@ -837,7 +837,7 @@ export default {
               }));
             }
             result.push(JSON.stringify({
-              name: 'click:el-child-all',
+              name: 'click:el-child',
               capture: Object.keys(el.data.tag.fromOtl),
             }));
           } else {
@@ -906,7 +906,7 @@ export default {
         const result = [];
         this.optionsFromStore.tokensBySchemeId.forEach((tokenName) => {
           const tokenByName = this.dashFromStore.tockens.find((el) => el.name === tokenName);
-          if (tokenName) {
+          if (tokenName && tokenByName && 'value' in tokenByName) {
             result.push(tokenByName.value);
           }
         });
@@ -1093,80 +1093,32 @@ export default {
           if (!type.includes('label-type') && type !== 'image-node') {
             return;
           }
-          const { tockens: tokens } = this.$store.state[this.idDashFrom];
-          if (tokens) {
-            tokens.forEach(({
-              name,
-              action,
-              capture,
-              elem,
-            }) => {
-              if (elem === this.idFrom) {
-                if (action === 'click:label' && data[capture]) {
-                  this.$store.commit('setTocken', {
-                    token: { name, action, capture },
-                    idDash: this.idDashFrom,
-                    value: data[capture],
-                    store: this.$store,
-                  });
-                } else if (action !== '' && action.includes('click:el')) {
-                  // TODO: Лучше переписать в дальнейшем, если будет такая возможность
-                  if (data?.fromOtl?.token_type) {
-                    if (
-                      data.fromOtl.token_type.includes('child-')
-                        && action.includes('click:el-child')
-                    ) {
-                      if (!action.includes('click:el-child-all')) {
-                        const actionType = action.replace('click:el-child-', '');
-                        const elType = data.fromOtl.token_type
-                          .split('_')[0]
-                          .replace('child-', '');
-                        if (elType === actionType) {
-                          this.$store.commit('setTocken', {
-                            token: { name, action, capture },
-                            idDash: this.idDashFrom,
-                            value: data.fromOtl[capture],
-                            store: this.$store,
-                          });
-                        }
-                      } else {
-                        this.$store.commit('setTocken', {
-                          token: { name, action, capture },
-                          idDash: this.idDashFrom,
-                          value: data.fromOtl[capture],
-                          store: this.$store,
-                        });
-                      }
-                    } else if (
-                      data.fromOtl.token_type.includes('parent-')
-                        && action.includes('click:el-parent-')
-                    ) {
-                      const actionType = action.replace('click:el-parent-', '');
-                      const elType = data.fromOtl.token_type.replace('parent-', '');
-                      if (elType === actionType) {
-                        this.$store.commit('setTocken', {
-                          token: { name, action, capture },
-                          idDash: this.idDashFrom,
-                          value: data.fromOtl[capture],
-                          store: this.$store,
-                        });
-                      }
-                    } else if (
-                      data.fromOtl.token_type.includes('other-')
-                        && action.includes('click:el-other')
-                    ) {
-                      this.$store.commit('setTocken', {
-                        token: { name, action, capture },
-                        idDash: this.idDashFrom,
-                        value: data.fromOtl[capture],
-                        store: this.$store,
-                      });
-                    }
-                  }
+          const actions = type.split('-')
+            .reduce((acc, item, idx) => {
+              if (idx > 0) acc.push(`${acc[idx - 1]}-${item}`);
+              else acc.push(`click:${item}`);
+              return acc;
+            }, []);
+          if (data?.fromOtl?.token_type) {
+            const tokenTypeSplited = data.fromOtl.token_type.split('-');
+            const extActions = tokenTypeSplited
+              .reduce((acc, item, idx) => {
+                if (idx === 0) acc.push(`click:el-${item}`);
+                else acc.push(`${acc[idx - 1]}-${item}`);
+                if (idx + 1 === tokenTypeSplited.length && item.match(/_\d+$/)) {
+                  acc.push(acc[idx].replace(/(_\d+)$/, ''));
                 }
-              }
-            });
+                return acc;
+              }, []);
+            actions.push(...extActions);
           }
+          this.$store.commit('tokenAction', {
+            idDash: this.idDashFrom,
+            elem: this.idFrom,
+            action: actions,
+            value: data?.fromOtl || data,
+          });
+
           const events = this.getEvents({ event: 'onclick' });
           if (events.length !== 0) {
             events.forEach((event) => {
@@ -1518,7 +1470,7 @@ export default {
     top: 5px;
     bottom: 15px;
     background-color: var(--main_bg);
-    width: 250px;
+    width: 260px;
     padding: 10px;
     transition: all .2s ease;
     pointer-events: none;
@@ -1540,6 +1492,7 @@ export default {
     }
   }
   &__data-panel {
+    overflow: hidden;
     right: 0;
     width: 300px;
     transform: translateX(100%);

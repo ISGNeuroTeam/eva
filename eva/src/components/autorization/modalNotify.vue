@@ -29,6 +29,7 @@
               :type="item.type || 'warning'"
               class="mb-3"
               :icon="item.icon || mdiSyncAlert"
+              style=" word-break: break-word;"
               @input="removeAlert(item.id)"
             >
               {{ item.message }}

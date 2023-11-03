@@ -1,3 +1,160 @@
+# [1.157.0] - 2023-11-02
+
+### Added
+- In Constructor-schemes:
+  - The "data-type-2" element (level/storage) now offers the capability to display overlapping elements instead of summarizing the height of nested elements.
+  - Added a new element, "gate valve" (data-type-4).
+
+### Changed
+- Updated the visualization list for functionality output, specifically for links and events in the panel.
+
+### Fixed
+- Popup Visualization Issues:
+  - Resolved an issue with the size of the visualization.
+  - Addressed problems with individual settings.
+  - Fixed issues related to saving visualization options.
+  - Corrected problems with zooming in multiline visualizations.
+  - Fixed problems with drawing table visualizations.
+
+
+# [1.156.0] - 2023-10-26
+
+### Fixed
+- Constructor Schemes: "Dynamic Image":
+  - Corrected the handling of numeric values.
+- Select:
+  - Resolved the issue with multiselect operation.
+  - Now correctly handles 0/false values.
+  - Improved dropdown list positioning.
+  - Fixed the item selection using arrow keys.
+
+# [1.155.0] - 2023-10-19
+
+### Added
+- In DatePicker, added the ability to specify a template for relative time functionality.
+
+### Changed
+- For OTL query, newline characters are now replaced with spaces instead of empty strings.
+
+### Fixed
+- Select:
+  - Resolved the issue where the token did not change when altering the select value, especially when the function responsible for the default value from the data source was enabled.
+  - Fixed a problem where the select value was not updating when the token was updated.
+
+# [1.154.1] - 2023-10-16
+
+### Fixed
+- DatePicker:
+  - Resolved errors that occurred when loading the dashboard.
+  - Fixed errors when adding a datepicker and then setting the time.
+  - Corrected the issue where saved dates were not displayed.
+- Fixed the problem where the token did not change when altering the select value, particularly when the function responsible for the default value from the data source was enabled.
+
+# [1.154.0] - 2023-10-12
+
+### Added
+- In DTPicker, added a button to select a time period equal to the last day.
+- Added a checkbox for running searches when the modal is opened by clicking on the header.
+- In yGraph, added support for processing hex, rgb, rgba, and hsla colors.
+- For GridGroup, added the capability to query data for visualizations from dynamic visualizations.
+
+### Fixed
+- Addressed an issue with the incorrect detection of token window size.
+- yGraph: Fixed old color handling through the palette.
+
+# [1.153.0] - 2023-10-06
+
+### Added
+- Multiline: Added the ability to customize Y-axis indents.
+
+### Fixed
+- Multiline:
+  - X-axis labels were being cut off when the legend was large.
+  - Not all labels on barplots were being displayed.
+
+# [1.152.0] - 2023-09-28
+
+### Added
+- TableV2: added number formatting for new column types (riskAcc, riskFact, riskSum)
+
+### Changed
+- Adjusted the position of input elements in the data source popup.
+- Corrected the color of the search button in the text block.
+- TableV2:
+  - Brightened the color of values and graphs in the table.
+  - Improved the checking of values for graphs in the table, now allowing the specification of values without floating points.
+
+### Fixed
+- Translated error messages during file upload to the server.
+- Fixed an issue in Data Research where the selected visualization would not reload properly.
+- TableV2:
+  - Addressed the handling of null values in cells with charts.
+  - Resolved incorrect table behavior when saving a dashboard (column order now remains unchanged).
+  - Fixed the operation of column movement.
+  - Corrected number formatting (previously applied to non-numeric values as well).
+
+# [1.151.0] - 2023-09-22
+
+### Added
+- For TableV2, added support for handling "_columnOptions" in DS for configuring column options.
+- Introducing new column types in TableV2: riskAcc, riskFact, riskSum.
+
+### Changed
+- Adjusted the position of action buttons in the component settings to align with the bottom edge of the modal window.
+- Improved the behavior of the cSvg component by resetting the image when no filename is provided in the data source.
+
+### Fixed
+- Resolved an issue with the generation of component IDs. The order of component ID suffixes added to the dashboard was incorrect in some cases.
+- Fixed the cSvg component, which was not setting the click token value.
+- Wrong text in the table when loading the dashboard "data is not displayed due to settings".
+- Table: Changing the token causes a reset to the first page.
+- Addressed an issue with Select and Textarea components where the default value was not set when the component was on a different tab.
+
+# [1.150.0] - 2023-09-14
+
+### Added
+- Implemented a 'click' event for the accumulator component.
+- Added a 'click' event for the frequency graph component.
+
+### Fixed
+- Fixed an issue where the color of the log icon would not change when the Data Source encountered an error.
+- Resolved the issue of the panel background flickering when changing it to a transparent background.
+
+# [1.149.0] - 2023-09-07
+
+### Added
+- Text wrapping in notifications modal
+- Multiline: added single y-axis
+- Gauge: added display in the labels of the value after the comma
+
+### Changed
+- Textarea to code editor in DS's create modal
+
+### Fixed
+- Dash-options: The primitives library has been returned to the settings
+- Accumulators: sometimes the settings fly off and the size is reset
+- Printer page size and colors
+- RiskReview: fixed display of more than 10 elements
+
+# [1.148.0] - 2023-08-31
+
+### Added
+- Notification window
+- Risk-review: Added placeholder on field options
+- Auto-resize dashboard tree panel
+
+### Changed
+- Risk-review: Changed color-picker in options panel.
+- Removed saving notifications between sessions
+
+### Fixed
+- TableV2: Fixed color on hover\select row
+- Multiline: Data goes off the Y axis
+- Prefix and suffix not working on components: Gantt, Tables, PieChart, Multiline, Tune, Tiles, Heatmap, TextArea, timePicker, ScatterPlot, Map, YGraph
+- Risk-review:
+  - Fixed suffixed \[_title], \[_list_title]
+  - Fixed work of tokens
+
 # [1.147.0] - 2023-08-22
 
 ### Added

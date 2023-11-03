@@ -3,11 +3,30 @@
     v-if="visualisationModal && visualisationModal.open"
     :value="visualisationModal.open"
     width="100%"
+    transition="fade-transition"
     @click:outside="visualisationModal = {}"
     @keydown.esc="visualisationModal = {}"
   >
     <v-card :style="{ background: theme.$main_bg }">
       <v-card-title class="card-title">
+        <v-tooltip
+            v-if="mode && hasZoomIcon"
+            bottom
+            :color="theme.$accent_ui_color"
+            :open-delay="tooltipOpenDelay"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+                class="option"
+                :color="theme.$main_border"
+                v-on="on"
+                @click="$refs.viz.sDataRange = null"
+            >
+              {{ zoomIcon }}
+            </v-icon>
+          </template>
+          <span>Сбросить зум</span>
+        </v-tooltip>
         <v-tooltip
           v-if="mode"
           bottom
@@ -49,10 +68,24 @@
           class="full-screen-dialog"
           :style="{ height: '80vh' }"
         >
+          <div class="loading-block" >
+            <div
+              :style="{ borderColor: theme.$main_border, opacity: '0.2' }"
+              class="loading-divider"
+              :class="{ loading: this.visualisationModal.search && this.data.length === 0 }"
+            >
+              <div
+                class="loading-bar"
+                :style="{ background: theme.$primary_button }"
+              />
+            </div>
+          </div>
           <visualisation
-            space-name="modal"
+            ref="viz"
+            :space-name="spaceName"
             :element="visualisationModal.tool"
             :data="data"
+            :search-schema="searchSchema"
             :mode="mode"
           />
         </div>
@@ -62,7 +95,11 @@
 </template>
 
 <script>
-import { mdiSettings, mdiClose } from '@mdi/js';
+import {
+  mdiSettings,
+  mdiClose,
+  mdiMagnifyMinusOutline
+} from '@mdi/js';
 
 import Visualisation from './visualisation.vue';
 
@@ -87,6 +124,7 @@ export default {
   data: () => ({
     settingsIcon: mdiSettings,
     closeIcon: mdiClose,
+    zoomIcon: mdiMagnifyMinusOutline,
     showModal: false,
   }),
   computed: {
@@ -108,6 +146,21 @@ export default {
     data() {
       return this.getElementData(this.visualisationModal.search || {});
     },
+    searchSchema() {
+      if (this.visualisationModal.search?.sid) {
+        const search = this.$store.state[this.idDash].searches
+            .find((element) => element?.sid === this.visualisationModal.search.sid)
+        if (search?.schema) return search.schema;
+      }
+      return {};
+    },
+    spaceName() {
+      const { tool, elemName } = this.visualisationModal;
+      return elemName.replace(tool + '-', '');
+    },
+    hasZoomIcon() {
+      return this.visualisationModal && this.visualisationModal.tool.includes('multiLine')
+    },
   },
   methods: {
     switchOP() {
@@ -118,6 +171,18 @@ export default {
       });
     },
   },
+  watch: {
+    visualisationModal(){
+      if(this.visualisationModal?.search && this.visualisationModal?.runOnOpen){
+        this.$store.commit('updateSearchStatus', {
+          idDash: this.idDash,
+          sid: this.visualisationModal.search.sid,
+          status: 'empty',
+        });
+      }
+    }
+  }
+
 };
 </script>
 
@@ -125,4 +190,36 @@ export default {
   .card-title
     display: flex
     justify-content: flex-end
+
+  .loading-block
+    overflow: hidden
+    height: 3px
+    margin: 0 auto
+
+    .loading-divider
+        position: relative
+        width: 100%
+        border-bottom: 1px solid
+
+        .loading-bar
+            position: absolute
+            top: 0
+            left: 0
+            width: 100%
+            height: 3px
+            transform: translateX(-100%)
+            transition: all 0.4s ease
+
+    .loading
+        opacity: 0.5 !important
+
+        .loading-bar
+            animation: loading 1.5s ease infinite
+
+
+  @keyframes loading
+    from
+        transform: translateX(-100%)
+    to
+        transform: translateX(100%)
 </style>

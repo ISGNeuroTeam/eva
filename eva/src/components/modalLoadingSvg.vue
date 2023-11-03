@@ -150,9 +150,30 @@ export default {
         }, 1000);
       } else {
         this.color = 'red';
-        this.message = res.statusText ? `Ошибка: ${res.statusText}` : 'Загрузить файл не удалось.';
+        this.message = res.statusText ? `Ошибка: ${this.translateStatusText(res.statusText)}` : 'Загрузить файл не удалось.';
       }
       this.disabled = false;
+    },
+    translateStatusText(statusText) {
+      const text = {
+        // 4xx
+        'Bad Request': 'Не удачный запрос',
+        'Unauthorized': 'Необходима авторизация',
+        'Forbidden': 'Запрещено',
+        'Not Acceptable': 'Неприемлемо',
+        'Request Timeout': 'Время ожидания запроса истекло',
+        'Request Entity Too Large': 'Слишком большой файл',
+        'Unsupported Media Type': 'Не поддерживаемый формат',
+        // 5xx
+        'Internal Server Error': 'Внутренняя ошибка сервера',
+        'Bad Gateway': 'Плохой шлюз',
+        'Service Unavailable': 'Сервис недоступен',
+        'Gateway Timeout': 'Время ожидания истекло',
+      };
+      if (statusText in text) {
+        return text[statusText];
+      }
+      return statusText;
     },
     focus() {
       this.color = '';

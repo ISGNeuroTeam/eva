@@ -56,6 +56,7 @@ export default {
               type: 'error',
               time: 2,
             });
+            this.store.commit('setErrorLogs', true);
             restAuth.putLog(error);
           }
           if (notifications.length) {

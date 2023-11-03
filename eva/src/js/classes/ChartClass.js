@@ -176,8 +176,9 @@ export default class ChartClass {
 
     // если ось х вышла за границу слева
     const { x } = this.svg.select('g.xAxis').node().getBBox();
-    if (x < 0) {
-      this.maxYLeftAxisWidth = -x + 22;
+    const xOffset = -x + 22;
+    if (x < 0 && this.maxYLeftAxisWidth < xOffset) {
+      this.maxYLeftAxisWidth = xOffset;
     }
 
     const rotate = options.xAxis.textRotate ? ` rotate(${options.xAxis.textRotate})` : '';
@@ -306,7 +307,7 @@ export default class ChartClass {
       className += ` axis-y-${metric.n}`;
     });
     yGroupItem.attr('class', `y${axisPosition}Axis axis-y ${className}`);
-    xOffset[axisPosition] += yGroupItem.node().getBBox().width;
+    xOffset[axisPosition] += yGroupItem.node().getBBox().width + 2;
 
     /// create Y axes
     const linearMetrics = metrics.filter((metric) => (['line', 'scatter'].includes(metric.type)));
@@ -326,13 +327,26 @@ export default class ChartClass {
         addClassName += ` axis-y-${item.n}`;
       });
 
-      const minYMetric = ChartClass.canBeNumber(metric.lowerBound) && +metric.lowerBound < min
-        ? +metric.lowerBound
-        : min;
+      let minYMetric = min;
+      let maxYMetric = max;
+      const { canBeNumber } = ChartClass;
 
-      const maxYMetric = ChartClass.canBeNumber(metric.upperBound) && metric.upperBound > max
-        ? +metric.upperBound
-        : max;
+      if (metric.hasPaddings && !metric.yAxisLink) {
+        const range = max - min;
+        if (canBeNumber(metric.paddingBottom) && +metric.paddingBottom > 0) {
+          minYMetric = min - range * (metric.paddingBottom / 100);
+        }
+        if (canBeNumber(metric.paddingTop) && +metric.paddingTop > 0) {
+          maxYMetric = max + range * (metric.paddingTop / 100);
+        }
+      } else {
+        if (canBeNumber(metric.lowerBound) && +metric.lowerBound < min) {
+          minYMetric = +metric.lowerBound;
+        }
+        if (canBeNumber(metric.upperBound) && metric.upperBound > max) {
+          maxYMetric = +metric.upperBound;
+        }
+      }
 
       this.yMinMax[metric.name] = [minYMetric, maxYMetric];
       this.y[metric.name] = d3.scaleLinear()
@@ -882,7 +896,13 @@ export default class ChartClass {
       .attr('cy', (d) => this.y[metric.yAxisLink || metric.name](d[metric.name]))
       .attr('r', metric.dotSize)
       .attr('fill', metric.color)
-      .on('click', (d) => this.clickChart([d[this.xMetric], d[metric.name]]))
+      .on('click', (d) => this.clickChart({
+        ...d,
+        pointX: d[this.xMetric],
+        pointY: d[metric.name],
+        start: d[this.xMetric],
+        end: d[metric.name],
+      }))
       .on('mouseover', (d, i, elems) => {
         d3.select(elems[i]).style('opacity', 1);
         const lineXPos = this.x(d[this.xMetric]);
@@ -1064,11 +1084,16 @@ export default class ChartClass {
       // add dots
       this.renderPeakDots(chartGroup, metric, height, num, line);
 
-      // add text
-      if (metric.showText) {
+      // add text (old logic)
+      /* if (metric.showText) {
         this.renderPeakTexts(chartGroup, metric, line);
-      }
+      } */
     });
+
+    // add text (new logic)
+    if (metric.showText) {
+      this.renderPeakTexts(chartGroup, metric, this.data.filter((item) => item[name] !== null));
+    }
   }
 
   addScatterDots(chartGroup, metric, height, num) {
@@ -1189,7 +1214,13 @@ export default class ChartClass {
         return Math.abs(this.y[yName](d[0]) - this.y[yName](d[1]));
       })
       .attr('width', barWidth)
-      .on('click', (d) => this.clickChart([d.data[this.xMetric], d[1] - d[0]]))
+      .on('click', (d) => this.clickChart({
+        ...d.data,
+        pointX: d.data[this.xMetric],
+        pointY: d[1] - d[0],
+        start: d.data[this.xMetric],
+        end: d[1] - d[0],
+      }))
       .on('mouseleave', () => {
         this.hideTooltip();
         this.hideLineDot();
@@ -1239,6 +1270,7 @@ export default class ChartClass {
     const metricByKeys = this.metricByKeys();
     const { length } = this.data;
 
+    let numBar = -1;
     chartGroup.append('g')
       .selectAll('g')
       .data(this.data)
@@ -1246,14 +1278,14 @@ export default class ChartClass {
       .append('g')
       .attr('transform', (d) => `translate(${this.x(d[this.xMetric]) - barWidth / 2},0)`)
       .selectAll('rect')
-      .data((d, i) => subgroups.map((key) => ({
+      .data((d) => subgroups.map((key) => ({
         key,
         value: d[key],
         color: metricByKeys[key].color,
         n: metricByKeys[key].n,
         metric: metricByKeys[key],
         data: d,
-        _pn: i,
+        _pn: numBar += +(d[key] !== null),
       })))
       .enter()
       .append('rect')
@@ -1276,7 +1308,13 @@ export default class ChartClass {
           : (zeroHeight - valHeight);
       })
       .attr('fill', (d) => d.color)
-      .on('click', (d) => this.clickChart([d.data[this.xMetric], d.value]))
+      .on('click', (d) => this.clickChart({
+        ...d.data,
+        pointX: d.data[this.xMetric],
+        pointY: d.value,
+        start: d.data[this.xMetric],
+        end: d.value,
+      }))
       .on('mousemove', (d) => {
         const { metric } = d;
         const lineXPos = this.x(d.data[this.xMetric]);

@@ -482,17 +482,12 @@ export default {
         },
         callback: (sender, args) => {
           if (args.item instanceof INode) {
-            const tokens = this.$store.state[this.idDashFrom]?.tockens || [];
-            tokens.forEach((token) => {
-              if (token.elem === this.idFrom && token.action === 'click') {
-                const value = args.item.tag[token.capture];
-                this.$store.commit('setTocken', {
-                  token,
-                  idDash: this.idDashFrom,
-                  store: this.$store,
-                  value,
-                });
-              }
+            this.$store.commit('tokenAction', {
+              idDash: this.idDashFrom,
+              elem: this.idFrom,
+              action: 'click',
+              value: args.item.tag,
+              capture: 'node',
             });
 
             const events = this.getEvents({

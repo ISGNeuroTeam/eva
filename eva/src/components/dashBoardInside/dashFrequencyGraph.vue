@@ -61,7 +61,9 @@ export default {
   },
   data() {
     return {
-      actions: [],
+      actions: [
+        { name: 'click', capture: [] },
+      ],
       margin: {
         top: 10,
         right: 20,
@@ -158,6 +160,11 @@ export default {
     },
   },
   mounted() {
+    this.$store.commit('setActions', {
+      actions: this.actions,
+      idDash: this.idDashFrom,
+      id: this.idFrom,
+    });
     this.render();
     this.setLastMetrics(this.tooltipFields);
     this.$on('resetZoom', this.resetZoom);
@@ -318,7 +325,8 @@ export default {
         .style('fill', (d) => color(d[this.groupMetric]))
         .attr('cx', (d) => this.x(new Date(d[this.xMetric] * 1000)))
         .attr('cy', (d) => this.y(d[this.groupMetric]) + this.y.bandwidth() / 2)
-        .attr('r', 5);
+        .attr('r', 5)
+        .on('click', this.onClickCircle);
 
       if (this.tooltip) {
         dot
@@ -364,6 +372,15 @@ export default {
         id: this.idFrom,
         idDash: this.idDashFrom,
         metrics,
+      });
+    },
+    onClickCircle(obj) {
+      this.$store.commit('tokenAction', {
+        idDash: this.idDashFrom,
+        elem: this.idFrom,
+        action: 'click',
+        value: obj,
+        capture: '_time',
       });
     },
   },
