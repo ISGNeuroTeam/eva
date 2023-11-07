@@ -338,7 +338,7 @@ const templates = {
       // Обязательные методы
       updateSettings(dataRest, options) {
         const dataItem = Utils.getDataItemById(dataRest, options.id);
-        const textFirst = typeof dataItem === 'number' || typeof dataItem === 'string'
+        const textFirst = typeof dataItem.value === 'number' || typeof dataItem.value === 'string'
           ? dataItem.value
           : '-';
         const textSecond = options?.description || dataItem?.Description || '-';
@@ -544,10 +544,11 @@ const templates = {
       updateData(node, updatedData) {
         const updatedItems = node.tag.items.map((nodeDataItem) => {
           const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
+          const value = typeof targetData?.value === 'number'
+              || typeof targetData?.value === 'string'
+            ? targetData.value
+            : '-';
           if (targetData) {
-            const value = Utils.isValidValue(targetData.value)
-              ? targetData.value
-              : '-';
             nodeDataItem = {
               ...nodeDataItem,
               value,

@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.157.1]
+
+### Fixed
+- Accumulator:
+  - Resolved an error that occurred when attaching data to the storage element.
+
 ## [1.157.0]
 
 ### Added
