@@ -1309,10 +1309,12 @@ export default new Vuex.Store({
       return tokens;
     },
     pullOutPreloadTokens({ state }, id) {
-      const idx = state.preloadTokens.findIndex((item) => item.id === id);
-      if (idx > -1) {
-        const { tokens } = state.preloadTokens[idx];
-        return tokens;
+      if (state?.preloadTokens?.length > 0) {
+        const idx = state.preloadTokens.findIndex((item) => item.id === id);
+        if (idx > -1) {
+          const { tokens } = state.preloadTokens[idx];
+          return tokens;
+        }
       }
       return [];
     },

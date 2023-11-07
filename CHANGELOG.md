@@ -8,7 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-
+- Constructor-schemes: Copy\Paste edges\nodes
+- Constructor-schemes: Duplicate edges\nodes
+- Constructor-schemes: Cut\Paste edges\nodes
+- Constructor-schemes: Auto-select copied elements
 ### Changed
 
 ### Fixed
