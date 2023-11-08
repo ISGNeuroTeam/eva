@@ -483,7 +483,7 @@
                                     outlined
                                     hide-details
                                     type="number"
-                                    :min="0"
+                                    :min="-360"
                                     :max="360"
                                 />
                               </v-col>
@@ -893,8 +893,8 @@ export default {
       default: () => ([
         { text: 'Тонкий', value: 'lighter' },
         { text: 'Нормальный', value: 'normal' },
-        { text: 'Полужирный', value: 'bold' },
-        { text: 'Жирный', value: 'bolder' },
+        { text: 'Полужирный', value: '400' },
+        { text: 'Жирный', value: 'bold' },
       ]),
     },
     dataRestFrom: {
