@@ -949,6 +949,14 @@ export default {
       min: (v) => v >= 0 || v === undefined || 'Минимум 0',
       max: (v) => v <= 10000 || v === undefined || 'Максимум 10000',
     },
+    defaultMetricFields: {
+      showTextStyles: false,
+      pointTextWeight: 'normal',
+      pointTextSize: 11,
+      pointTextAngle: 0,
+      pointTextChangeColor: false,
+      pointTextColor: '#ff0000',
+    }
   }),
   computed: {
     isOpen: {
@@ -1092,6 +1100,17 @@ export default {
       this.commonAxisY = !!this.receivedSettings.commonAxisY;
       this.metricsByGroup = [...JSON.parse(JSON.stringify(this.receivedSettings.metricsByGroup))];
       this.metricsByGroup.push([]);
+
+      // add default metric props
+      this.metricsByGroup.forEach((group) => {
+        group.forEach((metric) => {
+          Object.keys(this.defaultMetricFields).forEach((prop) => {
+            if (metric[prop] === undefined) {
+              this.$set(metric, prop, structuredClone(this.defaultMetricFields[prop]))
+            }
+          })
+        });
+      });
     },
 
     colorPickerInputChange() {

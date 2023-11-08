@@ -953,7 +953,7 @@ export default class ChartClass {
       .data(data)
       .enter()
       .append('g')
-        .attr('transform', (d, i) => {
+        .attr('transform', (d) => {
           let xPos = this.x(d[this.xMetric]);
           if (metric.type === 'barplot' && this.options.xAxis.barplotType === 'divided') {
             xPos += metric.n * this.barplotWidth * 1.1;
@@ -976,7 +976,6 @@ export default class ChartClass {
   }
 
   styleTextElemByMetric(text, metric) {
-    console.log(text, metric)
     if (metric.showTextStyles) {
       if (metric.pointTextSize) {
         text.style('font-size', metric.pointTextSize)
@@ -988,7 +987,7 @@ export default class ChartClass {
         text.style('transform', `rotate(${metric.pointTextAngle}deg)`)
       }
       if (metric.pointTextChangeColor) {
-        text.style('fill', metric.pointTextColor)
+        text.style('fill', metric.pointTextColor?.hex || metric.pointTextColor)
       }
     }
   }
