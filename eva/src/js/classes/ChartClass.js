@@ -946,6 +946,7 @@ export default class ChartClass {
       return ChartClass.lastDotParamForPoint(metric.lastDot, i, line);
     });
 
+    let ig = 0;
     const text = chartGroup
       .append('g')
       .attr('class', `metric metric-${metric.n}`)
@@ -953,7 +954,12 @@ export default class ChartClass {
       .data(data)
       .enter()
       .append('g')
-        .attr('transform', (d) => {
+        .attr('transform', (d, i, els) => {
+          let offset = [-5, -6];
+          if (ig === 0) {
+            offset[0] += 8;
+            ig += 1;
+          }
           let xPos = this.x(d[this.xMetric]);
           if (metric.type === 'barplot' && this.options.xAxis.barplotType === 'divided') {
             xPos += metric.n * this.barplotWidth * 1.1;
@@ -962,7 +968,7 @@ export default class ChartClass {
           if (metric.type === 'barplot' && d[metric.name] < 0) {
             yPos += 15;
           }
-          return `translate(${xPos + 2}, ${yPos - 1})`;
+          return `translate(${xPos + offset[0]}, ${yPos + offset[1]})`;
         })
       .append('text')
       .style('font-size', '11')
