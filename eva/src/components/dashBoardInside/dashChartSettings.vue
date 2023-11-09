@@ -682,7 +682,7 @@
                     value="value"
                   />
                 </v-col>
-                <v-col cols="4">
+                <v-col cols="6">
                   <v-text-field
                     v-model="xAxis.timeFormat"
                     :disabled="xAxis.type !== 'time'"
