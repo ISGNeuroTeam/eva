@@ -385,6 +385,7 @@ export default {
       'closeListByEnter',
     ],
     picker: [
+      'periodOrDay',
       'showLastTimeBlock',
       'showChoseDateAndTimeBlock',
       'showRangeDateBlock',
@@ -749,8 +750,15 @@ export default {
 
     // datepicker
     {
+      option: 'periodOrDay',
+      description: 'День/Период',
+      elem: 'switch',
+      default: true,
+    },
+    {
       option: 'showLastTimeBlock',
       description: 'Показать блок: Выбор времени',
+      relation: ['periodOrDay'],
       elem: 'switch',
       default: true,
     },
@@ -762,6 +770,7 @@ export default {
     },
     {
       option: 'showRangeDateBlock',
+      relation: ['periodOrDay'],
       description: 'Показать блок: Диапазон дат',
       elem: 'switch',
       default: true,
@@ -802,7 +811,7 @@ export default {
     {
       option: 'lastTimeTemplateEnd',
       description: 'Шаблон конечного времени',
-      relation: ['useLastTimeTemplate'],
+      relation: ['useLastTimeTemplate', 'periodOrDay'],
       elem: 'text-field',
       default: 'now()',
       placeholder: 'Пример: now()',

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Data-picker: Added the ability to toggle between range and exact date.
 
 ### Changed
 
