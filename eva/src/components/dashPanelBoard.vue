@@ -436,6 +436,30 @@
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
+                <input
+                  :ref="`clone${search.id}`"
+                  readonly
+                  style="position: absolute; opacity: 0;"
+                  @focus="$event.target.select()"
+                >
+                <v-icon
+                  class="search-clock"
+                  :color="theme.$primary_button"
+                  v-on="on"
+                  @click="copyProcessedOtl(search.id)"
+                >
+                  {{ iconCopy }}
+                </v-icon>
+              </template>
+              <span>Копировать</span>
+            </v-tooltip>
+
+            <v-tooltip
+              z-index="99"
+              bottom
+              :color="theme.$accent_ui_color"
+            >
+              <template v-slot:activator="{ on }">
                 <v-icon
                   class="search-clock"
                   :color="theme.$primary_button"
@@ -984,7 +1008,9 @@ import {
   mdiVariable,
   mdiFileTree,
   mdiCloudUpload,
-  mdiDragHorizontalVariant, mdiBellRingOutline,
+  mdiDragHorizontalVariant,
+  mdiBellRingOutline,
+  mdiContentCopy,
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
 import draggable from 'vuedraggable';
@@ -1067,6 +1093,7 @@ export default {
       logIcon: mdiScriptTextOutline,
       notifyIcon: mdiBellRingOutline,
       iconTree: mdiFileTree,
+      iconCopy: mdiContentCopy,
       openhelp: false,
       newDashBoard: {},
       lookTockens: [],
@@ -1423,6 +1450,13 @@ export default {
     openSchedule(id) {
       this.scheduleSid = id;
       this.activeSchedule = true;
+    },
+    copyProcessedOtl(id) {
+      const search = this.getSearchesFromStore.find((item) => item.id === id);
+      const input = this.$refs[`clone${id}`];
+      input[0].value = search?.sendedOtl || '';
+      input[0].focus();
+      document.execCommand('copy');
     },
     async getCookie() {
       if (this.$jwt.hasToken()) {
