@@ -8,16 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.158.0]
+
+### Added
 - MultiLine: Ability to format marks to points (color, thickness, size, angle)
 - Constructor-schemes: Copy\Paste edges\nodes
 - Constructor-schemes: Duplicate edges\nodes
 - Constructor-schemes: Cut\Paste edges\nodes
 - Constructor-schemes: Auto-select copied elements
 - DS: button for copy DS text with token values
-
-### Changed
-
-### Fixed
 
 ## [1.157.1]
 
