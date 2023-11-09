@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Constructor-schemes: Duplicate edges\nodes
 - Constructor-schemes: Cut\Paste edges\nodes
 - Constructor-schemes: Auto-select copied elements
+- DS: button for copy DS text with token values
+
 ### Changed
 
 ### Fixed

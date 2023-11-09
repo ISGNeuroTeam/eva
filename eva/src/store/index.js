@@ -81,24 +81,24 @@ export default new Vuex.Store({
       state[id].tockens?.forEach((token) => {
         const newTokens = tokens.filter((item) => item.name === token.name);
         if (newTokens) {
-          newTokens.forEach(newToken => {
+          newTokens.forEach((newToken) => {
             Vue.set(token, 'value', newToken.value);
             if (updateComponentValue) {
               state[id].elements
                 .filter((name) => name === token.elem)
                 .every((element) => {
                   const [, component] = element.match(/^([\w-]+[\D])(-(\d+))?$/) || [];
-                  let val = token.value
+                  let val = token.value;
                   if (component === 'select') {
                     if (!isNaN(parseFloat(token.value)) && isFinite(token.value)) {
-                      val = parseFloat(token.value)
+                      val = parseFloat(token.value);
                     }
                     Vue.set(state[id][element].selected, 'elemDeep', val);
                   }
                   return true;
                 });
             }
-          })
+          });
         }
       });
     },
@@ -1225,6 +1225,11 @@ export default new Vuex.Store({
         state[idDash].editMode = newModeState;
       }
     },
+    saveSendedOtl(state, { otl, idDash, idSearch }) {
+      if (idSearch !== undefined) {
+        state[idDash].searches.find((item) => item.id === idSearch).sendedOtl = otl;
+      }
+    },
   },
   actions: {
     settingApp({ state, dispatch, commit }) {
@@ -1439,6 +1444,7 @@ export default new Vuex.Store({
           value: result.schema,
         },
       ]);
+      commit('saveSendedOtl', { otl, idDash: searchFrom.idDash, idSearch: searchFrom.search.id });
       return result;
     },
     createSearchesId({ state }, payload) {
