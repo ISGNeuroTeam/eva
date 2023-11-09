@@ -630,9 +630,8 @@ const templates = {
         const mainImageFromData = options.defaultImage;
         const mainImageIsChange = mainImageFromNode !== mainImageFromData;
         const dataItem = Utils.getDataItemById(dataRest, options.id);
-        const value = dataItem?.value
-                || options?.value
-                || '-';
+        const isValidValue = typeof dataItem.value === 'string' || typeof dataItem.value === 'number';
+        const value = isValidValue ? dataItem.value : (options?.value || '-');
         if (mainImageIsChange && mainImageFromNode) {
           return {
             imageLayout: null,
