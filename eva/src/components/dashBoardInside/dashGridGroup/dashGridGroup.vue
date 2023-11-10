@@ -431,6 +431,20 @@ export default {
     box() {
       this.onGridResize();
     },
+    dataSources: {
+      deep: true,
+      handler() {
+        this.dataRestFrom
+          .forEach((item) => {
+            const optionKey = item?.option_key || item.id;
+            const visualizationId = `${item.visualization}-${this.idFrom}-${optionKey}-v1`;
+            this.updateDataRestVisualizations(item, visualizationId);
+          });
+      },
+    },
+  },
+  mounted() {
+    this.onGridResize();
   },
   methods: {
     onGridResize() {

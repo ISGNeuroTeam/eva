@@ -13,7 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated the top panel UX/UI
 
 ### Fixed
-- GridGroup: incorrect size of the multi-line chart 
+- GridGroup: 
+  - incorrect size of the multi-line chart
+  - fixed response when updating data sources
 
 ## [1.158.0]
 
