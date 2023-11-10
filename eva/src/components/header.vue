@@ -16,49 +16,58 @@
       <v-tooltip
         bottom
         :color="theme.$accent_ui_color"
+        :open-delay="openTooltipDelay"
       >
         <template v-slot:activator="{ on }">
-          <v-icon
-            class="home"
-            :color="theme.$secondary_text"
-            v-on="on"
-            @click="$store.commit('app/toggleOpenTree')"
+          <v-btn
+              icon
+              v-on="on"
+              :color="theme.$secondary_text"
+              @click="$store.commit('app/toggleOpenTree')"
           >
-            {{ iconTree }}
-          </v-icon>
+            <v-icon>
+              {{ iconTree }}
+            </v-icon>
+          </v-btn>
         </template>
         <span>Дерево</span>
       </v-tooltip>
       <v-tooltip
         bottom
         :color="theme.$accent_ui_color"
+        :open-delay="openTooltipDelay"
       >
         <template v-slot:activator="{ on }">
-          <router-link to="/main">
-            <v-icon
+          <v-btn
+              to="/main"
+              icon
+              v-on="on"
               class="home"
               :color="theme.$secondary_text"
-              v-on="on"
-            >
+          >
+            <v-icon>
               {{ home }}
             </v-icon>
-          </router-link>
+          </v-btn>
         </template>
         <span>На главную</span>
       </v-tooltip>
       <v-tooltip
         bottom
         :color="theme.$accent_ui_color"
+        :open-delay="openTooltipDelay"
       >
         <template v-slot:activator="{ on }">
-          <v-icon
-            class="undo"
-            :color="theme.$secondary_text"
-            v-on="on"
-            @click="toBackward"
+          <v-btn
+              icon
+              v-on="on"
+              :color="theme.$secondary_text"
+              @click="toBackward"
           >
-            {{ undo }}
-          </v-icon>
+            <v-icon>
+              {{ undo }}
+            </v-icon>
+          </v-btn>
         </template>
         <span>Назад</span>
       </v-tooltip>
@@ -66,39 +75,44 @@
     <div class="control-block">
       <div
         v-if="inside"
-        class="user-control-panel"
+        class="user-control-panel px-3"
       >
         <v-tooltip
           bottom
           :color="theme.$accent_ui_color"
+          :open-delay="openTooltipDelay"
         >
           <template v-slot:activator="{ on }">
-            <v-icon
-              class="control-button theme--dark"
-              :style="{ color: theme.$secondary_text }"
-              v-on="on"
-              @click="loadSvg = !loadSvg"
+            <v-btn
+                icon
+                v-on="on"
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': loadSvg}"
+                @click="loadSvg = !loadSvg"
             >
-              {{ mdiCloudUpload }}
-            </v-icon>
+              <v-icon>
+                {{ mdiCloudUpload }}
+              </v-icon>
+            </v-btn>
           </template>
           <span>Загрузка файла</span>
         </v-tooltip>
         <v-tooltip
           bottom
           :color="theme.$accent_ui_color"
+          :open-delay="openTooltipDelay"
         >
           <template v-slot:activator="{ on }">
-            <v-icon
-              class="control-button theme--dark"
-              :color="
-                getColorError ? theme.$primary_button : theme.$secondary_text
-              "
-              v-on="on"
-              @click="openLogs"
-            >
-              {{ logIcon }}
-            </v-icon>
+            <v-btn
+                v-on="on"
+                icon
+                :color="getColorError ? theme.$primary_button : theme.$secondary_text"
+                :class="{'v-btn--active': modalActive}"
+                @click="openLogs">
+              <v-icon>
+                {{ logIcon }}
+              </v-icon>
+            </v-btn>
           </template>
           <span>Открыть окно логов</span>
         </v-tooltip>
@@ -113,24 +127,26 @@
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
+            :open-delay="openTooltipDelay"
           >
             <template v-slot:activator="{ on: onTooltip }">
               <div
-                class="dropdown-profile"
                 v-on="{ ...onMenu, ...onTooltip }"
               >
-                <v-icon
-                  :style="{ color: theme.$secondary_text }"
-                  class="profile theme--dark"
+                <v-btn
+                    text
+                    rounded
+                    class="ml-2 pl-2 profile-login mr-2"
+                    v-on="{ ...onMenu, ...onTooltip }"
+                    :color="theme.$secondary_text"
                 >
-                  {{ profile_icon }}
-                </v-icon>
-                <div
-                  class="id-user profile-login"
-                  :style="{ color: theme.$secondary_text }"
-                >
+                  <v-icon
+                      class="profile theme--dark"
+                  >
+                    {{ profile_icon }}
+                  </v-icon>
                   {{ login }}
-                </div>
+                </v-btn>
               </div>
             </template>
             <span>Меню профиля</span>
@@ -205,6 +221,10 @@ export default {
     inside: {
       type: Boolean,
       default: false,
+    },
+    openTooltipDelay: {
+      type: Number,
+      default: 1000,
     },
   },
   data() {
@@ -343,4 +363,7 @@ export default {
 
 <style lang="scss">
 @import '../sass/dashPanelBoard.sass';
+.home.v-btn:before {
+  opacity: 0
+}
 </style>
