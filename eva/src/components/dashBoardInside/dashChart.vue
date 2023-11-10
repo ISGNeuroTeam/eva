@@ -495,10 +495,10 @@ export default {
         yAxisSide: 'left',
         yAxisLink: this.max.value > 0 && this.options.commonAxisY ? this.max.key : '',
         // eslint-disable-next-line no-nested-ternary
-        lastDot: conclusion_count[name] || (isDataAlwaysShow ? 1 : (lastDot ? 0 : '')),
+        lastDot: conclusion_count[name] || (isDataAlwaysShow ? 1 : (lastDot ? 0 : '0')),
         // eslint-disable-next-line no-restricted-globals
         zerosAfterDot: isNaN(zerosAfterDot) ? 2 : zerosAfterDot,
-        peakTextData: isDataAlwaysShow || false,
+        peakTextData: isDataAlwaysShow || 'data',
         showPeakDots: conclusion_count[name] > 0
           || isDataAlwaysShow
           || lastDot,
@@ -513,6 +513,12 @@ export default {
         strokeDasharray: this.getStyleLine(typeLine),
         unit: unit?.units,
         strokeWidth: 1,
+        showTextStyles: false,
+        pointTextWeight: 'normal',
+        pointTextSize: 11,
+        pointTextAngle: 0,
+        pointTextChangeColor: false,
+        pointTextColor: '#ff0000',
       };
     },
 

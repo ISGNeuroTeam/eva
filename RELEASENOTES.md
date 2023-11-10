@@ -1,3 +1,14 @@
+# [1.158.0] - 2023-11-09
+
+### Added
+- MultiLine: Added the ability to format marks as points (color, thickness, size, angle).
+- Data Sources (DS): Added a button for copying data source text along with token values.
+- Constructor-schemes:
+  - Copy/Paste edges and nodes.
+  - Duplicate edges and nodes.
+  - Cut/Paste edges and nodes.
+  - Auto-selects copied elements.
+
 # [1.157.1] - 2023-11-03
 
 ### Fixed

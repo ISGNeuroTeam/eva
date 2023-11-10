@@ -223,7 +223,11 @@ class SchemeUpdater {
 
   static getBends(edge) {
     if (edge?.bends.toArray()?.length > 0) {
-      return edge?.bends.toArray().map((bend) => ({ x: bend.location.x, y: bend.location.y }));
+      return edge?.bends.toArray()
+        .map((bend) => ({
+          x: bend.location.x,
+          y: bend.location.y,
+        }));
     }
     return [];
   }
@@ -253,7 +257,9 @@ class SchemeUpdater {
   static getLayout(nodeLayout) {
     return {
       x: nodeLayout.x,
+      maxX: nodeLayout.maxX,
       y: nodeLayout.y,
+      maxY: nodeLayout.maxY,
       width: nodeLayout.width,
       height: nodeLayout.height,
     };
