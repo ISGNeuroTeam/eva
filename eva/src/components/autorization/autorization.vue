@@ -29,6 +29,9 @@
                 outlined
                 hide-details
                 clearable
+                tabindex="1"
+                persistent-placeholder
+                placeholder="Логин"
               />
               <v-text-field
                 v-model="user.password"
@@ -39,6 +42,9 @@
                 outlined
                 hide-details
                 clearable
+                tabindex="2"
+                persistent-placeholder
+                placeholder="Пароль"
               />
               <div
                 class="error-msg"
