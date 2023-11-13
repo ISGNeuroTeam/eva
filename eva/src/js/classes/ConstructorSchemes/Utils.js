@@ -87,6 +87,14 @@ class Utils {
     });
     return result;
   }
+
+  static getDataItemById(dataRest, dataId) {
+    return dataRest.find((dataItem) => dataItem.TagName === dataId);
+  }
+
+  static isValidValue(value) {
+    return typeof value === 'string' || typeof value === 'number';
+  }
 }
 
 export default Utils;

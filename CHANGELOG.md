@@ -12,7 +12,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
-- Constructor-schemes: "Dynamic image" - Fixed incorrect processing of numeric values.
+
+## [1.158.0]
+
+### Added
+- MultiLine: Ability to format marks to points (color, thickness, size, angle)
+- Constructor-schemes: Copy\Paste edges\nodes
+- Constructor-schemes: Duplicate edges\nodes
+- Constructor-schemes: Cut\Paste edges\nodes
+- Constructor-schemes: Auto-select copied elements
+- DS: button for copy DS text with token values
+
+## [1.157.1]
+
+### Fixed
+- Accumulator:
+  - Resolved an error that occurred when attaching data to the storage element.
+
+## [1.157.0]
+
+### Added
+- Constructor-schemes: The "data-type-2" element (level/storage) now has the ability to display them overlapping instead of summarizing the height of nested elements. 
+- Constructor-schemes: Added element "gate valve"(data-type-4)
+
+### Changed
+- Changed visualization list for output in the functionality: Links and events for the panel
+
+### Fixed
+- Fixed a problem with the size of the visualization in the popup
+- Fixed an issue with individual visualization settings in the popup
+- Fixed an issue with saving visualization options in a popup window
+- Fixed a problem with zooming a multiline visualization in a popup window
+- Fixed a problem with drawing a table visualization in a popup window
+
+## [1.156.0]
+
+### Fixed
+- Constructor-schemes: "Dynamic image":
+  - Fixed incorrect processing of numeric values.
+- Select:
+  - Fixed multiselect operation.
+  - Fixed handling of 0/false values.
+  - Fixed dropdown list positioning.
+  - Fixed selection of items with arrows.
 
 ## [1.155.0]
 

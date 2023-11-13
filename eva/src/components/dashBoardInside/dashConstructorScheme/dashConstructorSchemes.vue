@@ -197,7 +197,7 @@
         </v-tooltip>
       </div>
       <div
-        v-if="dashboardEditMode"
+        v-if="false"
         class="dash-constructor-schemes__keymap-button"
       >
         <v-tooltip
@@ -567,12 +567,12 @@
       </div>
       <!--Settings-element-panel-->
       <div
-        class="dash-constructor-schemes__data-panel"
+        class="dash-constructor-schemes__data-panel pr-0"
         :class="{
           'dash-constructor-schemes__data-panel--active': dataPanel,
         }"
       >
-        <div class="row mb-3">
+        <div class="row">
           <div class="col-12">
             <div
               class="d-flex justify-content-right"
@@ -601,7 +601,6 @@
         :is="'div'"
         :ref="`graphComponent-${idFrom}`"
         class="dash-constructor-schemes__graph-component"
-        @keyup.ctrl="copyPaste"
       />
       <modal-confirm
         v-model="isConfirmModal"
@@ -1260,19 +1259,6 @@ export default {
         this.panelBottomOffset = this.isKeymapOpen ? this.$refs.keymap.$el.clientHeight + 5 : 10;
       });
     },
-    copyPaste(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      this.closeDataPanel();
-      // ctrl + c
-      if (e.keyCode === 67) {
-        this.constructorSchemes.copyElement();
-      }
-      // ctrl + v
-      if (e.keyCode === 86) {
-        this.constructorSchemes.pasteElement();
-      }
-    },
     fitGraphContent() {
       this.constructorSchemes.fitGraphContent();
     },
@@ -1470,7 +1456,7 @@ export default {
     top: 5px;
     bottom: 15px;
     background-color: var(--main_bg);
-    width: 250px;
+    width: 260px;
     padding: 10px;
     transition: all .2s ease;
     pointer-events: none;
@@ -1492,6 +1478,7 @@ export default {
     }
   }
   &__data-panel {
+    overflow: hidden;
     right: 0;
     width: 300px;
     transform: translateX(100%);
