@@ -1,5 +1,6 @@
 <template>
   <v-navigation-drawer
+    hide-overlay
     v-model="gearShow"
     absolute
     width="320"
@@ -11,6 +12,7 @@
       borderTop: `2px solid ${theme.$main_border}`,
       borderBottom: `2px solid ${theme.$main_border}`,
     }"
+    @input="onClose"
     :permissions="permissions"
   >
     <v-btn
@@ -288,6 +290,11 @@ export default {
         grid: JSON.parse(JSON.stringify(this.sizeGrid)),
       });
     },
+    onClose(val) {
+      if (val === false) {
+        this.$emit('update:gearFrom', false)
+      }
+    }
   },
 };
 </script>
