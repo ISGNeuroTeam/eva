@@ -18,7 +18,7 @@
       <div
         class="dash-constructor-schemes__options"
         :class="{
-          'dash-constructor-schemes__options--is-keymap-open': isKeymapOpen,
+          'dash-constructor-schemes__options--is-keymap-open': hotkeysPanel,
           'dash-constructor-schemes__options--edit-mode': dashboardEditMode,
           'dash-constructor-schemes__options--dnd-panel-is-open': dndPanel,
         }"
@@ -26,6 +26,7 @@
         <template v-if="dashboardEditMode">
           <v-tooltip
             bottom
+            z-index="100"
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
@@ -45,6 +46,7 @@
           <!--Export-->
           <v-tooltip
             bottom
+            z-index="100"
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
@@ -64,6 +66,7 @@
           <!--Import-->
           <v-tooltip
             bottom
+            z-index="100"
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
@@ -93,6 +96,7 @@
             <v-tooltip
               :disabled="isLoading"
               bottom
+              z-index="100"
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
@@ -113,6 +117,7 @@
           <template v-if="dataSelectedNode">
             <v-tooltip
               bottom
+              z-index="100"
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
@@ -129,6 +134,7 @@
             </v-tooltip>
             <v-tooltip
               bottom
+              z-index="100"
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
@@ -145,6 +151,7 @@
             </v-tooltip>
             <v-tooltip
               bottom
+              z-index="100"
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
@@ -161,6 +168,7 @@
             </v-tooltip>
             <v-tooltip
               bottom
+              z-index="100"
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
@@ -179,6 +187,7 @@
         </template>
         <v-tooltip
           bottom
+          z-index="100"
           :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
@@ -196,9 +205,15 @@
           <span>Выровнять по центру</span>
         </v-tooltip>
       </div>
-      <div class="dash-constructor-schemes__keymap-button">
+      <div
+        class="dash-constructor-schemes__keymap-button"
+        :class="{
+          'dash-constructor-schemes__keymap-button--x-offset': dataPanel,
+        }"
+      >
         <v-tooltip
           top
+          z-index="100"
           :nudge-top="5"
           :color="theme.$accent_ui_color"
         >
@@ -222,7 +237,7 @@
       <dash-constructor-schemes-keymap
         :id="idDashFrom"
         ref="keymap"
-        v-model="isKeymapOpen"
+        v-model="hotkeysPanel"
         @changeKeymapTab="setPanelBottomOffset"
       />
       <!--Drag-and-drop panel-->
@@ -245,13 +260,13 @@
             <v-select
               v-model="localActiveSchemeId"
               :items="allSavedSchemes"
-              class="
-                pt-3
-                px-0
-                pb-4
-                dash-constructor-schemes__select-field
-                dash-constructor-schemes__select-field--with-padding
-              "
+              :class="[
+                'pt-3',
+                'px-0',
+                'pb-4',
+                'dash-constructor-schemes__select-field',
+                'dash-constructor-schemes__select-field--with-padding',
+              ]"
               label="Активная схема"
               dense
               :menu-props="{
@@ -266,7 +281,13 @@
                   v-on="on"
                 >
                   <v-list-item-content>
-                    <v-list-item-title class="d-flex align-center justify-content-between">
+                    <v-list-item-title
+                      :class="[
+                        'd-flex',
+                        'align-center',
+                        'justify-content-between',
+                      ]"
+                    >
                       <div class="mr-auto">
                         {{ item }}
                       </div>
@@ -283,9 +304,7 @@
               </template>
             </v-select>
           </template>
-          <v-expansion-panels
-            accordion
-          >
+          <v-expansion-panels accordion>
             <v-expansion-panel>
               <v-expansion-panel-header
                 class="dndPanelItem__group-title"
@@ -293,7 +312,12 @@
                 Стандартные элементы
               </v-expansion-panel-header>
               <v-expansion-panel-content eager>
-                <div class="dndPanelItem__group dndPanelItem__group--default-element">
+                <div
+                  :class="[
+                    'dndPanelItem__group',
+                    'dndPanelItem__group--default-element',
+                  ]"
+                >
                   <v-expansion-panels>
                     <v-expansion-panel>
                       <v-expansion-panel-header>
@@ -420,6 +444,7 @@
                                     <v-btn
                                       min-width="100%"
                                       :style="{
+                                        // eslint-disable-next-line max-len
                                         'background-color': elementDefaultStyles.nodeFill.rgbaString,
                                       }"
                                       dark
@@ -709,8 +734,6 @@ export default {
       iconHelp: mdiHelp,
       cloudDownloadOutlineIcon: mdiCloudDownloadOutline,
       fitToPage: mdiFitToPageOutline,
-      dndPanel: false,
-      dataPanel: false,
       nodeBgColorPopup: false,
       nodeBorderColorPopup: false,
       shapeNodeStyle: '',
@@ -762,19 +785,22 @@ export default {
       selectedNode: '',
       selectedDataType: '',
       dataSelectedNode: null,
-      isKeymapOpen: false,
       panelBottomOffset: 10,
       isLoading: false,
-      isConfirmModal: false,
-      isConfirmUpdateScheme: false,
       // Default value - graph
       // activeScheme: 'graph',
       timeout: null,
       timer: 0,
-      isConfirmModalDelete: false,
       schemeIdForDelete: '',
       localActiveSchemeId: '',
       file: null,
+      isConfirmModal: false,
+      isConfirmUpdateScheme: false,
+      isConfirmModalDelete: false,
+      // Panels
+      dndPanel: false,
+      dataPanel: false,
+      hotkeysPanel: false,
     };
   },
   computed: {
@@ -821,52 +847,50 @@ export default {
     },
     tokenActionsByElType() {
       const filteredSavedElements = this.savedGraphObject
-        .filter((el) => typeof el.data?.tag?.fromOtl?.type !== 'undefined');
-      if (filteredSavedElements?.length > 0) {
-        let result = [];
+        .filter((el) => el.data?.tag?.fromOtl?.type != null);
 
-        let allChildCapture = [];
-        filteredSavedElements.forEach((el) => {
-          if (el.data.tag.fromOtl?.child_capture) {
-            const captureList = el.data.tag.fromOtl?.child_capture.split(',');
-            allChildCapture = [...new Set([...allChildCapture, ...captureList])];
-          }
-        });
-
-        filteredSavedElements.forEach((el) => {
-          if (el.data.tag.fromOtl?.type) {
-            result.push(JSON.stringify({
-              name: `click:el-parent-${el.data.tag.fromOtl.type}`,
-              capture: el.data.tag.fromOtl?.parent_capture
-              && typeof el.data.tag.fromOtl.parent_capture === 'string'
-                ? el.data.tag.fromOtl.parent_capture.split(',')
-                : Object.keys(el.data.tag.fromOtl),
-            }));
-            if (allChildCapture?.length > 0) {
-              result.push(JSON.stringify({
-                name: `click:el-child-${el.data.tag.fromOtl.type}`,
-                capture: allChildCapture,
-              }));
-            }
-            result.push(JSON.stringify({
-              name: 'click:el-child',
-              capture: Object.keys(el.data.tag.fromOtl),
-            }));
-          } else {
-            result.push(JSON.stringify({
-              name: 'click:el-other',
-              capture: el.data.tag.fromOtl?.other_capture
-              && typeof el.data.tag.fromOtl.other_capture === 'string'
-                ? el.data.tag.fromOtl.other_capture.split(',')
-                : Object.keys(el.data.tag.fromOtl),
-            }));
-          }
-        });
-
-        result = [...new Set(result)];
-        return result.map((el) => JSON.parse(el));
+      if (filteredSavedElements.length === 0) {
+        return [];
       }
-      return [];
+
+      const result = filteredSavedElements.reduce((acc, el) => {
+        const { type } = el.data.tag.fromOtl;
+        const parentCapture = el.data.tag.fromOtl.parent_capture;
+        const childCapture = el.data.tag.fromOtl.child_capture;
+
+        const capture = (captureString) => (
+          captureString && typeof captureString === 'string'
+            ? captureString.split(',')
+            : Object.keys(el.data.tag.fromOtl)
+        );
+
+        acc.push({
+          name: type
+            ? `click:el-parent-${type}`
+            : 'click:el-other',
+          capture: capture(parentCapture),
+        });
+
+        if (type) {
+          const allChildCapture = childCapture
+            ? [...new Set(childCapture.split(','))]
+            : [];
+          if (allChildCapture.length > 0) {
+            acc.push({
+              name: `click:el-child-${type}`,
+              capture: allChildCapture,
+            });
+          }
+          acc.push({
+            name: 'click:el-child',
+            capture: Object.keys(el.data.tag.fromOtl),
+          });
+        }
+
+        return acc;
+      }, []);
+
+      return [...new Set(result)];
     },
     innerSize() {
       return {
@@ -910,20 +934,21 @@ export default {
       return Number(this.optionsFromStore.minimumEdgeToEdgeDistance) || 10;
     },
     activeSchemeId() {
-      if (
-        this.saveMultipleScheme
+      const hasValidData = this.saveMultipleScheme
           && this.optionsFromStore?.tokensBySchemeId?.length > 0
-          && this.dashFromStore?.tockens?.length > 0
-      ) {
-        const result = [];
-        this.optionsFromStore.tokensBySchemeId.forEach((tokenName) => {
-          const tokenByName = this.dashFromStore.tockens.find((el) => el.name === tokenName);
-          if (tokenName && tokenByName && 'value' in tokenByName) {
-            result.push(tokenByName.value);
-          }
-        });
-        return result.join('-').replaceAll(' ', '_') || 'default-scheme';
+          && this.dashFromStore?.tockens?.length > 0;
+
+      if (hasValidData) {
+        return this.optionsFromStore.tokensBySchemeId
+          .map((tokenName) => {
+            const tokenByName = this.dashFromStore.tockens.find((el) => el.name === tokenName);
+            return tokenByName && 'value' in tokenByName ? tokenByName.value : null;
+          })
+          .filter((value) => value !== null)
+          .join('-')
+          .replace(/\s/g, '_') || 'default-scheme';
       }
+
       return 'default-scheme';
     },
     allSavedSchemes() {
@@ -951,10 +976,14 @@ export default {
         this.constructorSchemes.updateDataInNode(structuredClone(value));
       }
     },
-    isKeymapOpen() {
+    hotkeysPanel(val) {
+      if (val) {
+        this.closePanels(['hotkeysPanel']);
+      }
       this.setPanelBottomOffset();
     },
     fullScreenMode() {
+      this.closePanels();
       this.$nextTick(() => {
         this.$nextTick(() => {
           this.createGraph();
@@ -1041,6 +1070,18 @@ export default {
     }
   },
   methods: {
+    closePanels(exceptions) {
+      const panels = ['dndPanel', 'dataPanel', 'hotkeysPanel'];
+      panels.forEach((panelName) => {
+        if (exceptions) {
+          if (!exceptions.includes(panelName)) {
+            this[panelName] = false;
+          }
+        } else {
+          this[panelName] = false;
+        }
+      });
+    },
     setActions() {
       this.$store.commit('setActions', {
         actions: JSON.parse(JSON.stringify(this.actions)),
@@ -1078,6 +1119,7 @@ export default {
     },
     toggleDnDPanel() {
       this.dndPanel = !this.dndPanel;
+      this.closePanels(['dataPanel', 'dndPanel']);
     },
     toggleLoading(isLoading) {
       this.$emit('setLoading', isLoading);
@@ -1100,29 +1142,13 @@ export default {
         isEdit: this.dashboardEditMode,
         isBridgesEnable: this.isBridgeEnable,
         onClickObject: (type, data) => {
-          if (!type) return;
-          if (!type.includes('label-type') && type !== 'image-node') {
+          if (!type || (!type.includes('label-type') && type !== 'image-node')) {
             return;
           }
-          const actions = type.split('-')
-            .reduce((acc, item, idx) => {
-              if (idx > 0) acc.push(`${acc[idx - 1]}-${item}`);
-              else acc.push(`click:${item}`);
-              return acc;
-            }, []);
-          if (data?.fromOtl?.token_type) {
-            const tokenTypeSplited = data.fromOtl.token_type.split('-');
-            const extActions = tokenTypeSplited
-              .reduce((acc, item, idx) => {
-                if (idx === 0) acc.push(`click:el-${item}`);
-                else acc.push(`${acc[idx - 1]}-${item}`);
-                if (idx + 1 === tokenTypeSplited.length && item.match(/_\d+$/)) {
-                  acc.push(acc[idx].replace(/(_\d+)$/, ''));
-                }
-                return acc;
-              }, []);
-            actions.push(...extActions);
-          }
+
+          const actions = this.getActions(type, 'click');
+          this.addTokenTypeActions(actions, data);
+
           this.$store.commit('tokenAction', {
             idDash: this.idDashFrom,
             elem: this.idFrom,
@@ -1131,26 +1157,46 @@ export default {
           });
 
           const events = this.getEvents({ event: 'onclick' });
-          if (events.length !== 0) {
-            events.forEach((event) => {
-              const fieldName = event.element.match(/:label-(\w+)/);
-              if (event.action === 'go' && fieldName && data[fieldName[1]]) {
-                this.$store.dispatch('letEventGo', {
-                  event,
-                  idDash: this.idDashFrom,
-                  route: this.$router,
-                  store: this.$store,
-                  id: this.idFrom,
-                });
-              }
-            });
-          }
+          this.processEvents(events, data);
         },
       });
       if (this.constructorSchemes) {
         this.shapeNodeStyleList = this.constructorSchemes.getShapeNodeStyleList;
         this.nodeShape = this.constructorSchemes.defaultNodeStyle.shape;
         this.applyOptions();
+      }
+    },
+    getActions(typeString, prefix) {
+      return typeString.split('-').reduce((acc, item, idx) => {
+        if (idx > 0) {
+          acc.push(`${acc[idx - 1]}-${item}`);
+        } else {
+          acc.push(`${prefix}:${item}`);
+        }
+        return acc;
+      }, []);
+    },
+    addTokenTypeActions(actions, data) {
+      if (data?.fromOtl?.token_type) {
+        const tokenTypeSplited = data.fromOtl.token_type.split('-');
+        const extActions = this.getActions(tokenTypeSplited.join('-'), 'click:el');
+        actions.push(...extActions);
+      }
+    },
+    processEvents(events, data) {
+      if (events.length !== 0) {
+        events.forEach((event) => {
+          const fieldName = event.element.match(/:label-(\w+)/);
+          if (event.action === 'go' && fieldName && data[fieldName[1]]) {
+            this.$store.dispatch('letEventGo', {
+              event,
+              idDash: this.idDashFrom,
+              route: this.$router,
+              store: this.$store,
+              id: this.idFrom,
+            });
+          }
+        });
       }
     },
     changeDataSelectedNode(updatedData) {
@@ -1178,7 +1224,7 @@ export default {
     createSavedGraphObjectField() {
       if (!this.savedGraphObject) {
         this.$store.commit('setState', [{
-          object: this.dashFromStore[this.idFrom],
+          object: this.dashFromStore,
           prop: 'savedGraphObject',
           value: {},
         }]);
@@ -1235,6 +1281,7 @@ export default {
       }).then(() => {
         if (targetElement.dataType !== 'image-node') {
           this.dataPanel = true;
+          this.closePanels(['dndPanel', 'dataPanel']);
         }
       });
     },
@@ -1264,11 +1311,11 @@ export default {
       }
     },
     openKeymapPanel() {
-      this.isKeymapOpen = true;
+      this.hotkeysPanel = true;
     },
     setPanelBottomOffset() {
       this.$nextTick().then(() => {
-        this.panelBottomOffset = this.isKeymapOpen ? this.$refs.keymap.$el.clientHeight + 5 : 10;
+        this.panelBottomOffset = this.hotkeysPanel ? this.$refs.keymap.$el.clientHeight + 5 : 10;
       });
     },
     fitGraphContent() {
@@ -1398,6 +1445,8 @@ export default {
     z-index: 10;
     padding-right: 5px;
     transition: all .2s ease;
+    border-radius: 4px;
+    overflow: hidden;
     &--edit-mode {
       &::before {
         content: "";
@@ -1415,7 +1464,7 @@ export default {
     }
 
     &--dnd-panel-is-open {
-      left: 255px;
+      left: 264px;
     }
   }
   &__inner-options {
@@ -1435,6 +1484,10 @@ export default {
     align-items: center;
     justify-content: center;
     opacity: .8;
+    transition: all .2s ease;
+    &--x-offset {
+      right: 310px;
+    }
   }
   &__color-button {
     width: 100%;

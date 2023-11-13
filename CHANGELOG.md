@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Constructor-schemes: Fixed html-template in scheme keymap
+- Constructor-schemes: Fixed state data-panel on change fullscreen mode
 
 ## [1.158.0]
 

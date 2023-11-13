@@ -149,7 +149,7 @@ export default {
               keys: ['ЛКМ', 'Move'],
             },
             {
-              label: 'Перемещение линии ',
+              label: 'Перемещение линии',
               secondLabel: '(без перемещения точек начала и конца линии)',
               keys: ['ЛКМ x2', 'Move'],
             },
@@ -251,7 +251,10 @@ $padding-x: 24px;
   opacity: 0;
   transition: all .2s ease;
   background-color: var(--main_bg);
-  min-height: 400px;
+  height: 335px;
+  padding-left: 8px;
+  padding-bottom: 16px;
+  border-radius: 4px 4px 0 0;
   &--is-open {
     bottom: 0;
     opacity: 1;
@@ -269,10 +272,12 @@ $padding-x: 24px;
     z-index: 1;
   }
   &__wrapper {
+    height: 100%;
     display: grid;
     min-height: inherit;
     grid-template-columns: minmax(120px, auto) 1fr;
     grid-template-rows: auto 1fr;
+    gap: 16px 24px;
     grid-template-areas:
       "header header"
       "tab tab-content";
@@ -286,7 +291,7 @@ $padding-x: 24px;
     grid-template-columns: 1fr;
     grid-auto-rows: max-content;
     gap: 8px 0;
-    padding-top: $padding-top;
+    padding-top: 4px;
   }
   &__tab-item {
     padding: 4px 16px;
@@ -314,8 +319,10 @@ $padding-x: 24px;
     grid-auto-rows: min-content;
     grid-template-columns: 1fr;
     gap: 10px 10px;
-    padding: $padding-top $padding-x;
+    padding-right: $padding-x;
     font-size: 18px;
+    overflow-y: auto;
+    max-height: 260px;
   }
   &__tab-content-item {
     display: grid;
