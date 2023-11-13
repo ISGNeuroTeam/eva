@@ -1,5 +1,6 @@
 <template>
   <v-navigation-drawer
+    hide-overlay
     v-model="gearShow"
     absolute
     width="320"
@@ -11,8 +12,17 @@
       borderTop: `2px solid ${theme.$main_border}`,
       borderBottom: `2px solid ${theme.$main_border}`,
     }"
+    @input="onClose"
     :permissions="permissions"
   >
+    <v-btn
+      icon
+      small
+      :color="theme.$main_text"
+      class="mr-2 mt-1 absolute absolute--right"
+      @click="$emit('update:gearFrom', false)">
+      <v-icon>{{ iconClose }}</v-icon>
+    </v-btn>
     <div
       class="line-setting"
       :style="{ background: theme.$main_bg }"
@@ -140,6 +150,10 @@
 </template>
 
 <script>
+import {
+  mdiClose,
+} from '@mdi/js';
+
 export default {
   props: {
     gearFrom: Boolean,
@@ -165,6 +179,7 @@ export default {
         false: 'нет',
       },
       showTabs: false,
+      iconClose: mdiClose,
     };
   },
   computed: {
@@ -275,6 +290,11 @@ export default {
         grid: JSON.parse(JSON.stringify(this.sizeGrid)),
       });
     },
+    onClose(val) {
+      if (val === false) {
+        this.$emit('update:gearFrom', false)
+      }
+    }
   },
 };
 </script>

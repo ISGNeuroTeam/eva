@@ -306,7 +306,9 @@ export default {
     box(val, old) {
       if (JSON.stringify(val) !== JSON.stringify(old)) {
         this.updateLegendHeight();
-        this.updateBox();
+        this.$nextTick(() => {
+          this.updateBox();
+        })
       }
     },
     dataRestFrom() {

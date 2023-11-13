@@ -10,12 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Updated the top panel UX/UI
 
 ### Fixed
 - Fixed title position of x axis  of multiline visualization in the popup
 - Fixed time format setting of guntt visualization
-- Fixed title position of x axis  of multiline visualization in the popup
 - Fixed color range  setting of accunulator visualization
+- Problem with empty login in the header on the main page
+- GridGroup: 
+  - incorrect size of the multi-line chart
+  - fixed response when updating data sources
 
 ## [1.158.0]
 
