@@ -297,7 +297,7 @@ export default {
       return this.$store.getters.getTheme;
     },
     login() {
-      return this.$store.getters['auth/userName'];
+      return this.$jwt.decode().username;
     },
   },
   mounted() {
