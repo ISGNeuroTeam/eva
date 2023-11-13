@@ -196,10 +196,7 @@
           <span>Выровнять по центру</span>
         </v-tooltip>
       </div>
-      <div
-        v-if="false"
-        class="dash-constructor-schemes__keymap-button"
-      >
+      <div class="dash-constructor-schemes__keymap-button">
         <v-tooltip
           top
           :nudge-top="5"
@@ -223,6 +220,7 @@
       </div>
       <!--Keymap-panel-->
       <dash-constructor-schemes-keymap
+        :id="idDashFrom"
         ref="keymap"
         v-model="isKeymapOpen"
         @changeKeymapTab="setPanelBottomOffset"
@@ -654,7 +652,7 @@ export default {
     SendToBack,
   },
   props: {
-    // id элемента (table-1\2\3, graph-1\2\3)
+    // id элемента (constructor-schemes-1\2\3...)
     idFrom: {
       type: String,
       required: true,
@@ -674,10 +672,12 @@ export default {
       type: Object,
       required: true,
     },
+    // Полноэкранный режим
     fullScreenMode: {
       type: Boolean,
       default: false,
     },
+    // Список источников данных
     dataSources: {
       type: Object,
       default: () => ({}),
@@ -778,29 +778,42 @@ export default {
     };
   },
   computed: {
+    dndPanelId() {
+      return `dndPanel-${this.idFrom}`;
+    },
+    schemeElementId() {
+      return `graphComponent-${this.idFrom}`;
+    },
     dashFromStore() {
       return this.$store.state[this.idDashFrom];
+    },
+    visualisationFromStore() {
+      return this.dashFromStore[this.idFrom];
+    },
+    optionsFromStore() {
+      return this.visualisationFromStore.options;
     },
     dashboardEditMode() {
       return this.dashFromStore.editMode;
     },
-    optionsFromStore() {
-      return this.dashFromStore[this.idFrom].options;
-    },
     primitivesFromStore() {
-      if (this.dashFromStore[this.idFrom]?.options?.primitivesLibrary) {
-        return JSON.parse(this.dashFromStore[this.idFrom].options.primitivesLibrary)
+      if (this.optionsFromStore?.primitivesLibrary) {
+        return JSON.parse(this.optionsFromStore.primitivesLibrary)
           .map((iconName) => ({
             icon: iconName,
           }));
       }
       return [];
     },
+    // old
     savedGraph() {
-      return this.dashFromStore?.savedGraph || this.dashFromStore[this.idFrom]?.savedGraph || '';
+      if (this.dashFromStore?.savedGraph) {
+        return this.dashFromStore.savedGraph;
+      }
+      return this.visualisationFromStore?.savedGraph || '';
     },
     savedGraphObject() {
-      const savedGraph = this.dashFromStore[this.idFrom]?.savedGraphObject;
+      const savedGraph = this.visualisationFromStore?.savedGraphObject;
       if (savedGraph) {
         return savedGraph[this.localActiveSchemeId] || [];
       }
@@ -825,7 +838,7 @@ export default {
             result.push(JSON.stringify({
               name: `click:el-parent-${el.data.tag.fromOtl.type}`,
               capture: el.data.tag.fromOtl?.parent_capture
-                  && typeof el.data.tag.fromOtl.parent_capture === 'string'
+              && typeof el.data.tag.fromOtl.parent_capture === 'string'
                 ? el.data.tag.fromOtl.parent_capture.split(',')
                 : Object.keys(el.data.tag.fromOtl),
             }));
@@ -843,7 +856,7 @@ export default {
             result.push(JSON.stringify({
               name: 'click:el-other',
               capture: el.data.tag.fromOtl?.other_capture
-                  && typeof el.data.tag.fromOtl.other_capture === 'string'
+              && typeof el.data.tag.fromOtl.other_capture === 'string'
                 ? el.data.tag.fromOtl.other_capture.split(',')
                 : Object.keys(el.data.tag.fromOtl),
             }));
@@ -865,7 +878,7 @@ export default {
       return this.$store.getters.getTheme;
     },
     searchForBuildScheme() {
-      return this.dashFromStore[this.idFrom].options.searchForBuildScheme;
+      return this.optionsFromStore.searchForBuildScheme;
     },
     dataForBuildScheme() {
       if (this.searchForBuildScheme) {
@@ -879,7 +892,7 @@ export default {
         ?.status === 'pending';
     },
     isPanelBackHide() {
-      return this.dashFromStore[this.idFrom].options?.panelBackHide || false;
+      return this.optionsFromStore?.panelBackHide || false;
     },
     isBridgeEnable() {
       return this.optionsFromStore?.isBridgeEdgeSupport || false;
@@ -914,8 +927,8 @@ export default {
       return 'default-scheme';
     },
     allSavedSchemes() {
-      if (this.dashFromStore[this.idFrom]?.savedGraphObject) {
-        return Object.keys(this.dashFromStore[this.idFrom].savedGraphObject);
+      if (this.visualisationFromStore?.savedGraphObject) {
+        return Object.keys(this.visualisationFromStore.savedGraphObject);
       }
       return [];
     },
@@ -967,7 +980,7 @@ export default {
     },
     activeSchemeId(schemeId) {
       this.localActiveSchemeId = schemeId;
-      if (!this.dashFromStore[this.idFrom].savedGraphObject[schemeId]) {
+      if (!this.savedGraphObject[schemeId]) {
         this.updateSavedGraphObject([]);
       }
     },
@@ -1003,7 +1016,7 @@ export default {
     },
   },
   created() {
-    if (!this.dashFromStore[this.idFrom].savedGraphObject) {
+    if (!this.savedGraphObject) {
       this.localActiveSchemeId = this.activeSchemeId || 'default-scheme';
       this.createSavedGraphObjectField();
     }
@@ -1017,11 +1030,11 @@ export default {
     this.isEdit = this.dashboardEditMode;
     if (this.constructorSchemes) {
       if (this.isAlwaysUpdateScheme && this.dataForBuildScheme?.length > 0) {
-        this.constructorSchemes.buildSchemeFromSearch(
-          this.dataForBuildScheme,
-          this.minimumLastSegmentLength,
-          this.minimumEdgeToEdgeDistance,
-        );
+        this.constructorSchemes.buildSchemeFromSearch({
+          dataFrom: this.dataForBuildScheme,
+          minimumLastSegmentLength: this.minimumLastSegmentLength,
+          minimumEdgeToEdgeDistance: this.minimumEdgeToEdgeDistance,
+        });
       } else {
         this.constructorSchemes.update(this.savedGraphObject);
       }
@@ -1037,18 +1050,18 @@ export default {
     },
     getEvents({ event }) {
       let result = [];
-      if (!this.$store.state[this.idDashFrom].events) {
+      if (!this.dashFromStore.events) {
         this.$store.commit('setState', [{
-          object: this.$store.state[this.idDashFrom],
+          object: this.dashFromStore,
           prop: 'events',
           value: [],
         }]);
         return [];
       }
-      result = this.$store.state[this.idDashFrom].events.filter((item) => (
+      result = this.dashFromStore.events.filter((item) => (
         item.event === event
-        && item.element.indexOf(`${this.idFrom}:`) !== -1
-        && item.partelement === 'empty'
+          && item.element.indexOf(`${this.idFrom}:`) !== -1
+          && item.partelement === 'empty'
       ));
       return result;
     },
@@ -1072,12 +1085,11 @@ export default {
     },
     createGraph() {
       this.constructorSchemes = new ConstructorSchemesClass({
-        dndPanelElem: this.$refs[`dndPanel-${this.idFrom}`],
+        dndPanelElem: this.$refs[this.dndPanelId],
         schemeId: this.idFrom,
-        elem: this.$refs[`graphComponent-${this.idFrom}`],
+        elem: this.$refs[this.schemeElementId],
         dataRest: this.dataRestFrom,
         iconsList: this.primitivesFromStore,
-        elementDefaultStyles: this.elementDefaultStyles,
         openDataPanelCallback: this.openDataPanel,
         closeDataPanelCallback: this.closeDataPanel,
         savedGraph: this.savedGraph,
@@ -1150,7 +1162,7 @@ export default {
       });
     },
     updateSavedGraph(data) {
-      if (this.dashFromStore?.savedGraph) {
+      if (this.savedGraph) {
         this.$store.commit('setState', [{
           object: this.dashFromStore,
           prop: 'savedGraph',
@@ -1158,22 +1170,22 @@ export default {
         }]);
       }
       this.$store.commit('setState', [{
-        object: this.dashFromStore[this.idFrom],
+        object: this.visualisationFromStore,
         prop: 'savedGraph',
         value: data,
       }]);
     },
     createSavedGraphObjectField() {
-      if (!this.dashFromStore[this.idFrom]?.savedGraphObject) {
+      if (!this.savedGraphObject) {
         this.$store.commit('setState', [{
           object: this.dashFromStore[this.idFrom],
           prop: 'savedGraphObject',
           value: {},
         }]);
       }
-      if (!this.dashFromStore[this.idFrom]?.savedGraphObject[this.localActiveSchemeId]) {
+      if (!this.savedGraphObject[this.localActiveSchemeId]) {
         this.$store.commit('setState', [{
-          object: this.dashFromStore[this.idFrom].savedGraphObject,
+          object: this.savedGraphObject,
           prop: this.localActiveSchemeId || 'default-scheme',
           value: [],
         }]);
@@ -1181,7 +1193,7 @@ export default {
     },
     clearSavedGraphObject() {
       this.$store.commit('setState', [{
-        object: this.dashFromStore[this.idFrom].savedGraphObject,
+        object: this.savedGraphObject,
         prop: this.localActiveSchemeId,
         value: [],
       }]);
@@ -1194,11 +1206,11 @@ export default {
       this.timeout = setTimeout(() => {
         this.createSavedGraphObjectField();
         this.$store.commit('setState', [{
-          object: this.dashFromStore[this.idFrom].savedGraphObject,
+          object: this.savedGraphObject,
           prop: this.localActiveSchemeId,
           value: data,
         }]);
-        if (this.dashFromStore[this.idFrom].savedGraph || this.dashFromStore.savedGraph) {
+        if (this.savedGraph) {
           this.updateSavedGraph('');
         }
       }, this.timer);
@@ -1270,12 +1282,6 @@ export default {
         this.constructorSchemes.buildSchemeFromSearch(this.dataForBuildScheme);
       }
     },
-    updateIconsList(iconsListFrom) {
-      return iconsListFrom
-        .filter((elementFrom) => !this.primitivesFromStore
-          .some((element) => element.icon === elementFrom.icon))
-        .map((element) => element.icon);
-    },
     openConfirmDeleteModal(schemeIdForDelete) {
       this.schemeIdForDelete = schemeIdForDelete;
       this.isConfirmModalDelete = true;
@@ -1291,7 +1297,7 @@ export default {
           });
           return result;
         };
-        const allSchemes = structuredClone(this.dashFromStore[this.idFrom].savedGraphObject);
+        const allSchemes = structuredClone(this.savedGraphObject);
         const filteredSavedSchemes = deleteFn(allSchemes, [this.schemeIdForDelete]);
         this.$store.commit('setState', [{
           object: this.dashFromStore[this.idFrom],
