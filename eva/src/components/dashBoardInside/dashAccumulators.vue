@@ -286,15 +286,18 @@ export default {
         }
         // eslint-disable-next-line no-eval
         const metadata = eval(`({obj:[${item.metadata}]})`).obj[0];
-        const persentage = (item.value / item.max) * 100;
-        return Object.keys(metadata)
-          .reverse()
-          .reduce((acc, metadataKey) => {
-            if (persentage > parseInt(metadata[metadataKey], 10) && !acc) {
-              return metadataKey;
-            }
-            return acc;
-          }, '');
+        const percentage = (item.value / item.max) * 100;
+        if (metadata) {
+          const colorRange = Object.keys(metadata)
+            .reverse()
+            .reduce((acc, metadataKey) => {
+              if (percentage > parseInt(metadata[metadataKey], 10) && !acc) {
+                return metadataKey;
+              }
+              return acc;
+            }, '');
+          return colorRange;
+        }
       }
       return this.theme.$primary_button;
     },

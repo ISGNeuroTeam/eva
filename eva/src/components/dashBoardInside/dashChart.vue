@@ -588,6 +588,7 @@ export default {
 
 .x-metric-text
   font-size: 11px
+  text-align: center
 
 .legend
   text-align: left

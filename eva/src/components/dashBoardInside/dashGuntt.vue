@@ -134,6 +134,18 @@ export default {
     idDash() {
       return this.idDashFrom;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.id];
+    },
+    timeFormatFromOptions() {
+      if (!this.idDash) {
+        return '%Y-%m-%d %H:%M:%S';
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+      }
+      return this.dashFromStore.options?.timeFormat || '%Y-%m-%d %H:%M:%S';
+    },
   },
   watch: {
     dataRestFrom() {
@@ -160,7 +172,7 @@ export default {
         this.noMsg = true;
       }
     },
-    timeFormatFrom() {
+    timeFormatFromOptions() {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
           if (this.dataReport) {
@@ -317,7 +329,7 @@ export default {
       };
       const width = sizeChart.width - margin.left - margin.right;
       const height = sizeChart.height - margin.top - margin.bottom;
-      const dateFormat = this.timeFormatFrom || '%Y-%m-%d %H:%M:%S';
+      const dateFormat = this.timeFormatFromOptions || '%Y-%m-%d %H:%M:%S';
 
       const data = [];
       dataRest.forEach((item) => {

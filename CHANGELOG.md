@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Fixed title position of x axis  of multiline visualization in the popup
+- Fixed time format setting of guntt visualization
+- Fixed title position of x axis  of multiline visualization in the popup
+- Fixed color range  setting of accunulator visualization
 
 ## [1.158.0]
 
