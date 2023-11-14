@@ -321,10 +321,7 @@ export default {
   data() {
     return {
       actions: [{ name: 'select', capture: [] }],
-      captures: {
-        period: ['start', 'end'],
-        day: ['exactDate'],
-      },
+      captures: ['start', 'end', 'exact'],
       start: null,
       end: null,
       range: null,
@@ -464,7 +461,7 @@ export default {
       };
     },
     isPeriod() {
-      return this.options.periodOrDay;
+      return !this.options.selectingExactDate;
     },
     showLastTimeBlock() {
       if (!this.isPeriod) {
@@ -494,7 +491,25 @@ export default {
     },
   },
   watch: {
-    isPeriod() {
+    isPeriod(val) {
+      if (val) {
+        if (this.exactDate) {
+          this.start = this.exactDate;
+          this.curDate = `${this.start} - ...`;
+          this.exactDate = null;
+          this.setTocken('dt');
+        }
+      }
+      if (!val) {
+        if (this.start) {
+          this.exactDate = this.start;
+          this.curDate = this.exactDate;
+          this.start = null;
+          this.end = null;
+          this.setTocken('exactDate');
+        }
+      }
+      this.commitTokenValue();
       this.setTokenAction();
     },
     options(val, oldVal) {
@@ -538,9 +553,7 @@ export default {
     setTokenAction() {
       const actions = this.actions.map((action) => ({
         ...action,
-        capture: this.isPeriod
-          ? this.captures.period
-          : this.captures.day,
+        capture: this.captures,
       }));
       this.$store.commit('setActions', {
         actions,
@@ -705,6 +718,7 @@ export default {
         case 'dt':
           this.startForStore = this.formatDateToResult(this.start);
           this.endForStore = this.formatDateToResult(this.end);
+          this.exactDateForStore = null;
           this.range = null;
           this.exactDate = null;
           this.start_custom.value = null;
@@ -751,6 +765,7 @@ export default {
         case 'custom-range':
           this.startForStore = this.start_custom.value;
           this.endForStore = this.end_custom.value;
+          this.exactDateForStore = null;
           this.start = null;
           this.exactDate = null;
           this.exactDateCustom.value = null;
@@ -819,6 +834,7 @@ export default {
           this.start = null;
           this.end = null;
           this.range = null;
+          this.exactDateForStore = null;
           this.start_custom.value = null;
           this.end_custom.value = null;
           break;
@@ -855,11 +871,10 @@ export default {
         idDash: this.idDashFrom,
         elem: this.idFrom,
         action: 'select',
-        value: this.isPeriod ? {
+        value: {
           start: this.startForStore || '',
           end: this.endForStore || '',
-        } : {
-          exactDate: this.exactDateForStore || '',
+          exact: this.exactDateForStore || '',
         },
       });
     },

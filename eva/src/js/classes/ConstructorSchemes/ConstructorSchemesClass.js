@@ -42,7 +42,7 @@ import {
   Rect,
   ShapeNodeStyle,
   SimpleEdge,
-  SimpleLabel,
+  GraphClipboard,
   SimpleNode,
   Size,
   StorageLocation,
@@ -591,16 +591,6 @@ class ConstructorSchemesClass {
     // old
     // Сохранение через GraphML
     this.initializeIO();
-    if (this.savedGraph) {
-      this.loadGraph().then(() => {
-        this.updateDataNodeTemplate();
-        // Выравнивание графа, инициализация dnd панели
-        this.updateViewport().then(() => {
-          this.dndPanelElem = dndPanelElem;
-          this.initializeDnDPanel();
-        });
-      });
-    }
 
     this.schemeUpdater = null;
     if (this.savedGraphObject && !this.savedGraph) {
@@ -922,11 +912,9 @@ class ConstructorSchemesClass {
       focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
-      // Выключены встроеные способы копирования т.к. работают не корректно, написан свой
-      allowPaste: false,
-      allowDuplicate: false,
+      allowPaste: true,
+      allowDuplicate: true,
       ignoreVoidStyles: true,
-      allowClipboardOperations: false,
       moveLabelInputMode: labelMode,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
@@ -1065,6 +1053,40 @@ class ConstructorSchemesClass {
       this.saveAnObject();
     });
 
+    // Событие копирования
+    this.graphComponent.clipboard.fromClipboardCopier.addNodeCopiedListener(
+      (sender, { copy, original }) => {
+        copy.tag = {
+          ...copy.tag,
+          nodeId: copy.hashCode(),
+        };
+        original.tag = {
+          ...original.tag,
+          nodeId: original.hashCode(),
+        };
+      },
+    );
+
+    // Событие дублирования
+    this.graphComponent.clipboard.duplicateCopier.addNodeCopiedListener(
+      (sender, { copy, original }) => {
+        copy.tag = {
+          ...copy.tag,
+          nodeId: copy.hashCode(),
+        };
+        original.tag = {
+          ...original.tag,
+          nodeId: original.hashCode(),
+        };
+      },
+    );
+
+    // События вставки
+    this.graphComponent.clipboard.addElementsPastedListener(() => {
+      this.orderTo('toFront');
+      this.setDefaultElementsOrder();
+    });
+
     // Событие редактирования положения\размеров узла
     this.graphComponent.graph.addNodeLayoutChangedListener(throttle(() => {
       // Сохранение в store
@@ -1083,84 +1105,6 @@ class ConstructorSchemesClass {
     this.graphComponent.inputMode = mode;
   }
 
-  getOffsetSelectedElements() {
-    const selectedElements = this.graphComponent.selection.toArray();
-    let minX = selectedElements[0].layout.x;
-    let minY = selectedElements[0].layout.y;
-    let { maxX } = selectedElements[0].layout;
-    let maxY = selectedElements[0].layout.y;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const item of selectedElements) {
-      if (item instanceof INode && item.tag.dataType !== 'invisible') {
-        if (minX > item.layout.x) minX = item.layout.x;
-        if (minY > item.layout.y) minY = item.layout.y;
-        if (maxX < item.layout.maxX) maxX = item.layout.maxX;
-        if (maxY < item.layout.maxY) maxY = item.layout.maxY;
-      }
-    }
-    const width = maxX - minX;
-    const height = maxY - minY;
-    return {
-      x: width / 2,
-      y: height / 2,
-    };
-  }
-
-  getTemplateElementsForCopy() {
-    const offset = this.getOffsetSelectedElements();
-    return this.graphComponent.selection.toArray().map((el) => {
-      // TODO: Пока сделано только для узлов
-      if (el instanceof INode && el.tag.dataType !== 'invisible') {
-        const xPos = el.layout.x + (el.layout.width / 2);
-        const yPos = el.layout.y + (el.layout.height / 2);
-        const node = {
-          location: {
-            x: xPos + offset.x,
-            y: yPos + offset.y,
-          },
-          layout: {
-            width: el.layout.width,
-            height: el.layout.height,
-          },
-          labels: el.labels,
-          id: el.hashCode(),
-          tag: el.tag,
-        };
-        if (el.tag.dataType === 'image-node') {
-          return {
-            ...node,
-            style: el.style.clone(),
-          };
-        }
-        return node;
-      }
-      return null;
-    }).filter((el) => el !== null);
-  }
-
-  copyElement() {
-    // Очищаем ранее скопированные элементы
-    this.copiedElements = null;
-    // Сохраняем новые
-    this.copiedElements = this.getTemplateElementsForCopy();
-  }
-
-  async pasteElement() {
-    if (this.copiedElements?.length > 0) {
-      this.graphComponent.selection.clear();
-      await Promise.all(this.copiedElements.map((element) => this.nodeCreator({
-        dropData: element,
-        dropLocation: element?.location,
-      }))).then((createdElements) => {
-        createdElements.forEach((el) => {
-          this.graphComponent.inputMode.setSelected(el, true);
-          this.copyElement();
-        });
-        this.graphComponent.updateVisual();
-      });
-    }
-  }
-
   async nodeCreator({
     dropData,
     dropLocation,
@@ -1170,7 +1114,7 @@ class ConstructorSchemesClass {
       elements: [],
     });
     return new Promise((resolve) => {
-      elementCreator.createNode({
+      const element = {
         layout: {
           width: dropData.layout.width,
           height: dropData.layout.height,
@@ -1182,6 +1126,11 @@ class ConstructorSchemesClass {
           ...dropData.tag,
           nodeId: dropData?.id || dropData?.hashCode(),
         },
+      };
+      ElementCreator.createNode({
+        element,
+        graph: this.graphComponent.graph,
+        elementTemplates,
       }).then((createdElement) => {
         resolve(createdElement);
       });
@@ -1613,7 +1562,9 @@ class ConstructorSchemesClass {
   }
 
   refreshDnDPanel(updatedPrimitives) {
-    this.dragAndDropPanel.clearDnDPanel();
+    if (this.dragAndDropPanel) {
+      this.dragAndDropPanel.clearDnDPanel();
+    }
     this.initializeDnDPanel(updatedPrimitives);
   }
 
@@ -1906,6 +1857,10 @@ class ConstructorSchemesClass {
     const edges = this.graphComponent.selection.selectedEdges;
     const elements = [...nodes.toArray(), ...edges.toArray()];
 
+    this.changeOrderElements(method, command, elements);
+  }
+
+  changeOrderElements(method, command, elements) {
     if (elements?.length > 0) {
       this.graphComponent.graphModelManager[method](elements);
       elements.forEach((element) => {
@@ -1917,14 +1872,18 @@ class ConstructorSchemesClass {
     }
   }
 
-  orderTo(key) {
+  orderTo(key, elements) {
     const orderCommands = {
       toFront: 'TO_FRONT',
       toBack: 'TO_BACK',
       raise: 'RAISE',
       lower: 'LOWER',
     };
-    this.changeOrderSelectedElements(key, orderCommands[key]);
+    if (elements) {
+      this.changeOrderElements(key, orderCommands[key], elements);
+    } else {
+      this.changeOrderSelectedElements(key, orderCommands[key]);
+    }
   }
 
   // TODO: Временное решения для выставления z-order по уполчанию

@@ -385,7 +385,7 @@ export default {
       'closeListByEnter',
     ],
     picker: [
-      'periodOrDay',
+      'selectingExactDate',
       'showLastTimeBlock',
       'showChoseDateAndTimeBlock',
       'showRangeDateBlock',
@@ -750,10 +750,10 @@ export default {
 
     // datepicker
     {
-      option: 'periodOrDay',
-      description: 'День/Период',
+      option: 'selectingExactDate',
+      description: 'Выбор точной даты',
       elem: 'switch',
-      default: true,
+      default: false,
     },
     {
       option: 'showLastTimeBlock',
