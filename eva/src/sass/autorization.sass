@@ -40,7 +40,13 @@
 
         .field-aut
             margin: 15px 0
-            color: inherit 
+            color: inherit
+
+            input:autofill,
+            input:-internal-autofill-selected,
+            input:-internal-autofill-previewed
+                -webkit-text-fill-color: var(--primary_button)
+                -webkit-box-shadow: 0 0 0 30px var(--main_bg) inset !important
 
             .v-input__control
                 color: inherit
