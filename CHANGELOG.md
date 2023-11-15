@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated the top panel UX/UI
 
 ### Fixed
+- Multiline: clicking on the legend opens the settings when the dashboard editing mode is turned off
 - Problem with empty login in the header on the main page
 - GridGroup: 
   - incorrect size of the multi-line chart
