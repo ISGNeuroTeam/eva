@@ -356,6 +356,7 @@ class ConstructorSchemesClass {
     isBridgesEnable, // Флаг вкл\выкл обработку пересечения линий
   }) {
     this.dragAndDropPanel = null;
+    this.schemeUpdater = null;
     this.elem = elem;
     this.isEdit = isEdit;
     this.dataRest = dataRest;
@@ -388,9 +389,7 @@ class ConstructorSchemesClass {
     }
     // old
     // Сохранение через GraphML
-    this.initializeIO();
-
-    this.schemeUpdater = null;
+    // this.initializeIO();
     if (this.savedGraphObject && !this.savedGraph) {
       this.load(dndPanelElem);
     }
@@ -442,10 +441,6 @@ class ConstructorSchemesClass {
     dropData,
     dropLocation,
   }) {
-    const elementCreator = new ElementCreator({
-      graph: this.graphComponent.graph,
-      elements: [],
-    });
     return new Promise((resolve) => {
       const element = {
         layout: {
@@ -482,11 +477,17 @@ class ConstructorSchemesClass {
       const items = [];
       // Ребра
       items.push({
-        panelItem: this.createDndPanelDefaultEdge('Стандартные элементы', 'default-element'),
+        panelItem: this.createDndPanelDefaultEdge(
+          'Стандартные элементы',
+          'default-element',
+        ),
         id: 'default-edge',
       });
       if (this.elementTemplates) {
-        Object.entries(this.elementTemplates).forEach(([key, value]) => {
+        Object.entries(this.elementTemplates).forEach(([
+          key,
+          value,
+        ]) => {
           if (key.includes('shape-type')) {
             items.push({
               panelItem: this.createDnDPanelDefaultNode(value),
@@ -720,7 +721,7 @@ class ConstructorSchemesClass {
     });
   }
 
-  updateDataNodeTemplate() {
+  renderVueTemplateNode() {
     this.graphComponent.graph.nodes.forEach((node) => {
       if (node.tag.dataType || node?.tag[0] === 'i' || node?.tag === 'invisible') {
         if (node.tag.dataType !== 'image-node' && node?.tag?.dataType !== 'invisible') {
@@ -803,7 +804,9 @@ class ConstructorSchemesClass {
     const schemeUpdater = this.initSchemeUpdater();
     this.graphComponent.graph.clear();
     schemeUpdater.load().then(() => {
-      this.updateDataNodeTemplate();
+      // Применение VueJsNodeStyle
+      this.renderVueTemplateNode();
+      // Установка z-order по-умолчанию
       this.setDefaultElementsOrder();
       // Выравнивание графа, инициализация dnd панели
       return this.updateViewport();
@@ -813,7 +816,9 @@ class ConstructorSchemesClass {
   load(dndPanelElem) {
     const schemeUpdater = this.initSchemeUpdater();
     schemeUpdater.load().then(() => {
-      this.updateDataNodeTemplate();
+      // Применение VueJsNodeStyle
+      this.renderVueTemplateNode();
+      // Установка z-order по-умолчанию
       this.setDefaultElementsOrder();
       // Выравнивание графа, инициализация dnd панели
       this.updateViewport().then(() => {
@@ -1452,12 +1457,17 @@ class ConstructorSchemesClass {
 
   setDefaultStyles() {
     const { graph } = this.graphComponent;
-    // Creates a PolylineEdgeStyle which will be used as default for all edges
-    // that don't have another style assigned explicitly
+    const {
+      smoothingLength,
+      strokeSize,
+      strokeColor,
+      targetArrowColor,
+      targetArrowType,
+    } = this.defaultEdgeStyle;
     graph.edgeDefaults.style = new PolylineEdgeStyle({
-      smoothingLength: this.defaultEdgeStyle.smoothingLength,
-      stroke: `${this.defaultEdgeStyle.strokeSize} solid ${this.defaultEdgeStyle.strokeColor}`,
-      targetArrow: `${this.defaultEdgeStyle.targetArrowColor} ${this.defaultEdgeStyle.targetArrowType}`,
+      smoothingLength,
+      stroke: `${strokeSize} solid ${strokeColor}`,
+      targetArrow: `${targetArrowColor} ${targetArrowType}`,
     });
 
     graph.edgeDefaults.ports.style = new NodeStylePortStyleAdapter({
@@ -1631,17 +1641,15 @@ class ConstructorSchemesClass {
       'dynamic-image',
       'dynamic-image-node',
     );
+    // Основное(по-умолчанию) изображение
+    const { defaultImage } = node.tag;
     let {
       // Основные размеры изображения
       imageLayout,
-      // Основное(по-умолчанию) изображение
-      // eslint-disable-next-line prefer-const
-      defaultImage,
       // Полная ссылка на основное(по-умолчанию) изображение
       defaultImagePath,
     } = node.tag;
-    // Список изображений с полными ссылками
-    // Если это первое выбранное изображение или основное изображение заменили
+
     if (!imageLayout) {
       GenerateIconClass.generateIconNodes([{
         icon: defaultImage,
@@ -1666,7 +1674,11 @@ class ConstructorSchemesClass {
           updatedNodeTag.imageLayout = imageLayout;
           updatedNodeTag.defaultImagePath = defaultImagePath;
         });
-        this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath).then(() => {
+        this.updateActiveImageInDynamicNode(
+          node,
+          GenerateIconClass,
+          defaultImagePath,
+        ).then(() => {
           node.tag = {
             ...node.tag,
             imageLayout,
@@ -1677,11 +1689,33 @@ class ConstructorSchemesClass {
         });
       });
     } else {
-      this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath).then(() => {
+      this.updateActiveImageInDynamicNode(
+        node,
+        GenerateIconClass,
+        defaultImagePath,
+      ).then(() => {
         this.saveAnObject();
       });
     }
     return node;
+  }
+
+  async setImageRatio(path, node) {
+    return new Promise((resolve) => {
+      const imageAspectRatio = ImageNodeStyle.getAspectRatio(path);
+      imageAspectRatio.then((result) => {
+        const style = new ImageNodeStyle({
+          image: path,
+          // always keep the intrinsic aspect ratio independent of the node's size
+          aspectRatio: result,
+        });
+        this.graphComponent.graph.setStyle(
+          node,
+          style,
+        );
+        resolve();
+      });
+    });
   }
 
   updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath) {
@@ -1693,60 +1727,43 @@ class ConstructorSchemesClass {
     }));
     return GenerateIconClass.generateIconNodes(mappedImageListFromNode)
       .then((response) => new Promise((resolve) => {
-        imageListFromIconClass = response.map((item) => ({
-          value: item.value,
-          image: item.image,
-          path: item.icon?.node?.style?.image || '',
+        imageListFromIconClass = response.map(({ value, image, icon }) => ({
+          value,
+          image,
+          path: icon?.node?.style?.image || '',
         }));
+        // Ранее установленное изображение
         const activeImageFromNode = node.tag.activeImage;
+        // Новое изображение(по значению из дата-сета)
         const activeImageFromData = imageListFromIconClass
           .find((el) => `${el.value}` === `${node.tag.value}`);
         const activeImageIsChanged = activeImageFromData?.image !== activeImageFromNode?.image;
+        // Если есть новое изображениие
         if (activeImageFromData) {
+          // Если оно отличается от старого
           if (activeImageIsChanged) {
+            // Обновляем
             node.tag.activeImage = activeImageFromData;
           }
         }
+        // Отправляем изображение далее...
         resolve(activeImageFromData);
       }))
       .then((activeImage) => new Promise((resolve, reject) => {
         if (activeImage) {
-          // determine the intrinsic aspect ratio of the image
-          const imageAspectRatio = ImageNodeStyle.getAspectRatio(activeImage.path);
-          imageAspectRatio.then((result) => {
-            const style = new ImageNodeStyle({
-              image: activeImage.path,
-              // always keep the intrinsic aspect ratio independent of the node's size
-              aspectRatio: result,
-            });
-            this.graphComponent.graph.setStyle(
-              node,
-              style,
-            );
+          this.setImageRatio(activeImage.path, node).then(() => {
+            resolve();
           });
-
-          resolve();
-        } else if (!activeImage && defaultImagePath) {
-          // determine the intrinsic aspect ratio of the image
-          const imageAspectRatio = ImageNodeStyle.getAspectRatio(defaultImagePath);
-          imageAspectRatio.then((result) => {
-            const style = new ImageNodeStyle({
-              image: defaultImagePath,
-              // always keep the intrinsic aspect ratio independent of the node's size
-              aspectRatio: result,
-            });
-            this.graphComponent.graph.setStyle(
-              node,
-              style,
-            );
+        } else if (defaultImagePath) {
+          this.setImageRatio(defaultImagePath, node).then(() => {
+            resolve();
           });
-          resolve();
         } else {
           reject();
         }
       }))
       .catch(() => {
-        // Если изображение не найдено на сервере или по какой-то причине не загрузилось
+        // Если изображение не найдено на сервере
         // Или по какой-то причине не загрузилось
         // Или не указано в настройках элемента
         this.graphComponent.graph.setStyle(
