@@ -26,7 +26,7 @@
         <template v-if="dashboardEditMode">
           <v-tooltip
             bottom
-            z-index="100"
+            :z-index="fullScreenMode ? 1005 : 100"
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
@@ -46,7 +46,7 @@
           <!--Export-->
           <v-tooltip
             bottom
-            z-index="100"
+            :z-index="fullScreenMode ? 1005 : 100"
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
@@ -66,7 +66,7 @@
           <!--Import-->
           <v-tooltip
             bottom
-            z-index="100"
+            :z-index="fullScreenMode ? 1005 : 100"
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
@@ -96,7 +96,7 @@
             <v-tooltip
               :disabled="isLoading"
               bottom
-              z-index="100"
+              :z-index="fullScreenMode ? 1005 : 100"
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
@@ -117,7 +117,7 @@
           <template v-if="dataSelectedNode">
             <v-tooltip
               bottom
-              z-index="100"
+              :z-index="fullScreenMode ? 1005 : 100"
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
@@ -134,7 +134,7 @@
             </v-tooltip>
             <v-tooltip
               bottom
-              z-index="100"
+              :z-index="fullScreenMode ? 1005 : 100"
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
@@ -151,7 +151,7 @@
             </v-tooltip>
             <v-tooltip
               bottom
-              z-index="100"
+              :z-index="fullScreenMode ? 1005 : 100"
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
@@ -168,7 +168,7 @@
             </v-tooltip>
             <v-tooltip
               bottom
-              z-index="100"
+              :z-index="fullScreenMode ? 1005 : 100"
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
@@ -187,7 +187,7 @@
         </template>
         <v-tooltip
           bottom
-          z-index="100"
+          :z-index="fullScreenMode ? 1005 : 100"
           :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
@@ -213,7 +213,7 @@
       >
         <v-tooltip
           top
-          z-index="100"
+          :z-index="fullScreenMode ? 1005 : 100"
           :nudge-top="5"
           :color="theme.$accent_ui_color"
         >
@@ -350,7 +350,7 @@
                                 <v-menu
                                   top
                                   offset-x
-                                  z-index="100"
+                                  :z-index="fullScreenMode ? 1005 : 100"
                                   :close-on-content-click="false"
                                 >
                                   <template v-slot:activator="{ on, attrs }">
@@ -437,7 +437,7 @@
                                 <v-menu
                                   top
                                   offset-x
-                                  z-index="100"
+                                  :z-index="fullScreenMode ? 1005 : 100"
                                   :close-on-content-click="false"
                                 >
                                   <template v-slot:activator="{ on, attrs }">
@@ -469,7 +469,7 @@
                                 <v-menu
                                   top
                                   offset-x
-                                  z-index="100"
+                                  :z-index="fullScreenMode ? 1005 : 100"
                                   :close-on-content-click="false"
                                 >
                                   <template v-slot:activator="{ on, attrs }">
