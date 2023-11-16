@@ -42,9 +42,7 @@ import {
   Rect,
   ShapeNodeStyle,
   SimpleEdge,
-  GraphClipboard,
   SimpleNode,
-  Size,
   StorageLocation,
   VoidNodeStyle,
   SimplePort,
@@ -73,22 +71,7 @@ import GenerateElementsFromSearch from '@/js/classes/ConstructorSchemes/Generate
 License.value = licenseData; // Проверка лицензии
 
 class ConstructorSchemesClass {
-  static async webGl2CreateNode({
-    graph,
-    createdNode,
-    dropData,
-  }) {
-    await graph.setStyle(
-      createdNode,
-      new ShapeNodeStyle({
-        shape: 'round-rectangle',
-        fill: Utils.colorToString(Color.from(dropData.style.fill.color)),
-        stroke: `${Utils.colorToString(Color.from(dropData.style.stroke.fill.color))} ${dropData.style.stroke.thickness}px`,
-      }),
-    );
-    return createdNode;
-  }
-
+  /* Static methods */
   static getColorForColorPicker(color) {
     return {
       rgba: {
@@ -97,7 +80,10 @@ class ConstructorSchemesClass {
         b: color.b,
         a: color.a,
       },
-      rgbaString: Utils.colorToString(color),
+      rgbaString: Utils.colorToString(
+        color,
+        false,
+      ),
     };
   }
 
@@ -198,6 +184,377 @@ class ConstructorSchemesClass {
     }
     return node.tag;
   }
+
+  /* Variables */
+  defaultDataSource = []
+
+  // Main constructor options
+  options = {
+    defaultNodeSize: [150, 150],
+    defaultNodeStyle: {
+      shape: 0,
+      fill: '#FFFFFF',
+      strokeColor: '#F4F4F4',
+      strokeSize: '1.5px',
+    },
+    defaultEdgeStyle: {
+      strokeColor: '#FFFFFF',
+      strokeSize: '1.5px',
+      targetArrowColor: '#F4F4F4',
+      targetArrowType: 'none',
+      smoothingLength: 0,
+    },
+    defaultLabelStyle: {
+      font: '12px "ProximaNova", sans-serif', // Size, family
+      textFill: '#000000', // Color
+    },
+    selectedShapeNodeStyle: '',
+    isEdit: false,
+    loadingDnDPanelItems: false,
+  }
+
+  // Additional options
+  localVariables = {
+    isEdgeCreating: false,
+    creatingEdge: null,
+    dataRest: [],
+  }
+
+  /* Getters/setters */
+
+  get defaultDataSource() {
+    return this.defaultDataSource;
+  }
+
+  set defaultDataSource(value) {
+    this.defaultDataSource = value;
+  }
+
+  get loadingDnDPanelItems() {
+    return this.options.loadingDnDPanelItems;
+  }
+
+  set loadingDnDPanelItems(value) {
+    this.options.loadingDnDPanelItems = value;
+  }
+
+  get isEdit() {
+    return this.options.isEdit;
+  }
+
+  set isEdit(val) {
+    this.options.isEdit = val;
+  }
+
+  get defaultNodeSize() {
+    return this.options.defaultNodeSize;
+  }
+
+  set defaultNodeSize(value) {
+    this.options.defaultNodeSize = value;
+  }
+
+  get creatingEdge() {
+    return this.localVariables.creatingEdge;
+  }
+
+  set creatingEdge(value) {
+    this.localVariables.creatingEdge = value;
+  }
+
+  get isEdgeCreating() {
+    return this.localVariables.isEdgeCreating;
+  }
+
+  set isEdgeCreating(value) {
+    this.localVariables.isEdgeCreating = value;
+  }
+
+  get selectedShapeNodeStyle() {
+    return this.options.selectedShapeNodeStyle;
+  }
+
+  set selectedShapeNodeStyle(value) {
+    this.options.selectedShapeNodeStyle = value;
+  }
+
+  get defaultNodeStyle() {
+    return this.options.defaultNodeStyle;
+  }
+
+  set defaultNodeStyle({
+    shape = 0,
+    fill = Color.TRANSPARENT,
+    strokeColor = Color.TRANSPARENT,
+    strokeSize = '1.5px',
+  }) {
+    this.options.defaultNodeStyle = {
+      fill,
+      strokeColor,
+      strokeSize,
+      shape,
+    };
+  }
+
+  get defaultEdgeStyle() {
+    return this.options.defaultEdgeStyle;
+  }
+
+  set defaultEdgeStyle({
+    strokeColor = '#FFFFFF',
+    strokeSize = '1px',
+    targetArrowColor = '#F4F4F4',
+    targetArrowType = 'none',
+    smoothingLength = 0,
+  }) {
+    this.options.defaultEdgeStyle = {
+      strokeColor,
+      strokeSize,
+      targetArrowColor,
+      targetArrowType,
+      smoothingLength,
+    };
+  }
+
+  get defaultLabelStyle() {
+    return this.options.defaultLabelStyle;
+  }
+
+  set defaultLabelStyle({
+    font = `12px ${this.fontFamily}`,
+    textFill = '#000000',
+  }) {
+    this.options.defaultLabelStyle = {
+      font,
+      textFill,
+    };
+  }
+
+  get dataRest() {
+    return this.localVariables.dataRest;
+  }
+
+  set dataRest(value) {
+    this.localVariables.dataRest = value;
+  }
+
+  constructor({
+    elem, // HTML элемент для отображения схемы
+    dndPanelElem, // HTML элемент для отображения панели с элементами
+    schemeId, // Идентификатор активной схемы
+    dataRest, // Данные для схемы
+    iconsList, // Список изображений
+    savedGraph, // Сохраненная схема(old)
+    savedGraphObject, // Сохраненная схема
+    updateStoreCallback, // Обновление сохраненной схемы(old)
+    updateStoreCallbackV2, // Обновление сохраненной схемы
+    openDataPanelCallback, // Коллбэк для открытия панели с элементами
+    closeDataPanelCallback, // Коллбэк для закрытия панели с элементами
+    toggleLoadingCallback, // Коллбэк переключения состояния загрузки
+    isEdit, // Флаг состояния дашборда(редактирование\нет)
+    onClickObject, // Коллбэк для события click
+    isBridgesEnable, // Флаг вкл\выкл обработку пересечения линий
+  }) {
+    this.dragAndDropPanel = null;
+    this.schemeUpdater = null;
+    this.elem = elem;
+    this.isEdit = isEdit;
+    this.dataRest = dataRest;
+    this.iconsList = iconsList;
+    this.schemeId = schemeId;
+    // Сохранение через GraphML
+    this.savedGraph = savedGraph;
+    this.savedGraphObject = savedGraphObject;
+    this.updateStoreCallback = updateStoreCallback;
+    this.updateStoreCallbackV2 = updateStoreCallbackV2;
+    this.openDataPanelCallback = openDataPanelCallback;
+    this.closeDataPanelCallback = closeDataPanelCallback;
+    this.toggleLoadingCallback = toggleLoadingCallback;
+    this.elementTemplates = elementTemplates.templates;
+    this.fontFamily = elementTemplates.fontFamily;
+    // Вторая реализация сохранения данных
+    this.targetDataNode = {};
+    this.graphComponent = new GraphComponent(elem);
+    this.additionalEdgeToEdgeSettings();
+    this.setDefaultLabelParameters();
+    this.enableUndo();
+    if (this.isEdit) {
+      this.configureInputModes(
+        this.updateStoreCallback,
+        this.openDataPanelCallback,
+        this.closeDataPanelCallback,
+      );
+    } else {
+      this.enableViewerInputMode();
+    }
+    // old
+    // Сохранение через GraphML
+    // this.initializeIO();
+    if (this.savedGraphObject && !this.savedGraph) {
+      this.load(dndPanelElem);
+    }
+    this.disableResizeInvisibleNodes();
+
+    this.registerReshapeHandleProvider();
+    this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
+    // Привязка z-order у label к родителю
+    this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
+    this.onClickObject = onClickObject;
+    if (isBridgesEnable) {
+      this.enableBridges();
+    }
+  }
+
+  /* Async methods */
+  // eslint-disable-next-line class-methods-use-this,default-param-last
+  async exportGraphToJSON(schemeId = 'scheme', savedGraphObject) {
+    return new Promise((resolve) => {
+      const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(savedGraphObject))}`;
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute('href', dataStr);
+      downloadAnchorNode.setAttribute('download', `${schemeId}.json`);
+      document.body.appendChild(downloadAnchorNode); // required for firefox
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+      resolve();
+    });
+  }
+
+  // Load
+  async importGraphFromJSON(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const { result } = event.target;
+        if (result) {
+          this.update(JSON.parse(result));
+        }
+      };
+      reader.readAsText(file);
+      resolve();
+    }).then(() => {
+      this.setDefaultElementsOrder();
+    });
+  }
+
+  async nodeCreator({
+    dropData,
+    dropLocation,
+  }) {
+    return new Promise((resolve) => {
+      const element = {
+        layout: {
+          width: dropData.layout.width,
+          height: dropData.layout.height,
+          x: dropLocation.x - (dropData.layout.width / 2),
+          y: dropLocation.y - (dropData.layout.height / 2),
+        },
+        icon: dropData?.style?.image,
+        tag: {
+          ...dropData.tag,
+          nodeId: dropData?.id || dropData?.hashCode(),
+        },
+      };
+      ElementCreator.createNode({
+        element,
+        graph: this.graphComponent.graph,
+        elementTemplates,
+      }).then((createdElement) => {
+        resolve(createdElement);
+      });
+    });
+  }
+
+  async updateViewport() {
+    await this.graphComponent.fitGraphBounds();
+  }
+
+  async createDnDPanelItems({
+    iconsList,
+  }) {
+    this.loadingDnDPanelItems = true;
+    return new Promise((resolve) => {
+      const items = [];
+      // Ребра
+      items.push({
+        panelItem: this.createDndPanelDefaultEdge(
+          'Стандартные элементы',
+          'default-element',
+        ),
+        id: 'default-edge',
+      });
+      if (this.elementTemplates) {
+        Object.entries(this.elementTemplates).forEach(([
+          key,
+          value,
+        ]) => {
+          if (key.includes('shape-type')) {
+            items.push({
+              panelItem: this.createDnDPanelDefaultNode(value),
+              id: 'default-node',
+            });
+          }
+          if (key.includes('data-type')) {
+            items.push(
+              new DragAndDropPanelItem(
+                ConstructorSchemesClass.createReactiveNode(value),
+                'Элменты с данными',
+                'data-node',
+              ),
+            );
+          }
+          if (key.includes('label-type')) {
+            items.push(
+              new DragAndDropPanelItem(
+                ConstructorSchemesClass.createReactiveNode(value, true),
+                'Элементы с текстом',
+                'text-node',
+              ),
+            );
+          }
+        });
+      }
+
+      const portNode = new SimpleNode();
+      portNode.layout = new Rect(0, 0, 5, 5);
+      portNode.style = new VoidNodeStyle();
+      const port = new SimplePort(portNode, FreeNodePortLocationModel.NODE_CENTER_ANCHORED);
+      port.style = new NodeStylePortStyleAdapter(
+        new ShapeNodeStyle({
+          fill: 'transparent',
+          stroke: 'cornflowerblue',
+          shape: 'ellipse',
+        }),
+      );
+      portNode.tag = port;
+      portNode.ports = new ListEnumerable([port]);
+      items.push(new DragAndDropPanelItem(portNode, 'Порт', 'port-node'));
+
+      // Узел с изображением\иконкой
+      if (iconsList?.length > 0) {
+        this.getIconsListForGraph({
+          iconsList,
+          maxItemSize: this.dragAndDropPanel.getMaxItemWidth,
+          minItemSize: 150,
+        }).then((result) => {
+          result.forEach((item) => {
+            items.push(
+              new DragAndDropPanelItem(
+                item.icon.node,
+                item.icon.tooltip,
+                item.icon.dataType,
+              ),
+            );
+          });
+          resolve(items);
+        });
+      } else {
+        resolve(items);
+      }
+    });
+  }
+
+  /* Methods */
 
   updateImageNode(node) {
     const { image } = node.style;
@@ -311,302 +668,6 @@ class ConstructorSchemesClass {
       );
     }
   }
-  /*
-  * [
-    "element-1",
-    "element-2",
-    "element-3",
-    "element-4-top",
-    "element-4-left",
-    "element-4-right",
-    "element-4-bottom",
-    "element-5",
-    "element-5-green",
-    "element-5-red",
-    "element-5-yellow",
-    "element-6",
-    "element-7",
-    "element-8",
-    "element-9",
-    "element-10",
-    "element-10-rotate",
-    "element-11-left",
-    "element-11-right",
-    "element-12-top",
-    "element-12-left",
-    "element-12-right",
-    "element-12-bottom",
-    "element-13",
-    "element-14",
-    "element-15",
-    "element-16_1",
-    "element-17_1",
-    "element-18_1",
-    "element-19_1",
-    "element-20_1"
-]
-  * */
-
-  defaultDataSource = []
-
-  // Main constructor options
-  options = {
-    defaultNodeSize: [150, 150],
-    defaultNodeStyle: {
-      shape: 0,
-      fill: '#FFFFFF',
-      strokeColor: '#F4F4F4',
-      strokeSize: '1.5px',
-    },
-    defaultEdgeStyle: {
-      strokeColor: '#FFFFFF',
-      strokeSize: '1.5px',
-      targetArrowColor: '#F4F4F4',
-      targetArrowType: 'none',
-      smoothingLength: 0,
-    },
-    defaultLabelStyle: {
-      font: '12px "ProximaNova", sans-serif', // Size, family
-      textFill: '#000000', // Color
-    },
-    selectedShapeNodeStyle: '',
-    isEdit: false,
-    loadingDnDPanelItems: false,
-  }
-
-  // Additional options
-  localVariables = {
-    isEdgeCreating: false,
-    creatingEdge: null,
-    dataRest: [],
-  }
-
-  shapeNodeStyleList = [
-    {
-      label: 'Квадрат(скругленный)',
-      id: 0,
-    },
-    {
-      label: 'Квадрат',
-      id: 1,
-    },
-    {
-      label: 'Круг',
-      id: 2,
-    },
-    {
-      label: 'Треугольник(влево)',
-      id: 3,
-    },
-    {
-      label: 'Треугольник(вправо)',
-      id: 4,
-    },
-    {
-      label: 'Треугольник(вверх)',
-      id: 5,
-    },
-    {
-      label: 'Треугольник(вниз)',
-      id: 6,
-    },
-  ]
-
-  copiedElements = null
-
-  get defaultDataSource() {
-    return this.defaultDataSource;
-  }
-
-  set defaultDataSource(value) {
-    this.defaultDataSource = value;
-  }
-
-  get getShapeNodeStyleList() {
-    return this.shapeNodeStyleList;
-  }
-
-  get loadingDnDPanelItems() {
-    return this.options.loadingDnDPanelItems;
-  }
-
-  set loadingDnDPanelItems(value) {
-    this.options.loadingDnDPanelItems = value;
-  }
-
-  get isEdit() {
-    return this.options.isEdit;
-  }
-
-  set isEdit(val) {
-    this.options.isEdit = val;
-  }
-
-  get defaultNodeSize() {
-    return this.options.defaultNodeSize;
-  }
-
-  set defaultNodeSize(value) {
-    this.options.defaultNodeSize = value;
-  }
-
-  get creatingEdge() {
-    return this.localVariables.creatingEdge;
-  }
-
-  set creatingEdge(value) {
-    this.localVariables.creatingEdge = value;
-  }
-
-  get isEdgeCreating() {
-    return this.localVariables.isEdgeCreating;
-  }
-
-  set isEdgeCreating(value) {
-    this.localVariables.isEdgeCreating = value;
-  }
-
-  get selectedShapeNodeStyle() {
-    return this.options.selectedShapeNodeStyle;
-  }
-
-  set selectedShapeNodeStyle(value) {
-    this.options.selectedShapeNodeStyle = value;
-  }
-
-  get defaultNodeStyle() {
-    return this.options.defaultNodeStyle;
-  }
-
-  set defaultNodeStyle({
-    shape = 0,
-    fill = Color.TRANSPARENT,
-    strokeColor = Color.TRANSPARENT,
-    strokeSize = '1.5px',
-  }) {
-    this.options.defaultNodeStyle = {
-      fill,
-      strokeColor,
-      strokeSize,
-      shape,
-    };
-  }
-
-  get defaultEdgeStyle() {
-    return this.options.defaultEdgeStyle;
-  }
-
-  set defaultEdgeStyle({
-    strokeColor = '#FFFFFF',
-    strokeSize = '1px',
-    targetArrowColor = '#F4F4F4',
-    targetArrowType = 'none',
-    smoothingLength = 0,
-  }) {
-    this.options.defaultEdgeStyle = {
-      strokeColor,
-      strokeSize,
-      targetArrowColor,
-      targetArrowType,
-      smoothingLength,
-    };
-  }
-
-  get defaultLabelStyle() {
-    return this.options.defaultLabelStyle;
-  }
-
-  set defaultLabelStyle({
-    font = `12px ${this.fontFamily}`,
-    textFill = '#000000',
-  }) {
-    this.options.defaultLabelStyle = {
-      font,
-      textFill,
-    };
-  }
-
-  get dataRest() {
-    return this.localVariables.dataRest;
-  }
-
-  set dataRest(value) {
-    this.localVariables.dataRest = value;
-  }
-
-  constructor({
-    dndPanelElem,
-    elem,
-    schemeId,
-    dataRest,
-    iconsList,
-    elementDefaultStyles,
-    // Сохранение через GraphML
-    savedGraph,
-    savedGraphObject,
-    // Callbacks
-    updateStoreCallback,
-    updateStoreCallbackV2,
-    openDataPanelCallback,
-    closeDataPanelCallback,
-    toggleLoadingCallback,
-    isEdit,
-    onClickObject,
-    isBridgesEnable,
-  }) {
-    this.dragAndDropPanel = null;
-    this.mapper = null;
-    this.elem = elem;
-    this.isEdit = isEdit;
-    this.dataRest = dataRest;
-    this.iconsList = iconsList;
-    this.schemeId = schemeId;
-    // Сохранение через GraphML
-    this.savedGraph = savedGraph;
-    this.savedGraphObject = savedGraphObject;
-    this.updateStoreCallback = updateStoreCallback;
-    this.updateStoreCallbackV2 = updateStoreCallbackV2;
-    this.openDataPanelCallback = openDataPanelCallback;
-    this.closeDataPanelCallback = closeDataPanelCallback;
-    this.toggleLoadingCallback = toggleLoadingCallback;
-    this.elementTemplates = elementTemplates.templates;
-    this.fontFamily = elementTemplates.fontFamily;
-    // Вторая реализация сохранения данных
-    this.targetDataNode = {};
-    this.graphComponent = new GraphComponent(elem);
-    this.additionalEdgeToEdgeSettings();
-    this.setDefaultLabelParameters();
-    // Configures default styles for newly created graph elements
-    // this.applyStylesElements(elementDefaultStyles);
-    this.enableUndo();
-    if (this.isEdit) {
-      this.configureInputModes(
-        this.updateStoreCallback,
-        this.openDataPanelCallback,
-        this.closeDataPanelCallback,
-      );
-    } else {
-      this.enableViewerInputMode();
-    }
-    // old
-    // Сохранение через GraphML
-    this.initializeIO();
-
-    this.schemeUpdater = null;
-    if (this.savedGraphObject && !this.savedGraph) {
-      this.load(dndPanelElem);
-    }
-    this.disableResizeInvisibleNodes();
-
-    this.registerReshapeHandleProvider();
-    this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
-    // Привязка z-order у label к родителю
-    this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
-    this.onClickObject = onClickObject;
-    if (isBridgesEnable) {
-      this.enableBridges();
-    }
-  }
 
   disableResizeInvisibleNodes() {
     const { nodeDecorator } = this.graphComponent.graph.decorator;
@@ -660,38 +721,7 @@ class ConstructorSchemesClass {
     });
   }
 
-  // eslint-disable-next-line class-methods-use-this,default-param-last
-  async exportGraphToJSON(schemeId = 'scheme', savedGraphObject) {
-    return new Promise((resolve) => {
-      const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(savedGraphObject))}`;
-      const downloadAnchorNode = document.createElement('a');
-      downloadAnchorNode.setAttribute('href', dataStr);
-      downloadAnchorNode.setAttribute('download', `${schemeId}.json`);
-      document.body.appendChild(downloadAnchorNode); // required for firefox
-      downloadAnchorNode.click();
-      downloadAnchorNode.remove();
-      resolve();
-    });
-  }
-
-  // Load
-  async importGraphFromJSON(file) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const { result } = event.target;
-        if (result) {
-          this.update(JSON.parse(result));
-        }
-      };
-      reader.readAsText(file);
-      resolve();
-    }).then(() => {
-      this.setDefaultElementsOrder();
-    });
-  }
-
-  updateDataNodeTemplate() {
+  renderVueTemplateNode() {
     this.graphComponent.graph.nodes.forEach((node) => {
       if (node.tag.dataType || node?.tag[0] === 'i' || node?.tag === 'invisible') {
         if (node.tag.dataType !== 'image-node' && node?.tag?.dataType !== 'invisible') {
@@ -714,15 +744,6 @@ class ConstructorSchemesClass {
         this.updateImageNode(node);
       }
     });
-  }
-
-  // Load from LocalStorage to Store
-  updateGraphFromLocalStorage(updateStoreCallback) {
-    this.savedGraph = window.localStorage.getItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml') || '';
-    window.localStorage.removeItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml');
-    if (updateStoreCallback && this.savedGraph) {
-      updateStoreCallback(this.savedGraph);
-    }
   }
 
   // Settings GraphML
@@ -783,7 +804,9 @@ class ConstructorSchemesClass {
     const schemeUpdater = this.initSchemeUpdater();
     this.graphComponent.graph.clear();
     schemeUpdater.load().then(() => {
-      this.updateDataNodeTemplate();
+      // Применение VueJsNodeStyle
+      this.renderVueTemplateNode();
+      // Установка z-order по-умолчанию
       this.setDefaultElementsOrder();
       // Выравнивание графа, инициализация dnd панели
       return this.updateViewport();
@@ -793,7 +816,9 @@ class ConstructorSchemesClass {
   load(dndPanelElem) {
     const schemeUpdater = this.initSchemeUpdater();
     schemeUpdater.load().then(() => {
-      this.updateDataNodeTemplate();
+      // Применение VueJsNodeStyle
+      this.renderVueTemplateNode();
+      // Установка z-order по-умолчанию
       this.setDefaultElementsOrder();
       // Выравнивание графа, инициализация dnd панели
       this.updateViewport().then(() => {
@@ -817,7 +842,7 @@ class ConstructorSchemesClass {
           reshapeHandler,
           HandlePositions.BORDER,
         );
-        // Show only handles at the corners and always use aspect ratio resizing
+          // Show only handles at the corners and always use aspect ratio resizing
         provider.handlePositions = HandlePositions.CORNERS;
         provider.ratioReshapeRecognizer = EventRecognizers.ALWAYS;
         return provider;
@@ -999,7 +1024,7 @@ class ConstructorSchemesClass {
       // Проверяем на наличие данных в узле
       if (
         evt.item instanceof INode
-        || evt.item instanceof ILabel
+          || evt.item instanceof ILabel
       ) {
         const filteredElementTag = Utils.deleteFieldsFromObject(
           evt.item.tag,
@@ -1105,38 +1130,6 @@ class ConstructorSchemesClass {
     this.graphComponent.inputMode = mode;
   }
 
-  async nodeCreator({
-    dropData,
-    dropLocation,
-  }) {
-    const elementCreator = new ElementCreator({
-      graph: this.graphComponent.graph,
-      elements: [],
-    });
-    return new Promise((resolve) => {
-      const element = {
-        layout: {
-          width: dropData.layout.width,
-          height: dropData.layout.height,
-          x: dropLocation.x - (dropData.layout.width / 2),
-          y: dropLocation.y - (dropData.layout.height / 2),
-        },
-        icon: dropData?.style?.image,
-        tag: {
-          ...dropData.tag,
-          nodeId: dropData?.id || dropData?.hashCode(),
-        },
-      };
-      ElementCreator.createNode({
-        element,
-        graph: this.graphComponent.graph,
-        elementTemplates,
-      }).then((createdElement) => {
-        resolve(createdElement);
-      });
-    });
-  }
-
   settingsNodeDropInputMode() {
     return new NodeDropInputMode({
       showPreview: true,
@@ -1167,8 +1160,8 @@ class ConstructorSchemesClass {
       useBestMatchingParameter: true,
       // allow for nodes and edges to be the new label owner
       isValidLabelOwnerPredicate: (labelOwner) => labelOwner instanceof INode
-        || labelOwner instanceof IEdge
-        || labelOwner instanceof IPort,
+          || labelOwner instanceof IEdge
+          || labelOwner instanceof IPort,
       itemCreator: (context, graph, dropData, dropTarget, dropLocation) => {
         if (dropTarget instanceof IPort) {
           this.graphComponent.graphModelManager.graph.addLabel({
@@ -1464,12 +1457,17 @@ class ConstructorSchemesClass {
 
   setDefaultStyles() {
     const { graph } = this.graphComponent;
-    // Creates a PolylineEdgeStyle which will be used as default for all edges
-    // that don't have another style assigned explicitly
+    const {
+      smoothingLength,
+      strokeSize,
+      strokeColor,
+      targetArrowColor,
+      targetArrowType,
+    } = this.defaultEdgeStyle;
     graph.edgeDefaults.style = new PolylineEdgeStyle({
-      smoothingLength: this.defaultEdgeStyle.smoothingLength,
-      stroke: `${this.defaultEdgeStyle.strokeSize} solid ${this.defaultEdgeStyle.strokeColor}`,
-      targetArrow: `${this.defaultEdgeStyle.targetArrowColor} ${this.defaultEdgeStyle.targetArrowType}`,
+      smoothingLength,
+      stroke: `${strokeSize} solid ${strokeColor}`,
+      targetArrow: `${targetArrowColor} ${targetArrowType}`,
     });
 
     graph.edgeDefaults.ports.style = new NodeStylePortStyleAdapter({
@@ -1490,10 +1488,6 @@ class ConstructorSchemesClass {
     // Sets the defined style as the default for both edge and node labels
     graph.nodeDefaults.labels.style = new HtmlLabelStyle(defaultLabelStyle.font);
     graph.edgeDefaults.labels.style = new HtmlLabelStyle(defaultLabelStyle.font);
-  }
-
-  async updateViewport() {
-    await this.graphComponent.fitGraphBounds();
   }
 
   initializeDnDPanel(updatedPrimitives) {
@@ -1566,85 +1560,6 @@ class ConstructorSchemesClass {
       this.dragAndDropPanel.clearDnDPanel();
     }
     this.initializeDnDPanel(updatedPrimitives);
-  }
-
-  async createDnDPanelItems({
-    iconsList,
-  }) {
-    this.loadingDnDPanelItems = true;
-    return new Promise((resolve) => {
-      const items = [];
-      // Ребра
-      items.push({
-        panelItem: this.createDndPanelDefaultEdge('Стандартные элементы', 'default-element'),
-        id: 'default-edge',
-      });
-      if (this.elementTemplates) {
-        Object.entries(this.elementTemplates).forEach(([key, value]) => {
-          if (key.includes('shape-type')) {
-            items.push({
-              panelItem: this.createDnDPanelDefaultNode(value),
-              id: 'default-node',
-            });
-          }
-          if (key.includes('data-type')) {
-            items.push(
-              new DragAndDropPanelItem(
-                ConstructorSchemesClass.createReactiveNode(value),
-                'Элменты с данными',
-                'data-node',
-              ),
-            );
-          }
-          if (key.includes('label-type')) {
-            items.push(
-              new DragAndDropPanelItem(
-                ConstructorSchemesClass.createReactiveNode(value, true),
-                'Элементы с текстом',
-                'text-node',
-              ),
-            );
-          }
-        });
-      }
-
-      const portNode = new SimpleNode();
-      portNode.layout = new Rect(0, 0, 5, 5);
-      portNode.style = new VoidNodeStyle();
-      const port = new SimplePort(portNode, FreeNodePortLocationModel.NODE_CENTER_ANCHORED);
-      port.style = new NodeStylePortStyleAdapter(
-        new ShapeNodeStyle({
-          fill: 'transparent',
-          stroke: 'cornflowerblue',
-          shape: 'ellipse',
-        }),
-      );
-      portNode.tag = port;
-      portNode.ports = new ListEnumerable([port]);
-      items.push(new DragAndDropPanelItem(portNode, 'Порт', 'port-node'));
-
-      // Узел с изображением\иконкой
-      if (iconsList?.length > 0) {
-        this.getIconsListForGraph({
-          iconsList,
-          maxItemSize: this.dragAndDropPanel.getMaxItemWidth,
-          minItemSize: 150,
-        }).then((result) => {
-          result.forEach((item) => {
-            items.push(
-              new DragAndDropPanelItem(
-                item.icon.node,
-                item.icon.tooltip,
-                item.icon.dataType,
-              ),
-            );
-          });
-          resolve(items);
-        });
-      } else {
-        resolve(items);
-      }
-    });
   }
 
   updateDataInNode(updatedData) {
@@ -1726,17 +1641,15 @@ class ConstructorSchemesClass {
       'dynamic-image',
       'dynamic-image-node',
     );
+    // Основное(по-умолчанию) изображение
+    const { defaultImage } = node.tag;
     let {
       // Основные размеры изображения
       imageLayout,
-      // Основное(по-умолчанию) изображение
-      // eslint-disable-next-line prefer-const
-      defaultImage,
       // Полная ссылка на основное(по-умолчанию) изображение
       defaultImagePath,
     } = node.tag;
-    // Список изображений с полными ссылками
-    // Если это первое выбранное изображение или основное изображение заменили
+
     if (!imageLayout) {
       GenerateIconClass.generateIconNodes([{
         icon: defaultImage,
@@ -1761,7 +1674,11 @@ class ConstructorSchemesClass {
           updatedNodeTag.imageLayout = imageLayout;
           updatedNodeTag.defaultImagePath = defaultImagePath;
         });
-        this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath).then(() => {
+        this.updateActiveImageInDynamicNode(
+          node,
+          GenerateIconClass,
+          defaultImagePath,
+        ).then(() => {
           node.tag = {
             ...node.tag,
             imageLayout,
@@ -1772,11 +1689,33 @@ class ConstructorSchemesClass {
         });
       });
     } else {
-      this.updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath).then(() => {
+      this.updateActiveImageInDynamicNode(
+        node,
+        GenerateIconClass,
+        defaultImagePath,
+      ).then(() => {
         this.saveAnObject();
       });
     }
     return node;
+  }
+
+  async setImageRatio(path, node) {
+    return new Promise((resolve) => {
+      const imageAspectRatio = ImageNodeStyle.getAspectRatio(path);
+      imageAspectRatio.then((result) => {
+        const style = new ImageNodeStyle({
+          image: path,
+          // always keep the intrinsic aspect ratio independent of the node's size
+          aspectRatio: result,
+        });
+        this.graphComponent.graph.setStyle(
+          node,
+          style,
+        );
+        resolve();
+      });
+    });
   }
 
   updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath) {
@@ -1788,60 +1727,43 @@ class ConstructorSchemesClass {
     }));
     return GenerateIconClass.generateIconNodes(mappedImageListFromNode)
       .then((response) => new Promise((resolve) => {
-        imageListFromIconClass = response.map((item) => ({
-          value: item.value,
-          image: item.image,
-          path: item.icon?.node?.style?.image || '',
+        imageListFromIconClass = response.map(({ value, image, icon }) => ({
+          value,
+          image,
+          path: icon?.node?.style?.image || '',
         }));
+        // Ранее установленное изображение
         const activeImageFromNode = node.tag.activeImage;
+        // Новое изображение(по значению из дата-сета)
         const activeImageFromData = imageListFromIconClass
           .find((el) => `${el.value}` === `${node.tag.value}`);
         const activeImageIsChanged = activeImageFromData?.image !== activeImageFromNode?.image;
+        // Если есть новое изображениие
         if (activeImageFromData) {
+          // Если оно отличается от старого
           if (activeImageIsChanged) {
+            // Обновляем
             node.tag.activeImage = activeImageFromData;
           }
         }
+        // Отправляем изображение далее...
         resolve(activeImageFromData);
       }))
       .then((activeImage) => new Promise((resolve, reject) => {
         if (activeImage) {
-          // determine the intrinsic aspect ratio of the image
-          const imageAspectRatio = ImageNodeStyle.getAspectRatio(activeImage.path);
-          imageAspectRatio.then((result) => {
-            const style = new ImageNodeStyle({
-              image: activeImage.path,
-              // always keep the intrinsic aspect ratio independent of the node's size
-              aspectRatio: result,
-            });
-            this.graphComponent.graph.setStyle(
-              node,
-              style,
-            );
+          this.setImageRatio(activeImage.path, node).then(() => {
+            resolve();
           });
-
-          resolve();
-        } else if (!activeImage && defaultImagePath) {
-          // determine the intrinsic aspect ratio of the image
-          const imageAspectRatio = ImageNodeStyle.getAspectRatio(defaultImagePath);
-          imageAspectRatio.then((result) => {
-            const style = new ImageNodeStyle({
-              image: defaultImagePath,
-              // always keep the intrinsic aspect ratio independent of the node's size
-              aspectRatio: result,
-            });
-            this.graphComponent.graph.setStyle(
-              node,
-              style,
-            );
+        } else if (defaultImagePath) {
+          this.setImageRatio(defaultImagePath, node).then(() => {
+            resolve();
           });
-          resolve();
         } else {
           reject();
         }
       }))
       .catch(() => {
-        // Если изображение не найдено на сервере или по какой-то причине не загрузилось
+        // Если изображение не найдено на сервере
         // Или по какой-то причине не загрузилось
         // Или не указано в настройках элемента
         this.graphComponent.graph.setStyle(
@@ -1934,144 +1856,6 @@ class ConstructorSchemesClass {
       this.graphComponent.fitContent();
       this.graphComponent.updateVisual();
     });
-  }
-
-  deleteAllImageNode() {
-    return new Promise((resolve, reject) => {
-      try {
-        this.graphComponent.graph.nodes.toArray().forEach((node) => {
-          if (node.tag.dataType === 'image-node') {
-            this.graphComponent.graph.remove(node);
-          }
-        });
-        resolve();
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
-
-  deleteAllTextNodeByImage() {
-    return new Promise((resolve, reject) => {
-      try {
-        this.graphComponent.graph.nodes.toArray().forEach((node) => {
-          if (node.tag.dataType === 'label-0' && node.tag?.byImage) {
-            this.graphComponent.graph.remove(node);
-          }
-        });
-        resolve();
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
-
-  buildGraph(dataSource) {
-    this.defaultDataSource = dataSource;
-    this.deleteAllImageNode()
-      .then(() => this.deleteAllTextNodeByImage())
-      .then(() => this.getIconsListForGraph({
-        iconsList: this.defaultDataSource,
-        maxItemSize: 150,
-        minItemSize: 150,
-      }))
-      .then((dataForGraph) => {
-        this.createElementFromDefaultData(dataForGraph);
-      });
-  }
-
-  createDataNode({ graph, location, data }) {
-    return graph.createNodeAt({
-      location,
-      style: new VuejsNodeStyle(this.elementTemplates[data.tag.dataType].template),
-      tag: {
-        ...data.tag,
-        nodeId: data.id || data.hashCode(),
-      },
-    });
-  }
-
-  createTextNode({ graph, location, data }) {
-    return graph.createNodeAt({
-      location,
-      style: new VuejsNodeStyle(this.elementTemplates[data.tag.dataType].template),
-      tag: {
-        ...data.tag,
-        fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
-        nodeId: data?.id || data.hashCode(),
-      },
-    });
-  }
-
-  createElementFromDefaultData(elements, offsetY = 20, offsetX = 20) {
-    try {
-      let elementYPosition = this.graphComponent.viewPoint.y;
-      const resultElements = elements.map(async (element, index) => new Promise((resolve) => {
-        // icon-node
-        const createdIconNode = this.graphComponent.graph.createNodeAt({
-          location: new Point(
-            this.graphComponent.viewPoint.x,
-            elementYPosition,
-          ),
-          style: element.icon.node.style.clone(),
-          tag: {
-            ...element.icon.node.tag,
-            nodeId: index,
-          },
-        });
-        const data = {
-          tag: {
-            ...element.description.node.tag,
-            dataType: element.description.dataType,
-            text: `${element.description.text}`,
-            byImage: true,
-          },
-          id: +`${index + 1}${index}`,
-          byIconId: createdIconNode.tag.nodeId,
-        };
-        const createdTextNode = this.createTextNode({
-          graph: this.graphComponent.graph,
-          location: new Point(
-            this.graphComponent.viewPoint.x + element.icon.node.layout.width,
-            0,
-          ),
-          data,
-        });
-        resolve({
-          createdIconNode,
-          createdTextNode,
-        });
-      }).then(({
-        createdIconNode,
-        createdTextNode,
-      }) => new Promise((resolve) => {
-        const iconNodeHeight = element.icon.node.layout.height;
-        const iconNodePosition = new Rect(
-          createdIconNode.layout.x,
-          elementYPosition,
-          element.icon.node.layout.width,
-          element.icon.node.layout.height,
-        );
-        const textNodeHeight = element.description.node.layout.height;
-        const textNodePosition = new Rect(
-          createdTextNode.layout.x + offsetX,
-          elementYPosition + (((iconNodeHeight + offsetY) - (textNodeHeight + offsetY)) / 2),
-          element.description.node.layout.width,
-          element.description.node.layout.height,
-        );
-        this.graphComponent.graph.setNodeLayout(createdIconNode, iconNodePosition);
-        this.graphComponent.graph.setNodeLayout(createdTextNode, textNodePosition);
-        this.graphComponent.updateVisual();
-        elementYPosition += element.icon.node.layout.height + offsetY;
-        resolve();
-      })));
-      Promise.all(resultElements)
-        .then(() => {
-          this.fitGraphContent();
-        });
-    } catch (e) {
-      throw new Error(e);
-    }
   }
 
   // iconsList:Array<string>, maxItemSize:number, minItemSize:number
