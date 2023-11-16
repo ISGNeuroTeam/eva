@@ -391,6 +391,7 @@ export default {
       deep: true,
       handler(val, oldVal) {
         if (val !== oldVal) {
+          this.setDefaultValue();
           this.setTocken();
         }
       },
