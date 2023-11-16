@@ -1,3 +1,22 @@
+# [1.159.0] - 2023-11-16
+
+### Added
+- "Event go" can now accept external links.
+
+### Changed
+- Updated the UX/UI of the top panel.
+
+### Fixed
+- Multiline:
+  - Clicking on the legend now opens the settings, even when the dashboard editing mode is turned off.
+  - Corrected the order of metrics in the chart legend.
+- Select: Fixed an issue where the option "Update component value when changes in the ID for the default value" did not work.
+- Data Sources: Moving data sources now works properly.
+- Header on the Main Page: Resolved an issue with an empty login.
+- GridGroup:
+  - Fixed the incorrect size of the multi-line chart.
+  - Improved response when updating data sources.
+
 # [1.158.0] - 2023-11-09
 
 ### Added
