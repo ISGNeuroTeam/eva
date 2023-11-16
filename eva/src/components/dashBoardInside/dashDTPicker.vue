@@ -124,7 +124,7 @@
                     :button-color="theme.$primary_button"
                     class="dtpicker"
                     :only-date="hideTimeSelect"
-                    @input="setTocken('dt')"
+                    @input="setToken('dt')"
                   />
                   <DTPicker
                     :id="`${id}-end`"
@@ -137,7 +137,7 @@
                     :button-color="theme.$primary_button"
                     class="dtpicker"
                     :only-date="hideTimeSelect"
-                    @input="setTocken('dt')"
+                    @input="setToken('dt')"
                   />
                 </template>
                 <template v-else>
@@ -154,7 +154,7 @@
                     :button-color="theme.$primary_button"
                     class="dtpicker"
                     :only-date="hideTimeSelect"
-                    @input="setTocken('exactDate')"
+                    @input="setToken('exactDate')"
                   />
                 </template>
               </div>
@@ -180,7 +180,7 @@
                   :button-color="theme.$primary_button"
                   :custom-shortcuts="DTPickerCustomShortcuts"
                   class="dtpicker range-picker"
-                  @input="setTocken('range')"
+                  @input="setToken('range')"
                 />
               </div>
             </template>
@@ -207,7 +207,7 @@
                   outlined
                   class="dtpicker custom-picker"
                   @blur="start_custom.color = 'controlsActive'"
-                  @input="setTocken('custom-range')"
+                  @input="setToken('custom-range')"
                 />
                 <v-text-field
                   v-model="end_custom.value"
@@ -220,7 +220,7 @@
                   outlined
                   class="dtpicker custom-picker"
                   @blur="end_custom.color = 'controlsActive'"
-                  @input="setTocken('custom-range')"
+                  @input="setToken('custom-range')"
                 />
               </div>
               <div
@@ -244,7 +244,7 @@
                   outlined
                   class="dtpicker custom-picker"
                   @blur="exactDateCustom.color = 'controlsActive'"
-                  @input="setTocken('exactDateCustom')"
+                  @input="setToken('exactDateCustom')"
                 />
               </div>
             </template>
@@ -497,7 +497,7 @@ export default {
           this.start = this.exactDate;
           this.curDate = `${this.start} - ...`;
           this.exactDate = null;
-          this.setTocken('dt');
+          this.setToken('dt');
         }
       }
       if (!val) {
@@ -506,7 +506,7 @@ export default {
           this.curDate = this.exactDate;
           this.start = null;
           this.end = null;
-          this.setTocken('exactDate');
+          this.setToken('exactDate');
         }
       }
       this.commitTokenValue();
@@ -525,9 +525,24 @@ export default {
           lastTimeTemplateEnd: oldVal.lastTimeTemplateEnd,
         };
         if (JSON.stringify(newOpts) !== JSON.stringify(oldOpts)) {
-          this.setTocken('time');
+          this.setToken('time');
           this.commitTokenValue();
         }
+      }
+    },
+    dateTimeFormat(newFormat, oldFormat) {
+      if (this.range) {
+        this.updateFormat('range', oldFormat, newFormat);
+      } else if (this.start) {
+        this.updateFormat('dt', oldFormat, newFormat);
+      } else if (this.start_custom.value) {
+        this.updateFormat('custom-range', oldFormat, newFormat);
+      } else if (this.exactDate) {
+        this.updateFormat('exactDate', oldFormat, newFormat);
+      } else if (this.exactDateCustom) {
+        this.updateFormat('exactDateCustom', oldFormat, newFormat);
+      } else if (this.last.time) {
+        this.updateFormat('time', oldFormat, newFormat);
       }
     },
   },
@@ -550,6 +565,21 @@ export default {
     this.curDate = this.calcCurrentDate();
   },
   methods: {
+    updateFormat(elem, oldFormat, newFormat) {
+      this.setToken(elem, oldFormat, newFormat);
+      this.commitTokenValue();
+      this.showCurrent();
+      this.curDate = this.calcCurrentDate({
+        start: this.start,
+        end: this.end,
+        exactDate: this.exactDate,
+        exactDateCustom: this.exactDateCustom.value,
+        range: this.range,
+        startCus: this.start_custom.value,
+        endCus: this.end_custom.value,
+        last: this.last,
+      });
+    },
     setTokenAction() {
       const actions = this.actions.map((action) => ({
         ...action,
@@ -569,7 +599,6 @@ export default {
         this.changeDate = !this.changeDate;
       }
     },
-
     replaceTokens(value, prefix = '', suffix = '') {
       let updatedValue = value;
       if (/\$\w+\$/.test(value)) {
@@ -580,9 +609,8 @@ export default {
       }
       return `${prefix}${updatedValue}${suffix}`;
     },
-
-    calcCurrentDate() {
-      const data = this.getPickerDate;
+    calcCurrentDate(forceUpdateValue) {
+      const data = forceUpdateValue || this.getPickerDate;
       let current = '';
 
       if (data.exactDate !== null) {
@@ -692,7 +720,7 @@ export default {
     },
     setLast(event) {
       this.last.every = event;
-      this.setTocken('time');
+      this.setToken('time');
     },
     setTime(time) {
       // this.last.time = time;
@@ -709,15 +737,36 @@ export default {
       } else {
         this.color[time] = '$accent_ui_color';
       }
-      this.setTocken('time');
+      this.setToken('time');
     },
-    setTocken(elem) {
+    setToken(elem, oldFormat = '', newFormat = '') {
       this.lastControlElement = elem;
+      const isFormatUpdated = (oldFormat && newFormat) && (oldFormat !== newFormat);
       let period = 0;
       switch (elem) {
         case 'dt':
-          this.startForStore = this.formatDateToResult(this.start);
-          this.endForStore = this.formatDateToResult(this.end);
+          this.startForStore = this.formatDateToResult(
+            this.start,
+            oldFormat,
+            newFormat,
+          );
+          this.endForStore = this.formatDateToResult(
+            this.end,
+            oldFormat,
+            newFormat,
+          );
+          if (isFormatUpdated) {
+            this.start = this.formatDateToResult(
+              this.start,
+              oldFormat,
+              newFormat,
+            );
+            this.end = this.formatDateToResult(
+              this.end,
+              oldFormat,
+              newFormat,
+            );
+          }
           this.exactDateForStore = null;
           this.range = null;
           this.exactDate = null;
@@ -733,8 +782,28 @@ export default {
 
         case 'range':
           if (this.range) {
-            this.startForStore = this.formatDateToResult(this.range.start);
-            this.endForStore = this.formatDateToResult(this.range.end);
+            this.startForStore = this.formatDateToResult(
+              this.range.start,
+              oldFormat,
+              newFormat,
+            );
+            this.endForStore = this.formatDateToResult(
+              this.range.end,
+              oldFormat,
+              newFormat,
+            );
+            if (isFormatUpdated) {
+              this.range.start = this.formatDateToResult(
+                this.range.start,
+                oldFormat,
+                newFormat,
+              );
+              this.range.end = this.formatDateToResult(
+                this.range.end,
+                oldFormat,
+                newFormat,
+              );
+            }
           }
           this.start = null;
           this.end = null;
@@ -749,7 +818,18 @@ export default {
           break;
 
         case 'exactDate':
-          this.exactDateForStore = this.formatDateToResult(this.exactDate);
+          this.exactDateForStore = this.formatDateToResult(
+            this.exactDate,
+            oldFormat,
+            newFormat,
+          );
+          if (isFormatUpdated) {
+            this.exactDate = this.formatDateToResult(
+              this.exactDate,
+              oldFormat,
+              newFormat,
+            );
+          }
           this.start = null;
           this.end = null;
           this.start_custom.value = null;
@@ -818,8 +898,16 @@ export default {
             lastTimeTemplateStart,
             lastTimeTemplateEnd,
           } = this.options;
-          this.startForStore = this.formatDateToResult(Date.now() - period);
-          this.endForStore = this.formatDateToResult(Date.now());
+          this.startForStore = this.formatDateToResult(
+            Date.now() - period,
+            oldFormat,
+            newFormat,
+          );
+          this.endForStore = this.formatDateToResult(
+            Date.now(),
+            oldFormat,
+            newFormat,
+          );
           if (useLastTimeTemplate) {
             const secPeriod = (period / 1000).toFixed();
             if (lastTimeTemplateStart) {
@@ -842,11 +930,14 @@ export default {
           break;
       }
     },
-    formatDateToResult(date) {
+    formatDateToResult(date, oldFormat, newFormat) {
       if (date === null) return '';
       const {
         timeOutputFormat = null,
       } = this.options;
+      if (oldFormat && newFormat) {
+        return moment(date, oldFormat).format(newFormat);
+      }
       if (timeOutputFormat) {
         return moment(date, timeOutputFormat).format(timeOutputFormat);
       }
@@ -857,11 +948,10 @@ export default {
     },
     setDate() {
       if (this.lastControlElement) {
-        this.setTocken(this.lastControlElement);
+        this.setToken(this.lastControlElement);
       }
 
       this.commitTokenValue();
-
       this.showCurrent();
       this.curDate = this.calcCurrentDate();
       this.openHidden();
