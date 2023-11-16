@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated the top panel UX/UI
 
 ### Fixed
+- Select: The option Update component value when changes in the ID for the default value did not work
 - Data Sources: moving data sources does not work
 - Problem with empty login in the header on the main page
 - GridGroup: 
