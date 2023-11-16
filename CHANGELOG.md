@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- event go can accept external links
 
 ### Changed
 - Updated the top panel UX/UI
