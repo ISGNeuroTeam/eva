@@ -16,6 +16,9 @@
 - GridGroup:
   - Fixed the incorrect size of the multi-line chart.
   - Improved response when updating data sources.
+- Constructor-schemes:
+  - Fixed html-template in scheme keymap.
+  - Fixed state data-panel on change fullscreen mode.
 
 # [1.158.0] - 2023-11-09
 
