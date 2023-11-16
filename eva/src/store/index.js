@@ -2007,10 +2007,31 @@ export default new Vuex.Store({
 
       // при переходе на другой дашборд нам нужно обновить определенный токен
       const item = { ...event.event };
-      if (item.prop[0] === '') {
+
+      if (item.prop[0] === '' && !item.target.includes('http://') && !item.target.includes('https://')) {
         return;
       }
       const { tockens } = state[event.idDash];
+      if (item.target.includes('http://') || item.target.includes('https://')) {
+        let processedTarget = item.target;
+        if (item.target.indexOf('$') !== -1) {
+          const regexPattern = /(\$.*?\$)|([^$]+)/g;
+          const matches = item.target.match(regexPattern);
+          processedTarget = matches.reduce((acc, part) => {
+            if (part.indexOf('$') === -1) {
+              return acc + part;
+            }
+            return acc + tockens.find((tockenDeep) => tockenDeep?.name === part.replaceAll('$', '')).value;
+          }, '');
+        }
+        if (openNewTab) {
+          window.open(processedTarget);
+          return;
+        }
+        window.location = processedTarget;
+        return;
+      }
+
       let id = -1;
 
       if (tockens) {

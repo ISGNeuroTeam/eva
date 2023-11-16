@@ -306,7 +306,9 @@ export default {
     box(val, old) {
       if (JSON.stringify(val) !== JSON.stringify(old)) {
         this.updateLegendHeight();
-        this.updateBox();
+        this.$nextTick(() => {
+          this.updateBox();
+        })
       }
     },
     dataRestFrom() {
@@ -435,6 +437,9 @@ export default {
       this.chart.updateBox(width, height);
     },
     openSettingsForMetric(metric, nGroup, nMetric) {
+      if (!this.dataModeFrom) {
+        return;
+      }
       const panelMetric = [];
       panelMetric[nGroup] = nMetric;
       this.$refs.chartSettings.panelMetric = panelMetric;

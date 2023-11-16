@@ -52,6 +52,7 @@
               />
             </div>
             <v-card-text
+              v-if="gridRendered"
               :is="item.dash"
               :id-from="item.visualizationId"
               :id-dash-from="idDash"
@@ -260,6 +261,7 @@ export default {
         rowHeight: 60,
       },
       dataForVisualizations: {},
+      gridRendered: true,
     };
   },
   computed: {
@@ -426,8 +428,34 @@ export default {
         this.dataForVisualizations = {};
       }
     },
+    box() {
+      this.onGridResize();
+    },
+    dataSources: {
+      deep: true,
+      handler() {
+        this.dataRestFrom
+          .forEach((item) => {
+            const optionKey = item?.option_key || item.id;
+            const visualizationId = `${item.visualization}-${this.idFrom}-${optionKey}-v1`;
+            this.updateDataRestVisualizations(item, visualizationId);
+          });
+      },
+    },
+  },
+  mounted() {
+    this.onGridResize();
   },
   methods: {
+    onGridResize() {
+      // даем сформировать размер сетки
+      this.gridRendered = false
+      if (this.renderTO) clearInterval(this.renderTO);
+      this.renderTO = setTimeout(() => {
+        // после - рендер компонентов
+        this.gridRendered = true
+      }, 10)
+    },
     setRange({ range }, item) {
       const { xMetric = '_time' } = this.$store.state[this.idDash][item.visualizationId].options?.xAxis || {};
       this.$emit('SetRange', {

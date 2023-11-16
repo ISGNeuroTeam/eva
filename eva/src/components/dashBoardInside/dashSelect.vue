@@ -391,6 +391,7 @@ export default {
       deep: true,
       handler(val, oldVal) {
         if (val !== oldVal) {
+          this.setDefaultValue();
           this.setTocken();
         }
       },
@@ -478,9 +479,6 @@ export default {
       }
       if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
         let val = selected.elemDeep;
-        if (!Number.isNaN(parseFloat(selected.elemDeep)) && Number.isFinite(selected.elemDeep)) {
-          val = parseFloat(selected.elemDeep);
-        }
         this.elemDeep[`${this.multiple}`] = val;
       }
     }
@@ -508,12 +506,7 @@ export default {
             }
           }
           // Если нет значения(в селекте) ИЛИ оно отсутствует в датасете
-        } else if (
-          value === undefined
-            || value === null
-            || value === ''
-            || !this.dataRestDeep.includes(value)
-        ) {
+        } else {
           this.$set(this.elemDeep, `${this.multiple}`, defaultValue);
         }
       }
@@ -654,7 +647,7 @@ export default {
       if (this.loading !== false) {
         return;
       }
-      this.setDefaultValue();
+      //this.setDefaultValue();
       let elemDeepValue = this.elemDeep[`${this.multiple}`];
       if (this.getOptions?.resetValuesWhichAreNot) {
         const existsItems = this.dataReady.map((item) => item[this.elem]);

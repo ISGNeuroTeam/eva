@@ -639,7 +639,7 @@ export default class ChartClass {
   }
 
   set groups(val) {
-    this.groupNumberList = val.sort();
+    this.groupNumberList = val//.sort();
     this.groupCount = val.length;
   }
 
