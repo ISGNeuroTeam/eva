@@ -476,7 +476,7 @@
                 <input
                   :ref="`clone${search.id}`"
                   readonly
-                  style="position: absolute; opacity: 0;"
+                  class="hidden-input"
                   @focus="$event.target.select()"
                 >
                 <v-icon
@@ -2458,5 +2458,10 @@ export default {
 .tocken-view {
     height: 45px;
     overflow: auto;
+}
+.hidden-input {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
 }
 </style>

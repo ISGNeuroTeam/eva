@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated the top panel UX/UI
 
 ### Fixed
+- Data Sources: moving data sources does not work
 - Problem with empty login in the header on the main page
 - GridGroup: 
   - incorrect size of the multi-line chart
