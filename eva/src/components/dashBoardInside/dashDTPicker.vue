@@ -601,8 +601,12 @@ export default {
     },
     replaceTokens(value, prefix = '', suffix = '') {
       let updatedValue = value;
+
       if (/\$\w+\$/.test(value)) {
         updatedValue = this.convertingTokens(value);
+        if (/^\d+$/.test(updatedValue)) {
+          updatedValue = moment(+updatedValue * 1000).format(this.dateTimeFormat);
+        }
       }
       if (/^\d+$/.test(value)) {
         updatedValue = moment(+value * 1000).format(this.dateTimeFormat);
