@@ -437,6 +437,9 @@ export default {
       this.chart.updateBox(width, height);
     },
     openSettingsForMetric(metric, nGroup, nMetric) {
+      if (!this.dataModeFrom) {
+        return;
+      }
       const panelMetric = [];
       panelMetric[nGroup] = nMetric;
       this.$refs.chartSettings.panelMetric = panelMetric;
