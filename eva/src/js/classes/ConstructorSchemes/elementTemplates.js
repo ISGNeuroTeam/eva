@@ -229,7 +229,7 @@ const templates = {
           widthLeft: options?.widthLeft,
           items: options.items.map((item) => {
             const dataItem = Utils.getDataItemById(dataRest, item.id);
-            const textLeft = dataItem?.Description || '-';
+            const textLeft = item?.description || dataItem?.Description || '-';
             const textRight = typeof dataItem?.value === 'number'
             || typeof dataItem?.value === 'string'
               ? dataItem.value
