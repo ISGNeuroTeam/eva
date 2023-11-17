@@ -8,16 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Data-picker: Added the ability to toggle between range and exact date.
 
 ### Changed
 
 ### Fixed
+- Data-picker: Fixed changing format
 
 ## [1.159.0]
 
 ### Added
 - event go can accept external links
-- Data-picker: Added the ability to toggle between range and exact date.
+
 
 
 ### Changed
@@ -35,7 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - fixed response when updating data sources
 - Constructor-schemes: Fixed html-template in scheme keymap
 - Constructor-schemes: Fixed state data-panel on change fullscreen mode
-- Data-picker: Fixed changing format
 
 ## [1.158.0]
 
