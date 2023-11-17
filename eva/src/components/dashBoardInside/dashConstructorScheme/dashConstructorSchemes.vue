@@ -30,7 +30,11 @@
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
-              <div class="pa-3 d-flex">
+              <v-btn
+                class="ma-2"
+                :color="theme.$secondary_text"
+                icon
+              >
                 <v-icon
                   class="control-button edit-icon theme--dark"
                   :style="{ color: theme.$secondary_text }"
@@ -39,7 +43,7 @@
                 >
                   {{ dndPanel ? arrowCollapseLeft : arrowCollapseRight }}
                 </v-icon>
-              </div>
+              </v-btn>
             </template>
             <span>Панель настроек</span>
           </v-tooltip>
@@ -50,7 +54,11 @@
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
-              <div class="pa-3 d-flex">
+              <v-btn
+                class="ma-2"
+                :color="theme.$secondary_text"
+                icon
+              >
                 <v-icon
                   class="control-button edit-icon theme--dark"
                   :style="{ color: theme.$secondary_text }"
@@ -59,7 +67,7 @@
                 >
                   {{ fileExportOutline }}
                 </v-icon>
-              </div>
+              </v-btn>
             </template>
             <span>Экспорт</span>
           </v-tooltip>
@@ -70,8 +78,10 @@
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
-              <div
-                class="pa-3 ma-0 d-flex"
+              <v-btn
+                class="ma-2"
+                :color="theme.$secondary_text"
+                icon
                 v-on="on"
               >
                 <v-file-input
@@ -79,7 +89,7 @@
                   :value="file"
                   :color="theme.$secondary_text"
                   :style="{ color: theme.$secondary_text, fill: theme.$secondary_text }"
-                  class="dash-constructor-schemes__file-input ma-0"
+                  class="dash-constructor-schemes__file-input"
                   hide-details
                   hide-input
                   :prepend-icon="fileImportOutline"
@@ -88,7 +98,7 @@
                   label=""
                   @change="updateFile"
                 />
-              </div>
+              </v-btn>
             </template>
             <span>Импорт</span>
           </v-tooltip>
@@ -100,7 +110,11 @@
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
-                <div class="pa-3 d-flex">
+                <v-btn
+                  class="ma-2"
+                  :color="theme.$secondary_text"
+                  icon
+                >
                   <v-icon
                     class="control-button edit-icon theme--dark"
                     :style="{ color: theme.$secondary_text }"
@@ -109,7 +123,7 @@
                   >
                     {{ cloudDownloadOutlineIcon }}
                   </v-icon>
-                </div>
+                </v-btn>
               </template>
               <span>Загрузить с сервера</span>
             </v-tooltip>
@@ -121,14 +135,18 @@
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
-                <div class="pa-3 d-flex">
+                <v-btn
+                  class="ma-2"
+                  :color="theme.$secondary_text"
+                  icon
+                >
                   <bring-to-front
                     class="control-button edit-icon theme--dark"
                     :style="{ color: theme.$secondary_text }"
                     v-on="on"
                     @click="orderTo('toFront')"
                   />
-                </div>
+                </v-btn>
               </template>
               <span>На передний план</span>
             </v-tooltip>
@@ -138,14 +156,18 @@
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
-                <div class="pa-3 d-flex">
+                <v-btn
+                  class="ma-2"
+                  :color="theme.$secondary_text"
+                  icon
+                >
                   <send-to-back
                     class="control-button edit-icon theme--dark"
                     :style="{ color: theme.$secondary_text }"
                     v-on="on"
                     @click="orderTo('toBack')"
                   />
-                </div>
+                </v-btn>
               </template>
               <span>На задний план</span>
             </v-tooltip>
@@ -155,14 +177,18 @@
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
-                <div class="pa-3 d-flex">
+                <v-btn
+                  class="ma-2"
+                  :color="theme.$secondary_text"
+                  icon
+                >
                   <bring-forward
                     class="control-button edit-icon theme--dark"
                     :style="{ color: theme.$secondary_text }"
                     v-on="on"
                     @click="orderTo('raise')"
                   />
-                </div>
+                </v-btn>
               </template>
               <span>На уровень выше</span>
             </v-tooltip>
@@ -172,14 +198,18 @@
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
-                <div class="pa-3 d-flex">
+                <v-btn
+                  class="ma-2"
+                  :color="theme.$secondary_text"
+                  icon
+                >
                   <send-backward
                     class="control-button edit-icon theme--dark"
                     :style="{ color: theme.$secondary_text }"
                     v-on="on"
                     @click="orderTo('lower')"
                   />
-                </div>
+                </v-btn>
               </template>
               <span>На уровень ниже</span>
             </v-tooltip>
@@ -191,7 +221,11 @@
           :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
-            <div class="pa-3 d-flex">
+            <v-btn
+              class="ma-2"
+              :color="theme.$secondary_text"
+              icon
+            >
               <v-icon
                 class="control-button edit-icon theme--dark"
                 :style="{ color: theme.$secondary_text }"
@@ -200,9 +234,33 @@
               >
                 {{ fitToPage }}
               </v-icon>
-            </div>
+            </v-btn>
           </template>
           <span>Выровнять по центру</span>
+        </v-tooltip>
+        <v-tooltip
+          bottom
+          :z-index="fullScreenMode ? 1005 : 100"
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-btn
+              class="ma-2"
+              :color="theme.$secondary_text"
+              :loading="exportToPDFLoading"
+              icon
+            >
+              <v-icon
+                class="control-button edit-icon theme--dark"
+                :style="{ color: theme.$secondary_text }"
+                v-on="on"
+                @click="exportToPDF"
+              >
+                {{ fileExportPDF }}
+              </v-icon>
+            </v-btn>
+          </template>
+          <span>ToPDF</span>
         </v-tooltip>
       </div>
       <div
@@ -658,6 +716,7 @@ import {
   mdiCloudDownloadOutline,
   mdiFileImport,
   mdiFileExport,
+  mdiFilePdfBox,
 } from '@mdi/js';
 import BringForward from '../../../images/bring_forward.svg';
 import BringToFront from '../../../images/bring_to_front.svg';
@@ -729,6 +788,7 @@ export default {
       arrowCollapseRight: mdiArrowCollapseRight,
       fileImportOutline: mdiFileImport,
       fileExportOutline: mdiFileExport,
+      fileExportPDF: mdiFilePdfBox,
       iconArrowUp: '/icons/OrderIcons/bring_to_front.svg',
       arrowDown: mdiArrowDown,
       iconHelp: mdiHelp,
@@ -801,6 +861,7 @@ export default {
       dndPanel: false,
       dataPanel: false,
       hotkeysPanel: false,
+      exportToPDFLoading: false,
     };
   },
   computed: {
@@ -957,6 +1018,12 @@ export default {
       }
       return [];
     },
+    getNameForExporter() {
+      return this.localActiveSchemeId === 'default-scheme'
+        || this.localActiveSchemeId === ''
+        ? this.visualisationFromStore.name_elem
+        : this.localActiveSchemeId;
+    },
   },
   watch: {
     file(value) {
@@ -1016,6 +1083,7 @@ export default {
     localActiveSchemeId() {
       if (this.constructorSchemes) {
         this.constructorSchemes.update(this.savedGraphObject);
+        this.constructorSchemes.setExporterOptions({ fileName: this.getNameForExporter });
       }
     },
     loadingSearchForBuildScheme(val) {
@@ -1141,6 +1209,9 @@ export default {
         toggleLoadingCallback: this.toggleLoading,
         isEdit: this.dashboardEditMode,
         isBridgesEnable: this.isBridgeEnable,
+        exporterOptions: {
+          fileName: this.getNameForExporter,
+        },
         onClickObject: (type, data) => {
           if (!type || (!type.includes('label-type') && type !== 'image-node')) {
             return;
@@ -1321,6 +1392,11 @@ export default {
     fitGraphContent() {
       this.constructorSchemes.fitGraphContent();
     },
+    async exportToPDF() {
+      this.exportToPDFLoading = true;
+      await this.constructorSchemes.exportToPDF();
+      this.exportToPDFLoading = false;
+    },
     openConfirmModal() {
       this.isConfirmModal = true;
     },
@@ -1423,7 +1499,7 @@ export default {
   }
   &__file-input {
     ::v-deep.v-input__prepend-outer {
-      margin: 0 !important;
+      margin: 0 auto !important;
       .v-icon__svg {
         fill: var(--secondary_text);
       }

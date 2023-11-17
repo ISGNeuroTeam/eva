@@ -67,6 +67,9 @@ import SchemeUpdater from './SchemeUpdater.js';
 import elementTemplates from './elementTemplates.js';
 import ElementCreator from '@/js/classes/ConstructorSchemes/ElementCreator';
 import GenerateElementsFromSearch from '@/js/classes/ConstructorSchemes/GenerateElementsFromSearch';
+import {
+  ExporterToPDF,
+} from '@/js/classes/ConstructorSchemes/ExportToPDF';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -220,6 +223,8 @@ class ConstructorSchemesClass {
     dataRest: [],
   }
 
+  exporterToPDF = undefined
+
   /* Getters/setters */
 
   get defaultDataSource() {
@@ -354,6 +359,7 @@ class ConstructorSchemesClass {
     isEdit, // Флаг состояния дашборда(редактирование\нет)
     onClickObject, // Коллбэк для события click
     isBridgesEnable, // Флаг вкл\выкл обработку пересечения линий
+    exporterOptions = undefined,
   }) {
     this.dragAndDropPanel = null;
     this.schemeUpdater = null;
@@ -403,6 +409,7 @@ class ConstructorSchemesClass {
     if (isBridgesEnable) {
       this.enableBridges();
     }
+    this.exporterToPDF = new ExporterToPDF(this.graphComponent, exporterOptions);
   }
 
   /* Async methods */
@@ -1856,6 +1863,15 @@ class ConstructorSchemesClass {
       this.graphComponent.fitContent();
       this.graphComponent.updateVisual();
     });
+  }
+
+  setExporterOptions(options) {
+    this.exporterToPDF.setOptions(options);
+  }
+
+  async exportToPDF() {
+    await this.exporterToPDF.exportPdfClientSide();
+    // await exportPdfClientSide(this.graphComponent);
   }
 
   // iconsList:Array<string>, maxItemSize:number, minItemSize:number

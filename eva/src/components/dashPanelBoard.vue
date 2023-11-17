@@ -21,11 +21,11 @@
         >
           <template v-slot:activator="{ on }">
             <v-btn
-                icon
-                v-on="on"
-                :color="theme.$secondary_text"
-                :class="{'v-btn--active': $store.state.app.treeOpen}"
-                @click="openNavPanel"
+              icon
+              :color="theme.$secondary_text"
+              :class="{'v-btn--active': $store.state.app.treeOpen}"
+              v-on="on"
+              @click="openNavPanel"
             >
               <v-icon>
                 {{ iconTree }}
@@ -41,10 +41,10 @@
         >
           <template v-slot:activator="{ on }">
             <v-btn
-                to="/main"
-                icon
-                v-on="on"
-                :color="theme.$secondary_text"
+              to="/main"
+              icon
+              :color="theme.$secondary_text"
+              v-on="on"
             >
               <v-icon>
                 {{ home }}
@@ -60,10 +60,10 @@
         >
           <template v-slot:activator="{ on }">
             <v-btn
-                icon
-                v-on="on"
-                :color="theme.$secondary_text"
-                @click="toBackward"
+              icon
+              :color="theme.$secondary_text"
+              v-on="on"
+              @click="toBackward"
             >
               <v-icon>
                 {{ undo }}
@@ -75,7 +75,6 @@
       </div>
       <div class="control-block">
         <div
-          v-if="editMode"
           class="edit-container px-3"
         >
           <v-tooltip
@@ -85,11 +84,31 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  icon
-                  v-on="on"
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': loadSvg}"
-                  @click="loadSvg = !loadSvg"
+                icon
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': loadSvg}"
+                v-on="on"
+                @click="exportDashBoard"
+              >
+                <v-icon>
+                  {{ upload_icon }}
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Экспорт дашборда</span>
+          </v-tooltip>
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+            :open-delay="openTooltipDelay"
+          >
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': loadSvg}"
+                v-on="on"
+                @click="loadSvg = !loadSvg"
               >
                 <v-icon>
                   {{ upload_icon }}
@@ -105,11 +124,11 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  icon
-                  v-on="on"
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': openevent}"
-                  @click="openEventCode"
+                icon
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': openevent}"
+                v-on="on"
+                @click="openEventCode"
               >
                 <v-icon>
                   {{ code_icon }}
@@ -125,11 +144,11 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  icon
-                  v-on="on"
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': opentocken}"
-                  @click="openTockenCode"
+                icon
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': opentocken}"
+                v-on="on"
+                @click="openTockenCode"
               >
                 <v-icon>
                   {{ tocken_icon }}
@@ -145,11 +164,11 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  icon
-                  v-on="on"
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': search_elem}"
-                  @click="openSearchCode"
+                icon
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': search_elem}"
+                v-on="on"
+                @click="openSearchCode"
               >
                 <v-icon>
                   {{ search_icon }}
@@ -165,11 +184,11 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  icon
-                  v-on="on"
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': opentool}"
-                  @click="openToolPanel"
+                icon
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': opentool}"
+                v-on="on"
+                @click="openToolPanel"
               >
                 <v-icon>
                   {{ tool_icon }}
@@ -188,9 +207,9 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
-                v-on="on"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': openfilter}"
+                v-on="on"
                 @click="openFilterPanel"
               >
                 <v-icon>
@@ -208,11 +227,11 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  v-on="on"
-                  icon
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': gearShow}"
-                  @click.prevent="gearShow = !gearShow"
+                icon
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': gearShow}"
+                v-on="on"
+                @click.prevent="gearShow = !gearShow"
               >
                 <v-icon>
                   {{ gear }}
@@ -229,11 +248,12 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                v-on="on"
                 icon
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': opensave}"
-                @click="openSave">
+                v-on="on"
+                @click="openSave"
+              >
                 <v-icon>
                   {{ save_icon }}
                 </v-icon>
@@ -248,11 +268,12 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  v-on="on"
-                  icon
-                  :color="getColorError ? theme.$primary_button : theme.$secondary_text"
-                  :class="{'v-btn--active': modalActive}"
-                  @click="openLogs">
+                icon
+                :color="getColorError ? theme.$primary_button : theme.$secondary_text"
+                :class="{'v-btn--active': modalActive}"
+                v-on="on"
+                @click="openLogs"
+              >
                 <v-icon>
                   {{ logIcon }}
                 </v-icon>
@@ -267,11 +288,12 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  v-on="on"
-                  icon
-                  :color="hasNewNotify ? theme.$primary_button : theme.$secondary_text"
-                  :class="{'v-btn--active': modalNotify}"
-                  @click="openNotify">
+                icon
+                :color="hasNewNotify ? theme.$primary_button : theme.$secondary_text"
+                :class="{'v-btn--active': modalNotify}"
+                v-on="on"
+                @click="openNotify"
+              >
                 <v-icon>
                   {{ notifyIcon }}
                 </v-icon>
@@ -293,14 +315,14 @@
             >
               <template v-slot:activator="{ on: onTooltip }">
                 <v-btn
-                    text
-                    rounded
-                    class="ml-2 mr-2 pl-2 profile-login"
-                    v-on="{ ...onMenu, ...onTooltip }"
-                    :color="theme.$secondary_text"
+                  text
+                  rounded
+                  class="ml-2 mr-2 pl-2 profile-login"
+                  :color="theme.$secondary_text"
+                  v-on="{ ...onMenu, ...onTooltip }"
                 >
                   <v-icon
-                      class="profile theme--dark"
+                    class="profile theme--dark"
                   >
                     {{ profile_icon }}
                   </v-icon>
@@ -1056,6 +1078,8 @@ import {
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
 import draggable from 'vuedraggable';
+import html2canvas from 'html2canvas';
+import { jsPDF as JsPDF } from 'jspdf';
 import EvaLogo from '../images/eva-logo.svg';
 import settings from '../js/componentsSettings';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
@@ -2420,6 +2444,47 @@ export default {
         this.lookTockens.push({ show: false, color: this.theme.controls });
       });
       this.tokens = JSON.parse(JSON.stringify(tokens));
+    },
+    async exportDashBoard() {
+      const appElement = document.querySelector('#app');
+      const size = { height: appElement.scrollHeight, width: appElement.scrollWidth };
+
+      const sizeArray = [size.width, size.height];
+
+      await html2canvas(appElement, {
+        width: size.width,
+        height: size.height,
+        backgroundColor: this.theme.$secondary_bg,
+        foreignObjectRendering: true,
+        allowTaint: true,
+        logging: true,
+        useCORS: true,
+        // proxy: process.env.VUE_APP_PROXY,
+        imageTimeout: 55000,
+
+        onclone: (doc, el) => {
+          el.querySelector('.tab-panel-wrapper').remove();
+          el.querySelector('.app-header').position = 'static';
+          if (el.querySelector('.overlay-grid')) {
+            el.querySelector('.overlay-grid').background = 'transparent';
+          }
+        },
+      })
+        .then((canvas) => {
+          const imgData = canvas.toDataURL('image/png');
+
+          // Создаем новый объект jsPDF
+          // eslint-disable-next-line new-cap
+          const pdf = new JsPDF({
+            orientation: sizeArray[0] > sizeArray[1] ? 'l' : 'p',
+            unit: 'px',
+            format: sizeArray,
+            compress: true,
+          });
+          pdf.addImage(imgData, 'PNG', 0, 0, sizeArray[0], sizeArray[1]);
+          // Сохраняем PDF
+          pdf.save('your-filename.pdf');
+        });
     },
   },
 };
