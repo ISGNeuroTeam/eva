@@ -229,7 +229,7 @@ const templates = {
           widthLeft: options?.widthLeft,
           items: options.items.map((item) => {
             const dataItem = Utils.getDataItemById(dataRest, item.id);
-            const textLeft = dataItem?.Description || '-';
+            const textLeft = item?.description || dataItem?.Description || '-';
             const textRight = typeof dataItem?.value === 'number'
             || typeof dataItem?.value === 'string'
               ? dataItem.value
@@ -630,7 +630,7 @@ const templates = {
         const mainImageFromData = options.defaultImage;
         const mainImageIsChange = mainImageFromNode !== mainImageFromData;
         const dataItem = Utils.getDataItemById(dataRest, options.id);
-        const isValidValue = typeof dataItem.value === 'string' || typeof dataItem.value === 'number';
+        const isValidValue = Utils.isValidValue(dataItem.value);
         const value = isValidValue ? dataItem.value : (options?.value || '-');
         if (mainImageIsChange && mainImageFromNode) {
           return {
@@ -652,9 +652,12 @@ const templates = {
       },
       updateData(node, updatedData) {
         const targetData = updatedData.find((item) => item.TagName === node.tag.id);
+        const value = Utils.isValidValue(targetData.value)
+          ? targetData.value
+          : '-';
         node.tag = {
           ...node.tag,
-          value: `${targetData?.value || '-'}`,
+          value: `${value}`,
         };
       },
     },
@@ -663,7 +666,6 @@ const templates = {
     template: `
       <g class="b-data-node">
         <g :transform="tag.calculateScale(tag.type, layout).stringResult">
-          <!--Type-1-->
           <template v-if="tag.type === 0">
             <path 
               d="M55.15 60.337H54.25V55.8587H55.15H55.65V55.3587V55.25H58.85V55.3587V55.8587H59.35H60.25V60.337H59.35H58.85V60.837V61.25H55.65V60.837V60.337H55.15Z" 
@@ -1299,7 +1301,7 @@ const templates = {
           ? dataItemSecond.value
           : '';
         let colorByValue = null;
-        if (secondMetricById) {
+        if (secondMetricById !== '') {
           colorByValue = options.colors.find((el) => `${el.value}` === `${secondMetricById}`);
         }
         return {
