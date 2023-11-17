@@ -491,20 +491,23 @@ export default {
     },
   },
   watch: {
-    isPeriod(val) {
-      if (val) {
+    isPeriod(isPeriod) {
+      if (isPeriod) {
         if (this.exactDate) {
           this.start = this.exactDate;
           this.curDate = `${this.start} - ...`;
           this.exactDate = null;
+          this.exactDateForStore = null;
           this.setToken('dt');
         }
       }
-      if (!val) {
+      if (!isPeriod) {
         if (this.start) {
           this.exactDate = this.start;
           this.curDate = this.exactDate;
           this.start = null;
+          this.startForStore = null;
+          this.endForStore = null;
           this.end = null;
           this.setToken('exactDate');
         }
@@ -548,6 +551,7 @@ export default {
   },
   created() {
     const data = this.getPickerDate;
+    // eslint-disable-next-line no-prototype-builtins
     if (data.range != null && data.range.hasOwnProperty('shortcut')) {
       this.shortcut = this.DTPickerCustomShortcuts.find(
         (sc) => sc.value === data.range.shortcut,
