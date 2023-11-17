@@ -1,91 +1,68 @@
 <template>
   <div
     :class="{
-      'dash-constructor-schemes-keymap--is-open': modelValue,
+      'dash-scheme-keymap--is-open': modelValue,
     }"
-    class="dash-constructor-schemes-keymap"
+    class="dash-scheme-keymap"
   >
-    <div class="dash-constructor-schemes-keymap__wrapper">
-      <button
-        class="dash-constructor-schemes-keymap__close"
+    <div class="dash-scheme-keymap__close">
+      <v-btn
+        icon
+        :color="theme.$main_text"
         @click="close"
       >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
-        >
-          {{ iconClose }}
-        </v-icon>
-      </button>
-      <div class="dash-constructor-schemes-keymap__tab-list">
+        <v-icon>{{ mdiClose }}</v-icon>
+      </v-btn>
+    </div>
+    <div class="dash-scheme-keymap__wrapper">
+      <div class="dash-scheme-keymap__header">
+        <div class="dash-scheme-keymap__title">
+          Горячие клавиши
+        </div>
+        <div class="dash-scheme-keymap__subtitle">
+          (Работают <span>только</span> в режиме редактирования)
+        </div>
+      </div>
+      <div class="dash-scheme-keymap__tabs">
         <div
-          v-for="(item, index) in tabs"
-          :key="index"
-          class="dash-constructor-schemes-keymap__tab-item"
+          v-for="(tab, index) in tabs"
+          :key="`${id}-tab-${index}`"
+          class="dash-scheme-keymap__tab-item"
           :class="{
-            'dash-constructor-schemes-keymap__tab-item--active': activeTab === item.value,
+            'dash-scheme-keymap__tab-item--active': activeTab === index,
           }"
-          @click="setActiveTab(item.value)"
+          @click="setActiveTab(index)"
         >
-          {{ item.label }}
+          {{ tab.label }}
         </div>
       </div>
-      <div class="dash-constructor-schemes-keymap__row row">
-        <div class="col-5">
-          <div class="dash-constructor-schemes-keymap__title">
-            Горячие клавиши
-          </div>
-          <div class="dash-constructor-schemes-keymap__subtitle">
-            (работают только в режиме редактирования)
-          </div>
-        </div>
-        <div class="col-5" />
-      </div>
-      <div class="dash-constructor-schemes-keymap__row row">
+      <div class="dash-scheme-keymap__tab-content">
         <div
-          v-for="(groupItem, groupIndex) in activeTabContent"
-          :key="`tab-group-items-${groupIndex}`"
-          class=" col-5"
+          v-for="(content, index) in activeTabContent"
+          :key="`${id}-tab-content-${index}`"
+          class="dash-scheme-keymap__tab-content-item"
         >
-          <div
-            v-for="(item, index) in groupItem"
-            :key="`tab-content-item-${index}`"
-            class="dash-constructor-schemes-keymap__item d-flex justify-space-between align-center"
-          >
-            <div class="column">
-              <div class="dash-constructor-schemes-keymap__label">
-                {{ item.label }}
+          <div class="dash-scheme-keymap__hotkey-label">
+            {{ content.label }}:
+          </div>
+          <div class="dash-scheme-keymap__hotkey-value">
+            <div
+              v-for="(hotkey, hotkeyIndex) in content.keys"
+              :key="`${id}-hotkey-${index}-${hotkeyIndex}`"
+              class="dash-scheme-keymap__hotkey-item"
+            >
+              <div class="dash-scheme-keymap__hotkey-btn">
+                {{ hotkey }}
               </div>
               <div
-                v-if="item.secondLabel"
-                class="dash-constructor-schemes-keymap__second-label"
+                v-if="hotkeyIndex < content.keys.length - 1"
+                class="px-1"
               >
-                {{ item.secondLabel }}
+                +
               </div>
-            </div>
-            <div class="d-flex justify-space-between align-center">
-              <template v-for="(keyItem, keyIndex) in item.keys">
-                <div
-                  :key="`key-item-${keyIndex}`"
-                  class="dash-constructor-schemes-keymap__button"
-                >
-                  {{ keyItem }}
-                </div>
-                <div
-                  v-if="(keyIndex + 1) < item.keys.length"
-                  :key="`key-separator-${keyIndex}`"
-                  class="dash-constructor-schemes-keymap__separator"
-                >
-                  +
-                </div>
-              </template>
             </div>
           </div>
         </div>
-        <div
-          v-if="activeTabContent.length === 1"
-          class="col-5"
-        />
       </div>
     </div>
   </div>
@@ -105,6 +82,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    id: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -121,7 +102,27 @@ export default {
             },
             {
               label: 'Удаление выделенного элемента',
-              keys: ['Delete'],
+              keys: ['Del'],
+            },
+            {
+              label: 'Копирование выделенных элементов',
+              keys: ['Ctrl', 'C'],
+            },
+            {
+              label: 'Дублирование выделенных элементов',
+              keys: ['Ctrl', 'D'],
+            },
+            {
+              label: 'Вырезание выделенных элементов',
+              keys: ['Ctrl', 'X'],
+            },
+            {
+              label: 'Вставка скопированных/вырезанных элементов',
+              keys: ['Ctrl', 'V'],
+            },
+            {
+              label: 'Откат изменений(назад/вперед)',
+              keys: ['Ctrl', 'Z/Y'],
             },
           ],
         },
@@ -148,7 +149,7 @@ export default {
               keys: ['ЛКМ', 'Move'],
             },
             {
-              label: 'Перемещение линии ',
+              label: 'Перемещение линии',
               secondLabel: '(без перемещения точек начала и конца линии)',
               keys: ['ЛКМ x2', 'Move'],
             },
@@ -170,7 +171,7 @@ export default {
         },
         {
           value: 3,
-          label: 'Подписи к блокам',
+          label: 'Подписи',
           content: [
             {
               label: 'Выделить указанную подпись',
@@ -202,7 +203,7 @@ export default {
           ],
         },
       ],
-      iconClose: mdiClose,
+      mdiClose,
     };
   },
   computed: {
@@ -222,7 +223,7 @@ export default {
         }
       });
       tabContent.push([...arr]);
-      return tabContent;
+      return this.tabs[this.activeTab].content;
     },
   },
   methods: {
@@ -238,7 +239,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.dash-constructor-schemes-keymap {
+$padding-top: 16px;
+$padding-x: 24px;
+.dash-scheme-keymap {
   position: absolute;
   left: 0;
   right: 0;
@@ -248,9 +251,10 @@ export default {
   opacity: 0;
   transition: all .2s ease;
   background-color: var(--main_bg);
-  padding-top: 10px;
-  padding-bottom: 39px;
-  min-height: 400px;
+  height: 335px;
+  padding-left: 8px;
+  padding-bottom: 16px;
+  border-radius: 4px 4px 0 0;
   &--is-open {
     bottom: 0;
     opacity: 1;
@@ -268,112 +272,101 @@ export default {
     z-index: 1;
   }
   &__wrapper {
-    position: relative;
+    height: 100%;
+    display: grid;
+    min-height: inherit;
+    grid-template-columns: minmax(120px, auto) 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 16px 24px;
+    grid-template-areas:
+      "header header"
+      "tab tab-content";
   }
-  &__tab-list {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 22px;
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 6px;
-    padding: 2px;
-    background-color: var(--secondary_bg);
+  &__tabs {
+    grid-area: tab;
+    align-content: flex-start;
+    align-self: flex-start;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: max-content;
+    gap: 8px 0;
+    padding-top: 4px;
   }
   &__tab-item {
-    padding: 0 20px;
-    margin-right: 2px;
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 16px;
-    color: var(--main_text);
+    padding: 4px 16px;
+    border: 1px solid var(--main_border);
+    border-radius: 4px;
     cursor: pointer;
-    transition: .3s cubic-bezier(.25,.8,.5,1);
-    position: relative;
-    &:last-child {
-      margin-right: 0;
-    }
-    &:after {
-      bottom: 0;
-      content: "";
-      opacity: 0;
-      pointer-events: none;
-      position: absolute;
-      top: 0;
-      z-index: -1;
-      background-color: var(--primary_button);
-      border-radius: 6px;
-      transition: .3s cubic-bezier(.25,.8,.5,1);
+    &:hover {
+      background-color: var(--secondary_bg);
     }
     &--active {
-      &:after {
-        opacity: 1;
-        left: 0;
-        right: 0;
-      }
+      border-color: var(--primary_button);
     }
   }
-  &__row {
+  &__header {
+    grid-area: header;
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: min-content min-content;
+    align-content: center;
+    justify-content: center;
+  }
+  &__tab-content {
+    grid-area: tab-content;
+    display: grid;
+    grid-auto-rows: min-content;
+    grid-template-columns: 1fr;
+    gap: 10px 10px;
+    padding-right: $padding-x;
+    font-size: 18px;
+    overflow-y: auto;
+    max-height: 260px;
+  }
+  &__tab-content-item {
+    display: grid;
+    grid-auto-rows: auto;
+    grid-template-columns: 1fr auto;
+    gap: 0 10px;
+    grid-template-areas:
+        "label hotkeys";
+  }
+  &__hotkey-label {
+    grid-area: label;
+    text-align: left;
+  }
+  &__hotkey-value {
+    grid-area: hotkeys;
     display: flex;
-    justify-content: space-evenly;
+    flex-wrap: nowrap;
+    justify-content: end;
+  }
+  &__hotkey-item {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+  &__hotkey-btn {
+    border: 1px solid var(--main_border);
+    background-color: var(--main_text);
+    color: var(--main_bg);
+    border-radius: 4px;
+    padding: 4px 6px;
+    line-height: 1;
+    align-self: center;
+    font-weight: 500;
+    min-width: 58px;
   }
   &__title {
-    color: var(--accent_ui_color);
-    font-weight: 600;
     font-size: 24px;
-    line-height: 29px;
+    color: var(--main_text);
   }
   &__subtitle {
-    color: var(--main_border);
-    font-weight: 400;
-    font-size: 15px;
-    line-height: 18px;
-  }
-  &__item {
-    margin-bottom: 30px;
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-  &__label {
-    font-weight: 600;
-    font-size: 24px;
-    line-height: 29px;
-    color: var(--main_text);
-  }
-  &__second-label {
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 18px;
-    color: var(--main_text);
-  }
-  &__button {
-    padding: 10px 20px;
-    font-weight: 600;
-    font-size: 24px;
-    line-height: 29px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: var(--main_bg);
-    background-color: var(--main_text);
-    border-radius: 4px;
-    pointer-events: none;
-    white-space: nowrap;
-  }
-  &__separator {
-    font-weight: 400;
-    font-size: 42px;
-    line-height: 51px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: var(--main_text);
-    margin: 0 8px;
-    pointer-events: none;
+    font-size: 16px;
+    color: var(--secondary_text);
+    line-height: 1;
   }
 }
 </style>

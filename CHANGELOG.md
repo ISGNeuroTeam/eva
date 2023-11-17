@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- event go can accept external links
 - Data-picker: Added the ability to toggle between range and exact date.
 
 
@@ -15,10 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated the top panel UX/UI
 
 ### Fixed
+- Multiline: 
+  - clicking on the legend opens the settings when the dashboard editing mode is turned off
+  - order of metrics in the chart legend
+- Select: The option Update component value when changes in the ID for the default value did not work
+- Data Sources: moving data sources does not work
 - Problem with empty login in the header on the main page
 - GridGroup: 
   - incorrect size of the multi-line chart
   - fixed response when updating data sources
+- Constructor-schemes: Fixed html-template in scheme keymap
+- Constructor-schemes: Fixed state data-panel on change fullscreen mode
 - Data-picker: Fixed changing format
 
 ## [1.158.0]

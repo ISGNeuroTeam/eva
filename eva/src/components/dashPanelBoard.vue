@@ -476,7 +476,7 @@
                 <input
                   :ref="`clone${search.id}`"
                   readonly
-                  style="position: absolute; opacity: 0;"
+                  class="hidden-input"
                   @focus="$event.target.select()"
                 >
                 <v-icon
@@ -2120,11 +2120,13 @@ export default {
             originItem = item;
             if (item !== '') {
               reg = /^\s*\w+\(/g;
+              const eventName = reg.exec(item)[0].replace('(', '');
               this.$set(
                 this.event,
                 'event',
-                reg.exec(item)[0].replace('(', ''),
+                eventName,
               );
+
               // reg = new RegExp(/\(.+\)/, 'g');
               reg = /\(.+\)/g;
               [body] = reg.exec(item);
@@ -2238,7 +2240,11 @@ export default {
 
                 // TODO: оставленно специально, если возникнет баг в смежном функционале
                 // doing = doing[1].slice(0, doing[1].length - 1).split(',');
-                doing = doing[1].match(/([\w-_]+)|(\[([^\]]+)])/g);
+                if (!doing[1].includes('http://') && !doing[1].includes('https://')) {
+                  doing = doing[1].match(/([\w-_]+)|(\[([^\]]+)])/g);
+                } else {
+                  doing = doing[1].split(')');
+                }
                 this.$set(this.event, 'target', doing[0]);
                 let prop;
                 let value;
@@ -2458,5 +2464,10 @@ export default {
 .tocken-view {
     height: 45px;
     overflow: auto;
+}
+.hidden-input {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
 }
 </style>
