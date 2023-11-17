@@ -478,8 +478,7 @@ export default {
         this.openSelect();
       }
       if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
-        let val = selected.elemDeep;
-        this.elemDeep[`${this.multiple}`] = val;
+        this.elemDeep[`${this.multiple}`] = selected.elemDeep;
       }
     }
   },
