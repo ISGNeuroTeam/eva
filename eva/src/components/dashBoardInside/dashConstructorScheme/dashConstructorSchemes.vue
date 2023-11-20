@@ -716,7 +716,7 @@ import {
   mdiCloudDownloadOutline,
   mdiFileImport,
   mdiFileExport,
-  mdiFilePdfBox,
+  mdiFilePdf,
 } from '@mdi/js';
 import BringForward from '../../../images/bring_forward.svg';
 import BringToFront from '../../../images/bring_to_front.svg';
@@ -788,7 +788,7 @@ export default {
       arrowCollapseRight: mdiArrowCollapseRight,
       fileImportOutline: mdiFileImport,
       fileExportOutline: mdiFileExport,
-      fileExportPDF: mdiFilePdfBox,
+      fileExportPDF: mdiFilePdf,
       iconArrowUp: '/icons/OrderIcons/bring_to_front.svg',
       arrowDown: mdiArrowDown,
       iconHelp: mdiHelp,
@@ -1026,6 +1026,11 @@ export default {
     },
   },
   watch: {
+    'theme.$secondary_bg': {
+      handler(val) {
+        this.constructorSchemes.setExporterOptions({ background: val.$secondary_bg });
+      },
+    },
     file(value) {
       if (value) {
         this.importFrom(value);
@@ -1211,6 +1216,7 @@ export default {
         isBridgesEnable: this.isBridgeEnable,
         exporterOptions: {
           fileName: this.getNameForExporter,
+          background: this.theme.$secondary_bg,
         },
         onClickObject: (type, data) => {
           if (!type || (!type.includes('label-type') && type !== 'image-node')) {

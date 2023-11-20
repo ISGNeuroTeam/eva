@@ -24,6 +24,8 @@ export class ExporterToPDF {
 
   exportRect = undefined
 
+  background = '#ffffff'
+
   constructor(sourceGraphComponent, options) {
     this.sourceGraphComponent = sourceGraphComponent;
     this.setOptions(options);
@@ -35,6 +37,7 @@ export class ExporterToPDF {
     this.paperSize = options?.paperSize ? PaperSize[options?.paperSize] : PaperSize.AUTO;
     this.exportRect = options?.exportRect ?? undefined;
     this.fileName = options?.fileName || 'schema';
+    this.background = options?.background || this.background;
   }
 
   async getSVGElement() {
@@ -74,7 +77,7 @@ export class ExporterToPDF {
   async convertSvgToPdf(svgElement, size) {
     svgElement = svgElement.cloneNode(true);
 
-    const sizeArray = [size.width, size.height];
+    const sizeArray = [size.width + 20, size.height + 20];
 
     const container = document.createElement('div');
     container.style.width = `${sizeArray[0]}px`;
@@ -85,16 +88,20 @@ export class ExporterToPDF {
     // Добавление элемента в DOM
     document.body.appendChild(container);
 
-    await html2canvas(container, { ...size })
+    await html2canvas(container, {
+      width: size.width + 20,
+      height: size.height + 20,
+      backgroundColor: this.background,
+      logging: false,
+    })
       .then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
-
         // Создаем новый объект jsPDF
         const pdf = new JsPDF({
           orientation: sizeArray[0] > sizeArray[1] ? 'l' : 'p',
           unit: 'px',
           format: sizeArray,
-          compress: true,
+          putOnlyUsedFonts: true,
         });
         pdf.addImage(imgData, 'PNG', 0, 0, sizeArray[0], sizeArray[1]);
         document.body.removeChild(container);
@@ -121,23 +128,6 @@ export class ExporterToPDF {
   }
 }
 
-// export const getExportSize = (paperSize, exporter) => {
-//   switch (paperSize) {
-//     case PaperSize.A3:
-//       return new Size(842, 1191);
-//     case PaperSize.A4:
-//       return new Size(595, 842);
-//     case PaperSize.A5:
-//       return new Size(420, 595);
-//     case PaperSize.A6:
-//       return new Size(298, 420);
-//     case PaperSize.LETTER:
-//       return new Size(612, 792);
-//     default:
-//       return new Size(exporter.viewWidth, exporter.viewHeight);
-//   }
-// };
-//
 export const convertSvgToPdf = async (svgElement, size) => {
   svgElement = svgElement.cloneNode(true);
 

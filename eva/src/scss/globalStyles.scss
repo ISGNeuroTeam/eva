@@ -197,4 +197,39 @@
       transform: translateY(-50%);
     }
   }
+  &.html2canvas_no_transitions * {
+    //transition: none !important;
+    //box-shadow: none !important;
+
+    //.v-input {
+    //  input {
+    //    padding: 0px;
+    //    height: 22px;
+    //  }
+    //}
+    //.tabulator-page-size {
+    //  height: 25px;
+    //}
+    //*::-webkit-scrollbar {
+    //  width: 10px;
+    //}
+    //
+    //*::-webkit-scrollbar-track {
+    //  background: #333333;
+    //  background: var(--scroll_bg);
+    //}
+    //.v-navigation-drawer__content::-webkit-scrollbar-track {
+    //  background-color: transparent
+    //}
+
+    foreignObject {
+      overflow: hidden !important;
+
+      //p {
+      //  margin-bottom: 0 !important;
+      //  line-height: 10px;
+      //}
+    }
+  }
+
 }

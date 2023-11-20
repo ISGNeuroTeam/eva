@@ -86,17 +86,23 @@
               <v-btn
                 icon
                 :color="theme.$secondary_text"
-                :class="{'v-btn--active': loadSvg}"
+                :class="{'v-btn--active': exportToPDFLoading}"
+                :loading="exportToPDFLoading"
                 v-on="on"
                 @click="exportDashBoard"
               >
                 <v-icon>
-                  {{ upload_icon }}
+                  {{ fileExportPDF }}
                 </v-icon>
               </v-btn>
             </template>
-            <span>Экспорт дашборда</span>
+            <span>Экспорт текущей вкладки(PDF)</span>
           </v-tooltip>
+        </div>
+        <div
+          v-if="editMode"
+          class="edit-container px-3"
+        >
           <v-tooltip
             bottom
             :color="theme.$accent_ui_color"
@@ -332,7 +338,7 @@
               <span>Меню профиля</span>
             </v-tooltip>
           </template>
-          <v-list class="profile-dropdown--list">
+          <v-list class="profile-dropdown--list profile-dropdown-menu">
             <v-list-item>
               <v-list-item-title class="profile-dropdown--title">
                 Профиль
@@ -1075,11 +1081,13 @@ import {
   mdiDragHorizontalVariant,
   mdiBellRingOutline,
   mdiContentCopy,
+  mdiFilePdf,
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
 import draggable from 'vuedraggable';
 import html2canvas from 'html2canvas';
 import { jsPDF as JsPDF } from 'jspdf';
+import domtoimage from 'dom-to-image-more';
 import EvaLogo from '../images/eva-logo.svg';
 import settings from '../js/componentsSettings';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
@@ -1118,6 +1126,7 @@ export default {
       undo: mdiUndoVariant,
       help_icon: mdiHelpCircleOutline,
       search_icon: mdiDatabase,
+      fileExportPDF: mdiFilePdf,
       modalActive: false,
       tool_elem: false,
       tocken_elem: false,
@@ -1248,6 +1257,7 @@ export default {
       allGroups: [],
       tokens: [],
       loadSvg: false,
+      exportToPDFLoading: false,
     };
   },
   computed: {
@@ -1423,6 +1433,15 @@ export default {
         ]);
       }
       return this.dashFromStore?.grid;
+    },
+    nameForPDFExport() {
+      let { name } = this.dashFromStore;
+      const tabName = this.dashFromStore.tabList
+        .find((tab) => tab.id === this.dashFromStore.currentTab).name;
+      if (tabName !== 'Без названия') {
+        name = `${name} ${tabName}`;
+      }
+      return name;
     },
   },
   watch: {
@@ -2445,46 +2464,74 @@ export default {
       });
       this.tokens = JSON.parse(JSON.stringify(tokens));
     },
-    async exportDashBoard() {
-      const appElement = document.querySelector('#app');
+    exportDashBoard() {
+      this.exportToPDFLoading = true;
+      const appElement = document.querySelector('.v-application--wrap');
       const size = { height: appElement.scrollHeight, width: appElement.scrollWidth };
 
       const sizeArray = [size.width, size.height];
 
-      await html2canvas(appElement, {
-        width: size.width,
-        height: size.height,
-        backgroundColor: this.theme.$secondary_bg,
-        foreignObjectRendering: true,
-        allowTaint: true,
-        logging: true,
-        useCORS: true,
-        // proxy: process.env.VUE_APP_PROXY,
-        imageTimeout: 55000,
+      document.querySelector('#app').classList.add('html2canvas_no_transitions');
 
-        onclone: (doc, el) => {
-          el.querySelector('.tab-panel-wrapper').remove();
-          el.querySelector('.app-header').position = 'static';
-          if (el.querySelector('.overlay-grid')) {
-            el.querySelector('.overlay-grid').background = 'transparent';
-          }
-        },
-      })
-        .then((canvas) => {
-          const imgData = canvas.toDataURL('image/png');
+      this.openfilter = false;
 
-          // Создаем новый объект jsPDF
-          // eslint-disable-next-line new-cap
-          const pdf = new JsPDF({
-            orientation: sizeArray[0] > sizeArray[1] ? 'l' : 'p',
-            unit: 'px',
-            format: sizeArray,
-            compress: true,
+      this.$nextTick(() => setTimeout(() => {
+        domtoimage
+          .toPng(
+            appElement,
+            {
+              width: sizeArray[0],
+              height: sizeArray[1],
+              bgcolor: this.theme.$secondary_bg,
+              filter: (el) => {
+                if (el.tagName === 'SELECT' && el.selectedIdx !== -1) {
+                  const options = el.childNodes; // Assumption!
+                  let optionCount = 0;
+                  const selectedIdx = el.selectedIndex;
+                  for (let i = 0; i < options.length; i += 1) {
+                    const option = options[i]; // Maybe not an option
+                    if (option.tagName === 'OPTION') {
+                      if (optionCount === selectedIdx) {
+                        options[i].setAttribute('selected', true);
+                      } else {
+                        options[i].removeAttribute('selected');
+                      }
+                      optionCount += 1;
+                    }
+                  }
+                }
+                return !(
+                  el.classList?.contains('tab-panel-wrapper')
+                  || el?.classList?.contains('v-tooltip__content')
+                  || el?.classList?.contains('block-tool')
+                  || el?.classList?.contains('block-tool')
+                  || el?.classList?.contains('block-code')
+                  || el?.classList?.contains('block-tocken')
+                  || el?.classList?.contains('block-event')
+                  || el?.classList?.contains('overlay-grid')
+                  || el?.classList?.contains('block-filter')
+                  || el?.classList?.contains('notifications')
+                  || el?.classList?.contains('profile-dropdown-menu')
+                  || el?.classList?.contains('v-overlay')
+                  || el?.classList?.contains('left-dash-setting')
+                );
+              },
+            },
+          ).then((dataUrl) => {
+            const pdf = new JsPDF({
+              orientation: sizeArray[0] > sizeArray[1] ? 'l' : 'p',
+              unit: 'pt',
+              format: sizeArray,
+              // compress: true,
+              putOnlyUsedFonts: true,
+            });
+            pdf.addImage(dataUrl, 'PNG', 0, 0, sizeArray[0], sizeArray[1]);
+            // Сохраняем PDF
+            pdf.save(`${this.nameForPDFExport}.pdf`);
+            document.querySelector('#app').classList.remove('html2canvas_no_transitions');
+            this.exportToPDFLoading = false;
           });
-          pdf.addImage(imgData, 'PNG', 0, 0, sizeArray[0], sizeArray[1]);
-          // Сохраняем PDF
-          pdf.save('your-filename.pdf');
-        });
+      }, 300));
     },
   },
 };

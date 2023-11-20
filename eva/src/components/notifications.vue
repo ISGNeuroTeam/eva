@@ -1,7 +1,7 @@
 <template>
   <div
     style="position:absolute; right: 0;"
-    class="ma-3"
+    class="notifications ma-3"
   >
     <template
       v-for="item in alerts"
