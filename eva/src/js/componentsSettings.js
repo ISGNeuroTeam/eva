@@ -758,7 +758,6 @@ export default {
     {
       option: 'showLastTimeBlock',
       description: 'Показать блок: Выбор времени',
-      relation: ['periodOrDay'],
       elem: 'switch',
       default: true,
     },
@@ -770,7 +769,10 @@ export default {
     },
     {
       option: 'showRangeDateBlock',
-      relation: ['periodOrDay'],
+      relation() {
+        // Вызывается в контексте modalSettings
+        return !this.options?.selectingExactDate;
+      },
       description: 'Показать блок: Диапазон дат',
       elem: 'switch',
       default: true,

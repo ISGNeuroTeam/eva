@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Data-picker: Added the ability to toggle between range and exact date.
+- Select: Added option to clear the value
 
 ### Changed
 

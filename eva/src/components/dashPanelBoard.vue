@@ -21,11 +21,12 @@
         >
           <template v-slot:activator="{ on }">
             <v-btn
-                icon
-                v-on="on"
-                :color="theme.$secondary_text"
-                :class="{'v-btn--active': $store.state.app.treeOpen}"
-                @click="openNavPanel"
+              icon
+              class="ui-btn__tree ui-btn__tree--dash"
+              :color="theme.$secondary_text"
+              :class="{'v-btn--active': $store.state.app.treeOpen}"
+              v-on="on"
+              @click="openNavPanel"
             >
               <v-icon>
                 {{ iconTree }}
@@ -41,10 +42,11 @@
         >
           <template v-slot:activator="{ on }">
             <v-btn
-                to="/main"
-                icon
-                v-on="on"
-                :color="theme.$secondary_text"
+              to="/main"
+              class="ui-btn__home ui-btn__home--dash"
+              icon
+              :color="theme.$secondary_text"
+              v-on="on"
             >
               <v-icon>
                 {{ home }}
@@ -60,10 +62,11 @@
         >
           <template v-slot:activator="{ on }">
             <v-btn
-                icon
-                v-on="on"
-                :color="theme.$secondary_text"
-                @click="toBackward"
+              icon
+              class="ui-btn__undo ui-btn__undo--dash"
+              :color="theme.$secondary_text"
+              v-on="on"
+              @click="toBackward"
             >
               <v-icon>
                 {{ undo }}
@@ -85,11 +88,12 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  icon
-                  v-on="on"
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': loadSvg}"
-                  @click="loadSvg = !loadSvg"
+                icon
+                class="ui-btn__upload-file ui-btn__upload-file--dash"
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': loadSvg}"
+                v-on="on"
+                @click="loadSvg = !loadSvg"
               >
                 <v-icon>
                   {{ upload_icon }}
@@ -105,11 +109,12 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  icon
-                  v-on="on"
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': openevent}"
-                  @click="openEventCode"
+                icon
+                class="ui-btn__events ui-btn__events--dash"
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': openevent}"
+                v-on="on"
+                @click="openEventCode"
               >
                 <v-icon>
                   {{ code_icon }}
@@ -125,11 +130,12 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  icon
-                  v-on="on"
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': opentocken}"
-                  @click="openTockenCode"
+                icon
+                class="ui-btn__tokens ui-btn__tokens--dash"
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': opentocken}"
+                v-on="on"
+                @click="openTockenCode"
               >
                 <v-icon>
                   {{ tocken_icon }}
@@ -145,11 +151,12 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  icon
-                  v-on="on"
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': search_elem}"
-                  @click="openSearchCode"
+                icon
+                class="ui-btn__searches ui-btn__searches--dash"
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': search_elem}"
+                v-on="on"
+                @click="openSearchCode"
               >
                 <v-icon>
                   {{ search_icon }}
@@ -165,11 +172,12 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  icon
-                  v-on="on"
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': opentool}"
-                  @click="openToolPanel"
+                icon
+                class="ui-btn__visualisation ui-btn__visualisation--dash"
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': opentool}"
+                v-on="on"
+                @click="openToolPanel"
               >
                 <v-icon>
                   {{ tool_icon }}
@@ -188,9 +196,10 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
-                v-on="on"
+                class="ui-btn__filters ui-btn__filters--dash"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': openfilter}"
+                v-on="on"
                 @click="openFilterPanel"
               >
                 <v-icon>
@@ -208,11 +217,12 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  v-on="on"
-                  icon
-                  :color="theme.$secondary_text"
-                  :class="{'v-btn--active': gearShow}"
-                  @click.prevent="gearShow = !gearShow"
+                icon
+                class="ui-btn__settings ui-btn__settings--dash"
+                :color="theme.$secondary_text"
+                :class="{'v-btn--active': gearShow}"
+                v-on="on"
+                @click.prevent="gearShow = !gearShow"
               >
                 <v-icon>
                   {{ gear }}
@@ -229,11 +239,13 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                v-on="on"
                 icon
+                class="ui-btn__save ui-btn__save--dash"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': opensave}"
-                @click="openSave">
+                v-on="on"
+                @click="openSave"
+              >
                 <v-icon>
                   {{ save_icon }}
                 </v-icon>
@@ -248,11 +260,13 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  v-on="on"
-                  icon
-                  :color="getColorError ? theme.$primary_button : theme.$secondary_text"
-                  :class="{'v-btn--active': modalActive}"
-                  @click="openLogs">
+                icon
+                class="ui-btn__log ui-btn__log--dash"
+                :color="getColorError ? theme.$primary_button : theme.$secondary_text"
+                :class="{'v-btn--active': modalActive}"
+                v-on="on"
+                @click="openLogs"
+              >
                 <v-icon>
                   {{ logIcon }}
                 </v-icon>
@@ -267,11 +281,13 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn
-                  v-on="on"
-                  icon
-                  :color="hasNewNotify ? theme.$primary_button : theme.$secondary_text"
-                  :class="{'v-btn--active': modalNotify}"
-                  @click="openNotify">
+                icon
+                class="ui-btn__notification ui-btn__notification--dash"
+                :color="hasNewNotify ? theme.$primary_button : theme.$secondary_text"
+                :class="{'v-btn--active': modalNotify}"
+                v-on="on"
+                @click="openNotify"
+              >
                 <v-icon>
                   {{ notifyIcon }}
                 </v-icon>
@@ -293,14 +309,14 @@
             >
               <template v-slot:activator="{ on: onTooltip }">
                 <v-btn
-                    text
-                    rounded
-                    class="ml-2 mr-2 pl-2 profile-login"
-                    v-on="{ ...onMenu, ...onTooltip }"
-                    :color="theme.$secondary_text"
+                  text
+                  rounded
+                  class="ml-2 mr-2 pl-2 profile-login ui-btn__profile ui-btn__profile--dash"
+                  :color="theme.$secondary_text"
+                  v-on="{ ...onMenu, ...onTooltip }"
                 >
                   <v-icon
-                      class="profile theme--dark"
+                    class="profile theme--dark"
                   >
                     {{ profile_icon }}
                   </v-icon>
@@ -1295,7 +1311,7 @@ export default {
     editPermission() {
       return (
         this.isAdmin
-        || this.permissions.includes('editdash')
+          || this.permissions.includes('editdash')
       );
     },
     getEventFull() {
@@ -1315,8 +1331,8 @@ export default {
       if (this.$store.state[this.idDash]?.elements) {
         return this.$store.state[this.idDash].elements.filter(
           (elem) => this.$store.state[this.idDash][elem].tab
-              === this.$store.state[this.idDash].currentTab
-            || this.$store.state[this.idDash][elem].options?.pinned,
+                === this.$store.state[this.idDash].currentTab
+                || this.$store.state[this.idDash][elem].options?.pinned,
         );
       }
       return [];
@@ -1687,7 +1703,7 @@ export default {
       // проверяем не пустой ли токен
       if (
         (this.newTockenName?.toLowerCase() === 'evatknlogin' && !Number.isInteger(index))
-        || (Number.isInteger(index) && this.tockensName[this.tokens[index].name]?.toLowerCase() === 'evatknlogin')
+          || (Number.isInteger(index) && this.tockensName[this.tokens[index].name]?.toLowerCase() === 'evatknlogin')
       ) {
         this.errorSaveToken = true;
         this.openwarning = true;
@@ -1705,8 +1721,8 @@ export default {
       // проверяем не пустой ли токен
       if (
         (!this.newTockenName && !Number.isInteger(index))
-        || (Number.isInteger(index)
-          && !this.tockensName[this.tokens[index].name].length)
+          || (Number.isInteger(index)
+              && !this.tockensName[this.tokens[index].name].length)
       ) {
         this.errorSaveToken = true;
         this.openwarning = true;
@@ -1724,11 +1740,11 @@ export default {
       // проверяем на запретние названия
       if (
         (!Number.isInteger(index)
-          && globalTockens.includes(this.newTockenName.trim()))
-        || (Number.isInteger(index)
-          && globalTockens.includes(
-            this.tockensName[this.tokens[index].name].trim(),
-          ))
+              && globalTockens.includes(this.newTockenName.trim()))
+          || (Number.isInteger(index)
+              && globalTockens.includes(
+                this.tockensName[this.tokens[index].name].trim(),
+              ))
       ) {
         this.errorSaveToken = true;
         this.openwarning = true;
@@ -1918,7 +1934,7 @@ export default {
     openEditSearch(event, sid) {
       if (
         event.target.classList.contains('search-id')
-        || event.target.classList.contains('search-query')
+          || event.target.classList.contains('search-query')
       ) {
         this.openEdit(sid);
       }
@@ -2443,28 +2459,35 @@ export default {
 .v-tooltip__content {
   width: fit-content;
 }
+
 .backlight-tkn {
   font-family: monospace, Consolas;
   background-color: #9992;
 }
+
 .row-tocken::v-deep .v-menu__content {
   max-width: initial;
 }
+
 .main-title {
   overflow: hidden;
 }
+
 .title-name {
   overflow: hidden;
   white-space: nowrap;
   min-height: 1.5em;
 }
+
 .user-control-panel {
   display: inline-flex;
 }
+
 .tocken-view {
-    height: 45px;
-    overflow: auto;
+  height: 45px;
+  overflow: auto;
 }
+
 .hidden-input {
   position: absolute;
   opacity: 0;

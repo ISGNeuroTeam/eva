@@ -20,10 +20,11 @@
       >
         <template v-slot:activator="{ on }">
           <v-btn
-              icon
-              v-on="on"
-              :color="theme.$secondary_text"
-              @click="$store.commit('app/toggleOpenTree')"
+            class="ui-btn__tree ui-btn__tree--header"
+            icon
+            :color="theme.$secondary_text"
+            v-on="on"
+            @click="$store.commit('app/toggleOpenTree')"
           >
             <v-icon>
               {{ iconTree }}
@@ -39,11 +40,11 @@
       >
         <template v-slot:activator="{ on }">
           <v-btn
-              to="/main"
-              icon
-              v-on="on"
-              class="home"
-              :color="theme.$secondary_text"
+            to="/main"
+            icon
+            class="home ui-btn__home ui-btn__home--header"
+            :color="theme.$secondary_text"
+            v-on="on"
           >
             <v-icon>
               {{ home }}
@@ -59,10 +60,11 @@
       >
         <template v-slot:activator="{ on }">
           <v-btn
-              icon
-              v-on="on"
-              :color="theme.$secondary_text"
-              @click="toBackward"
+            icon
+            class="ui-btn__undo ui-btn__undo--header"
+            :color="theme.$secondary_text"
+            v-on="on"
+            @click="toBackward"
           >
             <v-icon>
               {{ undo }}
@@ -84,11 +86,12 @@
         >
           <template v-slot:activator="{ on }">
             <v-btn
-                icon
-                v-on="on"
-                :color="theme.$secondary_text"
-                :class="{'v-btn--active': loadSvg}"
-                @click="loadSvg = !loadSvg"
+              class="ui-btn__upload-file ui-btn__upload-file--header"
+              icon
+              :color="theme.$secondary_text"
+              :class="{'v-btn--active': loadSvg}"
+              v-on="on"
+              @click="loadSvg = !loadSvg"
             >
               <v-icon>
                 {{ mdiCloudUpload }}
@@ -104,11 +107,13 @@
         >
           <template v-slot:activator="{ on }">
             <v-btn
-                v-on="on"
-                icon
-                :color="getColorError ? theme.$primary_button : theme.$secondary_text"
-                :class="{'v-btn--active': modalActive}"
-                @click="openLogs">
+              icon
+              class="ui-btn__log ui-btn__log--header"
+              :color="getColorError ? theme.$primary_button : theme.$secondary_text"
+              :class="{'v-btn--active': modalActive}"
+              v-on="on"
+              @click="openLogs"
+            >
               <v-icon>
                 {{ logIcon }}
               </v-icon>
@@ -134,14 +139,14 @@
                 v-on="{ ...onMenu, ...onTooltip }"
               >
                 <v-btn
-                    text
-                    rounded
-                    class="ml-2 pl-2 profile-login mr-2"
-                    v-on="{ ...onMenu, ...onTooltip }"
-                    :color="theme.$secondary_text"
+                  text
+                  rounded
+                  class="ml-2 pl-2 profile-login mr-2 ui-btn__profile"
+                  :color="theme.$secondary_text"
+                  v-on="{ ...onMenu, ...onTooltip }"
                 >
                   <v-icon
-                      class="profile theme--dark"
+                    class="profile theme--dark"
                   >
                     {{ profile_icon }}
                   </v-icon>
@@ -363,6 +368,7 @@ export default {
 
 <style lang="scss">
 @import '../sass/dashPanelBoard.sass';
+
 .home.v-btn:before {
   opacity: 0
 }
