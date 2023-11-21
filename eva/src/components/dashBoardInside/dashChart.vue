@@ -246,7 +246,10 @@ export default {
           metricsByGroup.push([]);
         }
         newMetrics.forEach((metricName, nN) => {
-          const metric = this.getOldMetricConfig(metricName);
+          const metric = {
+            ...this.getOldMetricConfig(metricName),
+            ...this.options.commonMetricSettings,
+          };
           if (!this.options.useGroups && metricsByGroup[metricsByGroup.length - 1].length > 0) {
             metricsByGroup.push([]);
           }
@@ -294,11 +297,17 @@ export default {
     },
 
     receivedSettings() {
+      const {
+        useGroups,
+        commonAxisY,
+        commonMetricSettings,
+      } = this.options;
       return {
         metricsByGroup: [...this.metricsByGroup],
         xAxis: { ...this.xAxisSettings },
-        useGroups: !!this.options.useGroups,
-        commonAxisY: !!this.options.commonAxisY,
+        useGroups,
+        commonAxisY,
+        commonMetricSettings,
       };
     },
   },
@@ -537,7 +546,11 @@ export default {
 
     saveSettings(settings = {}) {
       const {
-        metricsByGroup, xAxis, useGroups, commonAxisY,
+        metricsByGroup,
+        xAxis,
+        useGroups,
+        commonAxisY,
+        commonMetricSettings,
       } = settings;
       this.$store.commit('setOptions', {
         id: this.idFrom,
@@ -549,6 +562,7 @@ export default {
           xAxis,
           version: 3,
           commonAxisY,
+          commonMetricSettings,
         },
       });
       this.chart.update(this.metricsByGroup, this.xAxisSettings, this.dataRestFrom, this.xMetric);

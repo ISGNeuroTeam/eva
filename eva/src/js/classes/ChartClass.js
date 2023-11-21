@@ -745,7 +745,7 @@ export default class ChartClass {
       if (ChartClass.isTimestamp(d)) {
         val *= 1000;
       }
-      return d3.timeFormat(timeFormat || '%Y-%m-%d %H:%M:%S')(val);
+      return d3.timeFormat(timeFormat || '%d.%m.%y %H:%M')(val);
     }
     return d.toLocaleString(numberFormat);
   }
