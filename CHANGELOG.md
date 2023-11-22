@@ -8,15 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Data-picker: Added the ability to toggle between range and exact date.
+- Select: Added option to clear the value
 
 ### Changed
 
 ### Fixed
+- Data-picker: Fixed changing format
 
 ## [1.159.0]
 
 ### Added
 - event go can accept external links
+
+
 
 ### Changed
 - Updated the top panel UX/UI
