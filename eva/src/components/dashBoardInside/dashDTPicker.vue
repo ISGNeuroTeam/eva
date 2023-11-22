@@ -563,11 +563,11 @@ export default {
   },
   mounted() {
     this.setTokenAction();
-    if (this.getPickerDate?.last?.time) {
-      this.last = this.getPickerDate.last;
-      this.setTime(this.getPickerDate.last.time);
-    }
     this.date = structuredClone(this.getPickerDate);
+    if (this.date?.last?.time) {
+      this.last = this.date.last;
+      this.setTime(this.date.last.time);
+    }
     this.$emit('hideDS', this.id);
     this.curDate = this.calcCurrentDate();
   },
@@ -667,6 +667,43 @@ export default {
         updatedValue = moment(+value * 1000).format(this.dateTimeFormat);
       }
       return `${prefix}${updatedValue}${suffix}`;
+    },
+    replaceOldFormat(elem, oldFormat, newFormat) {
+      switch (elem) {
+        case 'dt':
+          this.start = this.formatDateToResult({
+            date: this.start,
+            oldFormat,
+            newFormat,
+          });
+          this.end = this.formatDateToResult({
+            date: this.end,
+            oldFormat,
+            newFormat,
+          });
+          break;
+        case 'range':
+          this.range.start = this.formatDateToResult({
+            date: this.range.start,
+            oldFormat,
+            newFormat,
+          });
+          this.range.end = this.formatDateToResult({
+            date: this.range.end,
+            oldFormat,
+            newFormat,
+          });
+          break;
+        case 'exactDate':
+          this.exactDate = this.formatDateToResult({
+            date: this.exactDate,
+            oldFormat,
+            newFormat,
+          });
+          break;
+        default:
+          break;
+      }
     },
     calcCurrentDate(forceUpdateValue) {
       const data = forceUpdateValue || this.getPickerDate;
@@ -785,12 +822,7 @@ export default {
       this.setToken('time');
     },
     setTime(time) {
-      // this.last.time = time;
-      this.$store.commit('setState', [{
-        object: this.last,
-        prop: 'time',
-        value: time,
-      }]);
+      this.$set(this.last, 'time', time);
       Object.keys(this.color).forEach((item) => {
         this.color[item] = '$accent_ui_color';
       });
@@ -804,31 +836,22 @@ export default {
     setToken(elem, oldFormat = '', newFormat = '') {
       this.lastControlElement = elem;
       const isFormatUpdated = (oldFormat && newFormat) && (oldFormat !== newFormat);
+      if (isFormatUpdated) {
+        this.replaceOldFormat(elem, oldFormat, newFormat);
+      }
       let period = 0;
       switch (elem) {
         case 'dt':
-          this.startForStore = this.formatDateToResult(
-            this.start,
+          this.startForStore = this.formatDateToResult({
+            date: this.start,
             oldFormat,
             newFormat,
-          );
-          this.endForStore = this.formatDateToResult(
-            this.end,
+          });
+          this.endForStore = this.formatDateToResult({
+            date: this.end,
             oldFormat,
             newFormat,
-          );
-          if (isFormatUpdated) {
-            this.start = this.formatDateToResult(
-              this.start,
-              oldFormat,
-              newFormat,
-            );
-            this.end = this.formatDateToResult(
-              this.end,
-              oldFormat,
-              newFormat,
-            );
-          }
+          });
           this.exactDateForStore = null;
           this.range = null;
           this.exactDate = null;
@@ -844,28 +867,16 @@ export default {
 
         case 'range':
           if (this.range) {
-            this.startForStore = this.formatDateToResult(
-              this.range.start,
+            this.startForStore = this.formatDateToResult({
+              date: this.range.start,
               oldFormat,
               newFormat,
-            );
-            this.endForStore = this.formatDateToResult(
-              this.range.end,
+            });
+            this.endForStore = this.formatDateToResult({
+              date: this.range.end,
               oldFormat,
               newFormat,
-            );
-            if (isFormatUpdated) {
-              this.range.start = this.formatDateToResult(
-                this.range.start,
-                oldFormat,
-                newFormat,
-              );
-              this.range.end = this.formatDateToResult(
-                this.range.end,
-                oldFormat,
-                newFormat,
-              );
-            }
+            });
           }
           this.start = null;
           this.end = null;
@@ -880,18 +891,11 @@ export default {
           break;
 
         case 'exactDate':
-          this.exactDateForStore = this.formatDateToResult(
-            this.exactDate,
+          this.exactDateForStore = this.formatDateToResult({
+            date: this.exactDate,
             oldFormat,
             newFormat,
-          );
-          if (isFormatUpdated) {
-            this.exactDate = this.formatDateToResult(
-              this.exactDate,
-              oldFormat,
-              newFormat,
-            );
-          }
+          });
           this.start = null;
           this.end = null;
           this.start_custom.value = null;
@@ -960,16 +964,14 @@ export default {
             lastTimeTemplateStart,
             lastTimeTemplateEnd,
           } = this.options;
-          this.startForStore = this.formatDateToResult(
-            Date.now() - period,
-            '',
-            newFormat,
-          );
-          this.endForStore = this.formatDateToResult(
-            Date.now(),
-            '',
-            newFormat,
-          );
+          this.startForStore = this.formatDateToResult({
+            date: Date.now() - period,
+            isTime: true,
+          });
+          this.endForStore = this.formatDateToResult({
+            date: Date.now(),
+            isTime: true,
+          });
           if (useLastTimeTemplate) {
             const secPeriod = (period / 1000).toFixed();
             if (lastTimeTemplateStart) {
@@ -992,16 +994,21 @@ export default {
           break;
       }
     },
-    formatDateToResult(date, oldFormat, newFormat) {
+    formatDateToResult({
+      date, oldFormat, newFormat, isTime,
+    }) {
       if (date === null) return '';
       const {
         timeOutputFormat = null,
       } = this.options;
+      if (isTime) {
+        return moment(date).format(timeOutputFormat);
+      }
       if (oldFormat && newFormat) {
         return moment(date, oldFormat).format(newFormat);
       }
       if (timeOutputFormat) {
-        return moment(date).format(timeOutputFormat);
+        return moment(date, timeOutputFormat).format(timeOutputFormat);
       }
       return parseInt(
         new Date(date).getTime() / 1000,
