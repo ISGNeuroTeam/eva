@@ -589,17 +589,17 @@ export default {
         }
       }
       if (!isRange) {
-        if (this.start || this.range) {
+        if ((this.start || this.end) || this.range) {
           this.exactDate = this.start
               || this.end
               || this.range.start
               || this.range.end;
           this.curDate = this.exactDate;
           this.start = null;
+          this.end = null;
           this.range = null;
           this.startForStore = null;
           this.endForStore = null;
-          this.end = null;
           this.setToken('exactDate');
         } else if (this.start_custom.value || this.end_custom.value) {
           this.$set(
