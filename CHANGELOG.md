@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Multiline: common metrics settings
+- Multiline: 
+  - common metrics settings
+  - metrics settings from source data
 
 ### Changed
 

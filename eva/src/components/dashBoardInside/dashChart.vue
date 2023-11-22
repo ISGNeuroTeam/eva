@@ -186,7 +186,11 @@ export default {
     },
     firstDataRowMetricList() {
       return Object.keys(this.firstDataRow).filter(
-        (key) => key.indexOf('caption') === -1 && key.indexOf('annotation') === -1,
+        (key) => {
+          return key.indexOf('caption') === -1
+            && key.indexOf('annotation') === -1
+            && !/^_\w+_options$/.test(key);
+        },
       );
     },
     metrics() {
@@ -215,6 +219,24 @@ export default {
         allMetrics: this.firstDataRowMetricList,
       };
     },
+    mapMetricsOptions() {
+      const options = new Map();
+      this.dataRestFrom
+        .filter(row => row[this.xMetric] === null)
+          .forEach(row => {
+            Object.keys(row)
+              .filter(key => /^_(\w+)_options$/.test(key))
+              .forEach(key => {
+                try {
+                  const metricName = key.match(/^_(\w+)_options$/)[1]
+                  options.set(metricName, JSON.parse(row[key].replaceAll("'", '"')))
+                } catch (err) {
+                  console.warn(err)
+                }
+              })
+          })
+      return options;
+    },
     metricsByGroup() {
       // check current metrics config
       const metricsByGroup = [];
@@ -224,6 +246,13 @@ export default {
           this.max = this.getMaxValueYAxis(this.dataRestFrom, this.options.metricsByGroup[i]);
           const metrics = [];
           group.forEach((metric) => {
+            const rowOptions = this.mapMetricsOptions.get(metric.name);
+            if (rowOptions) {
+              metric = {
+                ...metric,
+                ...rowOptions,
+              }
+            }
             if (this.metrics.includes(metric.name)) {
               existsMetrics.push(metric.name);
               if (!this.options.useGroups) {
@@ -249,6 +278,7 @@ export default {
           const metric = {
             ...this.getOldMetricConfig(metricName),
             ...this.options.commonMetricSettings,
+            ...this.mapMetricsOptions.get(metricName),
           };
           if (!this.options.useGroups && metricsByGroup[metricsByGroup.length - 1].length > 0) {
             metricsByGroup.push([]);
@@ -439,7 +469,8 @@ export default {
     },
 
     updateData() {
-      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.dataRestFrom, this.xMetric);
+      const data = this.dataRestFrom.filter((row) => row[this.xMetric] !== null);
+      this.chart.update(this.metricsByGroup, this.xAxisSettings, data, this.xMetric);
     },
     updateBox() {
       const { width, height } = this.box;
