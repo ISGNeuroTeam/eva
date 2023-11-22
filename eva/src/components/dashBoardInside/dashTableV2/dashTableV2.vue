@@ -1571,6 +1571,7 @@ export default {
         padding: 0 4px;
         width: 32px;
        &:before {
+         content: "";
          font-family: 'eva-icons' !important;
          speak: never;
          font-style: normal;
@@ -1593,16 +1594,16 @@ export default {
        }
       }
       &[data-page="first"]:before {
-        content: "\e919";
+        content: "\e919" !important;
       }
       &[data-page="last"]:before {
-        content: "\e91a";
+        content: "\e91a" !important;
       }
       &[data-page="next"]:before {
-        content: "\e90e";
+        content: "\e90e" !important;
       }
       &[data-page="prev"]:before {
-        content: "\e90d";
+        content: "\e90d" !important;
       }
     }
   }
