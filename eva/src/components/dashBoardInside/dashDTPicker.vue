@@ -940,55 +940,57 @@ export default {
           break;
 
         case 'time':
-          switch (this.last.time) {
-            case 'second':
-              period = Number(this.last.every) * 1000;
-              break;
+          if (this.last.time) {
+            switch (this.last.time) {
+              case 'second':
+                period = Number(this.last.every) * 1000;
+                break;
 
-            case 'minute':
-              period = Number(this.last.every) * 1000 * 60;
-              break;
+              case 'minute':
+                period = Number(this.last.every) * 1000 * 60;
+                break;
 
-            case 'hour':
-              period = Number(this.last.every) * 1000 * 3600;
-              break;
-            case 'day':
-              period = Number(this.last.every) * 1000 * 3600 * 24;
-              break;
-            default:
-              break;
-          }
-          // eslint-disable-next-line no-case-declarations
-          const {
-            useLastTimeTemplate,
-            lastTimeTemplateStart,
-            lastTimeTemplateEnd,
-          } = this.options;
-          this.startForStore = this.formatDateToResult({
-            date: Date.now() - period,
-            isTime: true,
-          });
-          this.endForStore = this.formatDateToResult({
-            date: Date.now(),
-            isTime: true,
-          });
-          if (useLastTimeTemplate) {
-            const secPeriod = (period / 1000).toFixed();
-            if (lastTimeTemplateStart) {
-              // eslint-disable-next-line no-template-curly-in-string
-              this.startForStore = lastTimeTemplateStart.replace('${sec}', secPeriod);
+              case 'hour':
+                period = Number(this.last.every) * 1000 * 3600;
+                break;
+              case 'day':
+                period = Number(this.last.every) * 1000 * 3600 * 24;
+                break;
+              default:
+                break;
             }
-            if (lastTimeTemplateEnd) {
-              // eslint-disable-next-line no-template-curly-in-string
-              this.endForStore = lastTimeTemplateEnd.replace('${sec}', secPeriod);
+            // eslint-disable-next-line no-case-declarations
+            const {
+              useLastTimeTemplate,
+              lastTimeTemplateStart,
+              lastTimeTemplateEnd,
+            } = this.options;
+            this.startForStore = this.formatDateToResult({
+              date: Date.now() - period,
+              isTime: true,
+            });
+            this.endForStore = this.formatDateToResult({
+              date: Date.now(),
+              isTime: true,
+            });
+            if (useLastTimeTemplate) {
+              const secPeriod = (period / 1000).toFixed();
+              if (lastTimeTemplateStart) {
+                // eslint-disable-next-line no-template-curly-in-string
+                this.startForStore = lastTimeTemplateStart.replace('${sec}', secPeriod);
+              }
+              if (lastTimeTemplateEnd) {
+                // eslint-disable-next-line no-template-curly-in-string
+                this.endForStore = lastTimeTemplateEnd.replace('${sec}', secPeriod);
+              }
             }
+            this.start = null;
+            this.end = null;
+            this.range = null;
+            this.exactDateForStore = null;
+            this.start_custom.value = null;
+            this.end_custom.value = null;
           }
-          this.start = null;
-          this.end = null;
-          this.range = null;
-          this.exactDateForStore = null;
-          this.start_custom.value = null;
-          this.end_custom.value = null;
           break;
         default:
           break;
