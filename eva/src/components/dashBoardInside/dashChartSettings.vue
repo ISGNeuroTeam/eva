@@ -703,6 +703,17 @@
                   outlined
                   hide-details
                   color="blue"
+                  class="mb-3"
+              />
+              <v-checkbox
+                  v-if="commonMetricSettings.type === 'line'"
+                  v-model="commonMetricSettings.showArea"
+                  label="Закрашивать область между линией и нулем"
+                  persistent-placeholder
+                  dense
+                  outlined
+                  hide-details
+                  color="blue"
               />
               <v-row class="my-1">
                 <v-col
@@ -1288,6 +1299,7 @@ export default {
       strokeDasharray: '0',
       dontSplitLine: false,
       lineBySteps: false,
+      showArea: false,
       showPeakDots: false,
       showText: false,
       dotSize: 4,
