@@ -1004,7 +1004,13 @@ export default {
         timeOutputFormat = null,
       } = this.options;
       if (isTime) {
-        return moment(date).format(timeOutputFormat);
+        if (timeOutputFormat) {
+          return moment(date).format(timeOutputFormat);
+        }
+        return parseInt(
+          new Date(date).getTime() / 1000,
+          10,
+        );
       }
       if (oldFormat && newFormat) {
         return moment(date, oldFormat).format(newFormat);
