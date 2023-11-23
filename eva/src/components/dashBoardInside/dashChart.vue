@@ -204,7 +204,7 @@ export default {
         };
       }
       const {
-        timeFormat,
+        timeFormat = '%Y-%m-%d %H:%M:%S',
         xAxisCaptionRotate,
         barplotstyle,
       } = this.options;
