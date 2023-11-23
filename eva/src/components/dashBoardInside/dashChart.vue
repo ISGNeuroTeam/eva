@@ -193,6 +193,9 @@ export default {
         },
       );
     },
+    restDataRows() {
+      return this.dataRestFrom.filter((row) => row[this.xMetric] !== null)
+    },
     metrics() {
       return [...this.firstDataRowMetricList.filter((item) => !/^_.*_mark$/.test(item) && item !== this.xMetric)];
     },
@@ -469,8 +472,7 @@ export default {
     },
 
     updateData() {
-      const data = this.dataRestFrom.filter((row) => row[this.xMetric] !== null);
-      this.chart.update(this.metricsByGroup, this.xAxisSettings, data, this.xMetric);
+      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.restDataRows, this.xMetric);
     },
     updateBox() {
       const { width, height } = this.box;
@@ -596,7 +598,7 @@ export default {
           commonMetricSettings,
         },
       });
-      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.dataRestFrom, this.xMetric);
+      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.restDataRows, this.xMetric);
     },
     getMaxValueYAxis(dataRest, metricsByGroup) {
       const max = {
