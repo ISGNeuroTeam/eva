@@ -396,7 +396,7 @@ export default {
         numberFormat,
         xAxis: {
           type: 'time', // linear, time, - log, point, band
-          timeFormat: '%d.%m.%y %H:%M',
+          timeFormat: '%Y-%m-%d %H:%M:%S',
           nice: 100, // count
         },
       });
