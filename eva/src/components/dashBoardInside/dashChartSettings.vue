@@ -1194,6 +1194,7 @@ export default {
     zerosAfterDotList: {
       type: Array,
       default: () => ([
+        { value: -1, text: 'Нет' },
         { value: 0, text: '0' },
         { value: 1, text: '0.0' },
         { value: 2, text: '0.00' },
@@ -1304,8 +1305,8 @@ export default {
       showText: false,
       dotSize: 4,
       peakTextData: 'data',
-      lastDot: '0',
-      zerosAfterDot: 2,
+      lastDot: '1',
+      zerosAfterDot: -1,
       showTextStyles: false,
       pointTextWeight: 'normal',
       pointTextSize: 11,
