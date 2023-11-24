@@ -536,7 +536,8 @@ export default {
         }
       }
     },
-    dateTimeFormat(newFormat, oldFormat) {
+    dateTimeFormat(format, oldFormat) {
+      const newFormat = format || this.dateTimeFormat;
       if (this.range) {
         this.updateFormat('range', oldFormat, newFormat);
       } else if (this.start) {
@@ -904,13 +905,9 @@ export default {
         case 'dt':
           this.startForStore = this.formatDateToResult({
             date: this.start,
-            oldFormat,
-            newFormat,
           });
           this.endForStore = this.formatDateToResult({
             date: this.end,
-            oldFormat,
-            newFormat,
           });
           this.clearFields([
             'start',
@@ -925,13 +922,9 @@ export default {
           if (this.range) {
             this.startForStore = this.formatDateToResult({
               date: this.range.start,
-              oldFormat,
-              newFormat,
             });
             this.endForStore = this.formatDateToResult({
               date: this.range.end,
-              oldFormat,
-              newFormat,
             });
           }
           this.clearFields([
@@ -945,8 +938,6 @@ export default {
         case 'exactDate':
           this.exactDateForStore = this.formatDateToResult({
             date: this.exactDate,
-            oldFormat,
-            newFormat,
           });
           this.clearFields([
             'exactDate',
