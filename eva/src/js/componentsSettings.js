@@ -800,12 +800,20 @@ export default {
       option: 'useLastTimeTemplate',
       description: 'Использовать шаблон для функционала последнего времени',
       elem: 'switch',
+      relation() {
+        // Вызывается в контексте modalSettings
+        return !this.options?.selectingExactDate;
+      },
       default: false,
     },
     {
       option: 'lastTimeTemplateStart',
       description: 'Шаблон стартового времени',
-      relation: ['useLastTimeTemplate'],
+      relation() {
+        // Вызывается в контексте modalSettings
+        return !this.options?.selectingExactDate
+          && this.options.useLastTimeTemplate;
+      },
       elem: 'text-field',
       default: 'now() - ${sec}',
       placeholder: 'Пример: now() - ${sec}',
@@ -813,7 +821,11 @@ export default {
     {
       option: 'lastTimeTemplateEnd',
       description: 'Шаблон конечного времени',
-      relation: ['useLastTimeTemplate', 'periodOrDay'],
+      relation() {
+        // Вызывается в контексте modalSettings
+        return !this.options?.selectingExactDate
+          && this.options.useLastTimeTemplate;
+      },
       elem: 'text-field',
       default: 'now()',
       placeholder: 'Пример: now()',
