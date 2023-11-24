@@ -1,3 +1,26 @@
+# [1.160.0] - 2023-11-24
+
+### Added
+- Select: Added an option to clear the value.
+- Multiline:
+  - Added common metrics settings.
+  - Introduced metrics settings sourced from the data.
+- Data-picker: 
+  - Introduced the ability to toggle between range and exact date.
+  - Added an exact date display mode.
+  - Customized toggles between all input modes in the picker.
+  - Implemented auto-hiding of settings in the dashboard when switching between "range/exact" modes.
+
+### Fixed
+- Table: Fixed a bug with pagination icons.
+- The data source is now updated when the token is reset by clicking the button.
+- Data-picker:
+  - Resolved an issue with changing the format.
+  - Corrected an incorrect relation for the "lastTimeTemplateEnd" option.
+  - Fixed incorrect date formatting when changing the format setting.
+  - Addressed date formatting issues when switching between dashboards.
+  - Ensured proper updating of data in picker fields.
+
 # [1.159.0] - 2023-11-16
 
 ### Added
