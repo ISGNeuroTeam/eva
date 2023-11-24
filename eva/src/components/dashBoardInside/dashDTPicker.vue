@@ -327,8 +327,8 @@ export default {
       range: null,
       exactDate: null,
       last: {
-        every: 0,
-        time: '',
+        every: null,
+        time: null,
       },
       color: {
         day: '$accent_ui_color',
@@ -508,7 +508,7 @@ export default {
       if (this.exactDateCustom.value) {
         return 'exactDateCustom';
       }
-      if (this.last.time !== '') {
+      if (this.last.time !== null) {
         return 'time';
       }
       return '';
@@ -572,34 +572,98 @@ export default {
     this.curDate = this.calcCurrentDate();
   },
   methods: {
+    setColor() {
+      Object.keys(this.color).forEach((item) => {
+        this.color[item] = '$accent_ui_color';
+      });
+    },
+    clearFields(exceptions = []) {
+      const allFields = [
+        {
+          field: 'exactDateForStore',
+          key: null,
+        },
+        {
+          field: 'startForStore',
+          key: null,
+        },
+        {
+          field: 'endForStore',
+          key: null,
+        },
+        {
+          field: 'start',
+          key: null,
+        },
+        {
+          field: 'end',
+          key: null,
+        },
+        {
+          field: 'range',
+          key: null,
+        },
+        {
+          field: 'exactDate',
+          key: null,
+        },
+        {
+          field: 'exactDateCustom',
+          key: 'value',
+        },
+        {
+          field: 'start_custom',
+          key: 'value',
+        },
+        {
+          field: 'end_custom',
+          key: 'value',
+        },
+        {
+          field: 'last',
+          key: 'time',
+        },
+        {
+          field: 'last',
+          key: 'every',
+        },
+      ];
+      allFields.forEach(({ field, key }) => {
+        if (!exceptions.includes(field)) {
+          if (key) {
+            this.$set(this[field], key, null);
+          } else {
+            this[field] = null;
+          }
+        }
+      });
+    },
     changePickerMode(isRange) {
       if (isRange) {
         if (this.exactDate) {
           this.start = this.exactDate;
           this.curDate = `${this.start} - ...`;
-          this.exactDate = null;
-          this.exactDateForStore = null;
+          this.clearFields(['start']);
           this.setToken('dt');
         } else if (this.exactDateCustom.value) {
           this.start_custom.value = this.exactDateCustom.value;
           this.curDate = this.replaceTokens(this.start_custom.value, '', ' - ');
-          this.exactDateCustom.value = null;
-          this.exactDateForStore = null;
+          this.clearFields(['start_custom']);
           this.setToken('custom-range');
         }
       }
       if (!isRange) {
-        if ((this.start || this.end) || this.range) {
+        if (this.last.time) {
+          this.curDate = '';
+          this.clearFields();
+          this.setToken('exactDate');
+        } else if ((this.start || this.end) || this.range) {
           this.exactDate = this.start
               || this.end
               || this.range.start
               || this.range.end;
           this.curDate = this.exactDate;
-          this.start = null;
-          this.end = null;
-          this.range = null;
-          this.startForStore = null;
-          this.endForStore = null;
+          this.clearFields(['exactDate']);
           this.setToken('exactDate');
         } else if (this.start_custom.value || this.end_custom.value) {
           this.$set(
@@ -608,11 +672,7 @@ export default {
             this.start_custom.value || this.end_custom.value,
           );
           this.curDate = this.replaceTokens(this.exactDateCustom.value);
-          this.start_custom.value = null;
-          this.end_custom.value = null;
-          this.startForStore = null;
-          this.endForStore = null;
-          this.end = null;
+          this.clearFields(['exactDateCustom']);
           this.setToken('exactDateCustom');
         }
       }
@@ -759,7 +819,7 @@ export default {
         current = `... - ${data.endCus}`;
       }
       if (this.last) {
-        if (this.last.every !== 0 && this.last.time !== '') {
+        if (this.last.every !== null && this.last.time !== null) {
           let time = '...';
           switch (this.last.time) {
             case 'second':
@@ -801,15 +861,15 @@ export default {
     },
     updateValueInStore() {
       this.$set(this.date, 'start', this.start);
-      this.$set(this.date, 'startForStore', this.startForStore);
+      this.$set(this.date, 'startForStore', this.startForStore || '');
       this.$set(this.date, 'end', this.end);
-      this.$set(this.date, 'endForStore', this.endForStore);
+      this.$set(this.date, 'endForStore', this.endForStore || '');
       this.$set(this.date, 'range', this.range);
       this.$set(this.date, 'startCus', this.start_custom.value);
       this.$set(this.date, 'endCus', this.end_custom.value);
       this.$set(this.date, 'last', this.last);
       this.$set(this.date, 'exactDate', this.exactDate);
-      this.$set(this.date, 'exactDateForStore', this.exactDateForStore);
+      this.$set(this.date, 'exactDateForStore', this.exactDateForStore || '');
       this.$set(this.date, 'exactDateCustom', this.exactDateCustom.value);
       this.$store.commit('setPickerDate', {
         date: structuredClone(this.date),
@@ -852,17 +912,13 @@ export default {
             oldFormat,
             newFormat,
           });
-          this.exactDateForStore = null;
-          this.range = null;
-          this.exactDate = null;
-          this.start_custom.value = null;
-          this.exactDateCustom.value = null;
-          this.end_custom.value = null;
-          this.last.time = '';
-          this.last.every = 0;
-          Object.keys(this.color).forEach((item) => {
-            this.color[item] = '$accent_ui_color';
-          });
+          this.clearFields([
+            'start',
+            'end',
+            'startForStore',
+            'endForStore',
+          ]);
+          this.setColor();
           break;
 
         case 'range':
@@ -878,16 +934,12 @@ export default {
               newFormat,
             });
           }
-          this.start = null;
-          this.end = null;
-          this.exactDate = null;
-          this.start_custom.value = null;
-          this.end_custom.value = null;
-          this.last.time = '';
-          this.last.every = 0;
-          Object.keys(this.color).forEach((item) => {
-            this.color[item] = '$accent_ui_color';
-          });
+          this.clearFields([
+            'range',
+            'startForStore',
+            'endForStore',
+          ]);
+          this.setColor();
           break;
 
         case 'exactDate':
@@ -896,51 +948,36 @@ export default {
             oldFormat,
             newFormat,
           });
-          this.start = null;
-          this.end = null;
-          this.start_custom.value = null;
-          this.exactDateCustom.value = null;
-          this.end_custom.value = null;
-          this.last.time = '';
-          this.last.every = 0;
-          Object.keys(this.color).forEach((item) => {
-            this.color[item] = '$accent_ui_color';
-          });
+          this.clearFields([
+            'exactDate',
+            'exactDateForStore',
+          ]);
+          this.setColor();
           break;
 
         case 'custom-range':
           this.startForStore = this.start_custom.value;
           this.endForStore = this.end_custom.value;
-          this.exactDateForStore = null;
-          this.start = null;
-          this.exactDate = null;
-          this.exactDateCustom.value = null;
-          this.end = null;
-          this.range = null;
-          this.last.time = '';
-          this.last.every = 0;
-          Object.keys(this.color).forEach((item) => {
-            this.color[item] = '$accent_ui_color';
-          });
+          this.clearFields([
+            'start_custom',
+            'end_custom',
+            'startForStore',
+            'endForStore',
+          ]);
+          this.setColor();
           break;
 
         case 'exactDateCustom':
           this.exactDateForStore = this.exactDateCustom.value;
-          this.start = null;
-          this.end = null;
-          this.exactDate = null;
-          this.start_custom.value = null;
-          this.end_custom.value = null;
-          this.range = null;
-          this.last.time = '';
-          this.last.every = 0;
-          Object.keys(this.color).forEach((item) => {
-            this.color[item] = '$accent_ui_color';
-          });
+          this.clearFields([
+            'exactDateCustom',
+            'exactDateForStore',
+          ]);
+          this.setColor();
           break;
 
         case 'time':
-          if (this.last.time) {
+          if (this.last.time !== null) {
             switch (this.last.time) {
               case 'second':
                 period = Number(this.last.every) * 1000;
@@ -984,12 +1021,11 @@ export default {
                 this.endForStore = lastTimeTemplateEnd.replace('${sec}', secPeriod);
               }
             }
-            this.start = null;
-            this.end = null;
-            this.range = null;
-            this.exactDateForStore = null;
-            this.start_custom.value = null;
-            this.end_custom.value = null;
+            this.clearFields([
+              'last',
+              'startForStore',
+              'endForStore',
+            ]);
           }
           break;
         default:

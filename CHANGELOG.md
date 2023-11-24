@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Data-picker: Fixed changing format
 - Table: fix bug with pagination icons
+- Data-picker: Fixed incorrect relation for "lastTimeTemplateEnd" option
 
 ## [1.159.0]
 
