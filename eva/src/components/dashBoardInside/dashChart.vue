@@ -186,8 +186,15 @@ export default {
     },
     firstDataRowMetricList() {
       return Object.keys(this.firstDataRow).filter(
-        (key) => key.indexOf('caption') === -1 && key.indexOf('annotation') === -1,
+        (key) => {
+          return key.indexOf('caption') === -1
+            && key.indexOf('annotation') === -1
+            && !/^_\w+_options$/.test(key);
+        },
       );
+    },
+    restDataRows() {
+      return this.dataRestFrom.filter((row) => row[this.xMetric] !== null)
     },
     metrics() {
       return [...this.firstDataRowMetricList.filter((item) => !/^_.*_mark$/.test(item) && item !== this.xMetric)];
@@ -200,7 +207,7 @@ export default {
         };
       }
       const {
-        timeFormat,
+        timeFormat = '%Y-%m-%d %H:%M:%S',
         xAxisCaptionRotate,
         barplotstyle,
       } = this.options;
@@ -215,6 +222,24 @@ export default {
         allMetrics: this.firstDataRowMetricList,
       };
     },
+    mapMetricsOptions() {
+      const options = new Map();
+      this.dataRestFrom
+        .filter(row => row[this.xMetric] === null)
+          .forEach(row => {
+            Object.keys(row)
+              .filter(key => /^_(\w+)_options$/.test(key))
+              .forEach(key => {
+                try {
+                  const metricName = key.match(/^_(\w+)_options$/)[1]
+                  options.set(metricName, JSON.parse(row[key].replaceAll("'", '"')))
+                } catch (err) {
+                  console.warn(err)
+                }
+              })
+          })
+      return options;
+    },
     metricsByGroup() {
       // check current metrics config
       const metricsByGroup = [];
@@ -224,6 +249,13 @@ export default {
           this.max = this.getMaxValueYAxis(this.dataRestFrom, this.options.metricsByGroup[i]);
           const metrics = [];
           group.forEach((metric) => {
+            const rowOptions = this.mapMetricsOptions.get(metric.name);
+            if (rowOptions) {
+              metric = {
+                ...metric,
+                ...rowOptions,
+              }
+            }
             if (this.metrics.includes(metric.name)) {
               existsMetrics.push(metric.name);
               if (!this.options.useGroups) {
@@ -246,7 +278,11 @@ export default {
           metricsByGroup.push([]);
         }
         newMetrics.forEach((metricName, nN) => {
-          const metric = this.getOldMetricConfig(metricName);
+          const metric = {
+            ...this.getOldMetricConfig(metricName),
+            ...this.options.commonMetricSettings,
+            ...this.mapMetricsOptions.get(metricName),
+          };
           if (!this.options.useGroups && metricsByGroup[metricsByGroup.length - 1].length > 0) {
             metricsByGroup.push([]);
           }
@@ -294,11 +330,17 @@ export default {
     },
 
     receivedSettings() {
+      const {
+        useGroups,
+        commonAxisY,
+        commonMetricSettings,
+      } = this.options;
       return {
         metricsByGroup: [...this.metricsByGroup],
         xAxis: { ...this.xAxisSettings },
-        useGroups: !!this.options.useGroups,
-        commonAxisY: !!this.options.commonAxisY,
+        useGroups,
+        commonAxisY,
+        commonMetricSettings,
       };
     },
   },
@@ -357,7 +399,7 @@ export default {
         numberFormat,
         xAxis: {
           type: 'time', // linear, time, - log, point, band
-          timeFormat: '%d.%m.%y %H:%M',
+          timeFormat: '%Y-%m-%d %H:%M:%S',
           nice: 100, // count
         },
       });
@@ -430,7 +472,7 @@ export default {
     },
 
     updateData() {
-      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.dataRestFrom, this.xMetric);
+      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.restDataRows, this.xMetric);
     },
     updateBox() {
       const { width, height } = this.box;
@@ -537,7 +579,11 @@ export default {
 
     saveSettings(settings = {}) {
       const {
-        metricsByGroup, xAxis, useGroups, commonAxisY,
+        metricsByGroup,
+        xAxis,
+        useGroups,
+        commonAxisY,
+        commonMetricSettings,
       } = settings;
       this.$store.commit('setOptions', {
         id: this.idFrom,
@@ -549,9 +595,10 @@ export default {
           xAxis,
           version: 3,
           commonAxisY,
+          commonMetricSettings,
         },
       });
-      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.dataRestFrom, this.xMetric);
+      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.restDataRows, this.xMetric);
     },
     getMaxValueYAxis(dataRest, metricsByGroup) {
       const max = {

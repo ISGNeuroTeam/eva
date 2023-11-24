@@ -631,6 +631,340 @@
           </div>
         </div>
 
+        <!-- Common metric settings -->
+        <v-expansion-panels
+            v-model="openCommonMetricSettingsPanel"
+            flat
+        >
+          <v-expansion-panel class="ma-0">
+            <v-expansion-panel-header class="draggable-item panel-header">
+              <div class="text-uppercase v-card__subtitle pa-0 text-secondary">
+                Общие настройки метрик
+                <v-divider :color="theme.$main_bg" />
+              </div>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content class="panel-content py-3">
+              <!-- forms -->
+              <v-row class="mb-1">
+                <v-col cols="5">
+                  <v-autocomplete
+                      v-model="commonMetricSettings.type"
+                      required
+                      :items="metricTypes"
+                      value="value"
+                      label="Тип графика"
+                      persistent-placeholder
+                      dense
+                      outlined
+                      hide-details
+                  />
+                </v-col>
+                <v-col v-if="commonMetricSettings.type === 'line'">
+                  <v-autocomplete
+                      v-model="commonMetricSettings.strokeWidth"
+                      :items="strokeWidthList"
+                      label="Толщина"
+                      persistent-placeholder
+                      dense
+                      outlined
+                      hide-details
+                  />
+                </v-col>
+                <v-col v-if="commonMetricSettings.type === 'line'">
+                  <v-autocomplete
+                      v-model="commonMetricSettings.strokeDasharray"
+                      :disabled="commonMetricSettings.type !== 'line'"
+                      :items="strokeDasharrayList"
+                      label="Тип линий"
+                      persistent-placeholder
+                      dense
+                      outlined
+                      hide-details
+                  />
+                </v-col>
+              </v-row>
+              <v-checkbox
+                  v-if="commonMetricSettings.type === 'line'"
+                  v-model="commonMetricSettings.dontSplitLine"
+                  label="Не разрывать линию"
+                  persistent-placeholder
+                  dense
+                  outlined
+                  hide-details
+                  color="blue"
+                  class="mb-3"
+              />
+              <v-checkbox
+                  v-if="commonMetricSettings.type === 'line'"
+                  v-model="commonMetricSettings.lineBySteps"
+                  label="Линия-ступеньки"
+                  persistent-placeholder
+                  dense
+                  outlined
+                  hide-details
+                  color="blue"
+                  class="mb-3"
+              />
+              <v-checkbox
+                  v-if="commonMetricSettings.type === 'line'"
+                  v-model="commonMetricSettings.showArea"
+                  label="Закрашивать область между линией и нулем"
+                  persistent-placeholder
+                  dense
+                  outlined
+                  hide-details
+                  color="blue"
+              />
+              <v-row class="my-1">
+                <v-col
+                    v-if="commonMetricSettings.type === 'line'"
+                    class="col-auto py-1"
+                >
+                  <v-checkbox
+                      v-model="commonMetricSettings.showPeakDots"
+                      :disabled="commonMetricSettings.type !== 'line'"
+                      label="Отображать точки с данными"
+                      persistent-placeholder
+                      dense
+                      outlined
+                      hide-details
+                      color="blue"
+                  />
+                </v-col>
+                <v-col
+                    v-if="commonMetricSettings.type === 'line'"
+                    class="py-0"
+                >
+                  <v-slider
+                      v-model="commonMetricSettings.dotSize"
+                      color="blue"
+                      label="Размер"
+                      :disabled="!commonMetricSettings.showPeakDots || commonMetricSettings.type !== 'line'"
+                      min="2"
+                      max="10"
+                      thumb-size="25px"
+                      thumb-label="always"
+                      class="ml-2 mr-1"
+                      style="height: 20px;"
+                  />
+                </v-col>
+
+                <v-col>
+                  <div
+                      class="bordered-group"
+                      :class="{opened: commonMetricSettings.showText}"
+                  >
+                    <v-row>
+                      <v-col cols="12" class="pt-1 pb-0">
+                        <div class="d-flex">
+                          <v-checkbox
+                              v-model="commonMetricSettings.showText"
+                              class="d-inline-block"
+                              label="Отображать подписи"
+                              persistent-placeholder
+                              dense
+                              outlined
+                              hide-details
+                              color="blue"
+                          />
+                          <v-btn-toggle
+                              v-model="commonMetricSettings.peakTextData"
+                              color="blue accent-6"
+                              class="d-inline checkbox-toggle-data"
+                              dense
+                          >
+                            <v-btn
+                                :disabled="(!commonMetricSettings.showText)"
+                                value="data"
+                                class="ma-0"
+                            >
+                              Данные
+                            </v-btn>
+                            <v-btn
+                                :disabled="(!commonMetricSettings.showText)"
+                                value="caption"
+                                class="ma-0"
+                            >
+                              Подписи
+                            </v-btn>
+                          </v-btn-toggle>
+                        </div>
+                      </v-col>
+                    </v-row>
+                    <v-row
+                        v-if="commonMetricSettings.showText"
+                        class="mt-0"
+                    >
+                      <v-col>
+                        <v-text-field
+                            v-if="commonMetricSettings.lastDot >= 1"
+                            v-model="commonMetricSettings.lastDot"
+                            :disabled="!commonMetricSettings.showText"
+                            label="Вывод значений"
+                            placeholder="Введите число"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            clearable
+                            @keyup.prevent="(e) => {
+                              e.target.value = e.target.value.replaceAll(/\D/g, '')
+                            }"
+                            @input="() => {
+                              if (commonMetricSettings.lastDot !== null) {
+                                commonMetricSettings.lastDot = commonMetricSettings.lastDot.replaceAll(/\D/g, '');
+                              }
+                            }"
+                        />
+                        <v-autocomplete
+                            v-else
+                            v-model="commonMetricSettings.lastDot"
+                            :disabled="!commonMetricSettings.showText"
+                            :items="commonMetricSettings.lastDotSearch
+                              ? [
+                                ...defaultLastDotItems,
+                                commonMetricSettings.lastDotSearch.replaceAll(/\D/g, '').toString() || null
+                              ]
+                              : defaultLastDotItems"
+                            label="Вывод значений"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            :search-input.sync="commonMetricSettings.lastDotSearch"
+                        />
+                      </v-col>
+                      <v-col>
+                        <v-autocomplete
+                            v-model="commonMetricSettings.zerosAfterDot"
+                            :disabled="!commonMetricSettings.showText"
+                            :items="zerosAfterDotList"
+                            label="Округление значений"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                        />
+                      </v-col>
+                    </v-row>
+                  </div>
+
+                  <div
+                      class="bordered-group"
+                      :class="{opened: commonMetricSettings.showTextStyles && commonMetricSettings.showText}"
+                  >
+                    <v-row class="mt-3">
+                      <v-col cols="12" class="pt-1 pb-0">
+                        <v-checkbox
+                            v-model="commonMetricSettings.showTextStyles"
+                            :disabled="!commonMetricSettings.showText"
+                            class="d-inline-block"
+                            label="Стилизовать подписи"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            color="blue"
+                        />
+                      </v-col>
+                    </v-row>
+                    <v-row
+                        v-if="commonMetricSettings.showTextStyles && commonMetricSettings.showText"
+                        class="mt-0"
+                    >
+                      <v-col cols="4">
+                        <v-text-field
+                            v-model="commonMetricSettings.pointTextSize"
+                            label="Размер текста"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            type="number"
+                            :min="5"
+                            :max="42"
+                            @change="(val) => {
+                              const [min, max] = [5, 42]
+                              commonMetricSettings.pointTextSize = val < min ? min : (val > max ? max : val);
+                            }"
+                        />
+                      </v-col>
+                      <v-col cols="4">
+                        <v-autocomplete
+                            v-model="commonMetricSettings.pointTextWeight"
+                            :items="textWeightItems"
+                            label="Толщина текста"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                        />
+                      </v-col>
+                      <v-col cols="4">
+                        <v-text-field
+                            v-model="commonMetricSettings.pointTextAngle"
+                            label="Наклон текста"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            type="number"
+                            :min="-360"
+                            :max="360"
+                        />
+                      </v-col>
+                      <v-col cols="4" class="pt-0">
+                        <v-checkbox
+                            v-model="commonMetricSettings.pointTextChangeColor"
+                            class="d-inline-block"
+                            label="Цвет текста"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            color="blue"
+                        />
+                      </v-col>
+                      <v-col cols="8" class="pt-0">
+                        <div
+                            style="position: relative;"
+                            @dblclick="() => colorPicker2InputMode = !colorPicker2InputMode"
+                        >
+                          <v-tooltip right>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-icon
+                                  v-bind="attrs"
+                                  size="14px"
+                                  style="position:absolute;z-index: 2;right: 0;"
+                                  v-on="on"
+                              >
+                                {{ mdiHelpCircleOutline }}
+                              </v-icon>
+                            </template>
+                            <span>Двойным кликом переключается режим выбора цвета</span>
+                          </v-tooltip>
+                          <v-color-picker
+                              v-model="commonMetricSettings.pointTextColor"
+                              :hide-canvas="!colorPicker2InputMode"
+                              :disabled="!commonMetricSettings.pointTextChangeColor"
+                              :hide-inputs="!colorPicker2InputMode"
+                              dot-size="10"
+                              mode="hexa"
+                              width="320"
+                              canvas-height="100"
+                          />
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </div>
+
+                </v-col>
+              </v-row>
+              <!-- /forms -->
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+
         <!-- X axis settings -->
         <v-expansion-panels
           v-model="openXAxisPanel"
@@ -781,6 +1115,7 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
+
       </v-card-text>
 
       <v-card-actions class="footer pr-3 d-flex justify-end px-6">
@@ -859,6 +1194,7 @@ export default {
     zerosAfterDotList: {
       type: Array,
       default: () => ([
+        { value: -1, text: 'Нет' },
         { value: 0, text: '0' },
         { value: 1, text: '0.0' },
         { value: 2, text: '0.00' },
@@ -934,6 +1270,7 @@ export default {
     colorPickerInputMode: false,
     colorPicker2InputMode: false,
     openXAxisPanel: null,
+    openCommonMetricSettingsPanel: null,
     useGroups: true,
     lastDotSearch: '',
     defaultLastDotItems: [
@@ -950,6 +1287,26 @@ export default {
       max: (v) => v <= 10000 || v === undefined || 'Максимум 10000',
     },
     defaultMetricFields: {
+      showTextStyles: false,
+      pointTextWeight: 'normal',
+      pointTextSize: 11,
+      pointTextAngle: 0,
+      pointTextChangeColor: false,
+      pointTextColor: '#ff0000',
+    },
+    commonMetricSettings: {
+      type: 'line',
+      strokeWidth: 1,
+      strokeDasharray: '0',
+      dontSplitLine: false,
+      lineBySteps: false,
+      showArea: false,
+      showPeakDots: false,
+      showText: false,
+      dotSize: 4,
+      peakTextData: 'data',
+      lastDot: '1',
+      zerosAfterDot: -1,
       showTextStyles: false,
       pointTextWeight: 'normal',
       pointTextSize: 11,
@@ -1010,6 +1367,7 @@ export default {
         xAxis: { ...this.xAxis },
         useGroups: this.useGroups,
         commonAxisY: this.commonAxisY,
+        commonMetricSettings: this.commonMetricSettings,
       };
     },
 
@@ -1092,13 +1450,26 @@ export default {
     },
 
     makeMetricsOrderList() {
+      const {
+        xAxis,
+        useGroups,
+        commonAxisY,
+        commonMetricSettings,
+        metricsByGroup,
+      } = this.receivedSettings;
       this.xAxis = JSON.parse(JSON.stringify({
         ...this.xAxis,
-        ...this.receivedSettings.xAxis,
+        ...xAxis,
       }));
-      this.useGroups = !!this.receivedSettings.useGroups;
-      this.commonAxisY = !!this.receivedSettings.commonAxisY;
-      this.metricsByGroup = [...JSON.parse(JSON.stringify(this.receivedSettings.metricsByGroup))];
+      this.useGroups = !!useGroups;
+      this.commonAxisY = !!commonAxisY;
+      if (commonMetricSettings) {
+        this.commonMetricSettings = {
+          ...this.commonMetricSettings,
+          ...commonMetricSettings,
+        };
+      }
+      this.metricsByGroup = [...JSON.parse(JSON.stringify(metricsByGroup))];
       this.metricsByGroup.push([]);
 
       // add default metric props
