@@ -557,9 +557,12 @@ export default {
     const data = this.getPickerDate;
     // eslint-disable-next-line no-prototype-builtins
     if (data?.range !== null && data.range.hasOwnProperty('shortcut')) {
-      this.shortcut = this.DTPickerCustomShortcuts.find(
+      const updateShortcut = this.DTPickerCustomShortcuts.find(
         (sc) => sc.value === data.range.shortcut,
-      )?.key;
+      )?.key || '';
+      if (updateShortcut !== this.shortcut) {
+        this.shortcut = updateShortcut;
+      }
     }
   },
   mounted() {
@@ -737,11 +740,15 @@ export default {
             oldFormat,
             newFormat,
           });
-          this.end = this.formatDateToResult({
-            date: this.end,
-            oldFormat,
-            newFormat,
-          });
+          if (this.end) {
+            this.end = this.formatDateToResult({
+              date: this.end,
+              oldFormat,
+              newFormat,
+            });
+          } else {
+            this.end = null;
+          }
           break;
         case 'range':
           this.range.start = this.formatDateToResult({
@@ -795,7 +802,7 @@ export default {
 
       if (data.range !== null) {
         // eslint-disable-next-line no-prototype-builtins
-        if (data.range.hasOwnProperty('shortcut')) {
+        if (data.range?.shortcut) {
           this.commitTokenValue();
         } else {
           this.range = data.range;
@@ -819,27 +826,25 @@ export default {
       } else if (data.endCus !== null) {
         current = `... - ${data.endCus}`;
       }
-      if (this.last) {
-        if (this.last.every !== null && this.last.time !== null) {
-          let time = '...';
-          switch (this.last.time) {
-            case 'second':
-              time = 'секунд';
-              break;
-            case 'minute':
-              time = 'минут';
-              break;
-            case 'hour':
-              time = 'часов';
-              break;
-            case 'day':
-              time = 'дней';
-              break;
-            default:
-              break;
-          }
-          current = `Последние  ${this.last.every} ${time}`;
+      if (this.last.every !== null && this.last.time !== null) {
+        let time = '...';
+        switch (this.last.time) {
+          case 'second':
+            time = 'секунд';
+            break;
+          case 'minute':
+            time = 'минут';
+            break;
+          case 'hour':
+            time = 'часов';
+            break;
+          case 'day':
+            time = 'дней';
+            break;
+          default:
+            break;
         }
+        current = `Последние  ${this.last.every} ${time}`;
       }
 
       this.show_curent = current !== '';
