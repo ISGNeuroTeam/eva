@@ -545,8 +545,11 @@ export default {
       } else if (this.exactDate) {
         this.updateFormat('exactDate', oldFormat, newFormat);
       } else if (this.last.time) {
-        console.log('time');
         this.updateFormat('time', oldFormat, newFormat);
+      } else if (this.start_custom.value || this.end_custom.value) {
+        this.updateFormat('custom-range', oldFormat, newFormat);
+      } else if (this.exactDateCustom.value) {
+        this.updateFormat('exactDateCustom', oldFormat, newFormat);
       }
     },
   },
@@ -735,6 +738,9 @@ export default {
         end: null,
         shortcut: undefined,
       };
+      const start = null;
+      const end = null;
+      const rangeStr = '';
       switch (elem) {
         case 'dt':
           if (this.start) {
@@ -784,7 +790,6 @@ export default {
           if (!this.options.useLastTimeTemplate) {
             if (this.last.time !== null && this.last.every !== null) {
               const period = this.getTimePeriod();
-              console.log(period, newFormat, oldFormat);
               this.startForStore = this.formatDateToResult({
                 date: Date.now() - period,
                 isTime: true,
