@@ -303,6 +303,10 @@ export default new Vuex.Store({
           if (tokens.find((item) => item === token.name)) {
             token.value = token.defaultValue;
           }
+          this.commit('restartSearches', {
+            idDash,
+            filter: token.name,
+          });
         });
       }
     },
