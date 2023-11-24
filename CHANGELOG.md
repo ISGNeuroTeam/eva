@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Data-picker: Fixed changing format
 - Table: fix bug with pagination icons
+- The data source is not updated when the token is reset by clicking bitton
 
 ## [1.159.0]
 
