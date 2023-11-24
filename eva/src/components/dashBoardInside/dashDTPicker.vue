@@ -540,15 +540,12 @@ export default {
       const newFormat = format || this.dateTimeFormat;
       if (this.range) {
         this.updateFormat('range', oldFormat, newFormat);
-      } else if (this.start) {
+      } else if (this.start || this.end) {
         this.updateFormat('dt', oldFormat, newFormat);
-      } else if (this.start_custom.value) {
-        // this.updateFormat('custom-range', oldFormat, newFormat);
       } else if (this.exactDate) {
         this.updateFormat('exactDate', oldFormat, newFormat);
-      } else if (this.exactDateCustom) {
-        // this.updateFormat('exactDateCustom', oldFormat, newFormat);
       } else if (this.last.time) {
+        console.log('time');
         this.updateFormat('time', oldFormat, newFormat);
       }
     },
@@ -733,13 +730,22 @@ export default {
       return `${prefix}${updatedValue}${suffix}`;
     },
     replaceOldFormat(elem, oldFormat, newFormat) {
+      const range = {
+        start: null,
+        end: null,
+        shortcut: undefined,
+      };
       switch (elem) {
         case 'dt':
-          this.start = this.formatDateToResult({
-            date: this.start,
-            oldFormat,
-            newFormat,
-          });
+          if (this.start) {
+            this.start = this.formatDateToResult({
+              date: this.start,
+              oldFormat,
+              newFormat,
+            });
+          } else {
+            this.start = null;
+          }
           if (this.end) {
             this.end = this.formatDateToResult({
               date: this.end,
@@ -751,16 +757,21 @@ export default {
           }
           break;
         case 'range':
-          this.range.start = this.formatDateToResult({
-            date: this.range.start,
-            oldFormat,
-            newFormat,
-          });
-          this.range.end = this.formatDateToResult({
-            date: this.range.end,
-            oldFormat,
-            newFormat,
-          });
+          if (this.range.start) {
+            range.start = this.formatDateToResult({
+              date: this.range.start,
+              oldFormat,
+              newFormat,
+            });
+          }
+          if (this.range.end) {
+            range.end = this.formatDateToResult({
+              date: this.range.end,
+              oldFormat,
+              newFormat,
+            });
+          }
+          this.range = range;
           break;
         case 'exactDate':
           this.exactDate = this.formatDateToResult({
@@ -769,8 +780,40 @@ export default {
             newFormat,
           });
           break;
+        case 'time':
+          if (!this.options.useLastTimeTemplate) {
+            if (this.last.time !== null && this.last.every !== null) {
+              const period = this.getTimePeriod();
+              console.log(period, newFormat, oldFormat);
+              this.startForStore = this.formatDateToResult({
+                date: Date.now() - period,
+                isTime: true,
+                newFormat,
+              });
+              this.endForStore = this.formatDateToResult({
+                date: Date.now(),
+                isTime: true,
+                newFormat,
+              });
+            }
+          }
+          break;
         default:
           break;
+      }
+    },
+    getTimePeriod() {
+      switch (this.last.time) {
+        case 'second':
+          return Number(this.last.every) * 1000;
+        case 'minute':
+          return Number(this.last.every) * 1000 * 60;
+        case 'hour':
+          return Number(this.last.every) * 1000 * 3600;
+        case 'day':
+          return Number(this.last.every) * 1000 * 3600 * 24;
+        default:
+          return 0;
       }
     },
     calcCurrentDate(forceUpdateValue) {
@@ -870,7 +913,7 @@ export default {
       this.$set(this.date, 'startForStore', this.startForStore || '');
       this.$set(this.date, 'end', this.end);
       this.$set(this.date, 'endForStore', this.endForStore || '');
-      this.$set(this.date, 'range', this.range);
+      this.$set(this.date, 'range', structuredClone(this.range));
       this.$set(this.date, 'startCus', this.start_custom.value);
       this.$set(this.date, 'endCus', this.end_custom.value);
       this.$set(this.date, 'last', this.last);
@@ -973,25 +1016,8 @@ export default {
           break;
 
         case 'time':
-          if (this.last.time !== null) {
-            switch (this.last.time) {
-              case 'second':
-                period = Number(this.last.every) * 1000;
-                break;
-
-              case 'minute':
-                period = Number(this.last.every) * 1000 * 60;
-                break;
-
-              case 'hour':
-                period = Number(this.last.every) * 1000 * 3600;
-                break;
-              case 'day':
-                period = Number(this.last.every) * 1000 * 3600 * 24;
-                break;
-              default:
-                break;
-            }
+          if (this.last.time !== null && this.last.every !== null) {
+            period = this.getTimePeriod();
             // eslint-disable-next-line no-case-declarations
             const {
               useLastTimeTemplate,
@@ -1036,8 +1062,8 @@ export default {
         timeOutputFormat = null,
       } = this.options;
       if (isTime) {
-        if (timeOutputFormat) {
-          return moment(date).format(timeOutputFormat);
+        if (timeOutputFormat || newFormat) {
+          return moment(date).format(timeOutputFormat || newFormat);
         }
         return parseInt(
           new Date(date).getTime() / 1000,
