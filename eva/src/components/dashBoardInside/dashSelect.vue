@@ -86,6 +86,7 @@
             hide-details
             class="select theme--dark"
             label="Значение"
+            clearable
             @change="setTockenDelay('change')"
             @click="setTockenDelay('click')"
             @mouseover="setTockenDelay('mouseover')"
@@ -646,7 +647,7 @@ export default {
       if (this.loading !== false) {
         return;
       }
-      //this.setDefaultValue();
+      // this.setDefaultValue();
       let elemDeepValue = this.elemDeep[`${this.multiple}`];
       if (this.getOptions?.resetValuesWhichAreNot) {
         const existsItems = this.dataReady.map((item) => item[this.elem]);
