@@ -385,6 +385,8 @@ export default {
       'closeListByEnter',
     ],
     picker: [
+      'pickerOptions',
+      'pickerMode',
       'selectingExactDate',
       'showLastTimeBlock',
       'showChoseDateAndTimeBlock',
@@ -750,28 +752,77 @@ export default {
 
     // datepicker
     {
+      group: 'Настройки Дата-пикера',
+      option: 'pickerOptions',
+
+    },
+    {
+      description: 'Режим ввода',
+      optionGroup: 'pickerOptions',
+      option: 'pickerMode',
+      elem: 'select',
+      items: [
+        {
+          text: 'Диапазон',
+          value: 'range',
+        },
+        {
+          text: 'Начало-конец',
+          value: 'start-end',
+        },
+        {
+          text: 'Начало-конец(ручной ввод)',
+          value: 'start-end-manual',
+        },
+        {
+          text: 'Время',
+          value: 'time',
+        },
+        {
+          text: 'Точная дата',
+          value: 'exact',
+        },
+        {
+          text: 'Точная дата(ручной ввод)',
+          value: 'exact-manual',
+        },
+      ],
+      default: 'range',
+    },
+
+    {
       option: 'selectingExactDate',
       description: 'Выбор точной даты',
       elem: 'switch',
+      relation() {
+        return false;
+      },
       default: false,
     },
     {
       option: 'showLastTimeBlock',
       description: 'Показать блок: Выбор времени',
       elem: 'switch',
+      relation() {
+        return false;
+      },
       default: true,
     },
     {
       option: 'showChoseDateAndTimeBlock',
       description: 'Показать блок: Выбор времени и даты',
       elem: 'switch',
+      relation() {
+        return false;
+      },
       default: true,
     },
     {
       option: 'showRangeDateBlock',
       relation() {
         // Вызывается в контексте modalSettings
-        return !this.options?.selectingExactDate;
+        // return !this.options?.selectingExactDate;
+        return false;
       },
       description: 'Показать блок: Диапазон дат',
       elem: 'switch',
@@ -781,8 +832,12 @@ export default {
       option: 'showCustomInputBlock',
       description: 'Показать блок: Ввод даты и времени вручную',
       elem: 'switch',
+      relation() {
+        return false;
+      },
       default: true,
     },
+
     {
       option: 'timeOutputFormat',
       description: 'Формат даты для результата',
@@ -794,15 +849,21 @@ export default {
       option: 'hideTimeSelect',
       description: 'Скрыть выбор времени в календаре',
       elem: 'switch',
+      relation() {
+        const targetModes = ['start-end', 'range', 'exact'];
+        return targetModes.includes(this.options?.pickerMode);
+      },
       default: false,
     },
+
     {
       option: 'useLastTimeTemplate',
       description: 'Использовать шаблон для функционала последнего времени',
       elem: 'switch',
       relation() {
         // Вызывается в контексте modalSettings
-        return !this.options?.selectingExactDate;
+        // return !this.options?.selectingExactDate;
+        return this.options?.pickerMode === 'time';
       },
       default: false,
     },
@@ -811,11 +872,15 @@ export default {
       description: 'Шаблон стартового времени',
       relation() {
         // Вызывается в контексте modalSettings
-        return !this.options?.selectingExactDate
+        // return !this.options?.selectingExactDate
+        //   && this.options.useLastTimeTemplate;
+        return this.options?.pickerMode === 'time'
           && this.options.useLastTimeTemplate;
       },
       elem: 'text-field',
+      // eslint-disable-next-line no-template-curly-in-string
       default: 'now() - ${sec}',
+      // eslint-disable-next-line no-template-curly-in-string
       placeholder: 'Пример: now() - ${sec}',
     },
     {
@@ -823,7 +888,7 @@ export default {
       description: 'Шаблон конечного времени',
       relation() {
         // Вызывается в контексте modalSettings
-        return !this.options?.selectingExactDate
+        return this.options?.pickerMode === 'time'
           && this.options.useLastTimeTemplate;
       },
       elem: 'text-field',

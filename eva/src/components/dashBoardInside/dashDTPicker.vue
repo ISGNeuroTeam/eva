@@ -371,6 +371,39 @@ export default {
     };
   },
   computed: {
+    // new
+    getDashId() {
+      return this.idFrom;
+    },
+    getVisualId() {
+      return this.idDashFrom;
+    },
+    getDashFormStore() {
+      return this.$store.state[this.getDashId];
+    },
+    getVisualFromStore() {
+      return this.getDashFormStore[this.getVisualId];
+    },
+    getOptions() {
+      return this.getVisualFromStore.options;
+    },
+    getFormat() {
+      return this.getOptions?.timeOutputFormat;
+    },
+    getPickerMode() {
+      return this.getOptions?.pickerMode;
+    },
+    getTokens() {
+      return this.getDashFormStore?.tockens;
+    },
+    getTheme() {
+      return this.$store.getters.getTheme;
+    },
+    getPickerValue() {
+      // Заведомо - поле всегда существует и всегда чему-то равно.
+      return this.getVisualFromStore.pickerValue[this.getPickerMode];
+    },
+    // old
     dateTimeFormat() {
       const {
         timeOutputFormat,
@@ -576,6 +609,44 @@ export default {
     this.curDate = this.calcCurrentDate();
   },
   methods: {
+    // new
+    setDefaultPickerValue(mode = 'all') {
+      if (mode === 'all') {
+        this.$store.commit('setState', [{
+          object: this.getVisualFromStore,
+          prop: 'pickerValue',
+          value: {
+            range: {
+              start: null,
+              end: null,
+              shortcut: null,
+            },
+            startEnd: {
+              start: null,
+              end: null,
+            },
+            startEndManual: {
+              start: null,
+              end: null,
+            },
+            exact: null,
+            exactManual: null,
+            time: {
+              type: null,
+              count: null,
+            },
+          },
+        }]);
+      }
+    },
+    setPickerValue(value) {
+      this.$store.commit('setState', [{
+        object: this.getVisualFromStore.pickerValue,
+        prop: this.getPickerMode,
+        value: structuredClone(value),
+      }]);
+    },
+    // old
     setColor() {
       Object.keys(this.color).forEach((item) => {
         this.color[item] = '$accent_ui_color';
