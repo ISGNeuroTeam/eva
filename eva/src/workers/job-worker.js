@@ -11,7 +11,7 @@ onmessage = async (event) => {
     method: 'POST',
     body: formData,
   });
-  const answer = await response.json();
+  const answer = await response.json().catch(error => error);
   const { sid } = searchFrom;
   const { url, statusText } = response;
   let { status } = response;
@@ -87,7 +87,10 @@ onmessage = async (event) => {
       // если запрос не прошел то вернем ответ с ошибкой
       if (responseGet !== 200 && responseGet !== 0) {
         status = 'failed';
-        result.push('failed');
+        result = {
+          status: 'failed',
+          error: `${resEvents.status}: ${resEvents.statusText}`,
+        };
         clearTimeout(timeOut);
         // если прошёл
       } else {
@@ -161,7 +164,12 @@ onmessage = async (event) => {
     ]);
     let schema = null;
     const allData = new Promise((resolve) => {
-      dataResponse.json().then(async (res) => {
+      dataResponse.json()
+        .catch(error => {
+          console.error(error)
+          return resolve([])
+        })
+        .then(async (res) => {
         if (res.status === 'success') {
           log.push([
             new Date(),

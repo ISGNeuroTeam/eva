@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Constructor-schemes: The foreignObject of the text element has been changed to text for correct processing in pdf.
 
 ### Fixed
+- At 500 error, the visualization dashboard continues to display the loading line
 
 ## [1.160.0]
 
