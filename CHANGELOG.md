@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+- Constructor-schemes: The foreignObject of the text element has been changed to text for correct processing in pdf.
+
+### Fixed
+
+## [1.160.0]
+
+### Added
+- Multiline: 
+  - common metrics settings
+  - metrics settings from source data
+- Data-picker: Added the ability to toggle between range and exact date.
+- Select: Added option to clear the value
+
+### Fixed
+- Data-picker: Fixed changing format
+- Table: fix bug with pagination icons
+- The data source is not updated when the token is reset by clicking bitton
+- Data-picker: Fixed incorrect relation for "lastTimeTemplateEnd" option
+
+## [1.159.0]
+
+### Added
 - event go can accept external links
 - export dashboard to PDF
 - export scheme to PDF

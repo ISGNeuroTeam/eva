@@ -1458,6 +1458,9 @@ export default class ChartClass {
       return val;
     }
     const { zerosAfterDot } = metric;
+    if (zerosAfterDot === -1) {
+      return val
+    }
     return (zerosAfterDot % 1 === 0 && zerosAfterDot >= 0 && zerosAfterDot <= 100)
       ? Number.parseFloat(val).toLocaleString(numberFormat, {
         minimumFractionDigits: zerosAfterDot ?? 2,

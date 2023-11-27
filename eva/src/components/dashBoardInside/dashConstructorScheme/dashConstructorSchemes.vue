@@ -900,7 +900,11 @@ export default {
       return this.visualisationFromStore?.savedGraph || '';
     },
     savedGraphObject() {
-      const savedGraph = this.visualisationFromStore?.savedGraphObject;
+      if (!this.visualisationFromStore?.savedGraphObject) {
+        // this.localActiveSchemeId = this.activeSchemeId || 'default-scheme';
+        this.createSavedGraphObjectField();
+      }
+      const savedGraph = this.visualisationFromStore.savedGraphObject;
       if (savedGraph) {
         return savedGraph[this.localActiveSchemeId] || [];
       }
@@ -1118,10 +1122,10 @@ export default {
     },
   },
   created() {
-    if (!this.savedGraphObject) {
-      this.localActiveSchemeId = this.activeSchemeId || 'default-scheme';
-      this.createSavedGraphObjectField();
-    }
+    // if (!this.savedGraphObject) {
+    //   this.localActiveSchemeId = this.activeSchemeId || 'default-scheme';
+    // this.createSavedGraphObjectField();
+    // }
   },
   mounted() {
     this.createGraph();
@@ -1287,7 +1291,7 @@ export default {
     updateSavedGraph(data) {
       if (this.savedGraph) {
         this.$store.commit('setState', [{
-          object: this.dashFromStore,
+          object: this.visualisationFromStore,
           prop: 'savedGraph',
           value: data,
         }]);
@@ -1299,16 +1303,16 @@ export default {
       }]);
     },
     createSavedGraphObjectField() {
-      if (!this.savedGraphObject) {
+      if (!this.visualisationFromStore?.savedGraphObject) {
         this.$store.commit('setState', [{
-          object: this.dashFromStore,
+          object: this.visualisationFromStore,
           prop: 'savedGraphObject',
           value: {},
         }]);
       }
-      if (!this.savedGraphObject[this.localActiveSchemeId]) {
+      if (!this.visualisationFromStore.savedGraphObject[this.localActiveSchemeId]) {
         this.$store.commit('setState', [{
-          object: this.savedGraphObject,
+          object: this.visualisationFromStore.savedGraphObject,
           prop: this.localActiveSchemeId || 'default-scheme',
           value: [],
         }]);
@@ -1316,7 +1320,7 @@ export default {
     },
     clearSavedGraphObject() {
       this.$store.commit('setState', [{
-        object: this.savedGraphObject,
+        object: this.visualisationFromStore.savedGraphObject,
         prop: this.localActiveSchemeId,
         value: [],
       }]);
@@ -1329,7 +1333,7 @@ export default {
       this.timeout = setTimeout(() => {
         this.createSavedGraphObjectField();
         this.$store.commit('setState', [{
-          object: this.savedGraphObject,
+          object: this.visualisationFromStore.savedGraphObject,
           prop: this.localActiveSchemeId,
           value: data,
         }]);

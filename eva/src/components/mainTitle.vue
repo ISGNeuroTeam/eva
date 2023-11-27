@@ -884,7 +884,7 @@ export default {
       const [start, end] = range.range;
       return arr.filter((item) => {
         const xValue = item[xMetric];
-        return (xValue >= start && xValue <= end);
+        return item[xMetric] === null || (xValue >= start && xValue <= end);
       });
     },
     setRange(range, elem) {

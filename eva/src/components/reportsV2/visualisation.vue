@@ -209,7 +209,7 @@ export default {
         const { range, xMetric } = this.displayingRange;
         return this.data.filter((item) => {
           const x = item[xMetric];
-          return x >= range[0] && x <= range[1];
+          return x === null || (x >= range[0] && x <= range[1]);
         });
       }
       return this.data;

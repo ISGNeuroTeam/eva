@@ -385,6 +385,7 @@ export default {
       'closeListByEnter',
     ],
     picker: [
+      'selectingExactDate',
       'showLastTimeBlock',
       'showChoseDateAndTimeBlock',
       'showRangeDateBlock',
@@ -749,6 +750,12 @@ export default {
 
     // datepicker
     {
+      option: 'selectingExactDate',
+      description: 'Выбор точной даты',
+      elem: 'switch',
+      default: false,
+    },
+    {
       option: 'showLastTimeBlock',
       description: 'Показать блок: Выбор времени',
       elem: 'switch',
@@ -762,6 +769,10 @@ export default {
     },
     {
       option: 'showRangeDateBlock',
+      relation() {
+        // Вызывается в контексте modalSettings
+        return !this.options?.selectingExactDate;
+      },
       description: 'Показать блок: Диапазон дат',
       elem: 'switch',
       default: true,
@@ -789,12 +800,20 @@ export default {
       option: 'useLastTimeTemplate',
       description: 'Использовать шаблон для функционала последнего времени',
       elem: 'switch',
+      relation() {
+        // Вызывается в контексте modalSettings
+        return !this.options?.selectingExactDate;
+      },
       default: false,
     },
     {
       option: 'lastTimeTemplateStart',
       description: 'Шаблон стартового времени',
-      relation: ['useLastTimeTemplate'],
+      relation() {
+        // Вызывается в контексте modalSettings
+        return !this.options?.selectingExactDate
+          && this.options.useLastTimeTemplate;
+      },
       elem: 'text-field',
       default: 'now() - ${sec}',
       placeholder: 'Пример: now() - ${sec}',
@@ -802,7 +821,11 @@ export default {
     {
       option: 'lastTimeTemplateEnd',
       description: 'Шаблон конечного времени',
-      relation: ['useLastTimeTemplate'],
+      relation() {
+        // Вызывается в контексте modalSettings
+        return !this.options?.selectingExactDate
+          && this.options.useLastTimeTemplate;
+      },
       elem: 'text-field',
       default: 'now()',
       placeholder: 'Пример: now()',

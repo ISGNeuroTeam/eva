@@ -229,7 +229,7 @@ const templates = {
           widthLeft: options?.widthLeft,
           items: options.items.map((item) => {
             const dataItem = Utils.getDataItemById(dataRest, item.id);
-            const textLeft = dataItem?.Description || '-';
+            const textLeft = item?.description || dataItem?.Description || '-';
             const textRight = typeof dataItem?.value === 'number'
             || typeof dataItem?.value === 'string'
               ? dataItem.value
@@ -1353,40 +1353,17 @@ const templates = {
           :stroke-dasharray="tag.bordered && tag.borderDashed ? '4' : '0'" 
           :rx="tag.bordered && tag.borderSize / 2 || 3" 
         />
-        <foreignObject 
-          :height="layout.height" 
-          :width="layout.width"
+        <text
+          :x="tag.getXPosition(tag.isVertical, layout)"
+          :y="tag.getYPosition(tag.isVertical, layout)"
+          text-anchor="middle"
+          :font-size="tag.fontSize"
+          alignment-baseline="middle"
+          :fill="tag.textColor.hex"
+          :style="tag.getTextStyles(tag.isVertical)"
         >
-          <div
-           class="b-data-node__label" 
-           :style="{
-             height: '100%', 
-             display: 'flex', 
-             justifyContent: 'center', 
-             alignItems: 'center',
-           }" 
-          >
-            <div 
-             class="b-data-node__text-label" 
-             :style="{
-              width: layout.width + 'px',
-              height: layout.height + 'px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              writingMode: tag.isVertical ? 'vertical-rl' : 'horizontal-tb',
-              textOrientation: 'mixed', 
-              transform: tag.isVertical ? 'rotate(180deg)' : 'rotate(0deg)',
-              color: tag.textColor.rgbaString,
-              fontSize: tag.fontSize ? tag.fontSize + 'px' : '12px',
-              fontFamily: tag.fontFamily,
-             }"
-            >
-              {{ tag.text }}
-            </div>
-          </div>
-        </foreignObject>
+          {{ tag.text }}
+        </text>
       </g>
     `,
     width: 150,
@@ -1403,6 +1380,24 @@ const templates = {
       borderType: 'solid',
       borderSize: 1,
       borderDashed: true,
+      getTextStyles(isVertical) {
+        if (isVertical) {
+          return 'writing-mode: tb-rl; transform: rotate(180deg);';
+        }
+        return '';
+      },
+      getXPosition(isVertical, layout) {
+        if (isVertical) {
+          return (layout.width / 2) * -1;
+        }
+        return layout.width / 2;
+      },
+      getYPosition(isVertical, layout) {
+        if (isVertical) {
+          return (layout.height / 2) * -1;
+        }
+        return layout.height / 2;
+      },
       borderColor: {
         rgbaObject: {
           r: 0,
@@ -1422,6 +1417,8 @@ const templates = {
         rgbaString: 'rgba(255,255,255,1)',
       },
       textColor: {
+        hex: '#000000',
+        hexa: '#000000FF',
         rgbaObject: {
           r: 0,
           g: 0,
@@ -1451,6 +1448,9 @@ const fieldsForDelete = [
   'updateData',
   'calculateBackwardScale',
   'getYPositionBySvgBg',
+  'getTextStyles',
+  'getXPosition',
+  'getYPosition',
 ];
 export default {
   templates,

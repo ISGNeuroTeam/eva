@@ -86,6 +86,7 @@
             hide-details
             class="select theme--dark"
             label="Значение"
+            clearable
             @change="setTockenDelay('change')"
             @click="setTockenDelay('click')"
             @mouseover="setTockenDelay('mouseover')"
@@ -391,6 +392,7 @@ export default {
       deep: true,
       handler(val, oldVal) {
         if (val !== oldVal) {
+          this.setDefaultValue();
           this.setTocken();
         }
       },
@@ -477,8 +479,7 @@ export default {
         this.openSelect();
       }
       if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
-        let val = selected.elemDeep;
-        this.elemDeep[`${this.multiple}`] = val;
+        this.elemDeep[`${this.multiple}`] = selected.elemDeep;
       }
     }
   },
@@ -646,7 +647,7 @@ export default {
       if (this.loading !== false) {
         return;
       }
-      //this.setDefaultValue();
+      // this.setDefaultValue();
       let elemDeepValue = this.elemDeep[`${this.multiple}`];
       if (this.getOptions?.resetValuesWhichAreNot) {
         const existsItems = this.dataReady.map((item) => item[this.elem]);

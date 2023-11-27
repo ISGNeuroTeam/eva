@@ -22,6 +22,7 @@
           <template v-slot:activator="{ on }">
             <v-btn
               icon
+              class="ui-btn__tree ui-btn__tree--dash"
               :color="theme.$secondary_text"
               :class="{'v-btn--active': $store.state.app.treeOpen}"
               v-on="on"
@@ -42,6 +43,7 @@
           <template v-slot:activator="{ on }">
             <v-btn
               to="/main"
+              class="ui-btn__home ui-btn__home--dash"
               icon
               :color="theme.$secondary_text"
               v-on="on"
@@ -61,6 +63,7 @@
           <template v-slot:activator="{ on }">
             <v-btn
               icon
+              class="ui-btn__undo ui-btn__undo--dash"
               :color="theme.$secondary_text"
               v-on="on"
               @click="toBackward"
@@ -111,6 +114,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
+                class="ui-btn__upload-file ui-btn__upload-file--dash"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': loadSvg}"
                 v-on="on"
@@ -131,6 +135,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
+                class="ui-btn__events ui-btn__events--dash"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': openevent}"
                 v-on="on"
@@ -151,6 +156,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
+                class="ui-btn__tokens ui-btn__tokens--dash"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': opentocken}"
                 v-on="on"
@@ -171,6 +177,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
+                class="ui-btn__searches ui-btn__searches--dash"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': search_elem}"
                 v-on="on"
@@ -191,6 +198,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
+                class="ui-btn__visualisation ui-btn__visualisation--dash"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': opentool}"
                 v-on="on"
@@ -213,6 +221,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
+                class="ui-btn__filters ui-btn__filters--dash"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': openfilter}"
                 v-on="on"
@@ -234,6 +243,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
+                class="ui-btn__settings ui-btn__settings--dash"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': gearShow}"
                 v-on="on"
@@ -255,6 +265,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
+                class="ui-btn__save ui-btn__save--dash"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': opensave}"
                 v-on="on"
@@ -275,6 +286,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
+                class="ui-btn__log ui-btn__log--dash"
                 :color="getColorError ? theme.$primary_button : theme.$secondary_text"
                 :class="{'v-btn--active': modalActive}"
                 v-on="on"
@@ -295,6 +307,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
+                class="ui-btn__notification ui-btn__notification--dash"
                 :color="hasNewNotify ? theme.$primary_button : theme.$secondary_text"
                 :class="{'v-btn--active': modalNotify}"
                 v-on="on"
@@ -323,7 +336,7 @@
                 <v-btn
                   text
                   rounded
-                  class="ml-2 mr-2 pl-2 profile-login"
+                  class="ml-2 mr-2 pl-2 profile-login ui-btn__profile ui-btn__profile--dash"
                   :color="theme.$secondary_text"
                   v-on="{ ...onMenu, ...onTooltip }"
                 >
@@ -1329,7 +1342,7 @@ export default {
     editPermission() {
       return (
         this.isAdmin
-        || this.permissions.includes('editdash')
+          || this.permissions.includes('editdash')
       );
     },
     getEventFull() {
@@ -1349,8 +1362,8 @@ export default {
       if (this.$store.state[this.idDash]?.elements) {
         return this.$store.state[this.idDash].elements.filter(
           (elem) => this.$store.state[this.idDash][elem].tab
-              === this.$store.state[this.idDash].currentTab
-            || this.$store.state[this.idDash][elem].options?.pinned,
+                === this.$store.state[this.idDash].currentTab
+                || this.$store.state[this.idDash][elem].options?.pinned,
         );
       }
       return [];
@@ -1730,7 +1743,7 @@ export default {
       // проверяем не пустой ли токен
       if (
         (this.newTockenName?.toLowerCase() === 'evatknlogin' && !Number.isInteger(index))
-        || (Number.isInteger(index) && this.tockensName[this.tokens[index].name]?.toLowerCase() === 'evatknlogin')
+          || (Number.isInteger(index) && this.tockensName[this.tokens[index].name]?.toLowerCase() === 'evatknlogin')
       ) {
         this.errorSaveToken = true;
         this.openwarning = true;
@@ -1748,8 +1761,8 @@ export default {
       // проверяем не пустой ли токен
       if (
         (!this.newTockenName && !Number.isInteger(index))
-        || (Number.isInteger(index)
-          && !this.tockensName[this.tokens[index].name].length)
+          || (Number.isInteger(index)
+              && !this.tockensName[this.tokens[index].name].length)
       ) {
         this.errorSaveToken = true;
         this.openwarning = true;
@@ -1767,11 +1780,11 @@ export default {
       // проверяем на запретние названия
       if (
         (!Number.isInteger(index)
-          && globalTockens.includes(this.newTockenName.trim()))
-        || (Number.isInteger(index)
-          && globalTockens.includes(
-            this.tockensName[this.tokens[index].name].trim(),
-          ))
+              && globalTockens.includes(this.newTockenName.trim()))
+          || (Number.isInteger(index)
+              && globalTockens.includes(
+                this.tockensName[this.tokens[index].name].trim(),
+              ))
       ) {
         this.errorSaveToken = true;
         this.openwarning = true;
@@ -1961,7 +1974,7 @@ export default {
     openEditSearch(event, sid) {
       if (
         event.target.classList.contains('search-id')
-        || event.target.classList.contains('search-query')
+          || event.target.classList.contains('search-query')
       ) {
         this.openEdit(sid);
       }
@@ -2555,28 +2568,35 @@ export default {
 .v-tooltip__content {
   width: fit-content;
 }
+
 .backlight-tkn {
   font-family: monospace, Consolas;
   background-color: #9992;
 }
+
 .row-tocken::v-deep .v-menu__content {
   max-width: initial;
 }
+
 .main-title {
   overflow: hidden;
 }
+
 .title-name {
   overflow: hidden;
   white-space: nowrap;
   min-height: 1.5em;
 }
+
 .user-control-panel {
   display: inline-flex;
 }
+
 .tocken-view {
-    height: 45px;
-    overflow: auto;
+  height: 45px;
+  overflow: auto;
 }
+
 .hidden-input {
   position: absolute;
   opacity: 0;
