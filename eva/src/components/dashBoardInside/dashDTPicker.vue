@@ -272,6 +272,7 @@ import {
   mdiCheckBold,
 } from '@mdi/js';
 import moment from 'moment';
+import { throttle } from '@/js/utils/throttle';
 
 export default {
   name: 'DashDatePicker',
@@ -368,15 +369,63 @@ export default {
       defaultFormat: 'YYYY-MM-DD HH:mm',
       defaultFormatWithoutTime: 'YYYY-MM-DD',
       shortcut: '',
+      // new
+      localValue: {
+        range: {
+          value: {
+            start: null,
+            end: null,
+            shortcut: null,
+          },
+          valueForTokens: {
+            start: null,
+            end: null,
+          },
+        },
+        startEnd: {
+          value: {
+            start: null,
+            end: null,
+          },
+          valueForTokens: {
+            start: null,
+            end: null,
+          },
+        },
+        startEndManual: {
+          value: {
+            start: null,
+            end: null,
+          },
+          valueForTokens: {
+            start: null,
+            end: null,
+          },
+        },
+        exact: {
+          value: null,
+          valueForTokens: null,
+        },
+        exactManual: {
+          value: null,
+          valueForTokens: null,
+        },
+        time: {
+          value: {
+            every: null,
+            time: null,
+          },
+        },
+      },
     };
   },
   computed: {
     // new
     getDashId() {
-      return this.idFrom;
+      return this.idDashFrom;
     },
     getVisualId() {
-      return this.idDashFrom;
+      return this.idFrom;
     },
     getDashFormStore() {
       return this.$store.state[this.getDashId];
@@ -391,6 +440,12 @@ export default {
       return this.getOptions?.timeOutputFormat;
     },
     getPickerMode() {
+      if (this.getOldValue) {
+        return this.getOldValue.mode;
+      }
+      if (!this.getOptions?.pickerMode) {
+        this.setDefaultPickerMode();
+      }
       return this.getOptions?.pickerMode;
     },
     getTokens() {
@@ -399,9 +454,86 @@ export default {
     getTheme() {
       return this.$store.getters.getTheme;
     },
-    getPickerValue() {
-      // Заведомо - поле всегда существует и всегда чему-то равно.
-      return this.getVisualFromStore.pickerValue[this.getPickerMode];
+    // TODO: Для обработки значений старой версии пикера
+    getOldValue() {
+      if (this.getPickerDate) {
+        const picker = this.getPickerDate;
+        if (picker.range) {
+          return {
+            mode: 'range',
+            value: picker.range,
+            valueForTokens: {
+              start: picker.startForStore,
+              end: picker.endForStore,
+            },
+          };
+        }
+        if (picker.start || picker.end) {
+          return {
+            mode: 'startEnd',
+            value: {
+              start: picker.start,
+              end: picker.end,
+            },
+            valueForTokens: {
+              start: picker.startForStore,
+              end: picker.endForStore,
+            },
+          };
+        }
+        if (picker.startCus || picker.endCus) {
+          return {
+            mode: 'startEndManual',
+            value: {
+              start: picker.startCus,
+              end: picker.endCus,
+            },
+            valueForTokens: {
+              start: picker.startForStore,
+              end: picker.endForStore,
+            },
+          };
+        }
+        if (picker.exactDate) {
+          return {
+            mode: 'exact',
+            value: picker.exactDate,
+            valueForTokens: picker.exactDateForStore,
+          };
+        }
+        if (picker.exactDateCustom) {
+          return {
+            mode: 'exact',
+            value: picker.exactDateCustom,
+            valueForTokens: picker.exactDateForStore,
+          };
+        }
+        if (picker.last.time || picker.last.every) {
+          return {
+            mode: 'time',
+            value: {
+              time: picker.last.time,
+              every: picker.last.every,
+            },
+            valueForTokens: null,
+          };
+        }
+      }
+      return null;
+    },
+    pickerValue: {
+      get() {
+        if (this.getOldValue) {
+          return this.getOldValue.value;
+        }
+        if (!this.getVisualFromStore?.pickerValue) {
+          this.setDefaultPickerValue();
+        }
+        return this.getVisualFromStore?.pickerValue[this.getPickerMode];
+      },
+      set(value) {
+        this.setPickerValue(value, this.getPickerMode);
+      },
     },
     // old
     dateTimeFormat() {
@@ -599,6 +731,9 @@ export default {
     }
   },
   mounted() {
+    // new
+    this.setPickerValue = throttle(this.setPickerValue, 200);
+    // old
     this.setTokenAction();
     this.date = structuredClone(this.getPickerDate);
     if (this.date?.last?.time) {
@@ -610,39 +745,32 @@ export default {
   },
   methods: {
     // new
-    setDefaultPickerValue(mode = 'all') {
-      if (mode === 'all') {
+    setDefaultPickerMode() {
+      this.$store.commit('setState', [{
+        object: this.getOptions,
+        prop: 'pickerMode',
+        value: 'range',
+      }]);
+    },
+    setDefaultPickerValue() {
+      this.$store.commit('setState', [{
+        object: this.getVisualFromStore,
+        prop: 'pickerValue',
+        value: this.localValue,
+      }]);
+    },
+    setPickerValue(value, mode) {
+      if (this.getOldValue) {
+        // Обнуляем старые значения
         this.$store.commit('setState', [{
           object: this.getVisualFromStore,
-          prop: 'pickerValue',
-          value: {
-            range: {
-              start: null,
-              end: null,
-              shortcut: null,
-            },
-            startEnd: {
-              start: null,
-              end: null,
-            },
-            startEndManual: {
-              start: null,
-              end: null,
-            },
-            exact: null,
-            exactManual: null,
-            time: {
-              type: null,
-              count: null,
-            },
-          },
+          prop: 'date',
+          value: null,
         }]);
       }
-    },
-    setPickerValue(value) {
       this.$store.commit('setState', [{
         object: this.getVisualFromStore.pickerValue,
-        prop: this.getPickerMode,
+        prop: mode,
         value: structuredClone(value),
       }]);
     },
