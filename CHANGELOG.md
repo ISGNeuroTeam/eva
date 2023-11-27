@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Constructor-schemes: The foreignObject of the text element has been changed to text for correct processing in pdf.
 
 ### Fixed
 
