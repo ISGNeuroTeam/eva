@@ -158,9 +158,13 @@
                 v-on="on"
                 @click="openSearchCode"
               >
-                <v-icon>
-                  {{ search_icon }}
-                </v-icon>
+                <v-progress-circular
+                  v-if="hasLoadingSearches"
+                  indeterminate
+                >
+                  <v-icon>{{ search_icon }}</v-icon>
+                </v-progress-circular>
+                <v-icon v-else>{{ search_icon }}</v-icon>
               </v-btn>
             </template>
             <span>Источники данных</span>
@@ -1247,6 +1251,9 @@ export default {
       'isAdmin',
       'permissions',
     ]),
+    hasLoadingSearches() {
+      return this.searches.some((search) => search?.status === 'pending')
+    },
     editMode() {
       return this.dashFromStore?.editMode;
     },

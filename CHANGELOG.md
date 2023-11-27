@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Animation of data source icons
 
 ### Changed
 - Constructor-schemes: The foreignObject of the text element has been changed to text for correct processing in pdf.
