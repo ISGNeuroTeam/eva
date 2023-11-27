@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Datepicker: added date range selection buttons: Q1, Q2, H1, Q3, 9 months, Q4, H2
 
 ### Changed
 
