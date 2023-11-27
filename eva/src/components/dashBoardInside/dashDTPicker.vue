@@ -514,8 +514,8 @@ export default {
         const vk2title = new Map();
         vk2title.set('1-2', '1 пг.');
         vk2title.set('1-3', '9 месяцев');
-        vk2title.set('2-4', '2 пг.');
-        for (const kv of [1,2,'1-2',3,'1-3',4,'2-4']) {
+        vk2title.set('3-4', '2 пг.');
+        for (const kv of [1, 2, '1-2', 3, '1-3', 4, '3-4']) {
           shortcuts.push({
             key: `${kv}kv`,
             label: vk2title.get(kv) || `${kv} кв.`,
