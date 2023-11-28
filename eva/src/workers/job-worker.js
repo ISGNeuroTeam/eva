@@ -10,7 +10,15 @@ onmessage = async (event) => {
   const response = await fetch('/api/makejob', {
     method: 'POST',
     body: formData,
-  });
+  }).catch(error => (error.message));
+  if (typeof response === 'string') {
+    return postMessage({
+      status: 'failed',
+      statusText: response,
+      error: response,
+      answer: response,
+    });
+  }
   const answer = await response.json().catch(error => error);
   const { sid } = searchFrom;
   const { url, statusText } = response;
@@ -81,15 +89,19 @@ onmessage = async (event) => {
             `Запрос выполнить не удалось.&nbsp;&nbsp;Ошибка: ${error}`,
           ]);
           status = 'failed';
-          result = [];
+          result = {
+            status: 'failed',
+            error: `${error.message}`,
+          };
           clearTimeout(timeOut);
+          return resolve(result);
         });
       // если запрос не прошел то вернем ответ с ошибкой
       if (responseGet !== 200 && responseGet !== 0) {
         status = 'failed';
         result = {
           status: 'failed',
-          error: `${resEvents.status}: ${resEvents.statusText}`,
+          error: responseGet === undefined ? 'Ошибка сети' : `${resEvents.status}: ${resEvents.statusText}`,
         };
         clearTimeout(timeOut);
         // если прошёл
@@ -114,6 +126,7 @@ onmessage = async (event) => {
       if (
         status === 'success'
         || status === 'failed'
+        || status === 'nocache'
       ) {
         clearTimeout(timeOut);
         resolve(result);

@@ -140,7 +140,10 @@ export default {
                     `Запрос выполнить не удалось.&nbsp;&nbsp;Ошибка: ${error}`,
                   );
                   status = 'failed';
-                  result = [];
+                  result = {
+                    status: 'failed',
+                    error: `${error.message}`,
+                  };
                   clearTimeout(timeOut);
                 });
               // если запрос не прошел то вернем ответ с ошибкой
