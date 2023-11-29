@@ -126,7 +126,7 @@ onmessage = async (event) => {
       if (
         status === 'success'
         || status === 'failed'
-        || status === 'nocache'
+        // || status === 'nocache'
       ) {
         clearTimeout(timeOut);
         resolve(result);

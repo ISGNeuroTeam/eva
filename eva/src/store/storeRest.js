@@ -24,7 +24,9 @@ export default {
         });
         worker.onmessage = (event) => {
           // console.log('[response] worker: %s', searchFrom.sid/*, event.data*/)
-          worker.terminate();
+          if (process.env.NODE_ENV === 'production') {
+            worker.terminate();
+          }
           const {
             error,
             data,
