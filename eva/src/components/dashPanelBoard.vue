@@ -2527,6 +2527,8 @@ export default {
                   || el?.classList?.contains('profile-dropdown-menu')
                   || el?.classList?.contains('v-overlay')
                   || el?.classList?.contains('left-dash-setting')
+                  || el?.classList?.contains('left-dash-setting')
+                  || el?.classList?.contains('block-save')
                 );
               },
             },
