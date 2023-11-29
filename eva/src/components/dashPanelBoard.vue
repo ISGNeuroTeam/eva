@@ -159,12 +159,14 @@
                 @click="openSearchCode"
               >
                 <v-progress-circular
-                  v-if="hasLoadingSearches"
-                  indeterminate
+                  class="ds-progress"
+                  :rotate="90"
+                  :value="hasLoadingSearches"
+                  :width="2"
+                  :class="{'hidden-progress': !hasLoadingSearches}"
                 >
                   <v-icon>{{ search_icon }}</v-icon>
                 </v-progress-circular>
-                <v-icon v-else>{{ search_icon }}</v-icon>
               </v-btn>
             </template>
             <span>Источники данных</span>
@@ -1252,7 +1254,8 @@ export default {
       'permissions',
     ]),
     hasLoadingSearches() {
-      return this.searches.some((search) => search?.status === 'pending')
+      const pending = this.searches.filter((search) => search?.status === 'pending').length;
+      return pending / this.searches.length * 100
     },
     editMode() {
       return this.dashFromStore?.editMode;
@@ -2499,5 +2502,20 @@ export default {
   position: absolute;
   opacity: 0;
   z-index: -1;
+}
+
+.ds-progress {
+  .v-progress-circular__overlay {
+    transform-origin: bottom;
+    transform: rotateX(180deg);
+  }
+  .v-progress-circular__underlay {
+    transition: stroke 0.6s ease-in-out;
+  }
+  &.hidden-progress {
+    .v-progress-circular__underlay {
+      stroke: transparent;
+    }
+  }
 }
 </style>
