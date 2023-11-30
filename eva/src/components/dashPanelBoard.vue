@@ -1285,6 +1285,9 @@ export default {
       'permissions',
     ]),
     hasLoadingSearches() {
+      if (!this.searches.length) {
+        return 0;
+      }
       const pending = this.searches.filter((search) => search?.status === 'pending').length;
       return pending / this.searches.length * 100
     },
