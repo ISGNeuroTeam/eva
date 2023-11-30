@@ -288,23 +288,6 @@ export default {
       type: Array,
       required: true,
     },
-    DTPickerCustomShortcuts: {
-      type: Array,
-      default: function _default() {
-        return [
-          { key: 'thisDay', label: 'текущий день', value: 'day' },
-          { key: 'lastDay', label: 'предыдущий день', value: '-day' },
-          { key: 'thisWeek', label: 'текущая неделя', value: 'isoWeek' },
-          { key: 'lastWeek', label: 'пред. неделя', value: '-isoWeek' },
-          { key: 'last7Days', label: 'последние 7 дней', value: 7 },
-          { key: 'last30Days', label: 'последние 30 дней', value: 30 },
-          { key: 'thisMonth', label: 'текущий месяц', value: 'month' },
-          { key: 'lastMonth', label: 'пред. месяц', value: '-month' },
-          { key: 'thisYear', label: 'текущий год', value: 'year' },
-          { key: 'lastYear', label: 'пред. год', value: '-year' },
-        ];
-      },
-    },
     fullScreenMode: {
       type: Boolean,
       default: false,
@@ -512,6 +495,44 @@ export default {
         return 'time';
       }
       return '';
+    },
+    DTPickerCustomShortcuts() {
+      const shortcuts = [
+        { key: 'thisDay', label: 'текущий день', value: 'day' },
+        { key: 'lastDay', label: 'предыдущий день', value: '-day' },
+        { key: 'thisWeek', label: 'текущая неделя', value: 'isoWeek' },
+        { key: 'lastWeek', label: 'пред. неделя', value: '-isoWeek' },
+        { key: 'last7Days', label: 'последние 7 дней', value: 7 },
+        { key: 'last30Days', label: 'последние 30 дней', value: 30 },
+        { key: 'thisMonth', label: 'текущий месяц', value: 'month' },
+        { key: 'lastMonth', label: 'пред. месяц', value: '-month' },
+      ];
+
+      // если вкл. настройка - Расширить набор кнопок выбора диапазона дат
+      if (this.options?.expandRangeBtnsSet) {
+        // 1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.
+        const vk2title = new Map();
+        vk2title.set('1-2', '1 пг.');
+        vk2title.set('1-3', '9 месяцев');
+        vk2title.set('3-4', '2 пг.');
+        for (const kv of [1, 2, '1-2', 3, '1-3', 4, '3-4']) {
+          shortcuts.push({
+            key: `${kv}kv`,
+            label: vk2title.get(kv) || `${kv} кв.`,
+            value: () => {
+              let [start, end] = typeof kv === 'string' ? kv.split('-') : [kv, kv];
+              return {
+                start: moment().quarter(start).startOf('quarter'),
+                end: moment().quarter(end).endOf('quarter'),
+              }
+            },
+          })
+        }
+      }
+
+      shortcuts.push({ key: 'thisYear', label: 'текущий год', value: 'year' })
+      shortcuts.push({ key: 'lastYear', label: 'пред. год', value: '-year' })
+      return shortcuts;
     },
   },
   watch: {
