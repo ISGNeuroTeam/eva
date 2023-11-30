@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.161.0]
+
+### Added
+- Export dashboard and scheme to PDF
 - Animation of data source icons
 - Datepicker: added date range selection buttons: Q1, Q2, H1, Q3, 9 months, Q4, H2
 
@@ -36,8 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - event go can accept external links
-- export dashboard to PDF
-- export scheme to PDF
 
 ### Changed
 - Updated the top panel UX/UI
