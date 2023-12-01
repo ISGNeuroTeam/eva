@@ -8,15 +8,15 @@ class Utils {
   static generateColor(color, opacity) {
     if (opacity) {
       return {
-        // For correct work with vuetify color-picker
+        hex: Utils.rgbaToHex(Utils.colorToString(Color.from(color), opacity)),
         rgbaObject: Utils.colorToRgbaObject(color, opacity),
         rgbaString: Utils.colorToString(Color.from(color), opacity),
       };
     }
     return {
-      // For correct work with vuetify color-picker
+      hex: Utils.rgbaToHex(Utils.colorToString(Color.from(color), opacity)),
       rgbaObject: Utils.colorToRgbaObject(color),
-      rgbaString: Utils.colorToString(Color.from(color)),
+      rgbaString: Utils.colorToString(Color.from(color), 1),
     };
   }
 
@@ -44,6 +44,24 @@ class Utils {
     return {
       r, g, b, a,
     };
+  }
+
+  static rgbaToHex(rgba) {
+    const rgbaArray = rgba.match(/\d+/g);
+
+    // Преобразуем числа в формат HEX
+    const hex = rgbaArray.map((color, index) => {
+      if (index === 3) { // Если это альфа-канал
+        const alphaHex = parseInt(color, 10).toString(16);
+        return alphaHex.length === 1 ? `0${alphaHex}` : alphaHex;
+      }
+
+      const hexValue = parseInt(color, 10).toString(16);
+      return hexValue.length === 1 ? `0${hexValue}` : hexValue;
+    });
+
+    // Соединяем значения HEX и возвращаем результат
+    return `#${hex.slice(0, 3).join('')}${hex[3]}`;
   }
 
   static removeClass(e, className) {

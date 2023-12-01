@@ -112,6 +112,16 @@ class ElementCreator {
     return elements.filter((el) => el.type === type);
   }
 
+  static getPortById({
+    graph,
+    portId,
+  }) {
+    if (graph.ports.toArray()?.length > 0 && typeof portId === 'number') {
+      return graph.ports.toArray().find(({ tag }) => tag?.portId === portId);
+    }
+    return null;
+  }
+
   static getTargetPort({
     graph,
     targetPortId,
@@ -146,6 +156,8 @@ class ElementCreator {
               edge: data,
             }).then((createdEdge) => {
               createdEdgesList.push(createdEdge);
+            }).catch((e) => {
+              reject(e);
             });
           });
         }
@@ -198,7 +210,8 @@ class ElementCreator {
     const edgeId = element?.tag?.edgeId;
     if (portsList?.length > 0) {
       const filteredPortsList = [];
-      portsList.filter((el) => el?.data?.owner?.id === nodeId || el?.data?.owner?.id === edgeId)
+      portsList.filter(({ data }) => data
+          && (data?.owner?.id === nodeId || data?.owner?.id === edgeId))
         .forEach((port) => {
           const xPos = port?.data?.position?.x;
           const yPos = port?.data?.position?.y;
@@ -349,10 +362,12 @@ class ElementCreator {
     location,
     id,
   }) {
+    const { x, y } = location;
+    const offset = 1.5;
     const createdNode = graph.createNode({
       layout: new Rect(
-        location.x - 1.5,
-        location.y - 1.5,
+        x - offset,
+        y - offset,
         3,
         3,
       ),
@@ -388,73 +403,70 @@ class ElementCreator {
     return createdNode;
   }
 
+  static isString(value) {
+    return typeof value === 'string';
+  }
+
+  static createNodeForEdge({
+    graph,
+    nodes,
+    data,
+  }) {
+    let port = ElementCreator.getPortById({
+      graph,
+      portId: data?.port?.id,
+    });
+    // Target node
+    let node = null;
+    if (port?.owner) {
+      node = port.owner;
+    } else {
+      node = nodes.find((el) => el.tag.nodeId === data.node.nodeId);
+      const isStringId = ElementCreator.isString(data?.port?.id);
+      if (!port) {
+        if (isStringId) {
+          port = graph.addPort(
+            node,
+            FreeNodePortLocationModel.NODE_BOTTOM_ANCHORED,
+          );
+        }
+        if (data?.port?.location && !isStringId) {
+          port = graph.addPortAt(
+            node,
+            data.port.location,
+          );
+        }
+      }
+    }
+    return {
+      node,
+      port,
+    };
+  }
+
   static createEdge({
     graph,
     edge,
   }) {
+    const nodes = graph.nodes.toArray();
     return new Promise((resolve) => {
-      let targetPort = typeof edge?.target?.port?.id === 'number'
-        ? ElementCreator.getTargetPort({
-          graph,
-          targetPortId: edge?.target?.port?.id,
-        })
-        : null;
-      let sourcePort = typeof edge?.source?.port?.id === 'number'
-        ? ElementCreator.getSourcePort({
-          graph,
-          sourcePortId: edge?.source?.port?.id,
-        })
-        : null;
-      let targetNode = null;
-      if (targetPort?.owner) {
-        targetNode = targetPort?.owner;
-      } else {
-        targetNode = graph.nodes.toArray()
-          .find((el) => el.tag.nodeId === edge.target.node);
-        console.log('1', targetNode);
-        if (
-          !targetPort
-            && (edge?.target?.port?.location
-                || typeof edge?.target?.port?.id === 'string')
-        ) {
-          if (typeof edge?.target?.port?.id === 'string') {
-            targetPort = graph.addPort(
-              targetNode,
-              FreeNodePortLocationModel.NODE_BOTTOM_ANCHORED,
-            );
-          }
-          if (edge?.target?.port?.location) {
-            targetPort = graph.addPortAt(
-              targetNode,
-              edge.target.port.location,
-            );
-          }
-        }
-      }
-      let sourceNode = null;
-      if (sourcePort?.owner) {
-        sourceNode = sourcePort?.owner;
-      } else {
-        sourceNode = graph.nodes.toArray()
-          .find((el) => el.tag.nodeId === edge.source.node);
-        if (
-          !sourcePort
-            && (typeof edge?.source?.port?.id === 'string'
-                || edge?.source?.port?.location)
-        ) {
-          if (typeof edge.source.port.id === 'string') {
-            sourcePort = graph.addPortAt(
-              sourceNode,
-              edge.source.port.location,
-            );
-          } else {
-            sourcePort = graph.addPortAt(
-              sourceNode,
-              edge.source.port.location,
-            );
-          }
-        }
-      }
+      const {
+        node: targetNode,
+        port: targetPort,
+      } = ElementCreator.createNodeForEdge({
+        graph,
+        nodes,
+        data: edge?.target,
+      });
+      const {
+        node: sourceNode,
+        port: sourcePort,
+      } = ElementCreator.createNodeForEdge({
+        graph,
+        nodes,
+        data: edge?.source,
+      });
+
       const result = {};
       if (sourceNode) result.sourceNode = sourceNode;
       if (targetNode) result.targetNode = targetNode;
@@ -463,6 +475,16 @@ class ElementCreator {
       resolve(result);
     }).then((response) => new Promise((resolve, reject) => {
       let createdEdge;
+      const { style: savedStyle } = edge;
+      const strokeSize = typeof savedStyle.strokeSize === 'number'
+        ? `${savedStyle.strokeSize}px`
+        : savedStyle.strokeSize;
+      const style = new PolylineEdgeStyle({
+        smoothingLength: savedStyle.smoothingLength,
+        stroke: `${strokeSize} solid ${savedStyle.strokeColor}`,
+        targetArrow: 'none',
+        sourceArrow: 'none',
+      });
       if (response?.sourcePort && response?.targetPort) {
         if (!ElementCreator.checkCreatedEdge({
           graph,
@@ -473,14 +495,7 @@ class ElementCreator {
             targetNode: response.targetNode,
             sourcePort: response.sourcePort,
             targetPort: response.targetPort,
-            style: new PolylineEdgeStyle({
-              smoothingLength: edge.style.smoothingLength,
-              stroke: `${typeof edge.style.strokeSize === 'number'
-                ? `${edge.style.strokeSize}px`
-                : edge.style.strokeSize} solid ${edge.style.strokeColor}`,
-              targetArrow: 'none',
-              sourceArrow: 'none',
-            }),
+            style,
             tag: edge.tag,
           });
         }
@@ -488,14 +503,7 @@ class ElementCreator {
         createdEdge = graph.createEdge({
           source: response.sourceNode,
           target: response.targetNode,
-          style: new PolylineEdgeStyle({
-            smoothingLength: edge.style.smoothingLength,
-            stroke: `${typeof edge.style.strokeSize === 'number'
-              ? `${edge.style.strokeSize}px`
-              : edge.style.strokeSize} solid ${edge.style.strokeColor}`,
-            targetArrow: 'none',
-            sourceArrow: 'none',
-          }),
+          style,
           tag: edge.tag,
         });
       }
@@ -527,10 +535,10 @@ class ElementCreator {
     const sourcePortPosX = edge?.sourcePort?.location?.x;
     const sourcePortPosY = edge?.sourcePort?.location?.y;
     return graph.edges.toArray()
-      .some((el) => el.sourcePort.location.x === sourcePortPosX
-            && el.sourcePort.location.y === sourcePortPosY
-            && el.targetPort.location.x === targetPortPosX
-            && el.targetPort.location.y === targetPortPosY);
+      .some(({ sourcePort, targetPort }) => sourcePort.location.x === sourcePortPosX
+            && sourcePort.location.y === sourcePortPosY
+            && targetPort.location.x === targetPortPosX
+            && targetPort.location.y === targetPortPosY);
   }
 
   static createPort({

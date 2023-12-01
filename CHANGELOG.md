@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Constructor-schemes: Fixed color handling on text items when plotting a survey from a data source
+- Constructor-schemes: Refactoring of the method for creating lines was performed
 
 ## [1.161.0]
 
