@@ -186,15 +186,13 @@ export default {
     },
     firstDataRowMetricList() {
       return Object.keys(this.firstDataRow).filter(
-        (key) => {
-          return key.indexOf('caption') === -1
+        (key) => key.indexOf('caption') === -1
             && key.indexOf('annotation') === -1
-            && !/^_.+_options$/.test(key);
-        },
+            && !/^_.+_options$/.test(key),
       );
     },
     restDataRows() {
-      return this.dataRestFrom.filter((row) => row[this.xMetric] !== null)
+      return this.dataRestFrom.filter((row) => row[this.xMetric] !== null);
     },
     metrics() {
       return [...this.firstDataRowMetricList.filter((item) => !/^_.*_mark$/.test(item) && item !== this.xMetric)];
@@ -226,19 +224,19 @@ export default {
     mapMetricsOptions() {
       const options = new Map();
       this.dataRestFrom
-        .filter(row => row[this.xMetric] === null)
-          .forEach(row => {
-            Object.keys(row)
-              .filter(key => /^_(\w+)_options$/.test(key))
-              .forEach(key => {
-                try {
-                  const metricName = key.match(/^_(\w+)_options$/)[1]
-                  options.set(metricName, JSON.parse(row[key].replaceAll("'", '"')))
-                } catch (err) {
-                  console.warn(err)
-                }
-              })
-          })
+        .filter((row) => row[this.xMetric] === null)
+        .forEach((row) => {
+          Object.keys(row)
+            .filter((key) => /^_(\w+)_options$/.test(key))
+            .forEach((key) => {
+              try {
+                const metricName = key.match(/^_(\w+)_options$/)[1];
+                options.set(metricName, JSON.parse(row[key].replaceAll("'", '"')));
+              } catch (err) {
+                console.warn(err);
+              }
+            });
+        });
       return options;
     },
     metricsByGroup() {
@@ -255,7 +253,7 @@ export default {
               metric = {
                 ...metric,
                 ...rowOptions,
-              }
+              };
             }
             if (this.metrics.includes(metric.name)) {
               existsMetrics.push(metric.name);
@@ -351,7 +349,7 @@ export default {
         this.updateLegendHeight();
         this.$nextTick(() => {
           this.updateBox();
-        })
+        });
       }
     },
     dataRestFrom() {
