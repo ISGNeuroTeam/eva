@@ -189,7 +189,7 @@ export default {
         (key) => {
           return key.indexOf('caption') === -1
             && key.indexOf('annotation') === -1
-            && !/^_\w+_options$/.test(key);
+            && !/^_.+_options$/.test(key);
         },
       );
     },
@@ -211,9 +211,10 @@ export default {
         xAxisCaptionRotate,
         barplotstyle,
       } = this.options;
+      const firstDataRow = this.restDataRows[0] || {};
       return {
         xMetric: this.xMetric,
-        type: (this.options?.stringOX || !ChartClass.isTimestamp(this.firstDataRow[this.xMetric]))
+        type: (this.options?.stringOX || !ChartClass.isTimestamp(firstDataRow[this.xMetric]))
           ? 'linear' // linear, time, - log, point, band
           : 'time',
         timeFormat,

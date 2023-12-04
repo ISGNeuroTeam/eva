@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- MultiLine:
+  - Detection X axis data type
+  - Using space and other symbols in config from data source
 
 ## [1.161.0]
 
