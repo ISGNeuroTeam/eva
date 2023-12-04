@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Date-picker: Fixed range handling, 23 hours and 59 minutes is added to the final date
 
 ## [1.161.0]
 

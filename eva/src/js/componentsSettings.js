@@ -799,7 +799,11 @@ export default {
       description: 'Формат даты для результата',
       elem: 'text-field',
       default: '',
-      placeholder: 'Пример: YYYY-MM-DD HH:mm',
+      placeholder(options) {
+        return options.hideTimeSelect
+          ? 'Пример: YYYY-MM-DD'
+          : 'Пример: YYYY-MM-DD HH:mm';
+      },
     },
     {
       option: 'hideTimeSelect',
