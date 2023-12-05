@@ -10,8 +10,16 @@ onmessage = async (event) => {
   const response = await fetch('/api/makejob', {
     method: 'POST',
     body: formData,
-  });
-  const answer = await response.json();
+  }).catch(error => (error.message));
+  if (typeof response === 'string') {
+    return postMessage({
+      status: 'failed',
+      statusText: response,
+      error: response,
+      answer: response,
+    });
+  }
+  const answer = await response.json().catch(error => error);
   const { sid } = searchFrom;
   const { url, statusText } = response;
   let { status } = response;
@@ -81,13 +89,20 @@ onmessage = async (event) => {
             `Запрос выполнить не удалось.&nbsp;&nbsp;Ошибка: ${error}`,
           ]);
           status = 'failed';
-          result = [];
+          result = {
+            status: 'failed',
+            error: `${error.message}`,
+          };
           clearTimeout(timeOut);
+          return resolve(result);
         });
       // если запрос не прошел то вернем ответ с ошибкой
       if (responseGet !== 200 && responseGet !== 0) {
         status = 'failed';
-        result.push('failed');
+        result = {
+          status: 'failed',
+          error: responseGet === undefined ? 'Ошибка сети' : `${resEvents.status}: ${resEvents.statusText}`,
+        };
         clearTimeout(timeOut);
         // если прошёл
       } else {
@@ -111,6 +126,7 @@ onmessage = async (event) => {
       if (
         status === 'success'
         || status === 'failed'
+        // || status === 'nocache'
       ) {
         clearTimeout(timeOut);
         resolve(result);
@@ -161,7 +177,12 @@ onmessage = async (event) => {
     ]);
     let schema = null;
     const allData = new Promise((resolve) => {
-      dataResponse.json().then(async (res) => {
+      dataResponse.json()
+        .catch(error => {
+          console.error(error)
+          return resolve([])
+        })
+        .then(async (res) => {
         if (res.status === 'success') {
           log.push([
             new Date(),

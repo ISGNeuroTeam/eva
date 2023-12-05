@@ -13,6 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.161.0]
+
+### Added
+- Export dashboard and scheme to PDF
+- Animation of data source icons
+- Datepicker: added date range selection buttons: Q1, Q2, H1, Q3, 9 months, Q4, H2
+
+### Changed
+- Constructor-schemes: The foreignObject of the text element has been changed to text for correct processing in pdf.
+
+### Fixed
+- At 500 error, the visualization dashboard continues to display the loading line
+
 ## [1.160.0]
 
 ### Added

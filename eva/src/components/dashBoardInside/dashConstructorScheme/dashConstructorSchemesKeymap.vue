@@ -340,7 +340,7 @@ $padding-x: 24px;
     grid-area: hotkeys;
     display: flex;
     flex-wrap: nowrap;
-    justify-content: end;
+    justify-content: flex-end;
   }
   &__hotkey-item {
     display: flex;

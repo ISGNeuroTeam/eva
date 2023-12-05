@@ -397,6 +397,7 @@ export default {
       'useLastTimeTemplate',
       'lastTimeTemplateStart',
       'lastTimeTemplateEnd',
+      'expandRangeBtnsSet',
     ],
     graph: [
       'boxShadow',
@@ -797,6 +798,16 @@ export default {
       relation() {
         return false;
       },
+      default: false,
+    },
+    {
+      option: 'expandRangeBtnsSet',
+      description: 'Расширить набор кнопок выбора диапазона дат (1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.)',
+      relation() {
+        // Вызывается в контексте modalSettings
+        return !this.options?.selectingExactDate;
+      },
+      elem: 'switch',
       default: false,
     },
     {

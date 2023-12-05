@@ -1289,6 +1289,7 @@ export default {
         ? structuredClone(this.dataObject[listField][index])
         : structuredClone(this.dataObject);
       updateValue[field] = {
+        hex: evt.hex,
         rgbaObject: evt.rgba,
         rgbaString: `rgba(${evt.rgba.r}, ${evt.rgba.g}, ${evt.rgba.b}, ${evt.rgba.a})`,
       };
