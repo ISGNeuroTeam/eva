@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Export to PDF handles element scroll position
+- Export to PDF handles element transparent background
+
 ## [1.160.0]
 
 ### Added

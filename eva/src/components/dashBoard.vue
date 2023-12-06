@@ -324,7 +324,9 @@
                               class="icon"
                               :color="theme.$main_border"
                               v-on="on"
-                              @click="isFrequencyGraph ? $refs.screenCard.$emit('resetZoom') : resetRange()"
+                              @click="isFrequencyGraph
+                                ? $refs.screenCard.$emit('resetZoom')
+                                : resetRange()"
                             >
                               {{ props.mdiMagnifyMinusOutline }}
                             </v-icon>
@@ -1433,16 +1435,39 @@ export default {
 <style lang="sass">
 @import '../sass/dashBoard.sass'
 </style>
-<style lang="sass" scoped>
-.source-descr
-  overflow: auto
-  .source-descr__markdown::v-deep
-    margin: 8px 16px 0
-    color: var(--main_text)
-    text-align: left
-    table
-      width: 100%
+<style lang="scss" scoped>
+.source-descr {
+  overflow: auto;
+
+  .source-descr__markdown::v-deep {
+    margin: 8px 16px 0;
+    color: var(--main_text);
+    text-align: left;
+
+    table {
+      width: 100%;
+    }
+  }
+}
+
+.dash-layout.no-bg {
+  .dash-block {
+    border-color: transparent !important;
+  }
+  > div {
+    background: none !important;
+    .v-data-table--container,
+    .dash-single .number-block,
+    .dash-single .number-block .number {
+      background: transparent !important;
+    }
+  }
+  .loading-divider {
+    border-color: transparent !important;
+  }
+}
 </style>
+
 <style lang="sass">
 .settings-dash
   .v-icon:hover::after

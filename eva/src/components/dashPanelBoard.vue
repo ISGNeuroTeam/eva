@@ -2531,13 +2531,141 @@ export default {
                   || el?.classList?.contains('block-save')
                 );
               },
+              onclone: (container) => {
+                const allTableEl = container.querySelectorAll('.tabulator-tableholder');
+                const docAllTableEl = document.querySelectorAll('.tabulator-tableholder');
+
+                allTableEl.forEach((el, index) => {
+                  const tempContainer = document.createElement('div');
+                  tempContainer.style.width = el.style.width;
+                  tempContainer.style.height = el.style.height;
+                  tempContainer.style.overflow = 'hidden';
+
+                  tempContainer.classList = el.classList;
+                  tempContainer.innerHTML = el.innerHTML;
+
+                  tempContainer.children[0]
+                    .style.transform = `translate(-${docAllTableEl[index].scrollLeft}px, -${docAllTableEl[index].scrollTop}px`;
+
+                  if (el.parentElement) {
+                    const headersNode = el.parentElement.querySelector('.tabulator-headers');
+                    const headersCloneNode = headersNode.cloneNode(true);
+                    headersCloneNode.style.transform = `translate(-${docAllTableEl[index].scrollLeft}px, 0px)`;
+                    headersNode.parentElement.replaceChild(headersCloneNode, headersNode);
+                  }
+                  el.parentElement.replaceChild(tempContainer, el);
+                });
+
+                const allHeatmapEl = container.querySelectorAll('.heatmap-table');
+                const docAllHeatmapEl = document.querySelectorAll('.heatmap-table');
+
+                allHeatmapEl.forEach((el, index) => {
+                  const tableEl = el.querySelector('.v-data-table__wrapper');
+                  const originTableEl = docAllHeatmapEl[index].querySelector('.v-data-table__wrapper');
+
+                  const tempContainer = document.createElement('div');
+                  tempContainer.style.width = tableEl.style.width;
+                  tempContainer.style.height = tableEl.style.height;
+                  // tempContainer.style.overflow = 'auto';
+                  tempContainer.style.overflow = 'hidden';
+
+                  tempContainer.classList = tableEl.classList;
+                  tempContainer.innerHTML = tableEl.innerHTML;
+
+                  const hMapHeaderRow = tempContainer.querySelector('.heatmap-table__relative-row');
+
+                  hMapHeaderRow.style.transform = `translate(-${originTableEl.scrollLeft}px, 0px)`;
+
+                  tempContainer.querySelector('.heatmap-table__sticky-column')
+                    .style.transform = `translate(${originTableEl.scrollLeft}px, 0px)`;
+
+                  const hMapBody = tempContainer.querySelector('tbody');
+
+                  hMapBody.style.transform = `translate(-${originTableEl.scrollLeft}px, -${originTableEl.scrollTop}px`;
+
+                  const hMapBodyFirstCols = tempContainer.querySelectorAll('.heatmap-table__sticky-column');
+
+                  hMapBodyFirstCols.forEach((col) => {
+                    col.style.transform = `translate(${originTableEl.scrollLeft}px, 0px)`;
+                  });
+
+                  tableEl.parentElement.replaceChild(tempContainer, tableEl);
+                });
+
+                const allTileEl = container.querySelectorAll('.dash-tile');
+                const docAllTileEl = document.querySelectorAll('.dash-tile');
+
+                allTileEl.forEach((el, index) => {
+                  //   if (el.scrollTop > 0) {
+
+                  const tempContainer = document.createElement('div');
+                  tempContainer.style.width = el.style.width;
+                  tempContainer.style.height = el.style.height;
+                  // tempContainer.style.overflow = 'auto';
+                  tempContainer.style.overflow = 'hidden';
+
+                  tempContainer.classList = el.classList;
+                  tempContainer.innerHTML = el.innerHTML;
+
+                  tempContainer.children[0]
+                    .style.transform = `translate(0px, -${docAllTileEl[index].scrollTop}px`;
+
+                  el.parentElement.replaceChild(tempContainer, el);
+                });
+
+                const allTextareaEl = container.querySelectorAll('.textarea-itself textarea');
+                const docAllTextareaEl = document.querySelectorAll('.textarea-itself textarea');
+
+                allTextareaEl.forEach((el, index) => {
+                  const tempContainer = document.createElement('div');
+                  const tempContainerInside = document.createElement('div');
+                  tempContainer.style.width = el.style.width;
+                  tempContainer.style.height = el.style.height;
+                  tempContainer.style.paddingRight = '12px';
+                  tempContainer.style.overflow = 'hidden';
+
+                  tempContainer.classList = el.classList;
+                  tempContainerInside.innerHTML = el.innerHTML;
+                  tempContainer.appendChild(tempContainerInside);
+
+                  tempContainer.children[0]
+                    .style.transform = `translate(0px, -${docAllTextareaEl[index].scrollTop}px`;
+
+                  el.parentElement.replaceChild(tempContainer, el);
+                });
+
+                const allDfEl = container.querySelectorAll('.dynamicForm');
+                const docAllDfEl = document.querySelectorAll('.dynamicForm');
+
+                allDfEl.forEach((el, index) => {
+                  const tempContainer = document.createElement('div');
+                  tempContainer.style.width = el.style.width;
+                  tempContainer.style.height = el.style.height;
+                  tempContainer.style.paddingRight = '12px';
+                  el.parentElement.style.overflow = 'hidden';
+
+                  tempContainer.classList = el.classList;
+                  tempContainer.innerHTML = el.innerHTML;
+
+                  tempContainer.style.transform = `translate(0px, -${docAllDfEl[index].parentElement.scrollTop - 2}px`;
+
+                  el.parentElement.replaceChild(tempContainer, el);
+                });
+
+                const allNoBgEl = container.querySelectorAll('.no-bg');
+
+                allNoBgEl.forEach((el) => {
+                  el.children[0].style.background = 'none';
+                });
+
+                return container;
+              },
             },
           ).then((dataUrl) => {
             const pdf = new JsPDF({
               orientation: sizeArray[0] > sizeArray[1] ? 'l' : 'p',
               unit: 'pt',
               format: sizeArray,
-              // compress: true,
               putOnlyUsedFonts: true,
             });
             pdf.addImage(dataUrl, 'PNG', 0, 0, sizeArray[0], sizeArray[1]);
