@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MultiLine:
   - Detection X axis data type
   - Using space and other symbols in config from data source
+  - Caption order on barplots
 
 ## [1.161.0]
 
