@@ -227,10 +227,10 @@ export default {
         .filter((row) => row[this.xMetric] === null)
         .forEach((row) => {
           Object.keys(row)
-            .filter((key) => /^_(\w+)_options$/.test(key))
+            .filter((key) => /^_.+_options$/.test(key))
             .forEach((key) => {
               try {
-                const metricName = key.match(/^_(\w+)_options$/)[1];
+                const metricName = key.match(/^_(.+)_options$/)[1];
                 options.set(metricName, JSON.parse(row[key].replaceAll("'", '"')));
               } catch (err) {
                 console.warn(err);
@@ -290,7 +290,7 @@ export default {
           } else {
             metricsByGroup[metricsByGroup.length - 1].push(metric);
           }
-          // если тащим настройки со старого мультилайна то добавим группы для не united графиков
+          // если тащим настройки со старого мультилайна, то добавим группы для не united графиков
           if (this.options?.united === false && nN !== newMetrics.length - 1) {
             metricsByGroup.push([]);
           }
@@ -628,10 +628,9 @@ export default {
 
 .settings-icon
   float: right
-  margin: 8px 2px
   color: $secondary-text !important
   cursor: pointer
-  margin-bottom: -8px
+  margin: 8px 2px -8px
 
 .svg-container
   position: relative
