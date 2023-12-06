@@ -183,9 +183,15 @@
                 v-on="on"
                 @click="openSearchCode"
               >
-                <v-icon>
-                  {{ search_icon }}
-                </v-icon>
+                <v-progress-circular
+                  class="ds-progress"
+                  :rotate="90"
+                  :value="hasLoadingSearches"
+                  :width="2"
+                  :class="{'hidden-progress': !hasLoadingSearches}"
+                >
+                  <v-icon>{{ search_icon }}</v-icon>
+                </v-progress-circular>
               </v-btn>
             </template>
             <span>Источники данных</span>
@@ -1278,9 +1284,17 @@ export default {
       'isAdmin',
       'permissions',
     ]),
+    hasLoadingSearches() {
+      if (!this.searches.length) {
+        return 0;
+      }
+      const pending = this.searches.filter((search) => search?.status === 'pending').length;
+      return pending / this.searches.length * 100;
+    },
     editMode() {
       return this.dashFromStore?.editMode;
     },
+
     getColorError() {
       if (!this.$store.state.logError) {
         this.$store.commit('setState', [
@@ -2532,6 +2546,7 @@ export default {
                 );
               },
               onclone: (container) => {
+                // tabulator
                 const allTableEl = container.querySelectorAll('.tabulator-tableholder');
                 const docAllTableEl = document.querySelectorAll('.tabulator-tableholder');
 
@@ -2556,6 +2571,7 @@ export default {
                   el.parentElement.replaceChild(tempContainer, el);
                 });
 
+                // heatmap
                 const allHeatmapEl = container.querySelectorAll('.heatmap-table');
                 const docAllHeatmapEl = document.querySelectorAll('.heatmap-table');
 
@@ -2566,7 +2582,6 @@ export default {
                   const tempContainer = document.createElement('div');
                   tempContainer.style.width = tableEl.style.width;
                   tempContainer.style.height = tableEl.style.height;
-                  // tempContainer.style.overflow = 'auto';
                   tempContainer.style.overflow = 'hidden';
 
                   tempContainer.classList = tableEl.classList;
@@ -2578,6 +2593,10 @@ export default {
 
                   tempContainer.querySelector('.heatmap-table__sticky-column')
                     .style.transform = `translate(${originTableEl.scrollLeft}px, 0px)`;
+
+                  tempContainer.querySelector('table').style.position = 'relative';
+                  tempContainer.querySelector('thead').style.position = 'inherit';
+                  tempContainer.querySelector('thead').style.zIndex = '1';
 
                   const hMapBody = tempContainer.querySelector('tbody');
 
@@ -2592,16 +2611,14 @@ export default {
                   tableEl.parentElement.replaceChild(tempContainer, tableEl);
                 });
 
+                // tile
                 const allTileEl = container.querySelectorAll('.dash-tile');
                 const docAllTileEl = document.querySelectorAll('.dash-tile');
 
                 allTileEl.forEach((el, index) => {
-                  //   if (el.scrollTop > 0) {
-
                   const tempContainer = document.createElement('div');
                   tempContainer.style.width = el.style.width;
                   tempContainer.style.height = el.style.height;
-                  // tempContainer.style.overflow = 'auto';
                   tempContainer.style.overflow = 'hidden';
 
                   tempContainer.classList = el.classList;
@@ -2613,6 +2630,7 @@ export default {
                   el.parentElement.replaceChild(tempContainer, el);
                 });
 
+                // textarea
                 const allTextareaEl = container.querySelectorAll('.textarea-itself textarea');
                 const docAllTextareaEl = document.querySelectorAll('.textarea-itself textarea');
 
@@ -2634,6 +2652,7 @@ export default {
                   el.parentElement.replaceChild(tempContainer, el);
                 });
 
+                // dynamicForm
                 const allDfEl = container.querySelectorAll('.dynamicForm');
                 const docAllDfEl = document.querySelectorAll('.dynamicForm');
 
@@ -2652,12 +2671,43 @@ export default {
                   el.parentElement.replaceChild(tempContainer, el);
                 });
 
+                // grid-group
+                const allGgEl = container.querySelectorAll('.dash-grid-group > div');
+                const docAllGgEl = document.querySelectorAll('.dash-grid-group > div');
+
+                allGgEl.forEach((el, index) => {
+                  const tempContainer = document.createElement('div');
+                  tempContainer.style.width = el.style.width;
+                  tempContainer.style.height = el.style.height;
+                  tempContainer.style.overflow = 'hidden';
+
+                  tempContainer.classList = el.classList;
+                  tempContainer.innerHTML = el.innerHTML;
+
+                  tempContainer.children[0].style.transform = `translate(0px, -${docAllGgEl[index].scrollTop - 2}px`;
+
+                  el.parentElement.replaceChild(tempContainer, el);
+                });
+
+                // select
+                const allSelectEl = container.querySelectorAll('.target.select_show .v-select__selections');
+                const docAllSelectEl = document.querySelectorAll('.target.select_show .v-select__selections');
+
+                allSelectEl.forEach((el, index) => {
+                  el.style.overflow = 'hidden';
+                  el.style.paddingRight = '10px';
+
+                  el.querySelectorAll('.v-select__selection')
+                    .forEach((item) => {
+                      item.style.transform = `translate(0px, -${docAllSelectEl[index].scrollTop}px`;
+                    });
+                });
+
                 const allNoBgEl = container.querySelectorAll('.no-bg');
 
                 allNoBgEl.forEach((el) => {
                   el.children[0].style.background = 'none';
                 });
-
                 return container;
               },
             },
@@ -2684,7 +2734,7 @@ export default {
 @import '../sass/dashPanelBoard.sass';
 </style>
 
-<style scoped>
+<style lang="scss" scoped>
 .iconsNavigations {
   display: flex;
   justify-content: center;
@@ -2731,5 +2781,20 @@ export default {
   position: absolute;
   opacity: 0;
   z-index: -1;
+}
+
+.ds-progress {
+  .v-progress-circular__overlay {
+    transform-origin: bottom;
+    transform: rotateX(180deg);
+  }
+  .v-progress-circular__underlay {
+    transition: stroke 0.6s ease-in-out;
+  }
+  &.hidden-progress {
+    .v-progress-circular__underlay {
+      stroke: transparent;
+    }
+  }
 }
 </style>

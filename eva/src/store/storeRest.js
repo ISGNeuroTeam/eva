@@ -24,7 +24,9 @@ export default {
         });
         worker.onmessage = (event) => {
           // console.log('[response] worker: %s', searchFrom.sid/*, event.data*/)
-          worker.terminate();
+          if (process.env.NODE_ENV === 'production') {
+            worker.terminate();
+          }
           const {
             error,
             data,
@@ -140,13 +142,19 @@ export default {
                     `Запрос выполнить не удалось.&nbsp;&nbsp;Ошибка: ${error}`,
                   );
                   status = 'failed';
-                  result = [];
+                  result = {
+                    status: 'failed',
+                    error: `${error.message}`,
+                  };
                   clearTimeout(timeOut);
                 });
               // если запрос не прошел то вернем ответ с ошибкой
               if (responseGet !== 200 && responseGet !== 0) {
                 status = 'failed';
-                result.push('failed');
+                result = {
+                  status: 'failed',
+                  error: `${resEvents.status}: ${resEvents.statusText}`,
+                };
                 clearTimeout(timeOut);
                 // если прошёл
               } else {

@@ -10,9 +10,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+
+### Fixed
+- Constructor-schemes: Fixed color handling on text items when plotting a survey from a data source
+- Constructor-schemes: Refactoring of the method for creating lines was performed
+
+## [1.161.0]
+
+### Added
+- Export dashboard and scheme to PDF
+- Animation of data source icons
+- Datepicker: added date range selection buttons: Q1, Q2, H1, Q3, 9 months, Q4, H2
+
+### Changed
 - Constructor-schemes: The foreignObject of the text element has been changed to text for correct processing in pdf.
 
 ### Fixed
+- At 500 error, the visualization dashboard continues to display the loading line
 
 - Export to PDF handles element scroll position
 - Export to PDF handles element transparent background
@@ -36,8 +50,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - event go can accept external links
-- export dashboard to PDF
-- export scheme to PDF
 
 ### Changed
 - Updated the top panel UX/UI

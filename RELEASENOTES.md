@@ -1,3 +1,16 @@
+# [1.161.0] - 2023-11-30
+
+### Added
+- Ability to export dashboard and scheme to PDF.
+- Animated data source icons.
+- Datepicker: Added date range selection buttons for Q1, Q2, H1, Q3, 9 months, Q4, and H2.
+
+### Changed
+- Constructor-schemes: Modified the foreignObject of the text element to text for correct processing in PDF.
+
+### Fixed
+- Resolved an issue where the visualization dashboard continues to display the loading line even in the case of a 500 error.
+
 # [1.160.0] - 2023-11-24
 
 ### Added
