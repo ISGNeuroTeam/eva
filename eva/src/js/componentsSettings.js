@@ -395,7 +395,7 @@ export default {
       'useLastTimeTemplate',
       'lastTimeTemplateStart',
       'lastTimeTemplateEnd',
-      'expandRangeBtnsSet',
+      'rangeBtnList',
     ],
     graph: [
       'boxShadow',
@@ -757,14 +757,44 @@ export default {
       default: false,
     },
     {
-      option: 'expandRangeBtnsSet',
-      description: 'Расширить набор кнопок выбора диапазона дат (1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.)',
+      option: 'rangeBtnList',
+      description: 'Набор кнопок выбора диапазона дат',
       relation() {
         // Вызывается в контексте modalSettings
         return !this.options?.selectingExactDate;
       },
-      elem: 'switch',
-      default: false,
+      elem: 'select-checkbox',
+      default: [
+        'thisDay',
+        'lastDay',
+        'thisWeek',
+        'lastWeek',
+        'last7Days',
+        'last30Days',
+        'thisMonth',
+        'lastMonth',
+        'thisYear',
+        'lastYear',
+      ],
+      items: [
+        { value: 'thisDay', text: 'текущий день' },
+        { value: 'lastDay', text: 'предыдущий день' },
+        { value: 'thisWeek', text: 'текущая неделя' },
+        { value: 'lastWeek', text: 'пред. неделя' },
+        { value: 'last7Days', text: 'последние 7 дней' },
+        { value: 'last30Days', text: 'последние 30 дней' },
+        { value: 'thisMonth', text: 'текущий месяц' },
+        { value: 'lastMonth', text: 'пред. месяц' },
+        { value: 'kv1', text: '1 кв.' },
+        { value: 'kv2', text: '2 кв.' },
+        { value: 'kv1-2', text: '1 пг.' },
+        { value: 'kv3', text: '3 кв.' },
+        { value: 'kv1-3', text: '9 месяцев' },
+        { value: 'kv4', text: '4 кв.' },
+        { value: 'kv3-4', text: '2 пг.' },
+        { value: 'thisYear', text: 'текущий год' },
+        { value: 'lastYear', text: 'пред. год' },
+      ],
     },
     {
       option: 'showLastTimeBlock',
@@ -830,7 +860,9 @@ export default {
           && this.options.useLastTimeTemplate;
       },
       elem: 'text-field',
+      // eslint-disable-next-line no-template-curly-in-string
       default: 'now() - ${sec}',
+      // eslint-disable-next-line no-template-curly-in-string
       placeholder: 'Пример: now() - ${sec}',
     },
     {
