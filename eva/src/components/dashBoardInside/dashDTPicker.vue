@@ -454,6 +454,41 @@ export default {
           },
         ]);
       }
+      const pickerDate = this.dashFromStore.date;
+      if (!this.options?.timeOutputFormat) {
+        if (this.hideTimeSelect) {
+          if (pickerDate.end && pickerDate.start) {
+            // start-end
+            return {
+              ...pickerDate,
+              endForStore: this.addEndTime(
+                pickerDate.end,
+                this.defaultFormatWithoutTime,
+              ),
+            };
+          }
+          if (pickerDate.range) {
+            // range
+            return {
+              ...pickerDate,
+              endForStore: this.addEndTime(
+                pickerDate.range.end,
+                this.defaultFormatWithoutTime,
+              ),
+            };
+          }
+        }
+        if (pickerDate.range) {
+          // range
+          return {
+            ...pickerDate,
+            endForStore: this.addEndTime(
+              pickerDate.range.end,
+              this.defaultFormat,
+            ),
+          };
+        }
+      }
       // возвращаем либо новый созданный либо имеющийся
       return this.dashFromStore.date;
     },
@@ -605,6 +640,7 @@ export default {
   mounted() {
     this.setTokenAction();
     this.date = structuredClone(this.getPickerDate);
+    this.commitTokenValue();
     if (this.date?.last?.time) {
       this.last = this.date.last;
       this.setTime(this.date.last.time);
@@ -775,9 +811,6 @@ export default {
         end: null,
         shortcut: undefined,
       };
-      const start = null;
-      const end = null;
-      const rangeStr = '';
       switch (elem) {
         case 'dt':
           if (this.start) {
@@ -794,6 +827,7 @@ export default {
               date: this.end,
               oldFormat,
               newFormat,
+              isEnd: true,
             });
           } else {
             this.end = null;
@@ -812,6 +846,7 @@ export default {
               date: this.range.end,
               oldFormat,
               newFormat,
+              isEnd: true,
             });
           }
           this.range = range;
@@ -1115,6 +1150,13 @@ export default {
       isEnd = false,
       isTime = false,
     }) {
+      console.log({
+        date,
+        oldFormat,
+        newFormat,
+        isEnd,
+        isTime,
+      });
       if (date === null) return '';
       const {
         timeOutputFormat = '',
@@ -1136,24 +1178,22 @@ export default {
       }
       if (isEnd) {
         if (this.hideTimeSelect) {
-          return +moment(date, this.defaultFormatWithoutTime)
-            .set({
-              hour: 23,
-              minute: 59,
-            })
-            .format('X');
+          return this.addEndTime(date, this.defaultFormatWithoutTime);
         }
         if (this.range) {
-          return +moment(date, this.defaultFormat)
-            .set({
-              hour: 23,
-              minute: 59,
-            })
-            .format('X');
+          return this.addEndTime(date, this.defaultFormat);
         }
       }
 
       return +moment(date, this.defaultFormat).format('X');
+    },
+    addEndTime(date, format) {
+      return +moment(date, format)
+        .set({
+          hour: 23,
+          minute: 59,
+        })
+        .format('X');
     },
     setDate() {
       if (this.getElementType) {
@@ -1171,8 +1211,8 @@ export default {
         elem: this.idFrom,
         action: 'select',
         value: {
-          start: this.startForStore || '',
-          end: this.endForStore || '',
+          start: this.startForStore || this.date.startForStore || '',
+          end: this.endForStore || this.date.endForStore || '',
           exact: this.exactDateForStore || '',
         },
       });
