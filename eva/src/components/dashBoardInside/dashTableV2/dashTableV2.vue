@@ -724,6 +724,8 @@ export default {
         this.tabulator = null;
       }
       this.tabulator = new Tabulator(this.$refs[this.idFrom], {
+        renderHorizontal: 'basic',
+        renderVertical: 'basic',
         addRowPos: 'top',
         placeholder: 'Нет данных для отображения', // display message to user on empty table
         popupContainer: `#${this.idFrom}`,
