@@ -1150,13 +1150,6 @@ export default {
       isEnd = false,
       isTime = false,
     }) {
-      console.log({
-        date,
-        oldFormat,
-        newFormat,
-        isEnd,
-        isTime,
-      });
       if (date === null) return '';
       const {
         timeOutputFormat = '',
