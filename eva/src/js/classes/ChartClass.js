@@ -313,9 +313,7 @@ export default class ChartClass {
     const linearMetrics = metrics.filter((metric) => (['line', 'scatter'].includes(metric.type)));
     linearMetrics.forEach((metric) => {
       const axisSide = metric.yAxisSide === 'right' ? 'Right' : 'Left';
-
       const extendMetrics = linearMetrics.filter(({ yAxisLink }) => yAxisLink === metric.name);
-
       let min = d3.min(this.data, (d) => (typeof d[metric.name] === 'string' ? +d[metric.name] : d[metric.name]));
       let max = d3.max(this.data, (d) => (typeof d[metric.name] === 'string' ? +d[metric.name] : d[metric.name]));
       let addClassName = '';
@@ -639,7 +637,7 @@ export default class ChartClass {
   }
 
   set groups(val) {
-    this.groupNumberList = val//.sort();
+    this.groupNumberList = val;// .sort();
     this.groupCount = val.length;
   }
 
@@ -954,22 +952,22 @@ export default class ChartClass {
       .data(data)
       .enter()
       .append('g')
-        .attr('transform', (d, i, els) => {
-          let offset = [-5, -6];
-          if (ig === 0) {
-            offset[0] += 8;
-            ig += 1;
-          }
-          let xPos = this.x(d[this.xMetric]);
-          if (metric.type === 'barplot' && this.options.xAxis.barplotType === 'divided') {
-            xPos += metric.n * this.barplotWidth * 1.1;
-          }
-          let yPos = this.y[metric.yAxisLink || metric.name](d[metric.name]);
-          if (metric.type === 'barplot' && d[metric.name] < 0) {
-            yPos += 15;
-          }
-          return `translate(${xPos + offset[0]}, ${yPos + offset[1]})`;
-        })
+      .attr('transform', (d) => {
+        const offset = [-5, -6];
+        if (ig === 0) {
+          offset[0] += 8;
+          ig += 1;
+        }
+        let xPos = this.x(d[this.xMetric]);
+        if (metric.type === 'barplot' && this.options.xAxis.barplotType === 'divided') {
+          xPos += metric.n * this.barplotWidth * 1.1;
+        }
+        let yPos = this.y[metric.yAxisLink || metric.name](d[metric.name]);
+        if (metric.type === 'barplot' && d[metric.name] < 0) {
+          yPos += 15;
+        }
+        return `translate(${xPos + offset[0]}, ${yPos + offset[1]})`;
+      })
       .append('text')
       .style('font-size', '11')
       .style('pointer-events', 'none')
@@ -978,22 +976,22 @@ export default class ChartClass {
       .attr('class', `metric metric-${metric.n}`)
       .text((d) => ChartClass.valueToText(metric, d, numberFormat));
     // text styles
-    this.styleTextElemByMetric(text, metric)
+    this.styleTextElemByMetric(text, metric);
   }
 
   styleTextElemByMetric(text, metric) {
     if (metric.showTextStyles) {
       if (metric.pointTextSize) {
-        text.style('font-size', metric.pointTextSize)
+        text.style('font-size', metric.pointTextSize);
       }
       if (metric.pointTextWeight) {
-        text.style('font-weight', metric.pointTextWeight)
+        text.style('font-weight', metric.pointTextWeight);
       }
       if (metric.pointTextAngle) {
-        text.style('transform', `rotate(${metric.pointTextAngle}deg)`)
+        text.style('transform', `rotate(${metric.pointTextAngle}deg)`);
       }
       if (metric.pointTextChangeColor) {
-        text.style('fill', metric.pointTextColor?.hex || metric.pointTextColor)
+        text.style('fill', metric.pointTextColor?.hex || metric.pointTextColor);
       }
     }
   }
@@ -1259,11 +1257,11 @@ export default class ChartClass {
         if (d[1] !== null && d.metric.showText && showText) {
           const text = d3.select(this.parentNode)
             .append('g')
-              .attr('transform', () => {
-                const x = this.x.baseVal.value + barWidth / 2;
-                const y = this.y.baseVal.value + (d[1] < 0 ? (this.height.baseVal.value - 2) : 11)
-                return `translate(${x}, ${y})`
-              })
+            .attr('transform', () => {
+              const x = this.x.baseVal.value + barWidth / 2;
+              const y = this.y.baseVal.value + (d[1] < 0 ? (this.height.baseVal.value - 2) : 11);
+              return `translate(${x}, ${y})`;
+            })
             .append('text')
             .attr('class', `metric metric-${d.metric.n}`)
             .attr('font-size', '11')
@@ -1274,7 +1272,7 @@ export default class ChartClass {
             .attr('stroke-width', 0)
             .text(`${ChartClass.valueToText(d.metric, d.data, numberFormat)} ${d.metric.unit || ''}`);
           // text styles
-          styleTextElemByMetric(text, d.metric)
+          styleTextElemByMetric(text, d.metric);
         }
       });
   }
@@ -1302,15 +1300,19 @@ export default class ChartClass {
       .append('g')
       .attr('transform', (d) => `translate(${this.x(d[this.xMetric]) - barWidth / 2},0)`)
       .selectAll('rect')
-      .data((d) => subgroups.map((key) => ({
-        key,
-        value: d[key],
-        color: metricByKeys[key].color,
-        n: metricByKeys[key].n,
-        metric: metricByKeys[key],
-        data: d,
-        _pn: numBar += +(d[key] !== null),
-      })))
+      .data((d) => {
+        // eslint-disable-next-line no-underscore-dangle,no-multi-assign
+        const _pn = numBar += 1;
+        return subgroups.map((key) => ({
+          key,
+          value: d[key],
+          color: metricByKeys[key].color,
+          n: metricByKeys[key].n,
+          metric: metricByKeys[key],
+          data: d,
+          _pn,
+        }));
+      })
       .enter()
       .append('rect')
       .attr('clip-path', `url(#group-rect-${num}-${this.id})`)
@@ -1360,22 +1362,22 @@ export default class ChartClass {
         if (d.value !== null && d.metric.showText && showText) {
           const text = d3.select(this.parentNode)
             .append('g')
-              .attr('transform', () => {
-                const x = this.x.baseVal.value + xSubgroup.bandwidth() / 2;
-                const y = this.y.baseVal.value;
-                const height = this.height.baseVal.value;
-                let posY = y;
-                if (d.value < 0) {
-                  posY += height + 10;
-                } else {
-                  posY -= 2;
-                }
-                if (posY + 2 > groupHeight) {
-                  posY -= 12;
-                  this.darkText = true;
-                }
-                return `translate(${x}, ${posY})`;
-              })
+            .attr('transform', () => {
+              const x = this.x.baseVal.value + xSubgroup.bandwidth() / 2;
+              const y = this.y.baseVal.value;
+              const height = this.height.baseVal.value;
+              let posY = y;
+              if (d.value < 0) {
+                posY += height + 10;
+              } else {
+                posY -= 2;
+              }
+              if (posY + 2 > groupHeight) {
+                posY -= 12;
+                this.darkText = true;
+              }
+              return `translate(${x}, ${posY})`;
+            })
             .append('text')
             .attr('class', `metric metric-${d.metric.n}`)
             .attr('font-size', '10')
@@ -1384,7 +1386,7 @@ export default class ChartClass {
             .attr('fill', this.darkText ? 'var(--main_bg)' : 'var(--main_text)')
             .text(`${ChartClass.valueToText(d.metric, d.data, numberFormat)} ${d.metric.unit || ''}`);
 
-          styleTextElemByMetric(text, d.metric)
+          styleTextElemByMetric(text, d.metric);
         }
       });
   }
@@ -1459,7 +1461,7 @@ export default class ChartClass {
     }
     const { zerosAfterDot } = metric;
     if (zerosAfterDot === -1) {
-      return val
+      return val;
     }
     return (zerosAfterDot % 1 === 0 && zerosAfterDot >= 0 && zerosAfterDot <= 100)
       ? Number.parseFloat(val).toLocaleString(numberFormat, {
