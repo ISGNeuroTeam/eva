@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- MultiLine: The default x-axis is __time_, then _time_, then the first of the columns
 
 ### Fixed
 - MultiLine:

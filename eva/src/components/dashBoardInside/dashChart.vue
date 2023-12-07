@@ -305,6 +305,13 @@ export default {
       if (xMetric) {
         return xMetric;
       }
+      const findXMetrics = ['_time', 'time'];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const name of findXMetrics) {
+        if (this.firstDataRowMetricList.includes(name)) {
+          return name;
+        }
+      }
       const [firstMetric] = this.firstDataRowMetricList;
       return firstMetric;
     },
