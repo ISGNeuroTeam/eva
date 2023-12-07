@@ -680,23 +680,24 @@ export default {
         vk2title.set('1-2', '1 пг.');
         vk2title.set('1-3', '9 месяцев');
         vk2title.set('3-4', '2 пг.');
+        // eslint-disable-next-line no-restricted-syntax
         for (const kv of [1, 2, '1-2', 3, '1-3', 4, '3-4']) {
           shortcuts.push({
             key: `${kv}kv`,
             label: vk2title.get(kv) || `${kv} кв.`,
             value: () => {
-              let [start, end] = typeof kv === 'string' ? kv.split('-') : [kv, kv];
+              const [start, end] = typeof kv === 'string' ? kv.split('-') : [kv, kv];
               return {
                 start: moment().quarter(start).startOf('quarter'),
                 end: moment().quarter(end).endOf('quarter'),
-              }
+              };
             },
-          })
+          });
         }
       }
 
-      shortcuts.push({ key: 'thisYear', label: 'текущий год', value: 'year' })
-      shortcuts.push({ key: 'lastYear', label: 'пред. год', value: '-year' })
+      shortcuts.push({ key: 'thisYear', label: 'текущий год', value: 'year' });
+      shortcuts.push({ key: 'lastYear', label: 'пред. год', value: '-year' });
       return shortcuts;
     },
   },
@@ -766,6 +767,120 @@ export default {
   },
   methods: {
     // new
+    // TODO: Временно, для обновления старых компонентов на новую версию
+    updaterFn() {
+      if (this.getPickerDate) {
+        const picker = this.getPickerDate;
+        if (picker.range) {
+          this.$store.commit('setState', [{
+            object: this.getOptions,
+            prop: 'pickerMode',
+            value: 'range',
+          }]);
+          this.$store.commit('setState', [{
+            object: this.pickerValue,
+            prop: 'range',
+            value: {
+              value: picker.range,
+              valueForTokens: {
+                start: picker.startForStore,
+                end: picker.endForStore,
+              },
+            },
+          }]);
+        }
+        if (picker.start || picker.end) {
+          this.$store.commit('setState', [{
+            object: this.getOptions,
+            prop: 'pickerMode',
+            value: 'startEnd',
+          }]);
+          this.$store.commit('setState', [{
+            object: this.pickerValue,
+            prop: 'range',
+            value: {
+              value: {
+                start: picker.start,
+                end: picker.end,
+              },
+              valueForTokens: {
+                start: picker.startForStore,
+                end: picker.endForStore,
+              },
+            },
+          }]);
+        }
+        if (picker.startCus || picker.endCus) {
+          this.$store.commit('setState', [{
+            object: this.getOptions,
+            prop: 'pickerMode',
+            value: 'startEndManual',
+          }]);
+          this.$store.commit('setState', [{
+            object: this.pickerValue,
+            prop: 'startEndManual',
+            value: {
+              value: {
+                start: picker.startCus,
+                end: picker.endCus,
+              },
+              valueForTokens: {
+                start: picker.startForStore,
+                end: picker.endForStore,
+              },
+            },
+          }]);
+        }
+        if (picker.exactDate) {
+          this.$store.commit('setState', [{
+            object: this.getOptions,
+            prop: 'pickerMode',
+            value: 'exact',
+          }]);
+          this.$store.commit('setState', [{
+            object: this.pickerValue,
+            prop: 'exact',
+            value: {
+              value: picker.exactDate,
+              valueForTokens: picker.exactDateForStore,
+            },
+          }]);
+        }
+        if (picker.exactDateCustom) {
+          this.$store.commit('setState', [{
+            object: this.getOptions,
+            prop: 'pickerMode',
+            value: 'exactManual',
+          }]);
+          this.$store.commit('setState', [{
+            object: this.pickerValue,
+            prop: 'exactManual',
+            value: {
+              value: picker.exactDateCustom,
+              valueForTokens: picker.exactDateForStore,
+            },
+          }]);
+        }
+        if (picker.last.time || picker.last.every) {
+          this.$store.commit('setState', [{
+            object: this.getOptions,
+            prop: 'pickerMode',
+            value: 'time',
+          }]);
+          this.$store.commit('setState', [{
+            object: this.pickerValue,
+            prop: 'time',
+            value: {
+              value: {
+                time: picker.last.time,
+                every: picker.last.every,
+              },
+              valueForTokens: null,
+            },
+          }]);
+        }
+      }
+    },
     setDefaultPickerMode() {
       this.$store.commit('setState', [{
         object: this.getOptions,
@@ -777,7 +892,7 @@ export default {
       this.$store.commit('setState', [{
         object: this.getVisualFromStore,
         prop: 'pickerValue',
-        value: this.localValue,
+        value: this.localValue[this.getPickerMode],
       }]);
     },
     setPickerValue(value, mode) {
@@ -789,9 +904,16 @@ export default {
           value: null,
         }]);
       }
+      if (!this.getVisualFromStore?.pickerValue) {
+        this.$store.commit('setState', [{
+          object: this.getVisualFromStore,
+          prop: 'pickerValue',
+          value: null,
+        }]);
+      }
       this.$store.commit('setState', [{
-        object: this.getVisualFromStore.pickerValue,
-        prop: mode,
+        object: this.getVisualFromStore,
+        prop: 'pickerValue',
         value: structuredClone(value),
       }]);
     },
