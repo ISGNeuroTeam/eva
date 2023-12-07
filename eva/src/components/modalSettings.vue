@@ -194,7 +194,6 @@
                     v-else-if="field.elem === 'select-checkbox'"
                     v-model="options[field.option]"
                     :items="field.items"
-                    :placeholder="field.default"
                     :color="theme.$primary_button"
                     :style="{ color: theme.$main_text, fill: theme.$main_text }"
                     hide-details
@@ -1750,6 +1749,8 @@ export default {
                 this.pieType = options[item];
               } else if (item === 'color') {
                 localOptions[item] = options[item] || '';
+              } else if (item === 'rangeBtnList') {
+                localOptions[item] = options[item].length ? [...options[item]] : [];
               } else if (item === 'fillColor') {
                 if (this.accumulators?.length === 0) {
                   const defaultAccumulator = this.metrics.map(() => ({
