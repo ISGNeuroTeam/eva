@@ -1,3 +1,23 @@
+# [1.162.0] - 2023-12-07
+
+### Added
+- GridGroup: Implemented error output for dynamic visualization elements.
+
+### Changed
+- Date-picker: Updated the setting of the list of range buttons.
+- MultiLine: Adjusted the default order of x-axis columns to prioritize __time_, then _time_, and finally the first column.
+
+### Fixed
+- Export to PDF now considers element scroll position and supports transparent backgrounds.
+- Date-picker: Fixed range handling, 23 hours and 59 minutes is added to the final date.
+- MultiLine:
+  - Improved detection of X-axis data type.
+  - Resolved issues with using space and other symbols in the configuration from the data source.
+  - Corrected the order of captions on barplots.
+- Constructor-schemes:
+  - Fixed color handling on text items when plotting a survey from a data source.
+  - Performed refactoring of the method for creating lines.
+
 # [1.161.0] - 2023-11-30
 
 ### Added

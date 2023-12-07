@@ -186,15 +186,13 @@ export default {
     },
     firstDataRowMetricList() {
       return Object.keys(this.firstDataRow).filter(
-        (key) => {
-          return key.indexOf('caption') === -1
+        (key) => key.indexOf('caption') === -1
             && key.indexOf('annotation') === -1
-            && !/^_\w+_options$/.test(key);
-        },
+            && !/^_.+_options$/.test(key),
       );
     },
     restDataRows() {
-      return this.dataRestFrom.filter((row) => row[this.xMetric] !== null)
+      return this.dataRestFrom.filter((row) => row[this.xMetric] !== null);
     },
     metrics() {
       return [...this.firstDataRowMetricList.filter((item) => !/^_.*_mark$/.test(item) && item !== this.xMetric)];
@@ -211,9 +209,10 @@ export default {
         xAxisCaptionRotate,
         barplotstyle,
       } = this.options;
+      const firstDataRow = this.restDataRows[0] || {};
       return {
         xMetric: this.xMetric,
-        type: (this.options?.stringOX || !ChartClass.isTimestamp(this.firstDataRow[this.xMetric]))
+        type: (this.options?.stringOX || !ChartClass.isTimestamp(firstDataRow[this.xMetric]))
           ? 'linear' // linear, time, - log, point, band
           : 'time',
         timeFormat,
@@ -225,19 +224,19 @@ export default {
     mapMetricsOptions() {
       const options = new Map();
       this.dataRestFrom
-        .filter(row => row[this.xMetric] === null)
-          .forEach(row => {
-            Object.keys(row)
-              .filter(key => /^_(\w+)_options$/.test(key))
-              .forEach(key => {
-                try {
-                  const metricName = key.match(/^_(\w+)_options$/)[1]
-                  options.set(metricName, JSON.parse(row[key].replaceAll("'", '"')))
-                } catch (err) {
-                  console.warn(err)
-                }
-              })
-          })
+        .filter((row) => row[this.xMetric] === null)
+        .forEach((row) => {
+          Object.keys(row)
+            .filter((key) => /^_.+_options$/.test(key))
+            .forEach((key) => {
+              try {
+                const metricName = key.match(/^_(.+)_options$/)[1];
+                options.set(metricName, JSON.parse(row[key].replaceAll("'", '"')));
+              } catch (err) {
+                console.warn(err);
+              }
+            });
+        });
       return options;
     },
     metricsByGroup() {
@@ -254,7 +253,7 @@ export default {
               metric = {
                 ...metric,
                 ...rowOptions,
-              }
+              };
             }
             if (this.metrics.includes(metric.name)) {
               existsMetrics.push(metric.name);
@@ -291,7 +290,7 @@ export default {
           } else {
             metricsByGroup[metricsByGroup.length - 1].push(metric);
           }
-          // если тащим настройки со старого мультилайна то добавим группы для не united графиков
+          // если тащим настройки со старого мультилайна, то добавим группы для не united графиков
           if (this.options?.united === false && nN !== newMetrics.length - 1) {
             metricsByGroup.push([]);
           }
@@ -305,6 +304,13 @@ export default {
       const { xMetric = null } = xAxis;
       if (xMetric) {
         return xMetric;
+      }
+      const findXMetrics = ['_time', 'time'];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const name of findXMetrics) {
+        if (this.firstDataRowMetricList.includes(name)) {
+          return name;
+        }
       }
       const [firstMetric] = this.firstDataRowMetricList;
       return firstMetric;
@@ -350,7 +356,7 @@ export default {
         this.updateLegendHeight();
         this.$nextTick(() => {
           this.updateBox();
-        })
+        });
       }
     },
     dataRestFrom() {
@@ -629,10 +635,9 @@ export default {
 
 .settings-icon
   float: right
-  margin: 8px 2px
   color: $secondary-text !important
   cursor: pointer
-  margin-bottom: -8px
+  margin: 8px 2px -8px
 
 .svg-container
   position: relative
