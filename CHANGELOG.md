@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Constructor-schemes: Refactoring of the method for creating lines was performed
 - Export to PDF handles element scroll position
 - Export to PDF handles element transparent background
+- Date-picker: Fixed range handling, 23 hours and 59 minutes is added to the final date
 
 ## [1.161.0]
 
