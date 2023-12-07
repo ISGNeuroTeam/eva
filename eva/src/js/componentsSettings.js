@@ -788,7 +788,7 @@ export default {
         { value: 'kv1', text: '1 кв.' },
         { value: 'kv2', text: '2 кв.' },
         { value: 'kv1-2', text: '1 пг.' },
-        { value: 'kv3', text: '1 кв.' },
+        { value: 'kv3', text: '3 кв.' },
         { value: 'kv1-3', text: '9 месяцев' },
         { value: 'kv4', text: '4 кв.' },
         { value: 'kv3-4', text: '2 пг.' },
