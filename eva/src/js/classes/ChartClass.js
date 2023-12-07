@@ -313,9 +313,7 @@ export default class ChartClass {
     const linearMetrics = metrics.filter((metric) => (['line', 'scatter'].includes(metric.type)));
     linearMetrics.forEach((metric) => {
       const axisSide = metric.yAxisSide === 'right' ? 'Right' : 'Left';
-
       const extendMetrics = linearMetrics.filter(({ yAxisLink }) => yAxisLink === metric.name);
-
       let min = d3.min(this.data, (d) => (typeof d[metric.name] === 'string' ? +d[metric.name] : d[metric.name]));
       let max = d3.max(this.data, (d) => (typeof d[metric.name] === 'string' ? +d[metric.name] : d[metric.name]));
       let addClassName = '';
