@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GridGroup: Added error output for dynamic visualization elements
 
 ### Changed
+- DatePicker: changed setting of the list of range buttons
 
 ### Fixed
 - Constructor-schemes: Fixed color handling on text items when plotting a survey from a data source
