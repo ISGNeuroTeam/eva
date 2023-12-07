@@ -8,19 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.162.0]
+
+### Added
 - GridGroup: Added error output for dynamic visualization elements
 
 ### Changed
 - MultiLine: The default x-axis is __time_, then _time_, then the first of the columns
+- DatePicker: changed setting of the list of range buttons
 
 ### Fixed
 - MultiLine:
   - Detection X axis data type
   - Using space and other symbols in config from data source
   - Caption order on barplots
-- DatePicker: changed setting of the list of range buttons
 - Constructor-schemes: Fixed color handling on text items when plotting a survey from a data source
 - Constructor-schemes: Refactoring of the method for creating lines was performed
+- Export to PDF handles element scroll position
+- Export to PDF handles element transparent background
 
 ## [1.161.0]
 
@@ -34,9 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - At 500 error, the visualization dashboard continues to display the loading line
-
-- Export to PDF handles element scroll position
-- Export to PDF handles element transparent background
 
 ## [1.160.0]
 
