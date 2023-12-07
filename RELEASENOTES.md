@@ -4,11 +4,12 @@
 - GridGroup: Implemented error output for dynamic visualization elements.
 
 ### Changed
-- DatePicker: Updated the setting of the list of range buttons.
+- Date-picker: Updated the setting of the list of range buttons.
 - MultiLine: Adjusted the default order of x-axis columns to prioritize __time_, then _time_, and finally the first column.
 
 ### Fixed
 - Export to PDF now considers element scroll position and supports transparent backgrounds.
+- Date-picker: Fixed range handling, 23 hours and 59 minutes is added to the final date.
 - MultiLine:
   - Improved detection of X-axis data type.
   - Resolved issues with using space and other symbols in the configuration from the data source.
