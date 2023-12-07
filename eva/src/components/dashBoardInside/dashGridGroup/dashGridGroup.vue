@@ -51,9 +51,15 @@
                 v-text="mdiSettings"
               />
             </div>
+            <div
+              v-if="item.errorForElem"
+              class="absolute--top absolute absolute--center-h"
+            >
+              {{ item.errorMessageForElem +', id элемента ' + item.row.id }}
+            </div>
             <v-card-text
-              v-if="gridRendered"
               :is="item.dash"
+              v-if="gridRendered && !item.errorForElem"
               :id-from="item.visualizationId"
               :id-dash-from="idDash"
               :color-from="theme"
@@ -370,8 +376,6 @@ export default {
             }
             if (!this.dataForVisualizations[visualizationId]) {
               this.updateDataRestVisualizations(item, visualizationId);
-            } else if (this.dataForVisualizations[visualizationId]?.data?.length === 0) {
-              this.updateDataRestVisualizations(item, visualizationId);
             }
             const params = {
               row: item,
@@ -385,6 +389,8 @@ export default {
               optionKey,
               dataRest: this.dataForVisualizations[visualizationId],
               hasSettings: !!vizOptions.mainSettings,
+              errorForElem: this.dataForVisualizations[visualizationId]?.errorForElem,
+              errorMessageForElem: this.dataForVisualizations[visualizationId]?.errorMessageForElem,
             };
             if (!this.settings[visualizationId]) {
               this.$set(this.settings, visualizationId, {});
@@ -449,12 +455,12 @@ export default {
   methods: {
     onGridResize() {
       // даем сформировать размер сетки
-      this.gridRendered = false
+      this.gridRendered = false;
       if (this.renderTO) clearInterval(this.renderTO);
       this.renderTO = setTimeout(() => {
         // после - рендер компонентов
-        this.gridRendered = true
-      }, 10)
+        this.gridRendered = true;
+      }, 10);
     },
     setRange({ range }, item) {
       const { xMetric = '_time' } = this.$store.state[this.idDash][item.visualizationId].options?.xAxis || {};
@@ -523,20 +529,29 @@ export default {
         this.$set(
           this.dataForVisualizations,
           visualizationId,
-          structuredClone({ data: res.data, schema: res.schema }),
+          structuredClone({
+            data: res.data,
+            schema: res.schema,
+            errorForElem: !res.data,
+            errorMessageForElem: !res.data ? 'Нет данных для отображения' : '',
+          }),
         );
       });
     },
     updateDataRestVisualizations(item, visualizationId) {
+      const elementDataSources = this.dataSourcesBySid.find((obj) => obj.sid === item.source);
       if (item.source.includes('|')) {
         this.getDataRest(item, visualizationId);
-      } else {
-        this.$set(
-          this.dataForVisualizations,
-          visualizationId,
-          structuredClone(this.dataSourcesBySid.find((obj) => obj.sid === item.source)),
-        );
       }
+      this.$set(
+        this.dataForVisualizations,
+        visualizationId,
+        structuredClone({
+          ...elementDataSources,
+          errorForElem: !elementDataSources,
+          errorMessageForElem: !elementDataSources ? 'Нет данных для отображения' : '',
+        }),
+      );
     },
   },
 };

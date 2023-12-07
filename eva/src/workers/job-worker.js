@@ -10,7 +10,7 @@ onmessage = async (event) => {
   const response = await fetch('/api/makejob', {
     method: 'POST',
     body: formData,
-  }).catch(error => (error.message));
+  }).catch((error) => (error.message));
   if (typeof response === 'string') {
     return postMessage({
       status: 'failed',
@@ -19,7 +19,7 @@ onmessage = async (event) => {
       answer: response,
     });
   }
-  const answer = await response.json().catch(error => error);
+  const answer = await response.json().catch((error) => error);
   const { sid } = searchFrom;
   const { url, statusText } = response;
   let { status } = response;
@@ -178,107 +178,107 @@ onmessage = async (event) => {
     let schema = null;
     const allData = new Promise((resolve) => {
       dataResponse.json()
-        .catch(error => {
-          console.error(error)
-          return resolve([])
+        .catch((error) => {
+          console.error(error);
+          return resolve([]);
         })
         .then(async (res) => {
-        if (res.status === 'success') {
-          log.push([
-            new Date(),
-            `Данные из запроса ${
-              searchFrom.sid
-            }:&nbsp;&nbsp;${res.data_urls.join(' ; ')}`,
-          ]);
+          if (res.status === 'success') {
+            log.push([
+              new Date(),
+              `Данные из запроса ${
+                searchFrom.sid
+              }:&nbsp;&nbsp;${res.data_urls.join(' ; ')}`,
+            ]);
 
-          const promise = res.data_urls.map((item, i) => {
-            if (item.indexOf('SCHEMA') !== -1) {
-              schema = i;
-            }
-            return fetch(`/${item}`, { cache: 'no-store' });
-          });
+            const promise = res.data_urls.map((item, i) => {
+              if (item.indexOf('SCHEMA') !== -1) {
+                schema = i;
+              }
+              return fetch(`/${item}`, { cache: 'no-store' });
+            });
 
-          let resultProm = await Promise.all(promise);
+            let resultProm = await Promise.all(promise);
 
-          const dataProm = resultProm
-            .map((prom, i) => new Promise((resultPromResolve) => {
-              prom.text().then((dataitself) => {
-                if (schema === i) {
-                  schema = dataitself;
-                }
-                const resultData = [];
-                // все это потому что там не совсем json,
-                // а строка состоящая из строка в json
-                dataitself.split('\n').forEach((dataPeace) => {
-                  if (dataPeace[0] === '{') {
-                    try {
-                      resultData.push(JSON.parse(dataPeace));
-                    } catch (error) {
-                      console.error(error);
+            const dataProm = resultProm
+              .map((prom, i) => new Promise((resultPromResolve) => {
+                prom.text().then((dataitself) => {
+                  if (schema === i) {
+                    schema = dataitself;
+                  }
+                  const resultData = [];
+                  // все это потому что там не совсем json,
+                  // а строка состоящая из строка в json
+                  dataitself.split('\n').forEach((dataPeace) => {
+                    if (dataPeace[0] === '{') {
+                      try {
+                        resultData.push(JSON.parse(dataPeace));
+                      } catch (error) {
+                        console.error(error);
+                      }
                     }
+                  });
+                  resultPromResolve(resultData);
+                });
+              }));
+
+            resultProm = await Promise.all(dataProm);
+            const resolveData = resultProm.reduce((data, item) => {
+              data = data.concat(item);
+              return data;
+            }, []);
+
+            if (schema != null && schema !== '') {
+              const keys = [];
+              const values = [];
+              try {
+                schema
+                  .replace('``', '＂')
+                  .match(/`([^`]+)`\s(\w+(\([\d,]+)?)[^,]/g)
+                  .forEach((str) => {
+                    const [, key, value] = str.match(/^`(.*)`\s(.*)$/);
+                    keys.push(key.replace('＂', '`'));
+                    values.push(value);
+                  });
+              } catch (err) {
+                console.warn(`%cНе удалось прочитать схему данных! _SCHEMA: %c${schema}`, 'font-weight: bold', 'font-weight: normal');
+                console.error(err);
+                notifications.push({
+                  id: 'schema-error-reading',
+                  message: 'Не удалось прочитать схему данных',
+                  read: false,
+                  type: 'error',
+                });
+              }
+
+              schema = {};
+              keys.forEach((item, i) => {
+                schema[item] = values[i];
+              });
+
+              resolveData.forEach((item, i) => {
+                const resolveDataItemKeys = Object.keys(item);
+                Object.keys(schema).forEach((itemSchem) => {
+                  if (!resolveDataItemKeys.includes(itemSchem)) {
+                    resolveData[i][itemSchem] = null;
                   }
                 });
-                resultPromResolve(resultData);
-              });
-            }));
-
-          resultProm = await Promise.all(dataProm);
-          const resolveData = resultProm.reduce((data, item) => {
-            data = data.concat(item);
-            return data;
-          }, []);
-
-          if (schema != null && schema !== '') {
-            const keys = [];
-            const values = [];
-            try {
-              schema
-                .replace('``', '＂')
-                .match(/`([^`]+)`\s(\w+(\([\d,]+)?)[^,]/g)
-                .forEach((str) => {
-                  const [, key, value] = str.match(/^`(.*)`\s(.*)$/);
-                  keys.push(key.replace('＂', '`'));
-                  values.push(value);
-                });
-            } catch (err) {
-              console.warn(`%cНе удалось прочитать схему данных! _SCHEMA: %c${schema}`, 'font-weight: bold', 'font-weight: normal');
-              console.error(err);
-              notifications.push({
-                id: 'schema-error-reading',
-                message: 'Не удалось прочитать схему данных',
-                read: false,
-                type: 'error',
               });
             }
 
-            schema = {};
-            keys.forEach((item, i) => {
-              schema[item] = values[i];
-            });
-
-            resolveData.forEach((item, i) => {
-              const resolveDataItemKeys = Object.keys(item);
-              Object.keys(schema).forEach((itemSchem) => {
-                if (!resolveDataItemKeys.includes(itemSchem)) {
-                  resolveData[i][itemSchem] = null;
-                }
-              });
-            });
+            log.push([
+              new Date(),
+              `Все данные из запроса ${searchFrom.sid} обработаны  успешно.&nbsp;&nbsp;status: ${res.status}`,
+            ]);
+            resolve(resolveData);
+          } else {
+            log.push([
+              new Date(),
+              `Обработать данные из запроса ${searchFrom.sid} не удалось.&nbsp;&nbsp;status: ${res.status}&nbsp;&nbsp;Ошибка: ${res.error};`,
+            ]);
+            resolve([]);
           }
-
-          log.push([
-            new Date(),
-            `Все данные из запроса ${searchFrom.sid} обработаны  успешно.&nbsp;&nbsp;status: ${res.status}`,
-          ]);
-          resolve(resolveData);
-        } else {
-          log.push([
-            new Date(),
-            `Обработать данные из запроса ${searchFrom.sid} не удалось.&nbsp;&nbsp;status: ${res.status}&nbsp;&nbsp;Ошибка: ${res.error};`,
-          ]);
-          resolve([]);
-        }
-      });
+        });
     });
     delete answer.data;
     return postMessage({
