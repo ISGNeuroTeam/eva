@@ -130,7 +130,9 @@
                   <v-text-field
                     v-else-if="field.elem === 'text-field'"
                     v-model="options[field.option]"
-                    :placeholder="field.placeholder"
+                    :placeholder="typeof field.placeholder === 'function'
+                      ? field.placeholder(options)
+                      : field.placeholder"
                     clearable
                     :color="theme.$primary_button"
                     :style="{

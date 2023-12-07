@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DatePicker: changed setting of the list of range buttons
 - Constructor-schemes: Fixed color handling on text items when plotting a survey from a data source
 - Constructor-schemes: Refactoring of the method for creating lines was performed
+- Date-picker: Fixed range handling, 23 hours and 59 minutes is added to the final date
 
 ## [1.161.0]
 

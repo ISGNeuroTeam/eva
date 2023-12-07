@@ -892,10 +892,20 @@ export default {
         } else {
           this.range = data.range;
         }
-        current = [
-          data.range?.start || '',
-          data.range?.end || '',
-        ].join(' - ');
+        if (!this.hideTimeSelect && data.range?.end) {
+          current = [
+            data.range?.start || '',
+            moment(data.range.end, this.dateTimeFormat).set({
+              hour: 23,
+              minute: 59,
+            }).format(this.dateTimeFormat),
+          ].join(' - ');
+        } else {
+          current = [
+            data.range?.start || '',
+            data.range?.end || '',
+          ].join(' - ');
+        }
       }
 
       if (data.startCus !== null) {
@@ -998,6 +1008,7 @@ export default {
           });
           this.endForStore = this.formatDateToResult({
             date: this.end,
+            isEnd: true,
           });
           this.clearFields([
             'start',
@@ -1015,6 +1026,7 @@ export default {
             });
             this.endForStore = this.formatDateToResult({
               date: this.range.end,
+              isEnd: true,
             });
           }
           this.clearFields([
@@ -1097,11 +1109,15 @@ export default {
       }
     },
     formatDateToResult({
-      date, oldFormat, newFormat, isTime,
+      date,
+      oldFormat = '',
+      newFormat = '',
+      isEnd = false,
+      isTime = false,
     }) {
       if (date === null) return '';
       const {
-        timeOutputFormat = null,
+        timeOutputFormat = '',
       } = this.options;
       if (isTime) {
         if (timeOutputFormat || newFormat) {
@@ -1118,10 +1134,26 @@ export default {
       if (timeOutputFormat) {
         return moment(date, timeOutputFormat).format(timeOutputFormat);
       }
-      return parseInt(
-        new Date(date).getTime() / 1000,
-        10,
-      );
+      if (isEnd) {
+        if (this.hideTimeSelect) {
+          return +moment(date, this.defaultFormatWithoutTime)
+            .set({
+              hour: 23,
+              minute: 59,
+            })
+            .format('X');
+        }
+        if (this.range) {
+          return +moment(date, this.defaultFormat)
+            .set({
+              hour: 23,
+              minute: 59,
+            })
+            .format('X');
+        }
+      }
+
+      return +moment(date, this.defaultFormat).format('X');
     },
     setDate() {
       if (this.getElementType) {
