@@ -99,6 +99,7 @@ Vue.component(
 Vue.component('dash-select', require('./components/dashBoardInside/dashSelect.vue').default);
 // элемент выбора даты и времени
 Vue.component('dash-picker', () => import('./components/dashBoardInside/dashDTPicker.vue'));
+Vue.component('dash-pickerV2', () => import('./components/dashBoardInside/dashDatePickerV2.vue'));
 // элемент вывода числа
 Vue.component('dash-single', () => import('./components/dashBoardInside/dashSingle.vue'));
 // элумент круговой шкалы

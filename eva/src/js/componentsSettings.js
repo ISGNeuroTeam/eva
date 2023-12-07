@@ -75,6 +75,7 @@ export default {
     },
 
     { name: 'Выбор времени', img: mdiCalendarMonth, type: 'picker' },
+    { name: 'Выбор времени UPD', img: mdiCalendarMonth, type: 'pickerV2' },
     { name: 'Граф', img: mdiGraphql, type: 'ygraph' },
     // { name: 'Граф_old', img: mdiGraph, type: 'graph' },
     { name: 'Диаграмма Гантта', img: mdiChartGantt, type: 'guntt' },
@@ -177,6 +178,10 @@ export default {
     picker: {
       width: 365,
       height: 195,
+    },
+    pickerV2: {
+      width: 365,
+      height: 100,
     },
     select: {
       width: 480,
@@ -305,6 +310,7 @@ export default {
     guntt: mdiChartGantt,
     select: mdiFormatListBulleted,
     picker: mdiCalendarMonth,
+    pickerV2: mdiCalendarMonth,
     single: mdiNumeric,
     button: mdiGestureTap,
     textarea: mdiCardTextOutline,
@@ -398,6 +404,9 @@ export default {
       'lastTimeTemplateStart',
       'lastTimeTemplateEnd',
       'expandRangeBtnsSet',
+    ],
+    pickerV2: [
+      'pickerOptions',
     ],
     graph: [
       'boxShadow',
@@ -1620,6 +1629,7 @@ export default {
     fromDataSearches: [
       'menu',
       'picker',
+      'pickerV2',
       'dynamicForm',
     ],
   },
