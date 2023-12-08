@@ -154,18 +154,17 @@
                           <v-autocomplete
                             v-model="metric.yAxisLink"
                             :items="metricLineList
-                              .filter(m => m.name !== xAxis.xMetric)
-                              .filter(m => m.group === groupNumber
-                                && m.type === 'line'
+                              .filter(m => m.name !== xAxis.xMetric
+                                // && m.type === 'line'
+                                && m.group === groupNumber
                                 && !m.yAxisLink
                                 && m.name !== metric.name
-                                && metricLineList
-                                  .findIndex(m => m.yAxisLink === metric.name) === -1)
+                              )
                               .map(m => ({
                                 value: m.name,
                                 text: m.name,
                               }))"
-                            :disabled="metric.type !== 'line' || !useGroups || commonAxisY"
+                            :disabled="commonAxisY || metric.type !== 'line'"
                             label="Ось Y"
                             persistent-placeholder
                             dense
@@ -468,7 +467,8 @@
                                   :max="42"
                                   @change="(val) => {
                                     const [min, max] = [5, 42]
-                                    metric.pointTextSize = val < min ? min : (val > max ? max : val);
+                                    // eslint-disable-next-line max-len
+                                    metric.pointTextSize = (val < min) ? min : (val > max ? max : val);
                                   }"
                                 />
                               </v-col>
@@ -754,7 +754,8 @@
                     v-model="commonMetricSettings.dotSize"
                     color="blue"
                     label="Размер"
-                    :disabled="!commonMetricSettings.showPeakDots || commonMetricSettings.type !== 'line'"
+                    :disabled="!commonMetricSettings.showPeakDots
+                      || commonMetricSettings.type !== 'line'"
                     min="2"
                     max="10"
                     thumb-size="25px"
@@ -830,6 +831,7 @@
                           }"
                           @input="() => {
                             if (commonMetricSettings.lastDot !== null) {
+                              // eslint-disable-next-line max-len
                               commonMetricSettings.lastDot = commonMetricSettings.lastDot.replaceAll(/\D/g, '');
                             }
                           }"
@@ -841,6 +843,7 @@
                           :items="commonMetricSettings.lastDotSearch
                             ? [
                               ...defaultLastDotItems,
+                              // eslint-disable-next-line max-len
                               commonMetricSettings.lastDotSearch.replaceAll(/\D/g, '').toString() || null
                             ]
                             : defaultLastDotItems"
@@ -869,7 +872,8 @@
 
                   <div
                     class="bordered-group"
-                    :class="{opened: commonMetricSettings.showTextStyles && commonMetricSettings.showText}"
+                    :class="{opened:
+                      (commonMetricSettings.showTextStyles && commonMetricSettings.showText)}"
                   >
                     <v-row class="mt-3">
                       <v-col
@@ -906,6 +910,7 @@
                           :max="42"
                           @change="(val) => {
                             const [min, max] = [5, 42]
+                            // eslint-disable-next-line max-len
                             commonMetricSettings.pointTextSize = val < min ? min : (val > max ? max : val);
                           }"
                         />
@@ -1384,11 +1389,10 @@ export default {
         metricsByGroup.forEach((group, i) => {
           const max = this.getMaxValueYAxis(this.dataRestFrom, metricsByGroup[i]);
           group.forEach((metric) => {
-            if (!metric.yAxisLink && metric.yAxisLink !== metric.name) {
+            if (metric.name === max.key) {
+              delete metric.yAxisLink;
+            } else {
               metric.yAxisLink = max.key;
-              if (metric.yAxisLink === metric.name) {
-                delete metric.yAxisLink;
-              }
             }
           });
         });

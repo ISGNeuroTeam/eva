@@ -62,6 +62,7 @@ export default class ChartClass {
   theme = null;
 
   constructor(svgContainer, width, height, theme, options, linesRegression) {
+    // eslint-disable-next-line no-multi-assign
     this.id = ChartClass.objId += 1;
     this.theme = theme;
     this.options = ChartClass.mergeDeep(this.options, options);
@@ -218,6 +219,7 @@ export default class ChartClass {
       .attr('font-family', '"Roboto", sans-serif')
       .attr('class', 'groups');
 
+    this.y = {};
     this.groups.forEach((num, i) => {
       this.createGroupYAxes(width, groupHeight, groupHeight * i, num);
     });
@@ -234,12 +236,65 @@ export default class ChartClass {
       groupsTopOffset,
       yGroupLabel,
       numberFormat = false,
+      xAxis,
     } = this.options;
-    const { barplotType } = this.options.xAxis;
+    const {
+      barplotType,
+    } = xAxis;
     const groupHeight = height - groupsTopOffset;
+
+    // metrics for this group
     const metrics = this.metrics
-      .filter((metric) => metric.name !== this.xMetric)
-      .filter((item) => item.group === num);
+      .filter(({ name, group }) => name !== this.xMetric && group === num);
+    // common barplots
+    const firstBarplotMetric = metrics.find(({ type }) => type === 'barplot');
+    metrics.forEach((metric) => {
+      if (metric.type === 'barplot' && metric.name !== firstBarplotMetric.name) {
+        metric.yAxisLink = firstBarplotMetric.yAxisLink || firstBarplotMetric.name;
+      }
+    });
+    const barplotMetrics = metrics.filter(({ type }) => type === 'barplot');
+
+    const metricsNames = metrics.map(({ name }) => name);
+    const axes = metrics
+      .filter(({ yAxisLink }) => !yAxisLink
+        || !metricsNames.includes(yAxisLink)
+        || metrics.find(({ name }) => name === yAxisLink).yAxisLink);
+
+    const axesDomains = {};
+    const axesLinks = {};
+    axes.forEach((metric) => {
+      const extendsMetrics = metrics.filter(({ yAxisLink }) => yAxisLink === metric.name);
+      const extendsMetricsNames = extendsMetrics.map(({ name }) => name);
+
+      let min = d3.min(this.data, (d) => d3.min([
+        (typeof d[metric.name] === 'string' ? +d[metric.name] : d[metric.name]),
+        ...extendsMetricsNames.map((name) => d[name]),
+      ]));
+      let max = d3.max(this.data, (d) => d3.max([
+        (typeof d[metric.name] === 'string' ? +d[metric.name] : d[metric.name]),
+        ...extendsMetricsNames.map((name) => d[name]),
+      ]));
+
+      if (barplotType === 'accumulation') {
+        this.data.forEach((item) => {
+          let up = 0; let down = 0;
+          barplotMetrics.forEach(({ name }) => {
+            const val = item[name];
+            if (val >= 0) {
+              up += val;
+            } else {
+              down += val;
+            }
+          });
+          if (up > max) max = up;
+          if (down < min) min = down;
+        });
+      }
+
+      axesDomains[metric.name] = [min, max];
+      axesLinks[metric.name] = [...new Set([metric.name, ...extendsMetricsNames])];
+    });
 
     const group = this.svgGroups
       .append('g')
@@ -260,75 +315,19 @@ export default class ChartClass {
         .attr('transform', `translate(${width - this.maxYRightAxisWidth},0)`),
     };
 
-    /// create Y axes for barplot
     const xOffset = { Right: 0, Left: 0 };
     const axisPosition = 'Left';
     const yGroupItem = yGroups[axisPosition].append('g');
-    let minYBarMetric = 0;
-    let maxYBarMetric = 0;
-    const barplotMetrics = metrics.filter((metric) => metric.type === 'barplot');
-
-    if (barplotType === 'accumulation') {
-      this.data.forEach((item) => {
-        let up = 0; let down = 0;
-        barplotMetrics.forEach((metric) => {
-          const val = item[metric.name];
-          if (val >= 0) {
-            up += val;
-          } else {
-            down += val;
-          }
-        });
-        if (up > maxYBarMetric) maxYBarMetric = up;
-        if (down < minYBarMetric) minYBarMetric = down;
-      });
-    } else {
-      barplotMetrics.forEach((metric) => {
-        const min = d3.min(this.data, (d) => d[metric.name]);
-        if (min < minYBarMetric) minYBarMetric = min;
-        const max = d3.max(this.data, (d) => d[metric.name]);
-        if (max > maxYBarMetric) maxYBarMetric = max;
-      });
-    }
-
     let className = '';
-    barplotMetrics.forEach((metric) => {
-      this.yMinMax[metric.name] = [minYBarMetric, maxYBarMetric];
-      this.y[metric.name] = d3.scaleLinear()
-        .domain([minYBarMetric, maxYBarMetric])
-        .range([groupHeight, 0])
-        .nice(metric.nice);
-      yGroupItem
-        .call(
-          d3[`axis${axisPosition}`](this.y[metric.name])
-            .ticks(metric.ticks || Math.ceil(groupHeight / 30))
-            .tickFormat((val) => val.toLocaleString(numberFormat)),
-        );
-      className += ` axis-y-${metric.n}`;
-    });
-    yGroupItem.attr('class', `y${axisPosition}Axis axis-y ${className}`);
-    xOffset[axisPosition] += yGroupItem.node().getBBox().width + 2;
-
-    /// create Y axes
-    const linearMetrics = metrics.filter((metric) => (['line', 'scatter'].includes(metric.type)));
-    linearMetrics.forEach((metric) => {
+    const { canBeNumber } = ChartClass;
+    axes.forEach((metric) => {
       const axisSide = metric.yAxisSide === 'right' ? 'Right' : 'Left';
-      const extendMetrics = linearMetrics.filter(({ yAxisLink }) => yAxisLink === metric.name);
-      let min = d3.min(this.data, (d) => (typeof d[metric.name] === 'string' ? +d[metric.name] : d[metric.name]));
-      let max = d3.max(this.data, (d) => (typeof d[metric.name] === 'string' ? +d[metric.name] : d[metric.name]));
-      let addClassName = '';
-      extendMetrics.forEach((item) => {
-        const minExt = d3.min(this.data, (d) => d[item.name]);
-        const maxExt = d3.max(this.data, (d) => d[item.name]);
-        if (minExt < min) min = minExt;
-        if (maxExt > max) max = maxExt;
-        addClassName += ` axis-y-${item.n}`;
-      });
-
+      const yAxisKey = this.getYAxisKeyByMetric(metric, num);
+      const [min, max] = axesDomains[yAxisKey];
       let minYMetric = min;
       let maxYMetric = max;
-      const { canBeNumber } = ChartClass;
 
+      // y-axis paddings
       if (metric.hasPaddings && !metric.yAxisLink) {
         const range = max - min;
         if (canBeNumber(metric.paddingBottom) && +metric.paddingBottom > 0) {
@@ -346,35 +345,36 @@ export default class ChartClass {
         }
       }
 
-      this.yMinMax[metric.name] = [minYMetric, maxYMetric];
-      this.y[metric.name] = d3.scaleLinear()
-        .domain([minYMetric, maxYMetric])
-        .range([groupHeight, 0])
-        .nice(metric.nice);
-
-      if (metric.yAxisLink) {
-        return;
+      this.yMinMax[yAxisKey] = [minYMetric, maxYMetric];
+      if (!this.y[yAxisKey]) {
+        this.y[yAxisKey] = d3.scaleLinear()
+          .domain([minYMetric, maxYMetric])
+          .range([groupHeight, 0])
+          .nice(metric.nice);
       }
 
-      const offset = (axisSide === 'Right')
-        ? xOffset[axisSide]
-        : -xOffset[axisSide];
+      const extendMetrics = metrics.filter(({ name }) => axesLinks[yAxisKey].includes(name));
+      const addClassName = extendMetrics.map(({ n }) => `axis-y-${n}`).join(' ');
+      const offset = (axisSide === 'Right') ? xOffset[axisSide] : -xOffset[axisSide];
       const yGroup = yGroups[axisSide]
         .append('g')
         .attr('class', `y${axisSide}Axis axis-y axis-y-${metric.n} ${addClassName}`)
         .attr('transform', `translate(${offset},0)`)
         .style('color', this.theme.$main_text)
         .call(
-          d3[`axis${axisSide}`](this.y[metric.name])
+          d3[`axis${axisSide}`](this.y[yAxisKey])
             .ticks(metric.ticks || Math.ceil(groupHeight / 30))
             .tickFormat((val) => val.toLocaleString(numberFormat) + (metric.unit ? ` ${metric.unit}` : '')),
         );
 
-      if (metric.coloredYAxis) {
+      if (metric.coloredYAxis && axesLinks[yAxisKey].length === 1) {
         yGroup.selectAll('text').attr('fill', metric.color);
       }
-      xOffset[axisSide] += yGroup.node().getBBox().width + 8;
+      xOffset[axisSide] += yGroup.node().getBBox().width + 5;
+      className += ` axis-y-${metric.n}`;
     });
+
+    yGroupItem.attr('class', `y${axisPosition}Axis axis-y ${className}`);
 
     if (yGroupLabel) {
       // Add Y axis label:
@@ -461,7 +461,7 @@ export default class ChartClass {
         }
       }
       groupBarplotMetrics.forEach((metric) => {
-        this.addZeroLine(chartGroup, metric);
+        this.addZeroLine(chartGroup, metric, num);
       });
       const firstBarplot = this.svgGroups.select('.barplot-divided.metric').node();
       if (firstBarplot) {
@@ -477,7 +477,7 @@ export default class ChartClass {
       .filter((metric) => metric.type === 'line')
       .reverse()
       .forEach((metric) => {
-        this.addZeroLine(chartGroup, metric);
+        this.addZeroLine(chartGroup, metric, num);
         this.addPath(chartGroup, metric, height, num);
       });
 
@@ -815,7 +815,7 @@ export default class ChartClass {
       .attr('transform', `translate(0,${groupHeight})`)
       .call(d3.axisBottom(this.x)
         .tickSize(-groupHeight)
-        .tickFormat((_) => '')
+        .tickFormat(() => '')
         .ticks((ticksEnabled && ticks > 0) ? ticks : null)
         .tickValues((ticksEnabled && ticks === 0) ? this.data.map((item) => `${item[this.xMetric]}`) : null))
       .selectAll('.tick line')
@@ -872,6 +872,7 @@ export default class ChartClass {
   }
 
   renderPeakDots(chartGroup, metric, groupHeight, groupNum, line) {
+    const yAxisKey = this.getYAxisKeyByMetric(metric, groupNum);
     const { groupsTopOffset } = this.options;
     chartGroup
       .append('g')
@@ -891,7 +892,7 @@ export default class ChartClass {
       })
       .style('opacity', (d, i, elems) => +elems[i].classList.contains('dot-show'))
       .attr('cx', (d) => this.x(d[this.xMetric]))
-      .attr('cy', (d) => this.y[metric.yAxisLink || metric.name](d[metric.name]))
+      .attr('cy', (d) => this.y[yAxisKey](d[metric.name]))
       .attr('r', metric.dotSize)
       .attr('fill', metric.color)
       .on('click', (d) => this.clickChart({
@@ -904,7 +905,7 @@ export default class ChartClass {
       .on('mouseover', (d, i, elems) => {
         d3.select(elems[i]).style('opacity', 1);
         const lineXPos = this.x(d[this.xMetric]);
-        const lineYPos = this.y[metric.yAxisLink || metric.name](d[metric.name]);
+        const lineYPos = this.y[yAxisKey](d[metric.name]);
         this.setLineDotPosition(lineXPos, lineYPos, groupNum);
         const tooltipLeftPos = lineXPos + this.maxYLeftAxisWidth;
         const tooltipTopPos = lineYPos + (groupHeight * groupNum) + groupsTopOffset;
@@ -976,10 +977,10 @@ export default class ChartClass {
       .attr('class', `metric metric-${metric.n}`)
       .text((d) => ChartClass.valueToText(metric, d, numberFormat));
     // text styles
-    this.styleTextElemByMetric(text, metric);
+    ChartClass.styleTextElemByMetric(text, metric);
   }
 
-  styleTextElemByMetric(text, metric) {
+  static styleTextElemByMetric(text, metric) {
     if (metric.showTextStyles) {
       if (metric.pointTextSize) {
         text.style('font-size', metric.pointTextSize);
@@ -996,11 +997,11 @@ export default class ChartClass {
     }
   }
 
-  addZeroLine(chartGroup, metric) {
-    const yName = metric.yAxisLink || metric.name;
+  addZeroLine(chartGroup, metric, num) {
+    const yName = this.getYAxisKeyByMetric(metric, num);
     const zeroHeight = this.y[yName](0);
-    const minHeight = this.y[yName](this.yMinMax[metric.name][0]);
-    const maxHeight = this.y[yName](this.yMinMax[metric.name][1]);
+    const minHeight = this.y[yName](this.yMinMax[yName][0]);
+    const maxHeight = this.y[yName](this.yMinMax[yName][1]);
     const strokeWidth = 0.5;
     if (zeroHeight < minHeight && zeroHeight > maxHeight) {
       chartGroup
@@ -1022,7 +1023,6 @@ export default class ChartClass {
     const {
       showArea,
       color,
-      yAxisLink,
       name,
       dontSplitLine,
       lineBySteps,
@@ -1081,18 +1081,19 @@ export default class ChartClass {
       // add red lines
       this.renderRedLines(chartGroup, metric, height, line);
 
+      const yName = this.getYAxisKeyByMetric(metric, num);
       if (showArea) {
         path
           .attr('fill', d3.hsl(color).brighter(0.1))
           .attr('d', d3.area()
             .x((d) => this.x(d[this.xMetric]))
-            .y0((d) => this.y[yAxisLink || name](d[name]))
-            .y1(() => this.y[yAxisLink || name](0)));
+            .y0((d) => this.y[yName](d[name]))
+            .y1(() => this.y[yName](0)));
       } else {
         path
           .attr('d', d3.line()
             .x((d) => this.x(d[this.xMetric]))
-            .y((d) => this.y[yAxisLink || name](d[name])));
+            .y((d) => this.y[yName](d[name])));
       }
 
       // add dots
@@ -1124,7 +1125,8 @@ export default class ChartClass {
       .style('fill', (d) => color(d[metric.metricGroup]))
       .on('mouseover', (d) => {
         const lineXPos = this.x(d[this.xMetric]);
-        const lineYPos = this.y[metric.yAxisLink || metric.name](d[metric.name]);
+        const yAxisKey = this.getYAxisKeyByMetric(metric, num);
+        const lineYPos = this.y[yAxisKey](d[metric.name]);
         this.setLineDotPosition(lineXPos, lineYPos, num);
         const tooltipLeftPos = lineXPos + this.maxYLeftAxisWidth;
         const tooltipTopPos = lineYPos + (height * num) + 14;
@@ -1188,7 +1190,7 @@ export default class ChartClass {
     const stackedData = d3.stack()
       .keys(groupBarplotMetrics.map((d) => d.name))(this.data);
     const { length } = this.data;
-    const { styleTextElemByMetric } = this;
+    const { styleTextElemByMetric } = ChartClass;
 
     chartGroup.append('g')
       .selectAll('g')
@@ -1208,7 +1210,7 @@ export default class ChartClass {
       .attr('x', (d) => this.x(d.data[this.xMetric]) - barWidth / 2)
       .attr('y', (d) => {
         const { metric } = d;
-        const yName = metric.yAxisLink || metric.name;
+        const yName = this.getYAxisKeyByMetric(metric, num);
         let val = d[1];
         if (barplotType === 'accumulation' && (val - d[0]) < 0) {
           // Negative values are not available in accumulation histograms
@@ -1225,7 +1227,7 @@ export default class ChartClass {
       })
       .attr('height', (d) => {
         const { metric } = d;
-        const yName = metric.yAxisLink || metric.name;
+        const yName = this.getYAxisKeyByMetric(metric, num);
         return Math.abs(this.y[yName](d[0]) - this.y[yName](d[1]));
       })
       .attr('width', barWidth)
@@ -1242,16 +1244,18 @@ export default class ChartClass {
       })
       .on('mousemove', (d) => {
         const { metric } = d;
+        const yAxisKey = this.getYAxisKeyByMetric(metric, num);
         const lineXPos = this.x(d.data[this.xMetric]);
-        let lineYPos = this.y[metric.name](d[1]);
+        let lineYPos = this.y[yAxisKey](d[1]);
         if (barplotType === 'overlay') {
-          lineYPos = this.y[metric.name](d[1] - d[0]);
+          lineYPos = this.y[yAxisKey](d[1] - d[0]);
         }
         this.setLineDotPosition(lineXPos, lineYPos, num);
         const tooltipLeftPos = lineXPos + this.maxYLeftAxisWidth;
         const tooltipTopPos = lineYPos + (groupHeight * num) + groupsTopOffset;
         this.updateTooltip(d.data, metric, tooltipLeftPos, tooltipTopPos);
       })
+      // eslint-disable-next-line func-names
       .each(function (d, i) {
         const showText = ChartClass.lastDotParamForPoint(d.metric.lastDot, i, { length });
         if (d[1] !== null && d.metric.showText && showText) {
@@ -1290,7 +1294,7 @@ export default class ChartClass {
 
     const metricByKeys = this.metricByKeys();
     const { length } = this.data;
-    const { styleTextElemByMetric } = this;
+    const { styleTextElemByMetric } = ChartClass;
 
     let numBar = -1;
     chartGroup.append('g')
@@ -1319,16 +1323,18 @@ export default class ChartClass {
       .attr('class', (d) => `barplot barplot-divided metric metric-${d.n}`)
       .attr('x', (d) => xSubgroup(d.key))
       .attr('y', (d) => {
-        const yHeight = this.y[d.key](d.value);
+        const yAxisKey = this.getYAxisKeyByMetric(d.metric, num);
+        const yHeight = this.y[yAxisKey](d.value);
         if (d.value < 0) {
-          return this.y[d.key](0);
+          return this.y[yAxisKey](0);
         }
         return yHeight;
       })
       .attr('width', xSubgroup.bandwidth())
       .attr('height', (d) => {
-        const valHeight = this.y[d.key](d.value);
-        const zeroHeight = this.y[d.key](0);
+        const yAxisKey = this.getYAxisKeyByMetric(d.metric, num);
+        const valHeight = this.y[yAxisKey](d.value);
+        const zeroHeight = this.y[yAxisKey](0);
         return (d.value < 0)
           ? (valHeight - zeroHeight)
           : (zeroHeight - valHeight);
@@ -1343,8 +1349,9 @@ export default class ChartClass {
       }))
       .on('mousemove', (d) => {
         const { metric } = d;
+        const yAxisKey = this.getYAxisKeyByMetric(metric, num);
         const lineXPos = this.x(d.data[this.xMetric]);
-        const lineYPos = this.y[metric.name](d.value);
+        const lineYPos = this.y[yAxisKey](d.value);
         this.setLineDotPosition(lineXPos, lineYPos, num);
 
         const tooltipLeftPos = lineXPos + this.maxYLeftAxisWidth;
@@ -1356,6 +1363,7 @@ export default class ChartClass {
         this.hideTooltip();
         this.hideLineDot();
       })
+      // eslint-disable-next-line func-names
       .each(function (d) {
         // eslint-disable-next-line no-underscore-dangle
         const showText = ChartClass.lastDotParamForPoint(d.metric.lastDot, d._pn, { length });
@@ -1514,5 +1522,17 @@ export default class ChartClass {
         break;
     }
     return false;
+  }
+
+  getYAxisKeyByMetric(metric, num) {
+    const metrics = this.metrics
+      .filter((item) => item.name !== this.xMetric && item.group === num);
+    const metricsNames = metrics.map(({ name }) => name);
+    return (metric.yAxisLink
+      && metricsNames.includes(metric.yAxisLink)
+      && !metrics.find(({ name }) => name === metric.yAxisLink).yAxisLink
+    )
+      ? metric.yAxisLink
+      : metric.name;
   }
 }
