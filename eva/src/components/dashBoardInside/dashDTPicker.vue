@@ -895,6 +895,7 @@ export default {
     },
     calcCurrentDate(forceUpdateValue) {
       const data = forceUpdateValue || this.getPickerDate;
+      console.log(data);
       let current = '';
 
       if (data.exactDate !== null) {
@@ -927,18 +928,18 @@ export default {
         } else {
           this.range = data.range;
         }
-        if (!this.hideTimeSelect && data.range?.end) {
+        if (this.hideTimeSelect && this.range?.end) {
           current = [
-            data.range?.start || '',
-            moment(data.range.end, this.dateTimeFormat).set({
+            this.range?.start || '',
+            moment(this.range.end, this.dateTimeFormat).set({
               hour: 23,
               minute: 59,
             }).format(this.dateTimeFormat),
           ].join(' - ');
         } else {
           current = [
-            data.range?.start || '',
-            data.range?.end || '',
+            this.range?.start || '',
+            this.range?.end || '',
           ].join(' - ');
         }
       }
