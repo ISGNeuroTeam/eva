@@ -1289,7 +1289,7 @@ export default {
         return 0;
       }
       const pending = this.searches.filter((search) => search?.status === 'pending').length;
-      return pending / this.searches.length * 100;
+      return (pending / this.searches.length) * 100;
     },
     editMode() {
       return this.dashFromStore?.editMode;
