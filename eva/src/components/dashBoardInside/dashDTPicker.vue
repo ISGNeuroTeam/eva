@@ -895,7 +895,6 @@ export default {
     },
     calcCurrentDate(forceUpdateValue) {
       const data = forceUpdateValue || this.getPickerDate;
-      console.log(data);
       let current = '';
 
       if (data.exactDate !== null) {

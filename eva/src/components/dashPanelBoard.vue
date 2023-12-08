@@ -2730,6 +2730,23 @@ export default {
 };
 </script>
 
+<style lang="css" scoped>
+.ds-progress {
+  .v-progress-circular__overlay {
+    transform-origin: bottom;
+    transform: rotateX(180deg);
+  }
+  .v-progress-circular__underlay {
+    transition: stroke 0.6s ease-in-out;
+  }
+  &.hidden-progress {
+    .v-progress-circular__underlay {
+      stroke: transparent;
+    }
+  }
+}
+</style>
+
 <style lang="scss">
 @import '../sass/dashPanelBoard.sass';
 </style>
@@ -2781,20 +2798,5 @@ export default {
   position: absolute;
   opacity: 0;
   z-index: -1;
-}
-
-.ds-progress {
-  .v-progress-circular__overlay {
-    transform-origin: bottom;
-    transform: rotateX(180deg);
-  }
-  .v-progress-circular__underlay {
-    transition: stroke 0.6s ease-in-out;
-  }
-  &.hidden-progress {
-    .v-progress-circular__underlay {
-      stroke: transparent;
-    }
-  }
 }
 </style>
