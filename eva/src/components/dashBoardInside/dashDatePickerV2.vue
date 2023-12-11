@@ -28,6 +28,7 @@
           v-model="modelPopup"
           content-class="date-picker__menu"
           absolute
+          eager
           z-index="1000"
           :position-x="popupPositionX"
           :position-y="popupPositionY"
@@ -48,7 +49,7 @@
                   v-model="reactiveValue"
                   range
                   label="Диапазон дат"
-                  :shortcut="`${reactiveValue.shortcut}`"
+                  :shortcut="`${reactiveValue.shortcutKey}`"
                   :format="formatForPicker"
                   :formatted="formatForPicker"
                   :color="getTheme.$accent_ui_color"
@@ -274,7 +275,8 @@ export default {
       range: {
         start: '',
         end: '',
-        shortcut: undefined,
+        shortcut: '',
+        shortcutKey: undefined,
       },
       startEnd: {
         start: '',
@@ -461,9 +463,10 @@ export default {
   created() {
     this.setDefaultOptions();
     this.setTokenAction();
+    this.loadValueFromStore();
+    this.setDateFromShortcut();
   },
   mounted() {
-    this.loadValueFromStore();
     this.setDate();
   },
   methods: {
@@ -493,6 +496,7 @@ export default {
       this.reactiveValue = structuredClone(this.localValue);
       this.$nextTick(() => {
         this.modelPopup = true;
+        console.log('this.localValue?.shortcut', this.localValue?.shortcut);
         if (this.pickerMode === 'range' && !this.localValue?.shortcut) {
           this.disableSelectionOnShortcut();
         }
@@ -579,9 +583,26 @@ export default {
         this.updateValueInStore();
       });
     },
+    setDateFromShortcut() {
+      if (this.localValue?.shortcut) {
+        const targetShortcut = this.getCustomShortcuts
+          .find((el) => `${el.value}` === `${this.localValue.shortcut}`);
+
+        const shortcutKey = targetShortcut?.key || '';
+
+        if (shortcutKey && (shortcutKey !== this.localValue.shortcut)) {
+          this.localValue = structuredClone(this.defaultValueByMode[this.pickerMode]);
+          this.$set(this.localValue, 'shortcutKey', shortcutKey);
+          this.reactiveValue = structuredClone(this.localValue);
+        }
+      }
+    },
     updateLocalValue() {
       if (this.reactiveValue) {
-        this.localValue = this.reactiveValue;
+        this.localValue = {
+          ...this.localValue,
+          ...this.reactiveValue,
+        };
         if (this.pickerMode === 'time') {
           const timePeriod = this.getTimePeriod(
             this.reactiveValue.count,
