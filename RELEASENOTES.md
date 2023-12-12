@@ -1,3 +1,8 @@
+# [1.162.1] - 2023-12-12
+
+### Fixed
+- Constructor-schemes: Addressed an issue with text color.
+
 # [1.162.0] - 2023-12-07
 
 ### Added
