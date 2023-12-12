@@ -18,7 +18,7 @@
 - MultiLine:
   - Improved detection of X-axis data type.
   - Resolved issues with using space and other symbols in the configuration from the data source.
-  - Corrected the order of captions on barplots.
+  - Corrected the order of captions on bar-plots.
 - Constructor-schemes:
   - Fixed color handling on text items when plotting a survey from a data source.
   - Performed refactoring of the method for creating lines.
@@ -170,7 +170,7 @@
 ### Fixed
 - Multiline:
   - X-axis labels were being cut off when the legend was large.
-  - Not all labels on barplots were being displayed.
+  - Not all labels on bar-plots were being displayed.
 
 # [1.152.0] - 2023-09-28
 
@@ -274,7 +274,7 @@
 - Data source design
 - Risk-review: 
   - Delete primitives library
-  - Changed fields naming for metrics from 'risk, measure, riskfactor' to '\[main_metric_1], \[main_metric_2]'+suffixes '_title, _list_title, \_list_text\_\[0-1-2...], \_list_value\_\[0-1-2...]'
+  - Changed fields naming for metrics from 'risk, measure, risk-factor' to '\[main_metric_1], \[main_metric_2]'+suffixes '_title, _list_title, \_list_text\_\[0-1-2...], \_list_value\_\[0-1-2...]'
 
 ### Fixed
 - Risk-review: Fixed visible single bar
@@ -659,7 +659,7 @@
 # [1.117.0] - 2022-12-23
 
 ### Added
-- Multiline: added the x axis value in tooltip
+- Multiline: added the x-axis value in tooltip
 - Multiline: added setting to show ticks on x-axis by points
 - Added load icons list from datasource in constructor-schemes
 
@@ -879,7 +879,7 @@
 - Added visualization of a scatter chart
 - The button component now has the option to choose which tokens to update on click
 - Ability to paint the area between the line and 0 on a multiline chart
-- Ability to change the metric for the x axis on a multiline chart
+- Ability to change the metric for the x-axis on a multiline chart
 - Ability to move tabs on the dashboard
 - Ability to divide a number into digits in the SingleValue component
 - Added settings for label in the Constructor-schemes component
@@ -1083,7 +1083,7 @@
 
 #### ¹⁾ The "Single Value" component now requires an additional field
 
-In the returned data, there should be a "_order" field in each data row.
+In the returned data, there should be an "_order" field in each data row.
 System fields that are not output data (for example, "_title") should have empty order field.
 The "_order" field must be a positive number and the values for different rows must not be repeated.
 The values of "_order" should go in order without omissions:
@@ -1246,7 +1246,7 @@ The values of "_order" should go in order without omissions:
 - Selecting an object after changing dash setting
 - Token with an empty name
 - Name restriction for tokens
-- Visualization. Time selection. Parts of a component are rendered outside of the component's bounds
+- Visualization. Time selection. Parts of a component are rendered outside the component's bounds
 - Component checkboxes have undefined status
 - Dash single value title
 - Setting theme
@@ -1341,7 +1341,7 @@ The values of "_order" should go in order without omissions:
 - Reordered visualization settings.
 - Corrected mistakes in texts.
 
-# [1.76.0] - Filters for YGraph componet, selection property in events of select component and bugfixes.
+# [1.76.0] - Filters for YGraph component, selection property in events of select component and bugfixes.
 
 ### New
 
@@ -1374,20 +1374,20 @@ The values of "_order" should go in order without omissions:
 - Reduced reset zoom time.
 - Fixed filter range for points and zoom multiline.
 
-# [1.74.0] - New slider vizualization, tokens in filters and bugfixes.
+# [1.74.0] - New slider visualisation, tokens in filters and bugfixes.
 
 ### New
 
-- Brand new slider vizualization.
+- Brand-new slider visualisation.
 - Ability to use a token in the name of filter part.
 - Additional properties for hotkey ctrl+\ .
 - Ability to select strings in X-axis label.
-- Ability to use multiline select as filter for other datasourses.
+- Ability to use multiline select as filter for other datasource's.
 
 ### Bugfix
 
 - Optimized graph component performance.
-- One zoom for all graphs in seperate mode.
+- One zoom for all graphs in separate mode.
 - Details menu for not email fields.
 - Fixed the textarea in full screen mode, changed get current value.
 - Fixed hiding columns in tables.
