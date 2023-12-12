@@ -54,7 +54,7 @@
                   :formatted="formatForPicker"
                   :color="getTheme.$accent_ui_color"
                   :button-color="getTheme.$primary_button"
-                  :custom-shortcuts="getCustomShortcuts"
+                  :custom-shortcuts="shortcuts"
                   @input="updateLocalValue"
                 />
               </div>
@@ -306,6 +306,7 @@ export default {
     },
     // Только для режима range
     shortcut: null,
+    shortcuts: [],
   }),
   computed: {
     idDash() {
@@ -374,44 +375,44 @@ export default {
     expandRangeButtonsSet() {
       return this.getOptions.expandRangeButtonsSet;
     },
-    getCustomShortcuts() {
-      const shortcuts = [
-        { key: 'thisDay', label: 'текущий день', value: 'day' },
-        { key: 'lastDay', label: 'предыдущий день', value: '-day' },
-        { key: 'thisWeek', label: 'текущая неделя', value: 'isoWeek' },
-        { key: 'lastWeek', label: 'пред. неделя', value: '-isoWeek' },
-        { key: 'last7Days', label: 'последние 7 дней', value: 7 },
-        { key: 'last30Days', label: 'последние 30 дней', value: 30 },
-        { key: 'thisMonth', label: 'текущий месяц', value: 'month' },
-        { key: 'lastMonth', label: 'пред. месяц', value: '-month' },
-        { key: 'thisYear', label: 'текущий год', value: 'year' },
-        { key: 'lastYear', label: 'пред. год', value: '-year' },
-      ];
-
-      // если вкл. настройка - Расширить набор кнопок выбора диапазона дат
-      if (this.expandRangeButtonsSet) {
-        // 1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.
-        const vk2title = new Map();
-        vk2title.set('1-2', '1 пг.');
-        vk2title.set('1-3', '9 месяцев');
-        vk2title.set('3-4', '2 пг.');
-        // eslint-disable-next-line no-restricted-syntax
-        for (const kv of [1, 2, '1-2', 3, '1-3', 4, '3-4']) {
-          shortcuts.push({
-            key: `${kv}kv`,
-            label: vk2title.get(kv) || `${kv} кв.`,
-            value: () => {
-              const [start, end] = typeof kv === 'string' ? kv.split('-') : [kv, kv];
-              return {
-                start: moment().quarter(start).startOf('quarter'),
-                end: moment().quarter(end).endOf('quarter'),
-              };
-            },
-          });
-        }
-      }
-      return shortcuts;
-    },
+    // getCustomShortcuts() {
+    //   const shortcuts = [
+    //     { key: 'thisDay', label: 'текущий день', value: 'day' },
+    //     { key: 'lastDay', label: 'предыдущий день', value: '-day' },
+    //     { key: 'thisWeek', label: 'текущая неделя', value: 'isoWeek' },
+    //     { key: 'lastWeek', label: 'пред. неделя', value: '-isoWeek' },
+    //     { key: 'last7Days', label: 'последние 7 дней', value: 7 },
+    //     { key: 'last30Days', label: 'последние 30 дней', value: 30 },
+    //     { key: 'thisMonth', label: 'текущий месяц', value: 'month' },
+    //     { key: 'lastMonth', label: 'пред. месяц', value: '-month' },
+    //     { key: 'thisYear', label: 'текущий год', value: 'year' },
+    //     { key: 'lastYear', label: 'пред. год', value: '-year' },
+    //   ];
+    //
+    //   // если вкл. настройка - Расширить набор кнопок выбора диапазона дат
+    //   if (this.expandRangeButtonsSet) {
+    //     // 1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.
+    //     const vk2title = new Map();
+    //     vk2title.set('1-2', '1 пг.');
+    //     vk2title.set('1-3', '9 месяцев');
+    //     vk2title.set('3-4', '2 пг.');
+    //     // eslint-disable-next-line no-restricted-syntax
+    //     for (const kv of [1, 2, '1-2', 3, '1-3', 4, '3-4']) {
+    //       shortcuts.push({
+    //         key: `${kv}kv`,
+    //         label: vk2title.get(kv) || `${kv} кв.`,
+    //         value: () => {
+    //           const [start, end] = typeof kv === 'string' ? kv.split('-') : [kv, kv];
+    //           return {
+    //             start: moment().quarter(start).startOf('quarter'),
+    //             end: moment().quarter(end).endOf('quarter'),
+    //           };
+    //         },
+    //       });
+    //     }
+    //   }
+    //   return shortcuts;
+    // },
   },
   watch: {
     pickerMode(val, oldVal) {
@@ -459,9 +460,22 @@ export default {
         }
       }
     },
+    expandRangeButtonsSet(val) {
+      this.setShortcuts();
+    },
+    reactiveValue: {
+      handler(val, oldVal) {
+        console.log({
+          val,
+          oldVal,
+        });
+      },
+      deep: true,
+    },
   },
   created() {
     this.setDefaultOptions();
+    this.setShortcuts();
     this.setTokenAction();
     this.loadValueFromStore();
     this.setDateFromShortcut();
@@ -470,6 +484,48 @@ export default {
     this.setDate();
   },
   methods: {
+    setShortcuts() {
+      const shortcuts = [
+        { key: 'thisDay', label: 'текущий день', value: 'day' },
+        { key: 'lastDay', label: 'предыдущий день', value: '-day' },
+        { key: 'thisWeek', label: 'текущая неделя', value: 'isoWeek' },
+        { key: 'lastWeek', label: 'пред. неделя', value: '-isoWeek' },
+        { key: 'last7Days', label: 'последние 7 дней', value: 7 },
+        { key: 'last30Days', label: 'последние 30 дней', value: 30 },
+        { key: 'thisMonth', label: 'текущий месяц', value: 'month' },
+        { key: 'lastMonth', label: 'пред. месяц', value: '-month' },
+        { key: 'thisYear', label: 'текущий год', value: 'year' },
+        { key: 'lastYear', label: 'пред. год', value: '-year' },
+      ];
+      if (this.expandRangeButtonsSet) {
+        // 1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.
+        const vk2title = new Map();
+        vk2title.set('1-2', '1 пг.');
+        vk2title.set('1-3', '9 месяцев');
+        vk2title.set('3-4', '2 пг.');
+        // eslint-disable-next-line no-restricted-syntax
+        for (const kv of [1, 2, '1-2', 3, '1-3', 4, '3-4']) {
+          shortcuts.push({
+            key: `${kv}kv`,
+            label: vk2title.get(kv) || `${kv} кв.`,
+            value: () => {
+              const [start, end] = typeof kv === 'string' ? kv.split('-') : [kv, kv];
+              return {
+                start: moment().quarter(start).startOf('quarter'),
+                end: moment().quarter(end).endOf('quarter'),
+              };
+            },
+            callback: () => {
+              this.$nextTick(() => {
+                this.$set(this.reactiveValue, 'shortcutKey', 'function');
+                this.$set(this.reactiveValue, 'shortcut', `${kv}kv`);
+              });
+            },
+          });
+        }
+      }
+      this.shortcuts = shortcuts;
+    },
     checkFormatOnIncludesTime(format) {
       const tokensTimeFormat = ['h', 'H', 's', 'k', 'm', 'a', 'A'];
       let isFormatWithoutTime = true;
@@ -496,7 +552,6 @@ export default {
       this.reactiveValue = structuredClone(this.localValue);
       this.$nextTick(() => {
         this.modelPopup = true;
-        console.log('this.localValue?.shortcut', this.localValue?.shortcut);
         if (this.pickerMode === 'range' && !this.localValue?.shortcut) {
           this.disableSelectionOnShortcut();
         }
@@ -585,8 +640,10 @@ export default {
     },
     setDateFromShortcut() {
       if (this.localValue?.shortcut) {
-        const targetShortcut = this.getCustomShortcuts
-          .find((el) => `${el.value}` === `${this.localValue.shortcut}`);
+        const targetShortcut = this.shortcuts
+          .find((el) => `${this.localValue.shortcutKey === 'function'
+            ? el.key
+            : el.value}` === `${this.localValue.shortcut}`);
 
         const shortcutKey = targetShortcut?.key || '';
 
@@ -599,10 +656,14 @@ export default {
     },
     updateLocalValue() {
       if (this.reactiveValue) {
-        this.localValue = {
-          ...this.localValue,
-          ...this.reactiveValue,
-        };
+        this.$nextTick(() => {
+          this.$nextTick(() => {
+            this.localValue = {
+              ...this.localValue,
+              ...this.reactiveValue,
+            };
+          });
+        });
         if (this.pickerMode === 'time') {
           const timePeriod = this.getTimePeriod(
             this.reactiveValue.count,
