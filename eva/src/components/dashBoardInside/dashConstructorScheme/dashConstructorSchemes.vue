@@ -912,7 +912,7 @@ export default {
     },
     tokenActionsByElType() {
       const filteredSavedElements = this.savedGraphObject
-        .filter((el) => el.data?.tag?.fromOtl?.type != null);
+        .filter((el) => el.data?.tag?.fromOtl);
 
       if (filteredSavedElements.length === 0) {
         return [];

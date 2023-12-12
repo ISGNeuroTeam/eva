@@ -337,6 +337,7 @@ export default new Vuex.Store({
               value = objectValue[clickedField];
             }
           }
+
           const {
             prefix = '',
             sufix = '',
