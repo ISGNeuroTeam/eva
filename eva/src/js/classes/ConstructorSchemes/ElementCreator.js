@@ -10,6 +10,7 @@ import {
 import ElementTemplates from './elementTemplates.js';
 import VuejsNodeStyle from '@/js/classes/ConstructorSchemes/VueNodeStyle';
 import GenerateIcons from '@/js/classes/ConstructorSchemes/GenerateIcons';
+import Utils from '@/js/classes/ConstructorSchemes/Utils';
 
 class ElementCreator {
   constructor({
@@ -313,6 +314,30 @@ class ElementCreator {
             },
           });
         } else {
+          const { tag } = element;
+          if (element.tag.dataType.includes('label-type')) {
+            if (!element.tag.textColor?.hex) {
+              // rgba to hex
+              if (element.tag.textColor?.rgbaObject) {
+                const color = element.tag.textColor.rgbaObject;
+                const {
+                  r, g, b, a,
+                } = color;
+                tag.textColor.hex = Utils
+                  .rgbaToHex(`rgba(${r},${g},${b}, ${a <= 1 ? 255 : a}`);
+              }
+              // old saved color to new format
+              if (typeof element.tag.textColor === 'string') {
+                const oldColor = element.tag.textColor;
+                const rgbaObject = Utils.colorToRgbaObject(oldColor);
+                element.tag.textColor = {
+                  hex: oldColor,
+                  rgbaObject: Utils.colorToRgbaObject(oldColor),
+                  rgbaString: Utils.colorToString(rgbaObject, false),
+                };
+              }
+            }
+          }
           createdNode = graph.createNodeAt({
             location: new Rect(
               0,
@@ -323,7 +348,7 @@ class ElementCreator {
             style: new VuejsNodeStyle(template),
             tag: {
               ...templateList[element.tag.dataType].dataRest,
-              ...element.tag,
+              ...tag,
               fontFamily: elementTemplates.fontFamily,
               nodeId: element.tag.nodeId || element.hashCode(),
             },
