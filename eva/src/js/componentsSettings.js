@@ -412,7 +412,7 @@ export default {
       'useTimeTemplate',
       'timeTemplateStart',
       'timeTemplateEnd',
-      'expandRangeButtonsSet',
+      'rangeBtnList',
     ],
     graph: [
       'boxShadow',
@@ -898,7 +898,7 @@ export default {
       description: 'Набор кнопок выбора диапазона дат',
       relation() {
         // Вызывается в контексте modalSettings
-        return !this.options?.selectingExactDate;
+        return !this.options?.selectingExactDate || this.options?.pickerMode === 'range';
       },
       elem: 'select-checkbox',
       default: [
