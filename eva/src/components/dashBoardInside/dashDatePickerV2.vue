@@ -460,17 +460,8 @@ export default {
         }
       }
     },
-    expandRangeButtonsSet(val) {
+    expandRangeButtonsSet() {
       this.setShortcuts();
-    },
-    reactiveValue: {
-      handler(val, oldVal) {
-        console.log({
-          val,
-          oldVal,
-        });
-      },
-      deep: true,
     },
   },
   created() {
@@ -517,8 +508,8 @@ export default {
             },
             callback: () => {
               this.$nextTick(() => {
-                this.$set(this.reactiveValue, 'shortcutKey', 'function');
-                this.$set(this.reactiveValue, 'shortcut', `${kv}kv`);
+                this.$set(this.reactiveValue, 'shortcutKey', `${kv}kv`);
+                this.$set(this.reactiveValue, 'shortcut', 'function');
               });
             },
           });
@@ -552,8 +543,12 @@ export default {
       this.reactiveValue = structuredClone(this.localValue);
       this.$nextTick(() => {
         this.modelPopup = true;
-        if (this.pickerMode === 'range' && !this.localValue?.shortcut) {
-          this.disableSelectionOnShortcut();
+        if (this.pickerMode === 'range') {
+          if (!this.localValue?.shortcut) {
+            this.disableSelectionOnShortcut();
+          } else {
+            this.setSelectionOnShortcut();
+          }
         }
       });
     },
@@ -641,16 +636,26 @@ export default {
     setDateFromShortcut() {
       if (this.localValue?.shortcut) {
         const targetShortcut = this.shortcuts
-          .find((el) => `${this.localValue.shortcutKey === 'function'
-            ? el.key
-            : el.value}` === `${this.localValue.shortcut}`);
+          .find((el) => {
+            if (typeof el.value === 'function') {
+              return el.key === this.localValue.shortcutKey;
+            }
+            return el.value === this.localValue.shortcut;
+          });
 
         const shortcutKey = targetShortcut?.key || '';
-
-        if (shortcutKey && (shortcutKey !== this.localValue.shortcut)) {
-          this.localValue = structuredClone(this.defaultValueByMode[this.pickerMode]);
-          this.$set(this.localValue, 'shortcutKey', shortcutKey);
-          this.reactiveValue = structuredClone(this.localValue);
+        if (shortcutKey) {
+          if (this.localValue?.shortcut === 'function') {
+            if (shortcutKey !== this.localValue.shortcutKey) {
+              this.localValue = structuredClone(this.defaultValueByMode[this.pickerMode]);
+              this.$set(this.localValue, 'shortcutKey', shortcutKey);
+              this.reactiveValue = structuredClone(this.localValue);
+            }
+          } else if (shortcutKey !== this.localValue.shortcut) {
+            this.localValue = structuredClone(this.defaultValueByMode[this.pickerMode]);
+            this.$set(this.localValue, 'shortcutKey', shortcutKey);
+            this.reactiveValue = structuredClone(this.localValue);
+          }
         }
       }
     },
@@ -787,6 +792,30 @@ export default {
           }
         });
       });
+    },
+    setSelectionOnShortcut() {
+      // TODO: Костыль для применения кастомных шорткатов
+      const picker = this.$refs[`${this.idVisual}-range`];
+      const childrenList = picker.$children;
+      const containerId = `${this.idVisual}-range-picker-container`;
+      const modalContainerId = `${this.idVisual}-range-picker-container-DatePicker`;
+      if (childrenList) {
+        const pickerContainer = childrenList
+          .find((el) => el.$attrs.id === containerId);
+        if (pickerContainer) {
+          const modalContainer = pickerContainer.$children
+            .find((el) => el.$el.id === modalContainerId);
+          if (modalContainer) {
+            const shortcutContainer = modalContainer.$children
+              .find((el) => el.$el.classList.contains('shortcuts-container'));
+            if (shortcutContainer) {
+              const currentShortcut = this.shortcuts
+                .find((el) => el.key === this.localValue.shortcutKey);
+              shortcutContainer.select(currentShortcut || undefined);
+            }
+          }
+        }
+      }
     },
     setTokenAction() {
       const actions = this.actions.map((action) => ({
