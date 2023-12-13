@@ -1415,6 +1415,9 @@ export default {
             capture = [],
           } = this.dashFromStore[elem].actions.find(({ name }) => name === action) || {};
           capture.forEach((item) => result.add(item));
+          if (elem.includes('constructorSchemes')) {
+            return [{ text: '--', value: null }, ...capture];
+          }
         }
         return [{ text: '--', value: null }, ...result];
       };

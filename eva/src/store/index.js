@@ -330,13 +330,18 @@ export default new Vuex.Store({
         })
         .forEach((token) => {
           let value = objectValue;
+
           if (typeof objectValue === 'object') {
-            if (token.capture && token.capture in objectValue) {
-              value = objectValue[token.capture];
+            const trimCapture = token.capture ? token.capture.trim() : '';
+            if (trimCapture && trimCapture in objectValue) {
+              value = objectValue[trimCapture];
             } else if (clickedField) {
               value = objectValue[clickedField];
+            } else {
+              value = null;
             }
           }
+
           const {
             prefix = '',
             sufix = '',
