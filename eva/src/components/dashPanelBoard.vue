@@ -1289,11 +1289,12 @@ export default {
         return 0;
       }
       const pending = this.searches.filter((search) => search?.status === 'pending').length;
-      return pending / this.searches.length * 100
+      return (pending / this.searches.length) * 100;
     },
     editMode() {
       return this.dashFromStore?.editMode;
     },
+
     getColorError() {
       if (!this.$store.state.logError) {
         this.$store.commit('setState', [
@@ -2544,13 +2545,177 @@ export default {
                   || el?.classList?.contains('block-save')
                 );
               },
+              onclone: (container) => {
+                // tabulator
+                const allTableEl = container.querySelectorAll('.tabulator-tableholder');
+                const docAllTableEl = document.querySelectorAll('.tabulator-tableholder');
+
+                allTableEl.forEach((el, index) => {
+                  const tempContainer = document.createElement('div');
+                  tempContainer.style.width = el.style.width;
+                  tempContainer.style.height = el.style.height;
+                  tempContainer.style.overflow = 'hidden';
+
+                  tempContainer.classList = el.classList;
+                  tempContainer.innerHTML = el.innerHTML;
+
+                  tempContainer.children[0]
+                    .style.transform = `translate(-${docAllTableEl[index].scrollLeft}px, -${docAllTableEl[index].scrollTop}px`;
+
+                  if (el.parentElement) {
+                    const headersNode = el.parentElement.querySelector('.tabulator-headers');
+                    const headersCloneNode = headersNode.cloneNode(true);
+                    headersCloneNode.style.transform = `translate(-${docAllTableEl[index].scrollLeft}px, 0px)`;
+                    headersNode.parentElement.replaceChild(headersCloneNode, headersNode);
+                  }
+                  el.parentElement.replaceChild(tempContainer, el);
+                });
+
+                // heatmap
+                const allHeatmapEl = container.querySelectorAll('.heatmap-table');
+                const docAllHeatmapEl = document.querySelectorAll('.heatmap-table');
+
+                allHeatmapEl.forEach((el, index) => {
+                  const tableEl = el.querySelector('.v-data-table__wrapper');
+                  const originTableEl = docAllHeatmapEl[index].querySelector('.v-data-table__wrapper');
+
+                  const tempContainer = document.createElement('div');
+                  tempContainer.style.width = tableEl.style.width;
+                  tempContainer.style.height = tableEl.style.height;
+                  tempContainer.style.overflow = 'hidden';
+
+                  tempContainer.classList = tableEl.classList;
+                  tempContainer.innerHTML = tableEl.innerHTML;
+
+                  const hMapHeaderRow = tempContainer.querySelector('.heatmap-table__relative-row');
+
+                  hMapHeaderRow.style.transform = `translate(-${originTableEl.scrollLeft}px, 0px)`;
+
+                  tempContainer.querySelector('.heatmap-table__sticky-column')
+                    .style.transform = `translate(${originTableEl.scrollLeft}px, 0px)`;
+
+                  tempContainer.querySelector('table').style.position = 'relative';
+                  tempContainer.querySelector('thead').style.position = 'inherit';
+                  tempContainer.querySelector('thead').style.zIndex = '1';
+
+                  const hMapBody = tempContainer.querySelector('tbody');
+
+                  hMapBody.style.transform = `translate(-${originTableEl.scrollLeft}px, -${originTableEl.scrollTop}px`;
+
+                  const hMapBodyFirstCols = tempContainer.querySelectorAll('.heatmap-table__sticky-column');
+
+                  hMapBodyFirstCols.forEach((col) => {
+                    col.style.transform = `translate(${originTableEl.scrollLeft}px, 0px)`;
+                  });
+
+                  tableEl.parentElement.replaceChild(tempContainer, tableEl);
+                });
+
+                // tile
+                const allTileEl = container.querySelectorAll('.dash-tile');
+                const docAllTileEl = document.querySelectorAll('.dash-tile');
+
+                allTileEl.forEach((el, index) => {
+                  const tempContainer = document.createElement('div');
+                  tempContainer.style.width = el.style.width;
+                  tempContainer.style.height = el.style.height;
+                  tempContainer.style.overflow = 'hidden';
+
+                  tempContainer.classList = el.classList;
+                  tempContainer.innerHTML = el.innerHTML;
+
+                  tempContainer.children[0]
+                    .style.transform = `translate(0px, -${docAllTileEl[index].scrollTop}px`;
+
+                  el.parentElement.replaceChild(tempContainer, el);
+                });
+
+                // textarea
+                const allTextareaEl = container.querySelectorAll('.textarea-itself textarea');
+                const docAllTextareaEl = document.querySelectorAll('.textarea-itself textarea');
+
+                allTextareaEl.forEach((el, index) => {
+                  const tempContainer = document.createElement('div');
+                  const tempContainerInside = document.createElement('div');
+                  tempContainer.style.width = el.style.width;
+                  tempContainer.style.height = el.style.height;
+                  tempContainer.style.paddingRight = '12px';
+                  tempContainer.style.overflow = 'hidden';
+
+                  tempContainer.classList = el.classList;
+                  tempContainerInside.innerHTML = el.innerHTML;
+                  tempContainer.appendChild(tempContainerInside);
+
+                  tempContainer.children[0]
+                    .style.transform = `translate(0px, -${docAllTextareaEl[index].scrollTop}px`;
+
+                  el.parentElement.replaceChild(tempContainer, el);
+                });
+
+                // dynamicForm
+                const allDfEl = container.querySelectorAll('.dynamicForm');
+                const docAllDfEl = document.querySelectorAll('.dynamicForm');
+
+                allDfEl.forEach((el, index) => {
+                  const tempContainer = document.createElement('div');
+                  tempContainer.style.width = el.style.width;
+                  tempContainer.style.height = el.style.height;
+                  tempContainer.style.paddingRight = '12px';
+                  el.parentElement.style.overflow = 'hidden';
+
+                  tempContainer.classList = el.classList;
+                  tempContainer.innerHTML = el.innerHTML;
+
+                  tempContainer.style.transform = `translate(0px, -${docAllDfEl[index].parentElement.scrollTop - 2}px`;
+
+                  el.parentElement.replaceChild(tempContainer, el);
+                });
+
+                // grid-group
+                const allGgEl = container.querySelectorAll('.dash-grid-group > div');
+                const docAllGgEl = document.querySelectorAll('.dash-grid-group > div');
+
+                allGgEl.forEach((el, index) => {
+                  const tempContainer = document.createElement('div');
+                  tempContainer.style.width = el.style.width;
+                  tempContainer.style.height = el.style.height;
+                  tempContainer.style.overflow = 'hidden';
+
+                  tempContainer.classList = el.classList;
+                  tempContainer.innerHTML = el.innerHTML;
+
+                  tempContainer.children[0].style.transform = `translate(0px, -${docAllGgEl[index].scrollTop - 2}px`;
+
+                  el.parentElement.replaceChild(tempContainer, el);
+                });
+
+                // select
+                const allSelectEl = container.querySelectorAll('.target.select_show .v-select__selections');
+                const docAllSelectEl = document.querySelectorAll('.target.select_show .v-select__selections');
+
+                allSelectEl.forEach((el, index) => {
+                  el.style.overflow = 'hidden';
+                  el.style.paddingRight = '10px';
+
+                  el.querySelectorAll('.v-select__selection')
+                    .forEach((item) => {
+                      item.style.transform = `translate(0px, -${docAllSelectEl[index].scrollTop}px`;
+                    });
+                });
+
+                const allNoBgEl = container.querySelectorAll('.no-bg');
+
+                allNoBgEl.forEach((el) => {
+                  el.children[0].style.background = 'none';
+                });
+                return container;
+              },
             },
           ).then((dataUrl) => {
             const pdf = new JsPDF({
               orientation: sizeArray[0] > sizeArray[1] ? 'l' : 'p',
               unit: 'pt',
               format: sizeArray,
-              // compress: true,
               putOnlyUsedFonts: true,
             });
             pdf.addImage(dataUrl, 'PNG', 0, 0, sizeArray[0], sizeArray[1]);
@@ -2565,11 +2730,28 @@ export default {
 };
 </script>
 
+<style lang="css" scoped>
+.ds-progress {
+  .v-progress-circular__overlay {
+    transform-origin: bottom;
+    transform: rotateX(180deg);
+  }
+  .v-progress-circular__underlay {
+    transition: stroke 0.6s ease-in-out;
+  }
+  &.hidden-progress {
+    .v-progress-circular__underlay {
+      stroke: transparent;
+    }
+  }
+}
+</style>
+
 <style lang="scss">
 @import '../sass/dashPanelBoard.sass';
 </style>
 
-<style scoped>
+<style lang="scss" scoped>
 .iconsNavigations {
   display: flex;
   justify-content: center;
@@ -2616,20 +2798,5 @@ export default {
   position: absolute;
   opacity: 0;
   z-index: -1;
-}
-
-.ds-progress {
-  .v-progress-circular__overlay {
-    transform-origin: bottom;
-    transform: rotateX(180deg);
-  }
-  .v-progress-circular__underlay {
-    transition: stroke 0.6s ease-in-out;
-  }
-  &.hidden-progress {
-    .v-progress-circular__underlay {
-      stroke: transparent;
-    }
-  }
 }
 </style>

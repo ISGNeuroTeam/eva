@@ -272,7 +272,6 @@ import {
   mdiCheckBold,
 } from '@mdi/js';
 import moment from 'moment';
-import { throttle } from '@/js/utils/throttle';
 
 export default {
   name: 'DashDatePicker',
@@ -352,173 +351,33 @@ export default {
       defaultFormat: 'YYYY-MM-DD HH:mm',
       defaultFormatWithoutTime: 'YYYY-MM-DD',
       shortcut: '',
-      // new
-      localValue: {
-        range: {
-          value: {
-            start: null,
-            end: null,
-            shortcut: null,
-          },
-          valueForTokens: {
-            start: null,
-            end: null,
-          },
-        },
-        startEnd: {
-          value: {
-            start: null,
-            end: null,
-          },
-          valueForTokens: {
-            start: null,
-            end: null,
-          },
-        },
-        startEndManual: {
-          value: {
-            start: null,
-            end: null,
-          },
-          valueForTokens: {
-            start: null,
-            end: null,
-          },
-        },
-        exact: {
-          value: null,
-          valueForTokens: null,
-        },
-        exactManual: {
-          value: null,
-          valueForTokens: null,
-        },
-        time: {
-          value: {
-            every: null,
-            time: null,
-          },
-        },
+      defaultRangeBtnList: [
+        'thisDay',
+        'lastDay',
+        'thisWeek',
+        'lastWeek',
+        'last7Days',
+        'last30Days',
+        'thisMonth',
+        'lastMonth',
+        'thisYear',
+        'lastYear',
+      ],
+      rangeBtnOptions: {
+        thisDay: { label: 'текущий день', value: 'day' },
+        lastDay: { label: 'предыдущий день', value: '-day' },
+        thisWeek: { label: 'текущая неделя', value: 'isoWeek' },
+        lastWeek: { label: 'пред. неделя', value: '-isoWeek' },
+        last7Days: { label: 'последние 7 дней', value: 7 },
+        last30Days: { label: 'последние 30 дней', value: 30 },
+        thisMonth: { label: 'текущий месяц', value: 'month' },
+        lastMonth: { label: 'пред. месяц', value: '-month' },
+        thisYear: { label: 'текущий год', value: 'year' },
+        lastYear: { label: 'пред. год', value: '-year' },
       },
     };
   },
   computed: {
-    // new
-    getDashId() {
-      return this.idDashFrom;
-    },
-    getVisualId() {
-      return this.idFrom;
-    },
-    getDashFormStore() {
-      return this.$store.state[this.getDashId];
-    },
-    getVisualFromStore() {
-      return this.getDashFormStore[this.getVisualId];
-    },
-    getOptions() {
-      return this.getVisualFromStore.options;
-    },
-    getFormat() {
-      return this.getOptions?.timeOutputFormat;
-    },
-    getPickerMode() {
-      if (this.getOldValue) {
-        return this.getOldValue.mode;
-      }
-      if (!this.getOptions?.pickerMode) {
-        this.setDefaultPickerMode();
-      }
-      return this.getOptions?.pickerMode;
-    },
-    getTokens() {
-      return this.getDashFormStore?.tockens;
-    },
-    getTheme() {
-      return this.$store.getters.getTheme;
-    },
-    // TODO: Для обработки значений старой версии пикера
-    getOldValue() {
-      if (this.getPickerDate) {
-        const picker = this.getPickerDate;
-        if (picker.range) {
-          return {
-            mode: 'range',
-            value: picker.range,
-            valueForTokens: {
-              start: picker.startForStore,
-              end: picker.endForStore,
-            },
-          };
-        }
-        if (picker.start || picker.end) {
-          return {
-            mode: 'startEnd',
-            value: {
-              start: picker.start,
-              end: picker.end,
-            },
-            valueForTokens: {
-              start: picker.startForStore,
-              end: picker.endForStore,
-            },
-          };
-        }
-        if (picker.startCus || picker.endCus) {
-          return {
-            mode: 'startEndManual',
-            value: {
-              start: picker.startCus,
-              end: picker.endCus,
-            },
-            valueForTokens: {
-              start: picker.startForStore,
-              end: picker.endForStore,
-            },
-          };
-        }
-        if (picker.exactDate) {
-          return {
-            mode: 'exact',
-            value: picker.exactDate,
-            valueForTokens: picker.exactDateForStore,
-          };
-        }
-        if (picker.exactDateCustom) {
-          return {
-            mode: 'exact',
-            value: picker.exactDateCustom,
-            valueForTokens: picker.exactDateForStore,
-          };
-        }
-        if (picker.last.time || picker.last.every) {
-          return {
-            mode: 'time',
-            value: {
-              time: picker.last.time,
-              every: picker.last.every,
-            },
-            valueForTokens: null,
-          };
-        }
-      }
-      return null;
-    },
-    pickerValue: {
-      get() {
-        if (this.getOldValue) {
-          return this.getOldValue.value;
-        }
-        if (!this.getVisualFromStore?.pickerValue) {
-          this.setDefaultPickerValue();
-        }
-        return this.getVisualFromStore?.pickerValue[this.getPickerMode];
-      },
-      set(value) {
-        this.setPickerValue(value, this.getPickerMode);
-      },
-    },
-    // old
     dateTimeFormat() {
       const {
         timeOutputFormat,
@@ -595,6 +454,41 @@ export default {
           },
         ]);
       }
+      const pickerDate = this.dashFromStore.date;
+      if (!this.options?.timeOutputFormat) {
+        if (this.hideTimeSelect) {
+          if (pickerDate.end && pickerDate.start) {
+            // start-end
+            return {
+              ...pickerDate,
+              endForStore: this.addEndTime(
+                pickerDate.end,
+                this.defaultFormatWithoutTime,
+              ),
+            };
+          }
+          if (pickerDate.range) {
+            // range
+            return {
+              ...pickerDate,
+              endForStore: this.addEndTime(
+                pickerDate.range.end,
+                this.defaultFormatWithoutTime,
+              ),
+            };
+          }
+        }
+        if (pickerDate.range) {
+          // range
+          return {
+            ...pickerDate,
+            endForStore: this.addEndTime(
+              pickerDate.range.end,
+              this.defaultFormat,
+            ),
+          };
+        }
+      }
       // возвращаем либо новый созданный либо имеющийся
       return this.dashFromStore.date;
     },
@@ -662,43 +556,34 @@ export default {
       return '';
     },
     DTPickerCustomShortcuts() {
-      const shortcuts = [
-        { key: 'thisDay', label: 'текущий день', value: 'day' },
-        { key: 'lastDay', label: 'предыдущий день', value: '-day' },
-        { key: 'thisWeek', label: 'текущая неделя', value: 'isoWeek' },
-        { key: 'lastWeek', label: 'пред. неделя', value: '-isoWeek' },
-        { key: 'last7Days', label: 'последние 7 дней', value: 7 },
-        { key: 'last30Days', label: 'последние 30 дней', value: 30 },
-        { key: 'thisMonth', label: 'текущий месяц', value: 'month' },
-        { key: 'lastMonth', label: 'пред. месяц', value: '-month' },
-      ];
-
-      // если вкл. настройка - Расширить набор кнопок выбора диапазона дат
-      if (this.options?.expandRangeBtnsSet) {
-        // 1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.
-        const vk2title = new Map();
-        vk2title.set('1-2', '1 пг.');
-        vk2title.set('1-3', '9 месяцев');
-        vk2title.set('3-4', '2 пг.');
-        // eslint-disable-next-line no-restricted-syntax
-        for (const kv of [1, 2, '1-2', 3, '1-3', 4, '3-4']) {
-          shortcuts.push({
+      const rangeBtnList = this.options?.rangeBtnList || this.defaultRangeBtnList;
+      const vk2title = new Map();
+      vk2title.set('kv1-2', '1 пг.');
+      vk2title.set('kv1-3', '9 месяцев');
+      vk2title.set('kv3-4', '2 пг.');
+      // eslint-disable-next-line array-callback-return,consistent-return
+      return rangeBtnList.map((key) => {
+        if (key in this.rangeBtnOptions) {
+          return {
+            key,
+            ...this.rangeBtnOptions[key],
+          };
+        }
+        if (key.startsWith('kv')) {
+          const [, kv] = key.match(/^kv([\d-]+)$/);
+          return {
             key: `${kv}kv`,
-            label: vk2title.get(kv) || `${kv} кв.`,
+            label: vk2title.get(key) || `${kv} кв.`,
             value: () => {
-              const [start, end] = typeof kv === 'string' ? kv.split('-') : [kv, kv];
+              const [start, end] = kv.includes('-') ? kv.split('-') : [kv, kv];
               return {
                 start: moment().quarter(start).startOf('quarter'),
                 end: moment().quarter(end).endOf('quarter'),
               };
             },
-          });
+          };
         }
-      }
-
-      shortcuts.push({ key: 'thisYear', label: 'текущий год', value: 'year' });
-      shortcuts.push({ key: 'lastYear', label: 'пред. год', value: '-year' });
-      return shortcuts;
+      });
     },
   },
   watch: {
@@ -753,11 +638,9 @@ export default {
     }
   },
   mounted() {
-    // new
-    this.setPickerValue = throttle(this.setPickerValue, 200);
-    // old
     this.setTokenAction();
     this.date = structuredClone(this.getPickerDate);
+    this.commitTokenValue();
     if (this.date?.last?.time) {
       this.last = this.date.last;
       this.setTime(this.date.last.time);
@@ -766,158 +649,6 @@ export default {
     this.curDate = this.calcCurrentDate();
   },
   methods: {
-    // new
-    // TODO: Временно, для обновления старых компонентов на новую версию
-    updaterFn() {
-      if (this.getPickerDate) {
-        const picker = this.getPickerDate;
-        if (picker.range) {
-          this.$store.commit('setState', [{
-            object: this.getOptions,
-            prop: 'pickerMode',
-            value: 'range',
-          }]);
-          this.$store.commit('setState', [{
-            object: this.pickerValue,
-            prop: 'range',
-            value: {
-              value: picker.range,
-              valueForTokens: {
-                start: picker.startForStore,
-                end: picker.endForStore,
-              },
-            },
-          }]);
-        }
-        if (picker.start || picker.end) {
-          this.$store.commit('setState', [{
-            object: this.getOptions,
-            prop: 'pickerMode',
-            value: 'startEnd',
-          }]);
-          this.$store.commit('setState', [{
-            object: this.pickerValue,
-            prop: 'range',
-            value: {
-              value: {
-                start: picker.start,
-                end: picker.end,
-              },
-              valueForTokens: {
-                start: picker.startForStore,
-                end: picker.endForStore,
-              },
-            },
-          }]);
-        }
-        if (picker.startCus || picker.endCus) {
-          this.$store.commit('setState', [{
-            object: this.getOptions,
-            prop: 'pickerMode',
-            value: 'startEndManual',
-          }]);
-          this.$store.commit('setState', [{
-            object: this.pickerValue,
-            prop: 'startEndManual',
-            value: {
-              value: {
-                start: picker.startCus,
-                end: picker.endCus,
-              },
-              valueForTokens: {
-                start: picker.startForStore,
-                end: picker.endForStore,
-              },
-            },
-          }]);
-        }
-        if (picker.exactDate) {
-          this.$store.commit('setState', [{
-            object: this.getOptions,
-            prop: 'pickerMode',
-            value: 'exact',
-          }]);
-          this.$store.commit('setState', [{
-            object: this.pickerValue,
-            prop: 'exact',
-            value: {
-              value: picker.exactDate,
-              valueForTokens: picker.exactDateForStore,
-            },
-          }]);
-        }
-        if (picker.exactDateCustom) {
-          this.$store.commit('setState', [{
-            object: this.getOptions,
-            prop: 'pickerMode',
-            value: 'exactManual',
-          }]);
-          this.$store.commit('setState', [{
-            object: this.pickerValue,
-            prop: 'exactManual',
-            value: {
-              value: picker.exactDateCustom,
-              valueForTokens: picker.exactDateForStore,
-            },
-          }]);
-        }
-        if (picker.last.time || picker.last.every) {
-          this.$store.commit('setState', [{
-            object: this.getOptions,
-            prop: 'pickerMode',
-            value: 'time',
-          }]);
-          this.$store.commit('setState', [{
-            object: this.pickerValue,
-            prop: 'time',
-            value: {
-              value: {
-                time: picker.last.time,
-                every: picker.last.every,
-              },
-              valueForTokens: null,
-            },
-          }]);
-        }
-      }
-    },
-    setDefaultPickerMode() {
-      this.$store.commit('setState', [{
-        object: this.getOptions,
-        prop: 'pickerMode',
-        value: 'range',
-      }]);
-    },
-    setDefaultPickerValue() {
-      this.$store.commit('setState', [{
-        object: this.getVisualFromStore,
-        prop: 'pickerValue',
-        value: this.localValue[this.getPickerMode],
-      }]);
-    },
-    setPickerValue(value, mode) {
-      if (this.getOldValue) {
-        // Обнуляем старые значения
-        this.$store.commit('setState', [{
-          object: this.getVisualFromStore,
-          prop: 'date',
-          value: null,
-        }]);
-      }
-      if (!this.getVisualFromStore?.pickerValue) {
-        this.$store.commit('setState', [{
-          object: this.getVisualFromStore,
-          prop: 'pickerValue',
-          value: null,
-        }]);
-      }
-      this.$store.commit('setState', [{
-        object: this.getVisualFromStore,
-        prop: 'pickerValue',
-        value: structuredClone(value),
-      }]);
-    },
-    // old
     setColor() {
       Object.keys(this.color).forEach((item) => {
         this.color[item] = '$accent_ui_color';
@@ -1080,9 +811,6 @@ export default {
         end: null,
         shortcut: undefined,
       };
-      const start = null;
-      const end = null;
-      const rangeStr = '';
       switch (elem) {
         case 'dt':
           if (this.start) {
@@ -1099,6 +827,7 @@ export default {
               date: this.end,
               oldFormat,
               newFormat,
+              isEnd: true,
             });
           } else {
             this.end = null;
@@ -1117,6 +846,7 @@ export default {
               date: this.range.end,
               oldFormat,
               newFormat,
+              isEnd: true,
             });
           }
           this.range = range;
@@ -1197,10 +927,20 @@ export default {
         } else {
           this.range = data.range;
         }
-        current = [
-          data.range?.start || '',
-          data.range?.end || '',
-        ].join(' - ');
+        if (this.hideTimeSelect && this.range?.end) {
+          current = [
+            this.range?.start || '',
+            moment(this.range.end, this.dateTimeFormat).set({
+              hour: 23,
+              minute: 59,
+            }).format(this.dateTimeFormat),
+          ].join(' - ');
+        } else {
+          current = [
+            this.range?.start || '',
+            this.range?.end || '',
+          ].join(' - ');
+        }
       }
 
       if (data.startCus !== null) {
@@ -1303,6 +1043,7 @@ export default {
           });
           this.endForStore = this.formatDateToResult({
             date: this.end,
+            isEnd: true,
           });
           this.clearFields([
             'start',
@@ -1320,6 +1061,7 @@ export default {
             });
             this.endForStore = this.formatDateToResult({
               date: this.range.end,
+              isEnd: true,
             });
           }
           this.clearFields([
@@ -1402,11 +1144,15 @@ export default {
       }
     },
     formatDateToResult({
-      date, oldFormat, newFormat, isTime,
+      date,
+      oldFormat = '',
+      newFormat = '',
+      isEnd = false,
+      isTime = false,
     }) {
       if (date === null) return '';
       const {
-        timeOutputFormat = null,
+        timeOutputFormat = '',
       } = this.options;
       if (isTime) {
         if (timeOutputFormat || newFormat) {
@@ -1423,10 +1169,24 @@ export default {
       if (timeOutputFormat) {
         return moment(date, timeOutputFormat).format(timeOutputFormat);
       }
-      return parseInt(
-        new Date(date).getTime() / 1000,
-        10,
-      );
+      if (isEnd) {
+        if (this.hideTimeSelect) {
+          return this.addEndTime(date, this.defaultFormatWithoutTime);
+        }
+        if (this.range) {
+          return this.addEndTime(date, this.defaultFormat);
+        }
+      }
+
+      return +moment(date, this.defaultFormat).format('X');
+    },
+    addEndTime(date, format) {
+      return +moment(date, format)
+        .set({
+          hour: 23,
+          minute: 59,
+        })
+        .format('X');
     },
     setDate() {
       if (this.getElementType) {
@@ -1444,8 +1204,8 @@ export default {
         elem: this.idFrom,
         action: 'select',
         value: {
-          start: this.startForStore || '',
-          end: this.endForStore || '',
+          start: this.startForStore || this.date.startForStore || '',
+          end: this.endForStore || this.date.endForStore || '',
           exact: this.exactDateForStore || '',
         },
       });

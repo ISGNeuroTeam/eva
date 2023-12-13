@@ -391,8 +391,6 @@ export default {
       'closeListByEnter',
     ],
     picker: [
-      'pickerOptions',
-      'pickerMode',
       'selectingExactDate',
       'showLastTimeBlock',
       'showChoseDateAndTimeBlock',
@@ -403,7 +401,7 @@ export default {
       'useLastTimeTemplate',
       'lastTimeTemplateStart',
       'lastTimeTemplateEnd',
-      'expandRangeBtnsSet',
+      'rangeBtnList',
     ],
     pickerV2: [
       'pickerOptions',
@@ -880,6 +878,12 @@ export default {
       placeholder: 'Пример: now()',
     },
     {
+      option: 'selectingExactDate',
+      description: 'Выбор точной даты',
+      elem: 'switch',
+      default: false,
+    },
+    {
       option: 'expandRangeButtonsSet',
       description: 'Расширить набор кнопок выбора диапазона дат (1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.)',
       relation() {
@@ -889,31 +893,63 @@ export default {
       elem: 'switch',
       default: false,
     },
-
+    {
+      option: 'rangeBtnList',
+      description: 'Набор кнопок выбора диапазона дат',
+      relation() {
+        // Вызывается в контексте modalSettings
+        return !this.options?.selectingExactDate;
+      },
+      elem: 'select-checkbox',
+      default: [
+        'thisDay',
+        'lastDay',
+        'thisWeek',
+        'lastWeek',
+        'last7Days',
+        'last30Days',
+        'thisMonth',
+        'lastMonth',
+        'thisYear',
+        'lastYear',
+      ],
+      items: [
+        { value: 'thisDay', text: 'текущий день' },
+        { value: 'lastDay', text: 'предыдущий день' },
+        { value: 'thisWeek', text: 'текущая неделя' },
+        { value: 'lastWeek', text: 'пред. неделя' },
+        { value: 'last7Days', text: 'последние 7 дней' },
+        { value: 'last30Days', text: 'последние 30 дней' },
+        { value: 'thisMonth', text: 'текущий месяц' },
+        { value: 'lastMonth', text: 'пред. месяц' },
+        { value: 'kv1', text: '1 кв.' },
+        { value: 'kv2', text: '2 кв.' },
+        { value: 'kv1-2', text: '1 пг.' },
+        { value: 'kv3', text: '3 кв.' },
+        { value: 'kv1-3', text: '9 месяцев' },
+        { value: 'kv4', text: '4 кв.' },
+        { value: 'kv3-4', text: '2 пг.' },
+        { value: 'thisYear', text: 'текущий год' },
+        { value: 'lastYear', text: 'пред. год' },
+      ],
+    },
     {
       option: 'showLastTimeBlock',
       description: 'Показать блок: Выбор времени',
       elem: 'switch',
-      relation() {
-        return false;
-      },
       default: true,
     },
     {
       option: 'showChoseDateAndTimeBlock',
       description: 'Показать блок: Выбор времени и даты',
       elem: 'switch',
-      relation() {
-        return false;
-      },
       default: true,
     },
     {
       option: 'showRangeDateBlock',
       relation() {
         // Вызывается в контексте modalSettings
-        // return !this.options?.selectingExactDate;
-        return false;
+        return !this.options?.selectingExactDate;
       },
       description: 'Показать блок: Диапазон дат',
       elem: 'switch',
@@ -923,9 +959,6 @@ export default {
       option: 'showCustomInputBlock',
       description: 'Показать блок: Ввод даты и времени вручную',
       elem: 'switch',
-      relation() {
-        return false;
-      },
       default: true,
     },
     {
@@ -933,16 +966,16 @@ export default {
       description: 'Формат даты для результата',
       elem: 'text-field',
       default: '',
-      placeholder: 'Пример: YYYY-MM-DD HH:mm',
+      placeholder(options) {
+        return options.hideTimeSelect
+          ? 'Пример: YYYY-MM-DD'
+          : 'Пример: YYYY-MM-DD HH:mm';
+      },
     },
     {
       option: 'hideTimeSelect',
       description: 'Скрыть выбор времени в календаре',
       elem: 'switch',
-      relation() {
-        const targetModes = ['start-end', 'range', 'exact'];
-        return targetModes.includes(this.options?.pickerMode);
-      },
       default: false,
     },
     {
@@ -951,8 +984,7 @@ export default {
       elem: 'switch',
       relation() {
         // Вызывается в контексте modalSettings
-        // return !this.options?.selectingExactDate;
-        return this.options?.pickerMode === 'time';
+        return !this.options?.selectingExactDate;
       },
       default: false,
     },
@@ -961,9 +993,7 @@ export default {
       description: 'Шаблон стартового времени',
       relation() {
         // Вызывается в контексте modalSettings
-        // return !this.options?.selectingExactDate
-        //   && this.options.useLastTimeTemplate;
-        return this.options?.pickerMode === 'time'
+        return !this.options?.selectingExactDate
           && this.options.useLastTimeTemplate;
       },
       elem: 'text-field',
@@ -977,32 +1007,14 @@ export default {
       description: 'Шаблон конечного времени',
       relation() {
         // Вызывается в контексте modalSettings
-        return this.options?.pickerMode === 'time'
+        return !this.options?.selectingExactDate
           && this.options.useLastTimeTemplate;
       },
       elem: 'text-field',
       default: 'now()',
       placeholder: 'Пример: now()',
     },
-    {
-      option: 'selectingExactDate',
-      description: 'Выбор точной даты',
-      elem: 'switch',
-      relation() {
-        return false;
-      },
-      default: false,
-    },
-    {
-      option: 'expandRangeBtnsSet',
-      description: 'Расширить набор кнопок выбора диапазона дат (1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.)',
-      relation() {
-        // Вызывается в контексте modalSettings
-        return !this.options?.selectingExactDate;
-      },
-      elem: 'switch',
-      default: false,
-    },
+
     // dashSingle
     {
       option: 'subnumber',

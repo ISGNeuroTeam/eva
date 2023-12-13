@@ -12,6 +12,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Constructor-schemes: Fixed text color
+
+## [1.162.0]
+
+### Added
+- GridGroup: Added error output for dynamic visualization elements
+
+### Changed
+- MultiLine: The default x-axis is __time_, then _time_, then the first of the columns
+- DatePicker: changed setting of the list of range buttons
+
+### Fixed
+- MultiLine:
+  - Detection X axis data type
+  - Using space and other symbols in config from data source
+  - Caption order on barplots
+- Constructor-schemes: Fixed color handling on text items when plotting a survey from a data source
+- Constructor-schemes: Refactoring of the method for creating lines was performed
+- Export to PDF handles element scroll position
+- Export to PDF handles element transparent background
+- Date-picker: Fixed range handling, 23 hours and 59 minutes is added to the final date
 
 ## [1.161.0]
 
