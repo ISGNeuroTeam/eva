@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- SingleValue: Null in the value field results in an error.
 
 ## [1.162.1]
 
