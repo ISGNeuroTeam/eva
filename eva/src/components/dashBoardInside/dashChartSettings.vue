@@ -1387,12 +1387,12 @@ export default {
 
       if (this.commonAxisY) {
         metricsByGroup.forEach((group, i) => {
-          const max = this.getMaxValueYAxis(this.dataRestFrom, metricsByGroup[i]);
+          const [firstMetric] = metricsByGroup[i];
           group.forEach((metric) => {
-            if (metric.name === max.key) {
+            if (metric === firstMetric) {
               delete metric.yAxisLink;
             } else {
-              metric.yAxisLink = max.key;
+              metric.yAxisLink = firstMetric.name;
             }
           });
         });

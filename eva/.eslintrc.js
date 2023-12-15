@@ -23,6 +23,7 @@ module.exports = {
   ],
 
   rules: {
+    'max-len': [1, { code: 110 }],
     'import/extensions': 'off',
     'import/prefer-default-export': 'off',
     'import/no-unresolved': 'off',

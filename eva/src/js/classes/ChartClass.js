@@ -246,14 +246,29 @@ export default class ChartClass {
     // metrics for this group
     const metrics = this.metrics
       .filter(({ name, group }) => name !== this.xMetric && group === num);
-    // common barplots
     const firstBarplotMetric = metrics.find(({ type }) => type === 'barplot');
-    metrics.forEach((metric) => {
-      if (metric.type === 'barplot' && metric.name !== firstBarplotMetric.name) {
-        metric.yAxisLink = firstBarplotMetric.yAxisLink || firstBarplotMetric.name;
-      }
-    });
-    const barplotMetrics = metrics.filter(({ type }) => type === 'barplot');
+
+    if (metrics.length > 0 && metrics.filter(({ yAxisLink }) => !yAxisLink).length === 0) {
+      console.warn(
+        'all axes busy: %s',
+        metrics.map(({ name, type, yAxisLink }) => `[${type[0]}]${name} >> ${yAxisLink}`).join(', ')
+      )
+      metrics
+        .filter(({ type }) => type === 'barplot')
+        .forEach((metric) => {
+          delete metric.yAxisLink;
+        })
+    }
+
+    metrics
+      .filter(({ type, yAxisLink, name }) => type === 'barplot' && !yAxisLink)
+      .forEach((metric) => {
+        if (metric.name !== firstBarplotMetric.name) {
+          metric.yAxisLink = firstBarplotMetric.name
+        } else {
+          delete metric.yAxisLink
+        }
+      });
 
     const metricsNames = metrics.map(({ name }) => name);
     const axes = metrics
@@ -276,7 +291,8 @@ export default class ChartClass {
         ...extendsMetricsNames.map((name) => d[name]),
       ]));
 
-      if (barplotType === 'accumulation') {
+      if (metric.type === 'barplot' && barplotType === 'accumulation') {
+        const barplotMetrics = metrics.filter(({ type }) => type === 'barplot');
         this.data.forEach((item) => {
           let up = 0; let down = 0;
           barplotMetrics.forEach(({ name }) => {
@@ -936,7 +952,8 @@ export default class ChartClass {
       .attr('stroke', 'red');
   }
 
-  renderPeakTexts(chartGroup, metric, line) {
+  renderPeakTexts(chartGroup, metric, line, groupNum) {
+    const yAxisKey = this.getYAxisKeyByMetric(metric, groupNum);
     const { numberFormat = false } = this.options;
     const data = line.filter((d, i) => {
       if (metric.lastDot === '0' && line.length === i + 1) {
@@ -963,7 +980,7 @@ export default class ChartClass {
         if (metric.type === 'barplot' && this.options.xAxis.barplotType === 'divided') {
           xPos += metric.n * this.barplotWidth * 1.1;
         }
-        let yPos = this.y[metric.yAxisLink || metric.name](d[metric.name]);
+        let yPos = this.y[yAxisKey](d[metric.name]);
         if (metric.type === 'barplot' && d[metric.name] < 0) {
           yPos += 15;
         }
@@ -1107,7 +1124,8 @@ export default class ChartClass {
 
     // add text (new logic)
     if (metric.showText) {
-      this.renderPeakTexts(chartGroup, metric, this.data.filter((item) => item[name] !== null));
+      // eslint-disable-next-line max-len
+      this.renderPeakTexts(chartGroup, metric, this.data.filter((item) => item[name] !== null), num);
     }
   }
 
