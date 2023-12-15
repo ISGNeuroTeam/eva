@@ -86,9 +86,10 @@ const templates = {
       strokeSize: '1.5px',
     },
   },
-  'data-type-0': {
+  // Таблица с вертикальным разделением
+  'data-type-0': (callback) => ({
     template: `
-      <g class="b-data-node">
+      <g class="b-data-node" @click="tag.onClick(tag)">
         <!--Area-->
         <defs>
           <!--Border-radius-bg-->
@@ -153,11 +154,18 @@ const templates = {
         </template>
         <template v-if="tag && tag.items && tag.items.length > 0">
           <template v-for="(item, index) in tag.items">
+            <rect
+              x="0"
+              :width="layout.width"
+              :height="tag.getRowSize(layout)"
+              fill="transparent"
+              :y="tag.getRowPosition(layout, index)"
+            />
             <text
               dx="0.5em"
               class="b-data-node__text b-data-node__text--left"
               fill="#3C3B45"
-              :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
+              :dy="tag.getTextDy(layout, index)"
               alignment-baseline="middle"
               :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
               :font-family="tag.fontFamily || ''"
@@ -167,7 +175,7 @@ const templates = {
             </text>
             <text
               text-anchor="end"
-              :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
+              :dy="tag.getTextDy(layout, index)"
               alignment-baseline="middle"
               :dx="(layout.width / 2) - 1"
               class="b-data-node__text b-data-node__text--right"
@@ -206,23 +214,39 @@ const templates = {
           id: '',
           textLeft: '-',
           textRight: '-',
+          dataObject: null,
         },
         {
           id: '',
           textLeft: '-',
           textRight: '-',
+          dataObject: null,
         },
         {
           id: '',
           textLeft: '-',
           textRight: '-',
+          dataObject: null,
         },
         {
           id: '',
           textLeft: '-',
           textRight: '-',
+          dataObject: null,
         },
       ],
+      getTextDy(layout, index) {
+        const oneElementHeight = layout.height / this.items.length;
+        const curElIndex = index + 1;
+        return oneElementHeight * curElIndex - (oneElementHeight / 2);
+      },
+      getRowPosition(layout, index) {
+        const oneElementHeight = layout.height / this.items.length;
+        return oneElementHeight * index;
+      },
+      getRowSize(layout) {
+        return layout.height / this.items.length;
+      },
       // Обязательные методы
       updateSettings(dataRest, options) {
         return {
@@ -238,6 +262,12 @@ const templates = {
               ...item,
               textLeft,
               textRight,
+              dataObject: {
+                Description: dataItem?.Description,
+                NameObject: dataItem?.NameObject,
+                TagName: dataItem?.TagName,
+                value: dataItem?.value,
+              },
             };
           }),
         };
@@ -252,6 +282,12 @@ const templates = {
               || typeof targetData?.value === 'string'
                 ? targetData.value
                 : '-',
+              dataObject: {
+                Description: targetData?.Description,
+                NameObject: targetData?.NameObject,
+                TagName: targetData?.TagName,
+                value: targetData?.value,
+              },
             };
           }
           return nodeDataItem;
@@ -261,11 +297,17 @@ const templates = {
           items: updatedItems,
         };
       },
+      onClick(prop) {
+        if (callback) {
+          callback(prop.dataType, Utils.getDataObject(prop.items));
+        }
+      },
     },
-  },
-  'data-type-1': {
+  }),
+  // Таблица с горизонтальным разделением(максимум из 2 элементов)
+  'data-type-1': (callback) => ({
     template: `
-      <g class="b-data-node">
+      <g class="b-data-node" @click="tag.onClick(tag)">
         <!--Area-->
         <defs>
           <clipPath :id="'border-radius-' + tag.nodeId">
@@ -299,6 +341,7 @@ const templates = {
           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
           :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
         />
+        <!--Text-top-->
         <text
          :dx="layout.width / 2"
          text-anchor="middle"
@@ -311,6 +354,7 @@ const templates = {
         >
           {{ tag.textFirst }}
         </text>
+        <!--Text-bottom-->
         <text
          :dx="layout.width / 2"
          text-anchor="middle"
@@ -335,6 +379,7 @@ const templates = {
       id: '',
       textFirst: '-',
       textSecond: '-',
+      dataObject: null,
       // Обязательные методы
       updateSettings(dataRest, options) {
         const dataItem = Utils.getDataItemById(dataRest, options.id);
@@ -346,6 +391,12 @@ const templates = {
           ...options,
           textFirst,
           textSecond,
+          dataObject: {
+            Description: dataItem?.Description,
+            NameObject: dataItem?.NameObject,
+            TagName: dataItem?.TagName,
+            value: dataItem?.value,
+          },
         };
       },
       updateData(node, updatedData) {
@@ -357,13 +408,25 @@ const templates = {
             ? targetData.value
             : '-',
           valueColor: targetData?.value_color || null,
+          dataObject: {
+            Description: targetData?.Description,
+            NameObject: targetData?.NameObject,
+            TagName: targetData?.TagName,
+            value: targetData?.value,
+          },
         };
       },
+      onClick(prop) {
+        if (callback) {
+          callback(prop.dataType, Utils.getDataObject(prop.dataObject));
+        }
+      },
     },
-  },
-  'data-type-2': {
+  }),
+  // Накопитель (с одним или несколькими значениями)
+  'data-type-2': (callback) => ({
     template: `
-      <g class="b-data-node">
+      <g class="b-data-node" @click="tag.onClick(tag)">
         <!--Area-->
         <defs>
           <clipPath :id="'border-radius-' + tag.nodeId">
@@ -473,7 +536,7 @@ const templates = {
       },
       getDy(layout, index) {
         return this.items?.length > 1 ? (((layout.height / this.items.length) * (index + 1))
-            - ((layout.height / this.items.length) / 2)) : layout.height / 2;
+          - ((layout.height / this.items.length) / 2)) : layout.height / 2;
       },
       getPosition(index, layout, summaryValueHeight, isReverse) {
         if (!summaryValueHeight) {
@@ -494,6 +557,7 @@ const templates = {
       },
       items: [
         {
+          dataObject: null,
           value: 0,
           id: '',
           textColor: {
@@ -518,10 +582,19 @@ const templates = {
       ],
       // Обязательные методы
       updateSettings(dataRest, options) {
-        const updatedItems = options.items.map((item) => ({
-          ...item,
-          value: Utils.getDataItemById(dataRest, item.id)?.value || item?.value || '-',
-        }));
+        const updatedItems = options.items.map((item) => {
+          const dataItem = Utils.getDataItemById(dataRest, item.id);
+          return {
+            ...item,
+            value: dataItem?.value || item?.value || '-',
+            dataObject: {
+              Description: dataItem?.Description,
+              NameObject: dataItem?.NameObject,
+              TagName: dataItem?.TagName,
+              value: dataItem?.value,
+            },
+          };
+        });
         if (!options?.summaryValueHeight) {
           updatedItems.sort((a, b) => {
             // Сортировка по полю 'value' как строковых значений
@@ -545,13 +618,19 @@ const templates = {
         const updatedItems = node.tag.items.map((nodeDataItem) => {
           const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
           const value = typeof targetData?.value === 'number'
-              || typeof targetData?.value === 'string'
+          || typeof targetData?.value === 'string'
             ? targetData.value
             : '-';
           if (targetData) {
             nodeDataItem = {
               ...nodeDataItem,
               value,
+              dataObject: {
+                Description: targetData?.Description,
+                NameObject: targetData?.NameObject,
+                TagName: targetData?.TagName,
+                value: targetData?.value,
+              },
             };
           }
           return nodeDataItem;
@@ -561,11 +640,16 @@ const templates = {
           items: updatedItems,
         };
       },
+      onClick(prop) {
+        if (callback) {
+          callback(prop.dataType, Utils.getDataObject(prop.items));
+        }
+      },
     },
-  },
-  'data-type-3': {
+  }),
+  'data-type-3': (callback) => ({
     template: `
-      <g class="b-data-node">
+      <g class="b-data-node" @click="tag.onClick(tag)">
         <!--Area-->
         <defs>
           <clipPath :id="'border-radius-' + tag.nodeId">
@@ -611,6 +695,7 @@ const templates = {
       defaultImage: '',
       defaultImagePath: '',
       imageLayout: null,
+      dataObject: null,
       imageList: [
         {
           value: 0,
@@ -641,6 +726,12 @@ const templates = {
             id: options?.id,
             value,
             imageList: options.imageList,
+            dataObject: {
+              Description: dataItem?.Description,
+              NameObject: dataItem?.NameObject,
+              TagName: dataItem?.TagName,
+              value: dataItem?.value,
+            },
           };
         }
         return {
@@ -648,23 +739,40 @@ const templates = {
           id: options?.id,
           value,
           imageList: options.imageList,
+          dataObject: {
+            Description: dataItem?.Description,
+            NameObject: dataItem?.NameObject,
+            TagName: dataItem?.TagName,
+            value: dataItem?.value,
+          },
         };
       },
       updateData(node, updatedData) {
         const targetData = updatedData.find((item) => item.TagName === node.tag.id);
-        const value = Utils.isValidValue(targetData.value)
-          ? targetData.value
+        const value = Utils.isValidValue(targetData?.value)
+          ? targetData?.value
           : '-';
         node.tag = {
           ...node.tag,
           value: `${value}`,
+          dataObject: {
+            Description: targetData?.Description || '',
+            NameObject: targetData?.NameObject || '',
+            TagName: targetData?.TagName || '',
+            value: targetData?.value || '',
+          },
         };
       },
+      onClick(prop) {
+        if (callback) {
+          callback(prop.dataType, Utils.getDataObject(prop.dataObject));
+        }
+      },
     },
-  },
-  'data-type-4': {
+  }),
+  'data-type-4': (callback) => ({
     template: `
-      <g class="b-data-node">
+      <g class="b-data-node" @click="tag.onClick(tag)">
         <g :transform="tag.calculateScale(tag.type, layout).stringResult">
           <template v-if="tag.type === 0">
             <path 
@@ -1228,21 +1336,10 @@ const templates = {
           label: 'Сверху',
           value: 1,
         },
-        // {
-        //   label: 'Снизу',
-        //   value: 2,
-        // },
-        // {
-        //   label: 'Слева',
-        //   value: 3,
-        // },
-        // {
-        //   label: 'Справа',
-        //   value: 4,
-        // },
       ],
       textSecondSize: 24,
       textSecondValue: '',
+      dataObjects: [],
       calculateScale(type, layout) {
         const { initialWidth, initialHeight } = this.types[type];
         const finalWidth = layout.width;
@@ -1309,6 +1406,20 @@ const templates = {
           color: colorByValue?.color || null,
           value: secondMetricById,
           textFirstValue: firstMetricById || '',
+          dataObjects: [
+            {
+              Description: dataItemFirst?.Description,
+              NameObject: dataItemFirst?.NameObject,
+              TagName: dataItemFirst?.TagName,
+              value: dataItemFirst?.value,
+            },
+            {
+              Description: dataItemSecond?.Description,
+              NameObject: dataItemSecond?.NameObject,
+              TagName: dataItemSecond?.TagName,
+              value: dataItemSecond?.value,
+            },
+          ],
         };
       },
       updateData(node, updatedData) {
@@ -1320,10 +1431,29 @@ const templates = {
           color: updatedColor?.color ? updatedColor.color : null,
           textFirstValue: `${metricForText?.value || ''}`,
           value: `${metricForColor?.value || ''}`,
+          dataObjects: [
+            {
+              Description: metricForText?.Description,
+              NameObject: metricForText?.NameObject,
+              TagName: metricForText?.TagName,
+              value: metricForText?.value,
+            },
+            {
+              Description: metricForColor?.Description,
+              NameObject: metricForColor?.NameObject,
+              TagName: metricForColor?.TagName,
+              value: metricForColor?.value,
+            },
+          ],
         };
       },
+      onClick(prop) {
+        if (callback) {
+          callback(prop.dataType, Utils.getDataObject(prop.dataObjects));
+        }
+      },
     },
-  },
+  }),
   'label-type-0': {
     template: `
       <g class="b-label-node">
@@ -1434,7 +1564,10 @@ const templates = {
 // Все методы обязательно должны быть перечислены
 const fieldsForDelete = [
   'getTransform',
+  'getTextDy',
   'getDy',
+  'getRowSize',
+  'getRowPosition',
   'getPosition',
   'getHeight',
   'getActiveImage',
@@ -1451,6 +1584,7 @@ const fieldsForDelete = [
   'getTextStyles',
   'getXPosition',
   'getYPosition',
+  'onClick',
 ];
 export default {
   templates,

@@ -9,7 +9,9 @@ import ElementCreator from './ElementCreator.js';
 import elementTemplates from '@/js/classes/ConstructorSchemes/elementTemplates';
 
 class SchemeUpdater {
-  constructor({ graph, elementsFromStore, updateStoreCallback }) {
+  constructor({
+    graph, elementsFromStore, updateStoreCallback, elClickCallback,
+  }) {
     this.graph = graph;
     this.updateStoreCallback = updateStoreCallback;
     this.elementsFromStore = structuredClone(elementsFromStore);
@@ -17,6 +19,7 @@ class SchemeUpdater {
     this.edges = this.graph.edges.toArray();
     this.ports = this.graph.ports.toArray();
     this.labels = this.graph.labels.toArray();
+    this.elClickCallback = elClickCallback;
   }
 
   get allElementsOnGraph() {
@@ -60,6 +63,7 @@ class SchemeUpdater {
         const elementCreator = new ElementCreator({
           graph: this.graph,
           elements: structuredClone(this.elementsFromStore),
+          elClickCallback: this.elClickCallback,
         });
         elementCreator.buildGraph().then(() => {
           resolve();
