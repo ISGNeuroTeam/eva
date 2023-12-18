@@ -274,6 +274,7 @@
                 class="ui-btn__save ui-btn__save--dash"
                 :color="theme.$secondary_text"
                 :class="{'v-btn--active': opensave}"
+                :loading="dash_saving"
                 v-on="on"
                 @click="openSave"
               >
@@ -395,18 +396,24 @@
         :style="blockToolStyle"
       >
         <div class="iconsNavigations">
-          <v-icon
+          <v-btn
+            icon
             :color="theme.$primary_button"
             @click="runAllSearches"
           >
-            {{ mdiAnimationPlay }}
-          </v-icon>
-          <v-icon
+            <v-icon>
+              {{ mdiAnimationPlay }}
+            </v-icon>
+          </v-btn>
+          <v-btn
+            icon
             :color="theme.$primary_button"
             @click="openModal"
           >
-            {{ plus_icon }}
-          </v-icon>
+            <v-icon>
+              {{ plus_icon }}
+            </v-icon>
+          </v-btn>
         </div>
 
         <draggable
@@ -466,14 +473,18 @@
               :open-delay="openTooltipDelay"
             >
               <template v-slot:activator="{ on }">
-                <v-icon
+                <v-btn
+                  icon
                   class="search-play"
+                  :disabled="search.status === 'pending'"
                   :color="theme.$primary_button"
                   v-on="on"
                   @click="startSearch(search)"
                 >
-                  {{ play }}
-                </v-icon>
+                  <v-icon>
+                    {{ play }}
+                  </v-icon>
+                </v-btn>
               </template>
               <span>Запустить ИД</span>
             </v-tooltip>
@@ -956,17 +967,18 @@
           </div>
           <div class="buttons-save">
             <v-btn
-              class="save-btn my-2"
               small
               :color="theme.$primary_button"
+              :disabled="dash_saving"
               @click="saveDash"
             >
               Да
             </v-btn>
             <v-btn
-              class="save-btn"
+              class="ml-2"
               small
               :color="theme.$primary_button"
+              :disabled="dash_saving"
               @click="
                 opensave = false;
                 save_elem = false;
@@ -1180,6 +1192,7 @@ export default {
       opensearch: false,
       openfilter: false,
       opensave: false,
+      dash_saving: false,
       openwarning: false,
       openexim: false,
       sign: true,
@@ -1936,13 +1949,15 @@ export default {
       });
     },
     runAllSearches() {
-      this.searches.forEach((search) => {
-        this.$store.commit('updateSearchStatus', {
-          idDash: this.idDash,
-          sid: search.sid,
-          status: 'empty',
+      this.searches
+        .filter(({ status }) => status !== 'pending')
+        .forEach((search) => {
+          this.$store.commit('updateSearchStatus', {
+            idDash: this.idDash,
+            sid: search.sid,
+            status: 'empty',
+          });
         });
-      });
     },
     async startSearch(search) {
       this.$store.commit('updateSearchStatus', {
@@ -2427,6 +2442,7 @@ export default {
       }
     },
     saveDash() {
+      this.dash_saving = true;
       const dash = this.dashFromStore;
       const response = this.$store.dispatch('saveDashboard', {
         id: this.idDash,
@@ -2452,6 +2468,8 @@ export default {
           this.save_elem = false;
           this.opensave = false;
         }, 2000);
+      }).finally(() => {
+        this.dash_saving = false;
       });
     },
     updateDash(dash) {
@@ -2801,5 +2819,9 @@ export default {
   position: absolute;
   opacity: 0;
   z-index: -1;
+}
+.buttons-save {
+  margin-top: -5px;
+  margin-bottom: -5px;
 }
 </style>
