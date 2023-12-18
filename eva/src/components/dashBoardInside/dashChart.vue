@@ -302,7 +302,7 @@ export default {
     xMetric() {
       const { xAxis = {} } = this.options;
       const { xMetric = null } = xAxis;
-      if (xMetric) {
+      if (xMetric && this.firstDataRowMetricList.includes(xMetric)) {
         return xMetric;
       }
       const findXMetrics = ['_time', 'time'];

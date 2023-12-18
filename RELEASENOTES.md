@@ -1,3 +1,11 @@
+# [1.163.0] - 2023-12-18
+
+### Fixed
+- SingleValue: Resolved an error when using null in the value field.
+- Multiline:
+  - Corrected the functionality of the general Y-axis option on barplots with lines.
+  - Ensured proper display of the graph when the X-axis metric is missing from the data.
+
 # [1.162.1] - 2023-12-12
 
 ### Fixed

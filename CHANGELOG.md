@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.163.0]
+
+### Fixed
+- SingleValue: Null in the value field results in an error.
+- Multiline:
+    - The general Y-axis option does not work correctly on barplots with lines.
+    - If the X axis metric is missing from the data, the graph is not displayed.
+
 ## [1.162.1]
 
 ### Fixed
