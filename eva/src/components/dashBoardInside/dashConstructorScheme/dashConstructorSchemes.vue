@@ -912,12 +912,12 @@ export default {
     },
     tokenActionsByElType() {
       const filteredSavedElements = this.savedGraphObject
-        .filter((el) => el.data?.tag?.fromOtl?.type != null);
+        .filter((el) => el.data?.tag?.fromOtl);
 
       if (filteredSavedElements.length === 0) {
         return [];
       }
-
+      const actionsNameArr = [];
       const result = filteredSavedElements.reduce((acc, el) => {
         const { type } = el.data.tag.fromOtl;
         const parentCapture = el.data.tag.fromOtl.parent_capture;
@@ -954,8 +954,14 @@ export default {
 
         return acc;
       }, []);
-
-      return [...new Set(result)];
+      const filteredResult = [];
+      result.forEach((el) => {
+        if (!actionsNameArr.includes(el.name)) {
+          actionsNameArr.push(el.name);
+          filteredResult.push(el);
+        }
+      });
+      return filteredResult;
     },
     innerSize() {
       return {
@@ -1120,6 +1126,17 @@ export default {
         this.setActions();
       }
     },
+    actions: {
+      deep: true,
+      handler(val) {
+        const test = [];
+        val.forEach((el) => {
+          if (!test.includes(el.name)) {
+            test.push(el.name);
+          }
+        });
+      },
+    },
   },
   created() {
     // if (!this.savedGraphObject) {
@@ -1226,10 +1243,23 @@ export default {
           if (!type || (!type.includes('label-type') && type !== 'image-node')) {
             return;
           }
-
-          const actions = this.getActions(type, 'click');
-          this.addTokenTypeActions(actions, data);
-
+          let actions = [];
+          if (type === 'image-node') {
+            if (data.fromOtl.token_type) {
+              const tokenType = data.fromOtl.token_type;
+              const [element, groupWithCount] = tokenType.split('-');
+              const [group] = groupWithCount.split('_');
+              actions.push(`click:el-${element}`);
+              if (group) {
+                actions.push(`click:el-${element}-${group}`);
+              }
+            }
+          } else {
+            actions = this.addTokenTypeActions(
+              this.getActions(type, 'click'),
+              data,
+            );
+          }
           this.$store.commit('tokenAction', {
             idDash: this.idDashFrom,
             elem: this.idFrom,
@@ -1261,8 +1291,9 @@ export default {
       if (data?.fromOtl?.token_type) {
         const tokenTypeSplited = data.fromOtl.token_type.split('-');
         const extActions = this.getActions(tokenTypeSplited.join('-'), 'click:el');
-        actions.push(...extActions);
+        return [...new Set([...actions, ...extActions])];
       }
+      return actions;
     },
     processEvents(events, data) {
       if (events.length !== 0) {
