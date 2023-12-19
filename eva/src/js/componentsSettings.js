@@ -181,7 +181,7 @@ export default {
     },
     pickerV2: {
       width: 365,
-      height: 100,
+      height: 150,
     },
     select: {
       width: 480,
