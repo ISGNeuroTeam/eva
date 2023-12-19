@@ -358,7 +358,7 @@ export default {
       return this.getDashFromStore[this.idVisual];
     },
     getTokens() {
-      return this.getDashFormStore?.tockens;
+      return this.getDashFromStore?.tockens;
     },
     getOptions() {
       return this.getVisualFromStore.options;
@@ -489,12 +489,39 @@ export default {
         this.setTokenValue();
       }
     },
+    localValue: {
+      handler() {
+        this.setDateFromTokens();
+      },
+      deep: true,
+    },
+    getTokens: {
+      handler(tokens) {
+        if (this.pickerMode === 'exactManual') {
+          tokens.forEach(({ name }) => {
+            if (this.localValue.date.includes(`$${name}$`)) {
+              this.setDate();
+            }
+          });
+        } else if (this.pickerMode === 'startEndManual') {
+          tokens.forEach(({ name }) => {
+            if (this.localValue.start.includes(`$${name}$`)
+            || this.localValue.end.includes(`$${name}$`)) {
+              this.setDate();
+            }
+          });
+        }
+      },
+      deep: true,
+    },
   },
   created() {
     this.setDefaultOptions();
     this.setTokenAction();
     this.loadValueFromStore();
-    this.setDateFromShortcut();
+    if (this.pickerMode === 'range') {
+      this.setDateFromShortcut();
+    }
   },
   mounted() {
     this.setTokenValue = throttle(this.setTokenValue, 200);
@@ -502,6 +529,10 @@ export default {
     this.setDate();
   },
   methods: {
+    // TODO: Преобразование значений старого пикера в новые
+    updater() {
+
+    },
     checkFormatOnIncludesTime(format) {
       const tokensTimeFormat = ['h', 'H', 's', 'k', 'm', 'a', 'A'];
       let isFormatWithoutTime = true;
@@ -619,6 +650,16 @@ export default {
         this.setTokenValue();
       });
     },
+    setDateFromTokens() {
+      if (this.pickerMode === 'exactManual') {
+        this.formattedValue = this.replaceTokens(this.localValue.date);
+      }
+      if (this.pickerMode === 'startEndManual') {
+        const start = this.replaceTokens(this.localValue.start);
+        const end = this.replaceTokens(this.localValue.end);
+        this.formattedValue = `${start || '...'} - ${end || '...'}`;
+      }
+    },
     setDateFromShortcut() {
       if (this.localValue?.shortcut) {
         const updateShortcut = this.getShortcuts.find(
@@ -637,15 +678,6 @@ export default {
               ...this.localValue,
               ...this.reactiveValue,
             };
-            if (this.pickerMode === 'time') {
-              const timePeriod = this.getTimePeriod(
-                this.reactiveValue.count,
-                this.reactiveValue.type,
-              );
-              this.$set(this.localValue, 'period', timePeriod.period);
-              this.$set(this.localValue, 'start', timePeriod.start);
-              this.$set(this.localValue, 'end', timePeriod.end);
-            }
           });
         });
       } else {
@@ -653,15 +685,18 @@ export default {
       }
     },
     updateFormattedValue() {
-      if (['range', 'startEnd', 'startEndManual'].includes(this.pickerMode)) {
+      if (['range', 'startEnd'].includes(this.pickerMode)) {
         if (!(this.localValue.start && this.localValue.end)) {
           this.formattedValue = '';
         } else {
           this.formattedValue = `${this.localValue.start || '...'} - ${this.localValue.end || '...'}`;
         }
       }
-      if (['exact', 'exactManual'].includes(this.pickerMode)) {
+      if (['exact'].includes(this.pickerMode)) {
         this.formattedValue = `${this.localValue.date || ''}`;
+      }
+      if (['exactManual', 'startEndManual'].includes(this.pickerMode)) {
+        this.setDateFromTokens();
       }
       // Через includes на будущее, если будут подобные типы даты
       if (['time'].includes(this.pickerMode)) {
@@ -692,16 +727,16 @@ export default {
       if (time) {
         switch (type) {
           case 'second':
-            period = Number(time) * 1000;
+            period = Number(time);
             break;
           case 'minute':
-            period = Number(time) * 1000 * 60;
+            period = Number(time) * 60;
             break;
           case 'hour':
-            period = Number(time) * 1000 * 3600;
+            period = Number(time) * 3600;
             break;
           case 'day':
-            period = Number(time) * 1000 * 3600 * 24;
+            period = Number(time) * 3600 * 24;
             break;
           default:
             period = '';
@@ -709,7 +744,7 @@ export default {
         }
       }
       if (this.useTimeTemplate) {
-        const secPeriod = (period / 1000).toFixed();
+        const secPeriod = period.toFixed();
         let start = '';
         let end = '';
         if (this.timeTemplateStart) {
@@ -729,7 +764,6 @@ export default {
       return {
         start: period ? +moment().format('X') - period : '',
         end: period ? +moment().format('X') : '',
-        period,
       };
     },
     updateFormat({ format, oldFormat }) {
@@ -770,42 +804,40 @@ export default {
         exact: '',
       };
       const copyValue = structuredClone(this.localValue);
-      switch (this.pickerMode) {
-        case 'range':
-          result.start = this.formatForToken(copyValue.start);
-          result.end = this.formatForToken(copyValue.end);
-          break;
-        case 'startEnd':
-          result.start = this.formatForToken(copyValue.start);
-          result.end = this.formatForToken(copyValue.end);
-          break;
-        case 'exact':
-          result.exact = this.formatForToken(copyValue.date);
-          break;
-        case 'startEndCustom':
-          result.start = copyValue.start;
-          result.end = copyValue.end;
-          break;
-        case 'exactCustom':
-          result.exact = copyValue.date;
-          break;
-        case 'time':
-          result.start = copyValue.start;
-          result.end = copyValue.end;
-          if (this.useTimeTemplate) {
-            const secPeriod = (copyValue.period / 1000).toFixed();
-            if (this.timeTemplateStart) {
-              // eslint-disable-next-line no-template-curly-in-string
-              result.start = this.timeTemplateStart.replace('${sec}', secPeriod);
-            }
-            if (this.timeTemplateEnd) {
-              // eslint-disable-next-line no-template-curly-in-string
-              result.end = this.timeTemplateEnd.replace('${sec}', secPeriod);
-            }
-          }
-          break;
-        default:
-          break;
+      if (this.pickerMode === 'range') {
+        result.start = this.formatForToken(copyValue.start);
+        result.end = this.formatForToken(copyValue.end);
+        return result;
+      }
+      if (this.pickerMode === 'startEnd') {
+        result.start = this.formatForToken(copyValue.start);
+        result.end = this.formatForToken(copyValue.end);
+        return result;
+      }
+      if (this.pickerMode === 'exact') {
+        result.exact = this.formatForToken(copyValue.date);
+        return result;
+      }
+      if (this.pickerMode === 'startEndManual') {
+        result.start = this.replaceTokens(copyValue.start, true);
+        result.end = this.replaceTokens(copyValue.end, true);
+        return result;
+      }
+      if (this.pickerMode === 'exactManual') {
+        result.exact = this.replaceTokens(copyValue.date, true);
+        return result;
+      }
+      if (this.pickerMode === 'time') {
+        const {
+          start,
+          end,
+        } = this.getTimePeriod(
+          copyValue.count,
+          copyValue.type,
+        );
+        result.start = start;
+        result.end = end;
+        return result;
       }
       return result;
     },
@@ -873,6 +905,29 @@ export default {
           exact,
         },
       });
+    },
+    convertingTokens(element) {
+      this.getTokens.forEach((token) => {
+        element = element.replaceAll(`$${token.name}$`, token.value);
+      });
+      return element;
+    },
+    replaceTokens(value, noFormat) {
+      let format = this.defaultFormat.dateTime;
+      if (this.outputFormat) {
+        format = this.outputFormat;
+      } else if (this.hideTime) {
+        format = this.defaultFormat.date;
+      }
+      let updatedValue = value;
+
+      if (/\$\w+\$/.test(value)) {
+        updatedValue = this.convertingTokens(value);
+        if (/^\d+$/.test(updatedValue) && !noFormat) {
+          updatedValue = moment(+updatedValue * 1000).format(format);
+        }
+      }
+      return `${updatedValue}`;
     },
   },
 };
@@ -963,8 +1018,32 @@ export default {
         border-color: var(--main_border);
       }
     }
-    &::v-deep .datepicker-day-text {
-      color: var(--main_text) !important;
+    &::v-deep button.datepicker-day {
+      &.enable {
+        .datepicker-day-text {
+          color: var(--main_text) !important;
+        }
+
+        &.selected {
+          .datepicker-day-text {
+            color: var(--main_bg) !important;
+          }
+          .datepicker-day-effect {
+            background-color: var(--accent_ui_color) !important;
+          }
+        }
+
+        &.between {
+          .datepicker-day-text {
+            color: var(--main_bg) !important;
+          }
+        }
+      }
+      &:hover {
+        .datepicker-day-text {
+          color: var(--main_bg) !important;
+        }
+      }
     }
     &::v-deep .datepicker-today {
       background-color: transparent !important;
@@ -988,18 +1067,46 @@ export default {
         &.is-selected {
           .custom-button-content {
             span {
-              color: var(--main_text) !important;
+              color: var(--main_bg) !important;
             }
+          }
+          .custom-button-effect {
+            background-color: var(--accent_ui_color) !important;
           }
         }
         &:hover {
           .custom-button-content {
             span {
-              color: var(--main_text) !important;
+              color: var(--main_bg) !important;
             }
           }
         }
 
+      }
+    }
+    &::v-deep .year-month-selector {
+      background-color: var(--secondary_bg);
+      .custom-button {
+        .custom-button-content {
+          color: var(--main_text) !important;
+          fill: var(--main_text) !important;
+        }
+        &.is-selected {
+          .custom-button-content {
+            color: var(--main_bg) !important;
+          }
+        }
+        &:hover {
+          .custom-button-content {
+            color: var(--main_bg) !important;
+            span {
+              fill: var(--main_bg) !important;
+            }
+          }
+        }
+        .custom-button-effect {
+          background-color: var(--accent_ui_color) !important;
+        }
       }
     }
   }
