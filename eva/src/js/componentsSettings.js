@@ -418,6 +418,8 @@ export default {
       'ListDS',
       'onButtonToken',
       'ListTokens',
+      'btnDebounce',
+      'btnDebounceTime',
     ],
     textarea: [
       'searchBtn',
@@ -1177,6 +1179,22 @@ export default {
         }
         return [];
       },
+    },
+    {
+      label: 'btnDebounce',
+      option: 'btnDebounce',
+      description: 'Блокировка кнопки при нажатии',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      label: 'btnDebounceTime',
+      relation: ['btnDebounce'],
+      option: 'btnDebounceTime',
+      description: 'Время блокировки в мс.',
+      elem: 'text-field',
+      elemType: 'number',
+      default: 1000,
     },
 
     // dashSelect

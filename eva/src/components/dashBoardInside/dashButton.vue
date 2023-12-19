@@ -15,7 +15,7 @@
     >
       <v-btn
         class="name"
-        :disabled="eventLoading"
+        :disabled="eventLoading || timeout_waiting"
         :loading="eventLoading"
         :class="{ textDecoration: underline }"
         :style="{
@@ -25,7 +25,7 @@
           fontSize: `${fontSize}px`,
           background: optionsData.background,
         }"
-        @click="update()"
+        @click="onClickBtn"
       >
         {{ optionsData.name ? optionsData.name : 'Подтвердить' }}
       </v-btn>
@@ -109,6 +109,7 @@ export default {
       },
       eventLoading: false,
       underline: false,
+      timeout_waiting: false,
     };
   },
   computed: {
@@ -201,6 +202,25 @@ export default {
       }
       this.underline = options.underline;
       this.optionsData.onButton = options?.onButton;
+    },
+    onClickBtn() {
+      const {
+        btnDebounce,
+        btnDebounceTime,
+      } = this.getOptions;
+      if (btnDebounce) {
+        if (this.timeout_waiting) {
+          return;
+        }
+        this.timeout_waiting = true;
+        this.update();
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => {
+          this.timeout_waiting = false;
+        }, Math.abs(btnDebounceTime));
+      } else {
+        this.update();
+      }
     },
     update() {
       if (this.optionsData.onButton) {
