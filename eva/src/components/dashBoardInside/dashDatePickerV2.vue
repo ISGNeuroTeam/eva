@@ -741,8 +741,8 @@ export default {
           ? moment(this.localValue.end, oldFormat).format(format)
           : '...';
         this.formattedValue = `${start} - ${end}`;
-        this.$set(this.localValue, 'start', start);
-        this.$set(this.localValue, 'end', end);
+        this.$set(this.localValue, 'start', start === '...' ? null : start);
+        this.$set(this.localValue, 'end', end === '...' ? null : end);
       }
       if (['exact'].includes(this.pickerMode)) {
         if (this.formattedValue) {
