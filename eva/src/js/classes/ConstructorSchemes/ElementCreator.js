@@ -329,8 +329,11 @@ class ElementCreator {
               // old saved color to new format
               if (typeof element.tag.textColor === 'string') {
                 const oldColor = element.tag.textColor;
+                const rgbaObject = Utils.colorToRgbaObject(oldColor);
                 element.tag.textColor = {
                   hex: oldColor,
+                  rgbaObject: Utils.colorToRgbaObject(oldColor),
+                  rgbaString: Utils.colorToString(rgbaObject, false),
                 };
               }
             }
