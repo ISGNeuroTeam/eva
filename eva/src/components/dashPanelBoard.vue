@@ -399,6 +399,7 @@
           <v-btn
             icon
             :color="theme.$primary_button"
+            :disabled="all_ds_running"
             @click="runAllSearches"
           >
             <v-icon>
@@ -1297,6 +1298,9 @@ export default {
       'isAdmin',
       'permissions',
     ]),
+    all_ds_running() {
+      return this.searches.filter(({ status }) => status !== 'pending').length === 0;
+    },
     hasLoadingSearches() {
       if (!this.searches.length) {
         return 0;
