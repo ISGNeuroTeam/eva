@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - SingleValue: zero is not displayed.
+- Table: table coloring by event does not work.
 
 ## [1.163.0]
 
