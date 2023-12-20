@@ -56,6 +56,8 @@
 </template>
 
 <script>
+import visualisation from '@/js/visualisationCRUD';
+
 export default {
   name: 'ModalDelete',
   props: {
@@ -195,6 +197,20 @@ export default {
     deleteBtn() {
       // кнопка удаления
       const id = this.deleteId.replace(/\[|\]|\s/g, ''); // получаем id и отсеиваем все лишние знаки
+
+      // удаление модальных визуализаций
+      const elements = this.dashFromStore[id]?.options?.titleActions?.filter((elem) => elem.type === 'modal');
+      if (elements?.length) {
+        elements.forEach((element) => {
+          const nameElem = this.dashFromStore[element.elemName]?.name_elem;
+          visualisation.delete({
+            idDash: this.idDash,
+            id: element.elemName,
+            name: nameElem,
+            spaceName: element.type,
+          });
+        });
+      }
 
       this.$store.commit('deleteDashboardVisualization', {
         idDash: this.idDash,
