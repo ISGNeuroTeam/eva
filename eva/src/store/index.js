@@ -330,7 +330,10 @@ export default new Vuex.Store({
         })
         .forEach((token) => {
           let value = null;
-          if (objectValue?.length) {
+          if (
+            typeof objectValue !== 'string'
+            && objectValue?.length
+          ) {
             let mappedValue = objectValue.map((el) => JSON.stringify(el));
             if (token?.capture) {
               mappedValue = objectValue.map((el) => el[token.capture]);
