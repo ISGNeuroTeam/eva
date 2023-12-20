@@ -1191,10 +1191,11 @@ export default {
       label: 'btnDebounceTime',
       relation: ['btnDebounce'],
       option: 'btnDebounceTime',
-      description: 'Время блокировки в мс.',
+      description: 'Время блокировки в секундах',
       elem: 'text-field',
       elemType: 'number',
-      default: 1000,
+      default: 1,
+      placeholder: '1',
     },
 
     // dashSelect

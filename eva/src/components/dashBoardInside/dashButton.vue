@@ -184,6 +184,7 @@ export default {
   },
   methods: {
     updateOptionsData() {
+      this.timeout_waiting = false;
       const options = this.getOptions;
       if (options.color) {
         this.optionsData.colorText = options.color;
@@ -217,7 +218,7 @@ export default {
         clearTimeout(this.timeout);
         this.timeout = setTimeout(() => {
           this.timeout_waiting = false;
-        }, Math.abs(btnDebounceTime));
+        }, Math.abs((btnDebounceTime || 1) * 1000));
       } else {
         this.update();
       }
