@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The Save Dashboard button is locked when the dashboard is saved.
 
 ### Fixed
+- SingleValue: zero is not displayed.
 
 ## [1.163.0]
 
