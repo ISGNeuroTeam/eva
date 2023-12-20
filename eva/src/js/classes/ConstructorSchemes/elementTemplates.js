@@ -647,9 +647,10 @@ const templates = {
       },
     },
   }),
-  'data-type-3': (callback) => ({
+  // Динамическое изображение
+  'data-type-3': (/* callback */) => ({
     template: `
-      <g class="b-data-node" @click="tag.onClick(tag)">
+      <g class="b-data-node">
         <!--Area-->
         <defs>
           <clipPath :id="'border-radius-' + tag.nodeId">
@@ -756,17 +757,12 @@ const templates = {
           ...node.tag,
           value: `${value}`,
           dataObject: {
-            Description: targetData?.Description || '',
-            NameObject: targetData?.NameObject || '',
-            TagName: targetData?.TagName || '',
-            value: targetData?.value || '',
+            Description: targetData?.Description,
+            NameObject: targetData?.NameObject,
+            TagName: targetData?.TagName,
+            value: targetData?.value,
           },
         };
-      },
-      onClick(prop) {
-        if (callback) {
-          callback(prop.dataType, Utils.getDataObject(prop.dataObject));
-        }
       },
     },
   }),

@@ -302,6 +302,7 @@ class ElementCreator {
         const { template, dataRest } = typeof templateList[element.tag.dataType] === 'function'
           ? templateList[element.tag.dataType](elClickCallback)
           : templateList[element.tag.dataType];
+
         if (element.tag.dataType === 'data-type-3') {
           const imagePath = element.tag.activeImage?.path || element.tag.defaultImagePath;
           createdNode = graph.createNodeAt({
@@ -317,6 +318,7 @@ class ElementCreator {
             tag: {
               ...dataRest,
               ...element.tag,
+              onClick: dataRest.onClick,
               fontFamily: elementTemplates.fontFamily,
               nodeId: element.tag.nodeId || element.hashCode(),
             },
@@ -357,6 +359,7 @@ class ElementCreator {
             tag: {
               ...dataRest,
               ...tag,
+              onClick: dataRest.onClick,
               fontFamily: elementTemplates.fontFamily,
               nodeId: element.tag.nodeId || element.hashCode(),
             },

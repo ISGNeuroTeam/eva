@@ -851,9 +851,14 @@ class ConstructorSchemesClass {
   }
 
   addObjectClickCallback(item) {
-    const isLabelOrImage = item.tag.dataType.includes('label') || item.tag.dataType.includes('image');
-    if (typeof this.onClickObject === 'function' && isLabelOrImage) {
-      this.onClickObject(item?.tag?.dataType, item?.tag);
+    const isValidElement = item.tag.dataType.includes('label')
+      || item.tag.dataType.includes('image');
+    if (typeof this.onClickObject === 'function') {
+      if (item.tag.dataType === 'data-type-3') {
+        this.onClickObject(item?.tag?.dataType, Utils.getDataObject(item?.tag?.dataObject));
+      } else if (isValidElement) {
+        this.onClickObject(item?.tag?.dataType, item?.tag);
+      }
     }
   }
 
@@ -986,7 +991,6 @@ class ConstructorSchemesClass {
             ...filteredElementTag,
           });
         }
-        this.addObjectClickCallback(evt.item);
       } else if (evt.item instanceof IEdge) {
         if (!evt.item?.tag) {
           evt.item.tag = {

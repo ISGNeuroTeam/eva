@@ -1258,6 +1258,7 @@ export default {
           background: this.theme.$secondary_bg,
         },
         onClickObject: (type, data) => {
+          console.log(type, data);
           if (!this.isEdit) {
             const targetElements = [
               'label',
