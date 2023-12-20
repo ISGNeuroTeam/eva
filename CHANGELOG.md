@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Visualization button: added option Lock button when pressed.
 - Added dashboard saving indicator.
 
 ### Changed
