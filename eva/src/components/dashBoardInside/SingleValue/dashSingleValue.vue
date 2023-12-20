@@ -61,7 +61,7 @@
             />
           </span>
           <span
-            v-if="metric.value && metric.value.toString"
+            v-if="metric.value !== undefined && metric.value.toString"
             class="metric-value"
             :class="`color-${metric.color}`"
             style="
