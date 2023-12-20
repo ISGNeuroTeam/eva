@@ -8,10 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added dashboard saving indicator.
 
 ### Changed
+- The button start all data sources, starts only free data sources.
+- The Save Dashboard button is locked when the dashboard is saved.
 
 ### Fixed
+- SingleValue: zero is not displayed.
 
 ## [1.163.0]
 
