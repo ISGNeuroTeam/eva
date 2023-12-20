@@ -516,6 +516,7 @@ export default {
     },
   },
   created() {
+    this.updater();
     this.setDefaultOptions();
     this.setTokenAction();
     this.loadValueFromStore();
@@ -531,7 +532,92 @@ export default {
   methods: {
     // TODO: Преобразование значений старого пикера в новые
     updater() {
+      const oldDate = this.getVisualFromStore.date;
+      if (oldDate) {
+        const {
+          end = null,
+          endForStore = null,
+          endCus = null,
+          range = null,
+          start = null,
+          startForStore = null,
+          startCus = null,
+          exactDate = null,
+          exactDateForStore = null,
+          exactDateCustom = null,
+          last = null,
+        } = oldDate;
+        let mode = null;
+        let value = null;
+        let options = null;
+        if (range) {
+          mode = 'range';
+          value = range;
+          options = {
+            format: this.getVisualFromStore.timeOutputFormat,
+            hideTime: this.getVisualFromStore.hideTimeSelect,
+          };
+        } else if (end || start) {
+          mode = 'startEnd';
+          value = {
+            start,
+            end,
+          };
+          options = {
+            format: this.getVisualFromStore.timeOutputFormat,
+            hideTime: this.getVisualFromStore.hideTimeSelect,
+          };
+        } else if (endCus || startCus) {
+          mode = 'startEndManual';
+          value = {
+            start: startCus,
+            end: endCus,
+          };
+        } else if (exactDate) {
+          mode = 'exact';
+          value = {
+            date: exactDate,
+          };
+          options = {
+            format: this.getVisualFromStore.timeOutputFormat,
+            hideTime: this.getVisualFromStore.hideTimeSelect,
+          };
+        } else if (exactDateCustom) {
+          mode = 'exactManual';
+          value = {
+            date: exactDateCustom,
+          };
+        } else if (last && last?.every && last?.time) {
+          mode = 'time';
+          value = {
+            count: last.every,
+            type: last.time,
+            start: '',
+            end: '',
+            period: '',
+          };
+        }
+        if (mode && value) {
+          this.$store.commit('setState', [{
+            object: this.getOptions,
+            prop: 'pickerMode',
+            value: mode,
+          }]);
+          this.$store.commit('setState', [{
+            object: this.getVisualFromStore,
+            prop: 'pickerValue',
+            value,
+          }]);
+        }
+        if (options) {
 
+        }
+        console.log({
+          mode,
+          value,
+          options,
+        });
+      }
     },
     checkFormatOnIncludesTime(format) {
       const tokensTimeFormat = ['h', 'H', 's', 'k', 'm', 'a', 'A'];
