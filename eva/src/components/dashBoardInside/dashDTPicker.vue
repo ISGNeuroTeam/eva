@@ -624,15 +624,6 @@ export default {
         this.updateFormat('exactDateCustom', oldFormat, newFormat);
       }
     },
-    getTockens: {
-      handler(val, oldVal) {
-        console.group();
-        console.log(structuredClone(oldVal));
-        console.log(structuredClone(val));
-        console.groupEnd();
-      },
-      deep: true,
-    },
   },
   created() {
     const data = this.getPickerDate;
