@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Visualization button: added option Lock button when pressed.
 - Added dashboard saving indicator.
+- Constructor-schemes: Added processing of clicking on elements with data and binding tokens to them
 
 ### Changed
 - The button start all data sources, starts only free data sources.
