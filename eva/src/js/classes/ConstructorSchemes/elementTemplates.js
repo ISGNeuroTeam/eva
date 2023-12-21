@@ -90,15 +90,6 @@ const templates = {
   'data-type-0': (callback) => ({
     template: `
       <g class="b-data-node">
-        <!--Clickable area-->
-        <rect
-          x="0"
-          y="0"
-          :width="layout.width"
-          :height="layout.height"
-          fill="transparent"
-          @click="tag.onClick(tag)"
-        />
         <!--Area-->
         <defs>
           <!--Border-radius-bg-->
@@ -205,6 +196,15 @@ const templates = {
             />
           </template>
         </template>
+        <!--Clickable area-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height"
+          fill="transparent"
+          @click="tag.onClick(tag)"
+        />
       </g>
     `,
     width: 150,
@@ -317,15 +317,6 @@ const templates = {
   'data-type-1': (callback) => ({
     template: `
       <g class="b-data-node">
-        <!--Clickable area-->
-        <rect
-          x="0"
-          y="0"
-          :width="layout.width"
-          :height="layout.height"
-          fill="transparent"
-          @click="tag.onClick(tag)"
-        />
         <!--Area-->
         <defs>
           <clipPath :id="'border-radius-' + tag.nodeId">
@@ -385,6 +376,15 @@ const templates = {
         >
           {{ tag.textSecond }}
         </text>
+        <!--Clickable area-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height"
+          fill="transparent"
+          @click="tag.onClick(tag)"
+        />
       </g>
     `,
     width: 150,
@@ -445,15 +445,6 @@ const templates = {
   'data-type-2': (callback) => ({
     template: `
       <g class="b-data-node">
-        <!--Clickable area-->
-        <rect
-          x="0"
-          y="0"
-          :width="layout.width"
-          :height="layout.height"
-          fill="transparent"
-          @click="tag.onClick(tag)"
-        />
         <!--Area-->
         <defs>
           <clipPath :id="'border-radius-' + tag.nodeId">
@@ -528,6 +519,15 @@ const templates = {
             </text>
           </template>
         </template>
+        <!--Clickable area-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height"
+          fill="transparent"
+          @click="tag.onClick(tag)"
+        />
       </g>
     `,
     width: 150,
@@ -799,15 +799,6 @@ const templates = {
   'data-type-4': (callback) => ({
     template: `
       <g class="b-data-node">
-        <!--Clickable area-->
-        <rect
-          x="0"
-          y="0"
-          :width="layout.width"
-          :height="layout.height"
-          fill="transparent"
-          @click="tag.onClick(tag)"
-        />
         <g :transform="tag.calculateScale(tag.type, layout).stringResult">
           <template v-if="tag.type === 0">
             <path
@@ -1310,6 +1301,15 @@ const templates = {
             </defs>
           </template>
         </g>
+        <!--Clickable area-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height"
+          fill="transparent"
+          @click="tag.onClick(tag)"
+        />
       </g>
     `,
     width: 195,
