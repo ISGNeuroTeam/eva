@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.164.0]
+
+### Added
 - Visualization button: added option Lock button when pressed.
 - Added dashboard saving indicator.
 - Added feature for the onclick event that allows to open a modal window when click on an element in the Constructor-schemes
