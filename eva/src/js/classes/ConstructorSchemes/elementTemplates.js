@@ -307,7 +307,6 @@ const templates = {
         };
       },
       onClick(prop) {
-        console.log('template', typeof callback, prop);
         if (callback) {
           callback(prop.dataType, Utils.getDataObject(prop.items));
         }
@@ -436,7 +435,6 @@ const templates = {
         };
       },
       onClick(prop) {
-        console.log('template', typeof callback, prop);
         if (callback) {
           callback(prop.dataType, Utils.getDataObject(prop.dataObject));
         }
@@ -670,7 +668,6 @@ const templates = {
         };
       },
       onClick(prop) {
-        console.log('template', typeof callback, prop);
         if (callback) {
           callback(prop.dataType, Utils.getDataObject(prop.items));
         }
@@ -1486,7 +1483,6 @@ const templates = {
         };
       },
       onClick(prop) {
-        console.log('template', typeof callback, prop);
         if (callback) {
           callback(prop.dataType, Utils.getDataObject(prop.dataObjects));
         }

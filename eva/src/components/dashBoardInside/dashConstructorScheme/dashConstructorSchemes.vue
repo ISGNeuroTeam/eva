@@ -1261,7 +1261,6 @@ export default {
       }
     },
     clickSchemeObjectCallback(type, data) {
-      console.log('component', type, data);
       if (!this.isEdit) {
         // Validate
         const targetElements = [
