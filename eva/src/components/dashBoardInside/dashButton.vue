@@ -248,6 +248,9 @@ export default {
         tokens,
       });
     },
+    actionOpenModal(item) {
+      this.$store.commit('setVisualisationModalData', { idDash: this.idDash, data: item });
+    },
     actionOpen(targetLink, header, widthPersent, heightPersent) {
       // размер нового окна
       const width = window.screen.width * widthPersent;
@@ -358,6 +361,8 @@ export default {
               route: this.$router,
               store: this.$store,
             });
+          } else if (item.action.toLowerCase() === 'openmodal') {
+            this.actionOpenModal(item);
           } else if (item.action.toLowerCase() === 'open') {
             // если экшен open
             this.actionOpen(
