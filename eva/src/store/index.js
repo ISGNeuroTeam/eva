@@ -320,6 +320,13 @@ export default new Vuex.Store({
       if (!state[idDash]?.tockens) {
         return;
       }
+      console.log({
+        idDash,
+        elem,
+        action,
+        value: objectValue,
+        capture: clickedField = null,
+      });
       state[idDash].tockens
         .filter((token) => {
           if (token.elem !== elem) return false;
@@ -330,10 +337,9 @@ export default new Vuex.Store({
         })
         .forEach((token) => {
           let value = null;
-          if (
-            typeof objectValue !== 'string'
-            && objectValue?.length
-          ) {
+          const isArray = typeof objectValue !== 'string' && objectValue?.length;
+          const isObject = typeof objectValue === 'object' && !objectValue?.length;
+          if (isArray) {
             let mappedValue = objectValue.map((el) => JSON.stringify(el));
             if (token?.capture) {
               mappedValue = objectValue.map((el) => el[token.capture]);
@@ -343,13 +349,15 @@ export default new Vuex.Store({
             } else {
               value = mappedValue.join(', ');
             }
-          } else if (typeof objectValue === 'object') {
+          } else if (isObject) {
             const trimCapture = token.capture ? token.capture.trim() : '';
             if (trimCapture && trimCapture in objectValue) {
               value = objectValue[trimCapture];
             } else if (clickedField) {
               value = objectValue[clickedField];
             }
+          } else {
+            value = objectValue;
           }
 
           const {
