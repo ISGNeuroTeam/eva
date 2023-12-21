@@ -1520,6 +1520,11 @@ class ConstructorSchemesClass {
           element.dataRest.updateData(node, updatedData);
         }
         if (dataType === 'data-type-3') {
+          const updatedValue = updatedData.find((dataEl) => dataEl.TagName === node.tag.id)?.value;
+          node.tag = {
+            ...node.tag,
+            value: typeof updatedValue !== 'undefined' ? updatedValue : '-',
+          };
           this.updateDynamicImageNode(node);
         }
       });
@@ -1540,24 +1545,31 @@ class ConstructorSchemesClass {
       this.updateLabelVisual(dataFromComponent);
     } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
       updatedData = dataFromComponent;
-    } else if (elementTemplates.templates[dataType]) {
+    } else if (elementTemplates.templates[dataType] && dataType !== 'data-type-3') {
       updatedData = elementTemplates.templates[dataType](this.onClickObject)
         .dataRest.updateSettings(
           this.dataRest,
           dataFromComponent,
           this.targetDataNode,
         );
+    } else if (dataType === 'data-type-3') {
+      const targetDataItem = this.dataRest.find((dataEl) => dataEl.TagName === dataFromComponent.id);
+      const value = `${typeof targetDataItem?.value !== 'undefined' ? targetDataItem.value : '-'}`;
+      updatedData = {
+        ...dataFromComponent,
+        value,
+      };
     }
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,
       ...updatedData,
     };
-    // Обновляем состояние графа
-    this.graphComponent.updateVisual();
-    // Сохраняем изменения
     if (dataType === 'data-type-3') {
       this.updateDynamicImageNode(this.targetDataNode);
     }
+    // Обновляем состояние графа
+    this.graphComponent.updateVisual();
+    // Сохраняем изменения
     this.saveAnObject();
   }
 
@@ -1586,7 +1598,7 @@ class ConstructorSchemesClass {
     );
   }
 
-  updateDynamicImageNode(node) {
+  updateDynamicImageNode(node, data) {
     const updatedNodeTag = {};
     const GenerateIconClass = new GenerateIcons(
       'dynamic-image',
@@ -1644,6 +1656,7 @@ class ConstructorSchemesClass {
         node,
         GenerateIconClass,
         defaultImagePath,
+        data,
       ).then(() => {
         this.saveAnObject();
       });
@@ -1669,7 +1682,11 @@ class ConstructorSchemesClass {
     });
   }
 
-  updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath) {
+  updateActiveImageInDynamicNode(
+    node,
+    GenerateIconClass,
+    defaultImagePath,
+  ) {
     let imageListFromIconClass = [];
     // Список изображений из элемента(node)
     const mappedImageListFromNode = node.tag.imageList.map((item) => ({
@@ -1719,7 +1736,7 @@ class ConstructorSchemesClass {
         // Или не указано в настройках элемента
         this.graphComponent.graph.setStyle(
           node,
-          new VuejsNodeStyle(this.elementTemplates['data-type-3'](this.onClickObject).template),
+          new VuejsNodeStyle(this.elementTemplates['data-type-3'](() => null).template),
         );
       });
   }

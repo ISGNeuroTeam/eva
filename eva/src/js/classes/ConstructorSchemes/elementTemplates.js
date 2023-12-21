@@ -734,12 +734,6 @@ const templates = {
           path: '',
         },
       ],
-      getActiveImage() {
-        if (this.activeImage === '') {
-          return false;
-        }
-        return !!(this.imageList.find((item) => item.image === this.activeImage));
-      },
       // Обязательные методы
       updateSettings(dataRest, options, node) {
         const mainImageFromNode = node.tag.defaultImage;
@@ -1605,7 +1599,6 @@ const fieldsForDelete = [
   'getRowPosition',
   'getPosition',
   'getHeight',
-  'getActiveImage',
   'calculateScale',
   'getElementSize',
   'getTextStyles',
