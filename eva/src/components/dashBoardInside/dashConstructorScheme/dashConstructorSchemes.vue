@@ -1208,7 +1208,7 @@ export default {
       }
       result = this.dashFromStore.events.filter((item) => (
         item.event === event
-          && item.element.indexOf(`${this.idFrom}:`) !== -1
+          && item.element.indexOf(this.idFrom) !== -1
           && item.partelement === 'empty'
       ));
       return result;
@@ -1281,7 +1281,7 @@ export default {
         });
         // Events
         const events = this.getEvents({ event: 'onclick' });
-        this.processEvents(events, data);
+        this.processEvents(events, data, type);
       }
     },
     checkClickedElements(elementType, targetTypes) {
@@ -1340,7 +1340,7 @@ export default {
       }
       return actions;
     },
-    processEvents(events, data) {
+    processEvents(events, data, type) {
       if (events.length !== 0) {
         events.forEach((event) => {
           const fieldName = event.element.match(/:label-(\w+)/);
@@ -1352,9 +1352,20 @@ export default {
               store: this.$store,
               id: this.idFrom,
             });
+            return;
+          }
+          if (event.action.toLowerCase() === 'openmodal') {
+            const typeFromEvent = event.element.replace('constructorSchemes:', '');
+            const simpleType = type.split('-')[0];
+            if (typeFromEvent === simpleType) {
+              this.actionOpenModal(event);
+            }
           }
         });
       }
+    },
+    actionOpenModal(item) {
+      this.$store.commit('setVisualisationModalData', { idDash: this.idDashFrom, data: item });
     },
     changeDataSelectedNode(updatedData) {
       this.$nextTick().then(() => {

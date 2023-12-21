@@ -1235,7 +1235,18 @@ export default new Vuex.Store({
       if (!state[idDash]?.visualisationModalData) {
         Vue.set(state[idDash], 'visualisationModalData', {});
       }
+      if (data?.target && data?.prop) {
+        const visualisation = state[idDash][data.target];
 
+        if (visualisation) {
+          const modal = visualisation.options.titleActions.find((item) => item.title === data.prop);
+          if (modal) {
+            modal.open = true;
+            state[idDash].visualisationModalData = structuredClone(modal);
+          }
+        }
+        return;
+      }
       state[idDash].visualisationModalData = structuredClone(data);
     },
     setEditMode(state, { idDash, newModeState }) {

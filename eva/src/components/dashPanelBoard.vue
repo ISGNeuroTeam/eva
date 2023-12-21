@@ -2369,6 +2369,10 @@ export default {
                 this.$set(this.event, 'prop', prop);
                 this.$set(this.event, 'tab', tab);
                 this.$set(this.event, 'value', value);
+              } else if (doing[0].toLowerCase() === 'openmodal') {
+                doing = doing[1].slice(0, doing[1].length - 1).split(',');
+                this.$set(this.event, 'target', doing[0]);
+                this.$set(this.event, 'prop', doing[1]);
               } else if (doing[0].toLowerCase() === 'open'.toLowerCase()) {
                 // open
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
