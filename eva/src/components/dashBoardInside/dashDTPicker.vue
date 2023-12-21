@@ -624,6 +624,15 @@ export default {
         this.updateFormat('exactDateCustom', oldFormat, newFormat);
       }
     },
+    getTockens: {
+      handler(val, oldVal) {
+        console.group();
+        console.log(structuredClone(oldVal));
+        console.log(structuredClone(val));
+        console.groupEnd();
+      },
+      deep: true,
+    },
   },
   created() {
     const data = this.getPickerDate;
@@ -635,18 +644,20 @@ export default {
       if (updateShortcut !== this.shortcut) {
         this.shortcut = updateShortcut;
       }
+      this.commitTokenValue();
     }
   },
   mounted() {
     this.setTokenAction();
-    this.date = structuredClone(this.getPickerDate);
-    this.commitTokenValue();
-    if (this.date?.last?.time) {
-      this.last = this.date.last;
-      this.setTime(this.date.last.time);
-    }
-    this.$emit('hideDS', this.id);
-    this.curDate = this.calcCurrentDate();
+    this.$nextTick(() => {
+      this.date = structuredClone(this.getPickerDate);
+      if (this.date?.last?.time) {
+        this.last = this.date.last;
+        this.setTime(this.date.last.time);
+      }
+      this.$emit('hideDS', this.id);
+      this.curDate = this.calcCurrentDate();
+    });
   },
   methods: {
     setColor() {
