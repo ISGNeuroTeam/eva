@@ -1156,15 +1156,10 @@ export default {
       },
     },
   },
-  created() {
-    // if (!this.savedGraphObject) {
-    //   this.localActiveSchemeId = this.activeSchemeId || 'default-scheme';
-    // this.createSavedGraphObjectField();
-    // }
-  },
   mounted() {
     this.createGraph();
     this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
+    // this.clickSchemeObjectCallback = throttle(this.clickSchemeObjectCallback, 1000);
     this.updateSavedGraph = throttle(this.updateSavedGraph, 1000);
     this.setActions();
     this.localActiveSchemeId = this.activeSchemeId;
@@ -1257,33 +1252,36 @@ export default {
           fileName: this.getNameForExporter,
           background: this.theme.$secondary_bg,
         },
-        onClickObject: (type, data) => {
-          console.log(type, data);
-          if (!this.isEdit) {
-            const targetElements = [
-              'label',
-              'image',
-              'data',
-            ];
-            if (!type || !this.checkClickedElements(type, targetElements)) {
-              return;
-            }
-            const actions = this.getActionsByNodeType(type.split('-')[0], data);
-            this.$store.commit('tokenAction', {
-              idDash: this.idDashFrom,
-              elem: this.idFrom,
-              action: actions,
-              value: data?.fromOtl || data,
-            });
-          }
-          const events = this.getEvents({ event: 'onclick' });
-          this.processEvents(events, data);
-        },
+        onClickObject: this.clickSchemeObjectCallback,
       });
       if (this.constructorSchemes) {
         this.shapeNodeStyleList = this.constructorSchemes.getShapeNodeStyleList;
         this.nodeShape = this.constructorSchemes.defaultNodeStyle.shape;
         this.applyOptions();
+      }
+    },
+    clickSchemeObjectCallback(type, data) {
+      if (!this.isEdit) {
+        // Validate
+        const targetElements = [
+          'label',
+          'image',
+          'data',
+        ];
+        if (!type || !this.checkClickedElements(type, targetElements)) {
+          return;
+        }
+        // Tokens
+        const actions = this.getActionsByNodeType(type.split('-')[0], data);
+        this.$store.commit('tokenAction', {
+          idDash: this.idDashFrom,
+          elem: this.idFrom,
+          action: actions,
+          value: data?.fromOtl || data,
+        });
+        // Events
+        const events = this.getEvents({ event: 'onclick' });
+        this.processEvents(events, data);
       }
     },
     checkClickedElements(elementType, targetTypes) {
