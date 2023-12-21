@@ -89,7 +89,16 @@ const templates = {
   // Таблица с вертикальным разделением
   'data-type-0': (callback) => ({
     template: `
-      <g class="b-data-node" @click="tag.onClick(tag)">
+      <g class="b-data-node">
+        <!--Clickable area-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height"
+          fill="transparent"
+          @click="tag.onClick(tag)"
+        />
         <!--Area-->
         <defs>
           <!--Border-radius-bg-->
@@ -298,6 +307,7 @@ const templates = {
         };
       },
       onClick(prop) {
+        console.log('template', typeof callback, prop);
         if (callback) {
           callback(prop.dataType, Utils.getDataObject(prop.items));
         }
@@ -307,7 +317,16 @@ const templates = {
   // Таблица с горизонтальным разделением(максимум из 2 элементов)
   'data-type-1': (callback) => ({
     template: `
-      <g class="b-data-node" @click="tag.onClick(tag)">
+      <g class="b-data-node">
+        <!--Clickable area-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height"
+          fill="transparent"
+          @click="tag.onClick(tag)"
+        />
         <!--Area-->
         <defs>
           <clipPath :id="'border-radius-' + tag.nodeId">
@@ -417,6 +436,7 @@ const templates = {
         };
       },
       onClick(prop) {
+        console.log('template', typeof callback, prop);
         if (callback) {
           callback(prop.dataType, Utils.getDataObject(prop.dataObject));
         }
@@ -426,7 +446,16 @@ const templates = {
   // Накопитель (с одним или несколькими значениями)
   'data-type-2': (callback) => ({
     template: `
-      <g class="b-data-node" @click="tag.onClick(tag)">
+      <g class="b-data-node">
+        <!--Clickable area-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height"
+          fill="transparent"
+          @click="tag.onClick(tag)"
+        />
         <!--Area-->
         <defs>
           <clipPath :id="'border-radius-' + tag.nodeId">
@@ -641,6 +670,7 @@ const templates = {
         };
       },
       onClick(prop) {
+        console.log('template', typeof callback, prop);
         if (callback) {
           callback(prop.dataType, Utils.getDataObject(prop.items));
         }
@@ -648,6 +678,9 @@ const templates = {
     },
   }),
   // Динамическое изображение
+  // callback не используется т.к. обработка клика происходит в другом месте
+  // причина тому - использование ImageNodeStyle вместо VueJsNodeStyle
+  // VueJsNodeStyle используется только для создания самого элемента
   'data-type-3': (/* callback */) => ({
     template: `
       <g class="b-data-node">
@@ -768,10 +801,19 @@ const templates = {
   }),
   'data-type-4': (callback) => ({
     template: `
-      <g class="b-data-node" @click="tag.onClick(tag)">
+      <g class="b-data-node">
+        <!--Clickable area-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height"
+          fill="transparent"
+          @click="tag.onClick(tag)"
+        />
         <g :transform="tag.calculateScale(tag.type, layout).stringResult">
           <template v-if="tag.type === 0">
-            <path 
+            <path
               d="M55.15 60.337H54.25V55.8587H55.15H55.65V55.3587V55.25H58.85V55.3587V55.8587H59.35H60.25V60.337H59.35H58.85V60.837V61.25H55.65V60.837V60.337H55.15Z" 
               :fill="tag.addNodeIdToStr(tag.nodeId,'url(#gradient-1',')')" 
               stroke="black"
@@ -1444,6 +1486,7 @@ const templates = {
         };
       },
       onClick(prop) {
+        console.log('template', typeof callback, prop);
         if (callback) {
           callback(prop.dataType, Utils.getDataObject(prop.dataObjects));
         }
