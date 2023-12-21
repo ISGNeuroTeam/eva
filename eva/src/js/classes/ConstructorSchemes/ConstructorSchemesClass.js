@@ -1520,10 +1520,17 @@ class ConstructorSchemesClass {
           element.dataRest.updateData(node, updatedData);
         }
         if (dataType === 'data-type-3') {
-          const updatedValue = updatedData.find((dataEl) => dataEl.TagName === node.tag.id)?.value;
+          const targetDataItem = updatedData.find((dataEl) => dataEl.TagName === node.tag.id);
+          const updatedValue = targetDataItem?.value;
           node.tag = {
             ...node.tag,
             value: typeof updatedValue !== 'undefined' ? updatedValue : '-',
+            dataObject: {
+              Description: targetDataItem?.Description,
+              NameObject: targetDataItem?.NameObject,
+              TagName: targetDataItem?.TagName,
+              value: targetDataItem?.value,
+            },
           };
           this.updateDynamicImageNode(node);
         }
@@ -1555,9 +1562,16 @@ class ConstructorSchemesClass {
     } else if (dataType === 'data-type-3') {
       const targetDataItem = this.dataRest.find((dataEl) => dataEl.TagName === dataFromComponent.id);
       const value = `${typeof targetDataItem?.value !== 'undefined' ? targetDataItem.value : '-'}`;
+      const dataObject = {
+        Description: targetDataItem?.Description,
+        NameObject: targetDataItem?.NameObject,
+        TagName: targetDataItem?.TagName,
+        value: targetDataItem?.value,
+      };
       updatedData = {
         ...dataFromComponent,
         value,
+        dataObject,
       };
     }
     this.targetDataNode.tag = {
