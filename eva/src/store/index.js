@@ -329,17 +329,28 @@ export default new Vuex.Store({
           return token.action === action;
         })
         .forEach((token) => {
-          let value = objectValue;
-
-          if (typeof objectValue === 'object') {
+          let value = null;
+          const isArray = typeof objectValue !== 'string' && objectValue?.length;
+          const isObject = typeof objectValue === 'object' && !objectValue?.length;
+          if (isArray) {
+            let mappedValue = objectValue.map((el) => JSON.stringify(el));
+            if (token?.capture) {
+              mappedValue = objectValue.map((el) => el[token.capture]);
+            }
+            if (token?.delimetr) {
+              value = mappedValue.join(token.delimetr);
+            } else {
+              value = mappedValue.join(', ');
+            }
+          } else if (isObject) {
             const trimCapture = token.capture ? token.capture.trim() : '';
             if (trimCapture && trimCapture in objectValue) {
               value = objectValue[trimCapture];
             } else if (clickedField) {
               value = objectValue[clickedField];
-            } else {
-              value = null;
             }
+          } else {
+            value = objectValue;
           }
 
           const {

@@ -635,18 +635,20 @@ export default {
       if (updateShortcut !== this.shortcut) {
         this.shortcut = updateShortcut;
       }
+      this.commitTokenValue();
     }
   },
   mounted() {
     this.setTokenAction();
-    this.date = structuredClone(this.getPickerDate);
-    this.commitTokenValue();
-    if (this.date?.last?.time) {
-      this.last = this.date.last;
-      this.setTime(this.date.last.time);
-    }
-    this.$emit('hideDS', this.id);
-    this.curDate = this.calcCurrentDate();
+    this.$nextTick(() => {
+      this.date = structuredClone(this.getPickerDate);
+      if (this.date?.last?.time) {
+        this.last = this.date.last;
+        this.setTime(this.date.last.time);
+      }
+      this.$emit('hideDS', this.id);
+      this.curDate = this.calcCurrentDate();
+    });
   },
   methods: {
     setColor() {

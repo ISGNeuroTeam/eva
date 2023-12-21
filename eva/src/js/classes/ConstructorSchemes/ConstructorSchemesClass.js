@@ -393,9 +393,6 @@ class ConstructorSchemesClass {
     } else {
       this.enableViewerInputMode();
     }
-    // old
-    // Сохранение через GraphML
-    // this.initializeIO();
     if (this.savedGraphObject && !this.savedGraph) {
       this.load(dndPanelElem);
     }
@@ -406,6 +403,7 @@ class ConstructorSchemesClass {
     // Привязка z-order у label к родителю
     this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
     this.onClickObject = onClickObject;
+
     if (isBridgesEnable) {
       this.enableBridges();
     }
@@ -466,6 +464,7 @@ class ConstructorSchemesClass {
         element,
         graph: this.graphComponent.graph,
         elementTemplates,
+        elClickCallback: this.onClickObject,
       }).then((createdElement) => {
         resolve(createdElement);
       });
@@ -504,7 +503,7 @@ class ConstructorSchemesClass {
           if (key.includes('data-type')) {
             items.push(
               new DragAndDropPanelItem(
-                ConstructorSchemesClass.createReactiveNode(value),
+                ConstructorSchemesClass.createReactiveNode(value(this.test)),
                 'Элменты с данными',
                 'data-node',
               ),
@@ -725,70 +724,8 @@ class ConstructorSchemesClass {
       graph: this.graphComponent.graph,
       elementsFromStore: this.savedGraphObject,
       updateStoreCallback: this.updateStoreCallbackV2,
+      elClickCallback: this.onClickObject,
     });
-  }
-
-  renderVueTemplateNode() {
-    this.graphComponent.graph.nodes.forEach((node) => {
-      if (node.tag.dataType || node?.tag[0] === 'i' || node?.tag === 'invisible') {
-        if (node.tag.dataType !== 'image-node' && node?.tag?.dataType !== 'invisible') {
-          node.tag = ConstructorSchemesClass.upgradeNodeTag(node);
-          if (node.tag.dataType === 'data-type-3') {
-            const imagePath = node.tag.activeImage?.path || node.tag.defaultImagePath;
-            this.graphComponent.graph.setStyle(
-              node,
-              imagePath
-                ? new ImageNodeStyle(imagePath)
-                : new VuejsNodeStyle(this.elementTemplates[node.tag.dataType].template),
-            );
-          } else {
-            this.graphComponent.graph.setStyle(
-              node,
-              new VuejsNodeStyle(this.elementTemplates[node.tag.dataType].template),
-            );
-          }
-        }
-        this.updateImageNode(node);
-      }
-    });
-  }
-
-  // Settings GraphML
-  initializeIO() {
-    const graphmlHandler = new GraphMLIOHandler();
-    // enable serialization of the VueJS node style -
-    // without a namespace mapping, serialization will fail
-    graphmlHandler.addXamlNamespaceMapping(
-      'http://www.yworks.com/demos/yfiles-vuejs-node-style/1.0',
-      { VuejsNodeStyle: VuejsNodeStyleMarkupExtension },
-    );
-    graphmlHandler.addNamespace(
-      'http://www.yworks.com/demos/yfiles-vuejs-node-style/1.0',
-      'VuejsNodeStyle',
-    );
-    graphmlHandler.addHandleSerializationListener((sender, args) => {
-      const { item } = args;
-      const { context } = args;
-      if (item instanceof VuejsNodeStyle) {
-        const vuejsNodeStyleMarkupExtension = new VuejsNodeStyleMarkupExtension();
-        vuejsNodeStyleMarkupExtension.template = item.template;
-        context.serializeReplacement(
-          VuejsNodeStyleMarkupExtension.$class,
-          item,
-          vuejsNodeStyleMarkupExtension,
-        );
-        args.handled = true;
-      }
-    });
-    // this.zOrderSupport.configureZOrderGraphMLIOHandler(graphmlHandler);
-
-    if (this.savedGraph) {
-      graphmlHandler.readFromGraphMLText(this.graphComponent.graph, this.savedGraph).then(() => {
-        this.initGraphMlSupport(graphmlHandler);
-      });
-    } else {
-      this.initGraphMlSupport(graphmlHandler);
-    }
   }
 
   initGraphMlSupport(graphmlHandler) {
@@ -811,8 +748,6 @@ class ConstructorSchemesClass {
     const schemeUpdater = this.initSchemeUpdater();
     this.graphComponent.graph.clear();
     schemeUpdater.load().then(() => {
-      // Применение VueJsNodeStyle
-      this.renderVueTemplateNode();
       // Установка z-order по-умолчанию
       this.setDefaultElementsOrder();
       // Выравнивание графа, инициализация dnd панели
@@ -823,8 +758,6 @@ class ConstructorSchemesClass {
   load(dndPanelElem) {
     const schemeUpdater = this.initSchemeUpdater();
     schemeUpdater.load().then(() => {
-      // Применение VueJsNodeStyle
-      this.renderVueTemplateNode();
       // Установка z-order по-умолчанию
       this.setDefaultElementsOrder();
       // Выравнивание графа, инициализация dnd панели
@@ -917,15 +850,25 @@ class ConstructorSchemesClass {
     return this.isEdit;
   }
 
+  addObjectClickCallback(item) {
+    const isValidElement = item.tag.dataType.includes('label')
+      || item.tag.dataType.includes('image');
+    if (typeof this.onClickObject === 'function') {
+      if (item.tag.dataType === 'data-type-3') {
+        this.onClickObject(item?.tag?.dataType, Utils.getDataObject(item?.tag?.dataObject));
+      } else if (isValidElement) {
+        this.onClickObject(item?.tag?.dataType, item?.tag);
+      }
+    }
+  }
+
   enableViewerInputMode() {
     const mode = new GraphViewerInputMode({
       focusableItems: 'none',
     });
     mode.addItemClickedListener((sender, evt) => {
       const { item } = evt;
-      if (typeof this.onClickObject === 'function') {
-        this.onClickObject(item?.tag.dataType, item?.tag);
-      }
+      this.addObjectClickCallback(item);
     });
     this.graphComponent.inputMode = mode;
   }
@@ -1029,10 +972,7 @@ class ConstructorSchemesClass {
       // Достаем элемент в отдельную переменную для дальнейшей работы с ним
       this.targetDataNode = evt.item;
       // Проверяем на наличие данных в узле
-      if (
-        evt.item instanceof INode
-          || evt.item instanceof ILabel
-      ) {
+      if (evt.item instanceof INode) {
         const filteredElementTag = Utils.deleteFieldsFromObject(
           evt.item.tag,
           elementTemplates.fieldsForDelete,
@@ -1573,10 +1513,25 @@ class ConstructorSchemesClass {
     new Promise((resolve) => {
       this.graphComponent.graph.nodes.forEach((node) => {
         const { dataType } = node.tag;
-        if (elementTemplates.templates[dataType]?.dataRest?.updateData) {
-          elementTemplates.templates[dataType].dataRest.updateData(node, updatedData);
+        const element = typeof elementTemplates.templates[dataType] === 'function'
+          ? elementTemplates.templates[dataType](this.onClickObject)
+          : elementTemplates.templates[dataType];
+        if (element?.dataRest?.updateData) {
+          element.dataRest.updateData(node, updatedData);
         }
         if (dataType === 'data-type-3') {
+          const targetDataItem = updatedData.find((dataEl) => dataEl.TagName === node.tag.id);
+          const updatedValue = targetDataItem?.value;
+          node.tag = {
+            ...node.tag,
+            value: typeof updatedValue !== 'undefined' ? updatedValue : '-',
+            dataObject: {
+              Description: targetDataItem?.Description,
+              NameObject: targetDataItem?.NameObject,
+              TagName: targetDataItem?.TagName,
+              value: targetDataItem?.value,
+            },
+          };
           this.updateDynamicImageNode(node);
         }
       });
@@ -1597,23 +1552,38 @@ class ConstructorSchemesClass {
       this.updateLabelVisual(dataFromComponent);
     } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
       updatedData = dataFromComponent;
-    } else if (elementTemplates.templates[dataType]) {
-      updatedData = elementTemplates.templates[dataType].dataRest.updateSettings(
-        this.dataRest,
-        dataFromComponent,
-        this.targetDataNode,
-      );
+    } else if (elementTemplates.templates[dataType] && dataType !== 'data-type-3') {
+      updatedData = elementTemplates.templates[dataType](this.onClickObject)
+        .dataRest.updateSettings(
+          this.dataRest,
+          dataFromComponent,
+          this.targetDataNode,
+        );
+    } else if (dataType === 'data-type-3') {
+      const targetDataItem = this.dataRest.find((dataEl) => dataEl.TagName === dataFromComponent.id);
+      const value = `${typeof targetDataItem?.value !== 'undefined' ? targetDataItem.value : '-'}`;
+      const dataObject = {
+        Description: targetDataItem?.Description,
+        NameObject: targetDataItem?.NameObject,
+        TagName: targetDataItem?.TagName,
+        value: targetDataItem?.value,
+      };
+      updatedData = {
+        ...dataFromComponent,
+        value,
+        dataObject,
+      };
     }
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,
       ...updatedData,
     };
-    // Обновляем состояние графа
-    this.graphComponent.updateVisual();
-    // Сохраняем изменения
     if (dataType === 'data-type-3') {
       this.updateDynamicImageNode(this.targetDataNode);
     }
+    // Обновляем состояние графа
+    this.graphComponent.updateVisual();
+    // Сохраняем изменения
     this.saveAnObject();
   }
 
@@ -1642,7 +1612,7 @@ class ConstructorSchemesClass {
     );
   }
 
-  updateDynamicImageNode(node) {
+  updateDynamicImageNode(node, data) {
     const updatedNodeTag = {};
     const GenerateIconClass = new GenerateIcons(
       'dynamic-image',
@@ -1700,6 +1670,7 @@ class ConstructorSchemesClass {
         node,
         GenerateIconClass,
         defaultImagePath,
+        data,
       ).then(() => {
         this.saveAnObject();
       });
@@ -1725,7 +1696,11 @@ class ConstructorSchemesClass {
     });
   }
 
-  updateActiveImageInDynamicNode(node, GenerateIconClass, defaultImagePath) {
+  updateActiveImageInDynamicNode(
+    node,
+    GenerateIconClass,
+    defaultImagePath,
+  ) {
     let imageListFromIconClass = [];
     // Список изображений из элемента(node)
     const mappedImageListFromNode = node.tag.imageList.map((item) => ({
@@ -1775,7 +1750,7 @@ class ConstructorSchemesClass {
         // Или не указано в настройках элемента
         this.graphComponent.graph.setStyle(
           node,
-          new VuejsNodeStyle(this.elementTemplates['data-type-3'].template),
+          new VuejsNodeStyle(this.elementTemplates['data-type-3'](() => null).template),
         );
       });
   }
@@ -2000,6 +1975,7 @@ class ConstructorSchemesClass {
         const elementCreator = new ElementCreator({
           graph: this.graphComponent.graph,
           elements: response,
+          elClickCallback: this.onClickObject,
         });
         elementCreator.buildGraph().then(() => {
           this.enableEdgeRouter({

@@ -248,8 +248,8 @@ export default {
           id: this.id,
           textarea: replacedText,
         });
-        this.setTocken();
       }
+      this.setTocken();
     },
     onKeyUpText() {
       const { options } = this.dashFromStore;
@@ -289,8 +289,8 @@ export default {
           id: this.id,
           textarea: replacedText,
         });
-        this.setTocken();
       }
+      this.setTocken();
     },
     setTockenByPress(event) {
       if (event.ctrlKey && event.code === 'Enter') {
