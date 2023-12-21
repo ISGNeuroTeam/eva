@@ -516,7 +516,6 @@ export default {
     },
   },
   created() {
-    this.updater();
     this.setDefaultOptions();
     this.setTokenAction();
     this.loadValueFromStore();
@@ -525,6 +524,7 @@ export default {
     }
   },
   mounted() {
+    this.updater();
     this.setTokenValue = throttle(this.setTokenValue, 200);
     this.updateValueInStore = throttle(this.updateValueInStore, 200);
     this.setDate();
@@ -549,24 +549,21 @@ export default {
         } = oldDate;
         let mode = null;
         let value = null;
-        let options = null;
+        let format = null;
+        let hideTime = null;
         if (range) {
           mode = 'range';
           value = range;
-          options = {
-            format: this.getVisualFromStore.timeOutputFormat,
-            hideTime: this.getVisualFromStore.hideTimeSelect,
-          };
+          format = this.getVisualFromStore.timeOutputFormat;
+          hideTime = this.getVisualFromStore.hideTimeSelect;
         } else if (end || start) {
           mode = 'startEnd';
           value = {
             start,
             end,
           };
-          options = {
-            format: this.getVisualFromStore.timeOutputFormat,
-            hideTime: this.getVisualFromStore.hideTimeSelect,
-          };
+          format = this.getVisualFromStore.timeOutputFormat;
+          hideTime = this.getVisualFromStore.hideTimeSelect;
         } else if (endCus || startCus) {
           mode = 'startEndManual';
           value = {
@@ -578,10 +575,8 @@ export default {
           value = {
             date: exactDate,
           };
-          options = {
-            format: this.getVisualFromStore.timeOutputFormat,
-            hideTime: this.getVisualFromStore.hideTimeSelect,
-          };
+          format = this.getVisualFromStore.timeOutputFormat;
+          hideTime = this.getVisualFromStore.hideTimeSelect;
         } else if (exactDateCustom) {
           mode = 'exactManual';
           value = {
@@ -609,13 +604,24 @@ export default {
             value,
           }]);
         }
-        if (options) {
-
+        if (hideTime !== null && hideTime !== undefined) {
+          console.log(hideTime);
+          this.$store.commit('setState', [{
+            object: this.getOptions,
+            prop: 'hideTime',
+            value: hideTime,
+          }]);
+        }
+        if (format !== null && format !== undefined) {
+          this.$store.commit('setState', [{
+            object: this.getOptions,
+            prop: 'outputFormat',
+            value: format,
+          }]);
         }
         console.log({
           mode,
           value,
-          options,
         });
       }
     },
