@@ -409,10 +409,15 @@ export default {
     },
     getTokens() {
       if (this.$store.state[this.idDashFrom]?.tockens?.length > 0) {
-        return this.$store.state[this.idDashFrom].tockens
-          .filter((el) => el.elem === this.idFrom) || [];
+        return this.$store.state[this.idDashFrom].tockens || [];
       }
       return [];
+    },
+    tokenValues() {
+      return this.$store.state[this.idDashFrom].tockens?.reduce((acc, el) => {
+        acc[el.name] = el.value;
+        return acc;
+      }, {});
     },
     // options
     frozenColumns() {
@@ -520,6 +525,11 @@ export default {
         }
       },
       deep: true,
+    },
+    tokenValues(val, oldVal) {
+      if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+        this.updateColumnDefinition();
+      }
     },
     loading(val) {
       if (!val) {
