@@ -320,13 +320,6 @@ export default new Vuex.Store({
       if (!state[idDash]?.tockens) {
         return;
       }
-      console.log({
-        idDash,
-        elem,
-        action,
-        value: objectValue,
-        capture: clickedField = null,
-      });
       state[idDash].tockens
         .filter((token) => {
           if (token.elem !== elem) return false;
