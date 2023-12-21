@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Popup visualization: resets when switching tabs.
 - SingleValue: zero is not displayed.
+- Table:
+  - Table cells coloring is not updated when token is changed.
+  - Events of OnDataCompare type are not propagated to other tables.
 
 ## [1.163.0]
 
