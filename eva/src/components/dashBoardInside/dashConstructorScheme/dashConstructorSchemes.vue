@@ -1615,7 +1615,7 @@ export default {
     top: 5px;
     display: flex;
     align-items: center;
-    z-index: 10;
+    z-index: 5;
     padding-right: 5px;
     transition: all .2s ease;
     border-radius: 4px;
