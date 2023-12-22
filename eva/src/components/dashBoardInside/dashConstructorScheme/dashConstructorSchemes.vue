@@ -329,7 +329,7 @@
               dense
               :menu-props="{
                 'offset-y': true,
-                'z-index': 4000,
+                'z-index': fullScreenMode ? 1005 : 100,
               }"
             >
               <template #item="{ item, on }">
@@ -778,7 +778,25 @@ export default {
   data() {
     return {
       actions: [
-        { name: 'click:label', capture: ['value1', 'value2', 'value3', 'value4', 'value5'] },
+        {
+          name: 'click:label',
+          capture: [
+            'value1',
+            'value2',
+            'value3',
+            'value4',
+            'value5',
+          ],
+        },
+        {
+          name: 'click:data-node',
+          capture: [
+            'Description',
+            'NameObject',
+            'TagName',
+            'value',
+          ],
+        },
       ],
       isEdit: false,
       gear: mdiSettings,
@@ -913,7 +931,6 @@ export default {
     tokenActionsByElType() {
       const filteredSavedElements = this.savedGraphObject
         .filter((el) => el.data?.tag?.fromOtl);
-
       if (filteredSavedElements.length === 0) {
         return [];
       }
@@ -1121,6 +1138,7 @@ export default {
       if (this.dataForBuildScheme?.length > 0) {
         this.actions = [
           { name: 'click:label', capture: ['value1', 'value2', 'value3', 'value4', 'value5'] },
+          { name: 'click:data-node', capture: ['Description', 'NameObject', 'TagName', 'value'] },
           ...value,
         ];
         this.setActions();
@@ -1138,15 +1156,10 @@ export default {
       },
     },
   },
-  created() {
-    // if (!this.savedGraphObject) {
-    //   this.localActiveSchemeId = this.activeSchemeId || 'default-scheme';
-    // this.createSavedGraphObjectField();
-    // }
-  },
   mounted() {
     this.createGraph();
     this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
+    // this.clickSchemeObjectCallback = throttle(this.clickSchemeObjectCallback, 1000);
     this.updateSavedGraph = throttle(this.updateSavedGraph, 1000);
     this.setActions();
     this.localActiveSchemeId = this.activeSchemeId;
@@ -1195,7 +1208,7 @@ export default {
       }
       result = this.dashFromStore.events.filter((item) => (
         item.event === event
-          && item.element.indexOf(`${this.idFrom}:`) !== -1
+          && item.element.indexOf(this.idFrom) !== -1
           && item.partelement === 'empty'
       ));
       return result;
@@ -1239,43 +1252,75 @@ export default {
           fileName: this.getNameForExporter,
           background: this.theme.$secondary_bg,
         },
-        onClickObject: (type, data) => {
-          if (!type || (!type.includes('label-type') && type !== 'image-node')) {
-            return;
-          }
-          let actions = [];
-          if (type === 'image-node') {
-            if (data.fromOtl.token_type) {
-              const tokenType = data.fromOtl.token_type;
-              const [element, groupWithCount] = tokenType.split('-');
-              const [group] = groupWithCount.split('_');
-              actions.push(`click:el-${element}`);
-              if (group) {
-                actions.push(`click:el-${element}-${group}`);
-              }
-            }
-          } else {
-            actions = this.addTokenTypeActions(
-              this.getActions(type, 'click'),
-              data,
-            );
-          }
-          this.$store.commit('tokenAction', {
-            idDash: this.idDashFrom,
-            elem: this.idFrom,
-            action: actions,
-            value: data?.fromOtl || data,
-          });
-
-          const events = this.getEvents({ event: 'onclick' });
-          this.processEvents(events, data);
-        },
+        onClickObject: this.clickSchemeObjectCallback,
       });
       if (this.constructorSchemes) {
         this.shapeNodeStyleList = this.constructorSchemes.getShapeNodeStyleList;
         this.nodeShape = this.constructorSchemes.defaultNodeStyle.shape;
         this.applyOptions();
       }
+    },
+    clickSchemeObjectCallback(type, data) {
+      if (!this.isEdit) {
+        // Validate
+        const targetElements = [
+          'label',
+          'image',
+          'data',
+        ];
+        if (!type || !this.checkClickedElements(type, targetElements)) {
+          return;
+        }
+        // Tokens
+        const actions = this.getActionsByNodeType(type.split('-')[0], data);
+        this.$store.commit('tokenAction', {
+          idDash: this.idDashFrom,
+          elem: this.idFrom,
+          action: actions,
+          value: data?.fromOtl || data,
+        });
+        // Events
+        const events = this.getEvents({ event: 'onclick' });
+        this.processEvents(events, data, type);
+      }
+    },
+    checkClickedElements(elementType, targetTypes) {
+      if (!elementType || targetTypes?.length === 0) {
+        return false;
+      }
+      return targetTypes
+        .filter((type) => elementType.includes(type))
+        .length > 0;
+    },
+    getActionsByNodeType(type, data) {
+      const actions = [];
+      if (type === 'label') {
+        if (data && data?.type) {
+          return [];
+        }
+        return this.addTokenTypeActions(
+          this.getActions(data.dataType, 'click'),
+          data,
+        );
+      }
+      if (type === 'data') {
+        return this.actions
+          .map((action) => action.name)
+          .filter((nameAction) => nameAction.includes('data'));
+      }
+      if (type === 'image') {
+        if (data?.fromOtl?.token_type) {
+          const tokenType = data.fromOtl.token_type;
+          const [element, groupWithCount] = tokenType.split('-');
+          const [group] = groupWithCount.split('_');
+          actions.push(`click:el-${element}`);
+          if (group) {
+            actions.push(`click:el-${element}-${group}`);
+          }
+        }
+        return actions;
+      }
+      return actions;
     },
     getActions(typeString, prefix) {
       return typeString.split('-').reduce((acc, item, idx) => {
@@ -1295,7 +1340,7 @@ export default {
       }
       return actions;
     },
-    processEvents(events, data) {
+    processEvents(events, data, type) {
       if (events.length !== 0) {
         events.forEach((event) => {
           const fieldName = event.element.match(/:label-(\w+)/);
@@ -1307,9 +1352,20 @@ export default {
               store: this.$store,
               id: this.idFrom,
             });
+            return;
+          }
+          if (event.action.toLowerCase() === 'openmodal') {
+            const typeFromEvent = event.element.replace('constructorSchemes:', '');
+            const simpleType = type.split('-')[0];
+            if (typeFromEvent === simpleType) {
+              this.actionOpenModal(event);
+            }
           }
         });
       }
+    },
+    actionOpenModal(item) {
+      this.$store.commit('setVisualisationModalData', { idDash: this.idDashFrom, data: item });
     },
     changeDataSelectedNode(updatedData) {
       this.$nextTick().then(() => {
@@ -1551,7 +1607,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 5;
   }
   &__options {
     position: absolute;
@@ -1559,7 +1615,7 @@ export default {
     top: 5px;
     display: flex;
     align-items: center;
-    z-index: 10;
+    z-index: 5;
     padding-right: 5px;
     transition: all .2s ease;
     border-radius: 4px;
@@ -1592,7 +1648,7 @@ export default {
     position: absolute;
     right: 20px;
     bottom: 20px;
-    z-index: 1;
+    z-index: 5;
     border-radius: 50%;
     background-color: var(--main_bg);
     width: 40px;
@@ -1619,7 +1675,7 @@ export default {
     opacity: 0;
     width: 230px;
     &--active {
-      z-index: 1;
+      z-index: 5;
       opacity: 1;
       pointer-events: all;
       left: -170px;
@@ -1627,7 +1683,7 @@ export default {
   }
   &__dnd-panel-container, &__data-panel {
     color: var(--main_text);
-    z-index: 10;
+    z-index: 5;
     position: absolute;
     top: 5px;
     bottom: 15px;

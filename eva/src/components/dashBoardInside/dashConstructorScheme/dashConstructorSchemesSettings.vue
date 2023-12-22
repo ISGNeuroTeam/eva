@@ -109,7 +109,7 @@
               width="64"
               color="transparent"
               @click="addLine(
-                elementTemplates['data-type-0'].dataRest.items[0],
+                elementTemplates['data-type-0']().dataRest.items[0],
                 'items',
               )"
             >
@@ -352,7 +352,7 @@
                   width="64"
                   color="transparent"
                   @click="addLine(
-                    elementTemplates['data-type-2'].dataRest.items[0],
+                    elementTemplates['data-type-2']().dataRest.items[0],
                     'items',
                   )"
                 >
@@ -534,7 +534,7 @@
                   width="64"
                   color="transparent"
                   @click="addLine(
-                    elementTemplates['data-type-3'].dataRest.imageList[0],
+                    elementTemplates['data-type-3']().dataRest.imageList[0],
                     'imageList'
                   )"
                 >
@@ -699,7 +699,7 @@
                   width="64"
                   color="transparent"
                   @click="addLine(
-                    elementTemplates['data-type-4'].dataRest.colors[0],
+                    elementTemplates['data-type-4']().dataRest.colors[0],
                     'colors'
                   )"
                 >

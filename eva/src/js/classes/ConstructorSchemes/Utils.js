@@ -113,6 +113,44 @@ class Utils {
   static isValidValue(value) {
     return typeof value === 'string' || typeof value === 'number';
   }
+
+  static getDataObject(data) {
+    if (data) {
+      if (data?.length > 0) {
+        const filteredDataItems = data.map((item) => (item?.dataObject
+          ? item.dataObject
+          : item))
+          .filter((item) => {
+            if (item) {
+              return Utils.isValidDataFields(item);
+            }
+            return false;
+          });
+        if (filteredDataItems?.length > 0) {
+          return filteredDataItems;
+        }
+        return [];
+      }
+      if (Utils.isValidDataFields(data)) {
+        return [data];
+      }
+    }
+    return [];
+  }
+
+  static isValidDataFields(dataObject) {
+    const {
+      Description,
+      NameObject,
+      TagName,
+      value,
+    } = dataObject;
+    const isDescription = typeof Description !== 'undefined';
+    const isNameObject = typeof NameObject !== 'undefined';
+    const isTagName = typeof TagName !== 'undefined';
+    const isValue = typeof value !== 'undefined';
+    return isDescription && isNameObject && isTagName && isValue;
+  }
 }
 
 export default Utils;

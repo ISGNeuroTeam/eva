@@ -1,3 +1,22 @@
+# [1.164.0] - 2023-12-21
+
+### Added
+- The button visualization: Introduced the option to lock the button when pressed.
+- Added a dashboard saving indicator.
+- Implemented a feature for the onclick event, allowing the opening of a modal window when clicking on an element in Constructor-schemes.
+- Constructor-schemes: Added processing of clicking on elements with data and binding tokens to them.
+
+### Changed
+- The "Start All Data Sources" button now starts only free data sources.
+- The "Save Dashboard" button is now locked when the dashboard is saved.
+
+### Fixed
+- Popup visualization: Fixed the issue of resetting when switching tabs.
+- SingleValue: Addressed the problem where zero is not displayed.
+- Table:
+  - Fixed the issue where table cells coloring is not updated when the token is changed.
+  - Ensured events of the "OnDataCompare" type are propagated to other tables.
+
 # [1.163.0] - 2023-12-18
 
 ### Fixed

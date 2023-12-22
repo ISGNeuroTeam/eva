@@ -17,11 +17,13 @@ class ElementCreator {
     graph,
     elements,
     defaultEdgeStyles,
+    elClickCallback,
   }) {
     this.graph = graph;
     this.elements = elements;
     this.elementTemplates = ElementTemplates;
     this.defaultEdgeStyles = defaultEdgeStyles;
+    this.elClickCallback = elClickCallback;
   }
 
   buildGraph() {
@@ -51,6 +53,7 @@ class ElementCreator {
           elementTemplates: this.elementTemplates,
           allElements: this.elements,
           portsList,
+          elClickCallback: this.elClickCallback,
         })
           .then(() => {
             const updatedPortsList = ElementCreator.getElementsByType(
@@ -175,6 +178,7 @@ class ElementCreator {
     elementTemplates,
     allElements,
     portsList,
+    elClickCallback,
   }) {
     return new Promise((resolve, reject) => {
       const createdNodes = [];
@@ -185,6 +189,7 @@ class ElementCreator {
             graph,
             elementTemplates,
             allElements,
+            elClickCallback,
           }).then((createdNode) => {
             ElementCreator.createPortsById({
               graph,
@@ -250,6 +255,7 @@ class ElementCreator {
     graph,
     elementTemplates,
     allElements = [],
+    elClickCallback,
   }) {
     const templateList = elementTemplates.templates;
     return new Promise((resolve) => {
@@ -293,7 +299,10 @@ class ElementCreator {
           id: element.tag.nodeId,
         });
       } else {
-        const { template } = templateList[element.tag.dataType];
+        const { template, dataRest } = typeof templateList[element.tag.dataType] === 'function'
+          ? templateList[element.tag.dataType](elClickCallback)
+          : templateList[element.tag.dataType];
+
         if (element.tag.dataType === 'data-type-3') {
           const imagePath = element.tag.activeImage?.path || element.tag.defaultImagePath;
           createdNode = graph.createNodeAt({
@@ -307,8 +316,9 @@ class ElementCreator {
               ? new ImageNodeStyle(imagePath)
               : new VuejsNodeStyle(template),
             tag: {
-              ...templateList[element.tag.dataType].dataRest,
+              ...dataRest,
               ...element.tag,
+              onClick: dataRest.onClick,
               fontFamily: elementTemplates.fontFamily,
               nodeId: element.tag.nodeId || element.hashCode(),
             },
@@ -347,8 +357,9 @@ class ElementCreator {
             ),
             style: new VuejsNodeStyle(template),
             tag: {
-              ...templateList[element.tag.dataType].dataRest,
+              ...dataRest,
               ...tag,
+              onClick: dataRest.onClick,
               fontFamily: elementTemplates.fontFamily,
               nodeId: element.tag.nodeId || element.hashCode(),
             },

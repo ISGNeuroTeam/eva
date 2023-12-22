@@ -13,6 +13,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.164.0]
+
+### Added
+- Visualization button: added option Lock button when pressed.
+- Added dashboard saving indicator.
+- Added feature for the onclick event that allows to open a modal window when click on an element in the Constructor-schemes
+- Constructor-schemes: Added processing of clicking on elements with data and binding tokens to them
+
+### Changed
+- The button start all data sources, starts only free data sources.
+- The Save Dashboard button is locked when the dashboard is saved.
+
+### Fixed
+- Popup visualization: resets when switching tabs.
+- SingleValue: zero is not displayed.
+- Table:
+  - Table cells coloring is not updated when token is changed.
+  - Events of OnDataCompare type are not propagated to other tables.
+
 ## [1.163.0]
 
 ### Fixed
