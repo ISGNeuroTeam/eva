@@ -329,7 +329,7 @@
               dense
               :menu-props="{
                 'offset-y': true,
-                'z-index': 4000,
+                'z-index': fullScreenMode ? 1005 : 100,
               }"
             >
               <template #item="{ item, on }">
@@ -1607,7 +1607,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 5;
   }
   &__options {
     position: absolute;
@@ -1648,7 +1648,7 @@ export default {
     position: absolute;
     right: 20px;
     bottom: 20px;
-    z-index: 1;
+    z-index: 5;
     border-radius: 50%;
     background-color: var(--main_bg);
     width: 40px;
@@ -1675,7 +1675,7 @@ export default {
     opacity: 0;
     width: 230px;
     &--active {
-      z-index: 1;
+      z-index: 5;
       opacity: 1;
       pointer-events: all;
       left: -170px;
@@ -1683,7 +1683,7 @@ export default {
   }
   &__dnd-panel-container, &__data-panel {
     color: var(--main_text);
-    z-index: 10;
+    z-index: 5;
     position: absolute;
     top: 5px;
     bottom: 15px;
