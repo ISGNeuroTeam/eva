@@ -393,7 +393,7 @@
         ref="blockCode"
         class="block-code"
         :class="{ opencode: opencode }"
-        :style="blockToolStyle"
+        :style="blockToolStyle.default"
       >
         <div class="iconsNavigations">
           <v-btn
@@ -601,7 +601,7 @@
       <v-row
         class="block-tool"
         :class="{ opentool: opentool }"
-        :style="blockToolStyle"
+        :style="blockToolStyle.default"
       >
         <v-col
           v-for="tool in tools"
@@ -641,7 +641,7 @@
         ref="blockTocken"
         class="block-tocken"
         :class="{ opentocken: opentocken }"
-        :style="blockToolStyle"
+        :style="blockToolStyle.tokens"
       >
         <div
           v-for="(tocken, i) in tokens"
@@ -1441,9 +1441,16 @@ export default {
     },
     blockToolStyle() {
       return {
-        background: this.theme.$main_bg,
-        color: this.theme.$main_text,
-        'max-height': '258px',
+        tokens: {
+          background: this.theme.$main_bg,
+          color: this.theme.$main_text,
+          'max-height': '258px',
+        },
+        default: {
+          background: this.theme.$main_bg,
+          color: this.theme.$main_text,
+          'max-height': `${this.screenHeight - 50}px`,
+        },
       };
     },
     isEditDash() {
