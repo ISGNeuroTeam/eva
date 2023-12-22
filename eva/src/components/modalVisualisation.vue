@@ -72,7 +72,9 @@
             <div
               :style="{ borderColor: theme.$main_border, opacity: '0.2' }"
               class="loading-divider"
-              :class="{ loading: this.visualisationModal.search && this.data.length === 0 }"
+              :class="{
+                loading: visualisationModal.search && data !== undefined && data.length === 0
+              }"
             >
               <div
                 class="loading-bar"
