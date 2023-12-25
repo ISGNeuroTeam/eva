@@ -649,7 +649,7 @@ export default {
     },
     {
       option: 'withoutLineBreaks',
-      description: 'Отключить перенос строк',
+      description: 'Отключить перенос строк по [Enter]',
       elem: 'switch',
       default: false,
     },
