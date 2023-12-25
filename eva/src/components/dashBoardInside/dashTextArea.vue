@@ -293,6 +293,12 @@ export default {
       this.setTocken();
     },
     setTockenByPress(event) {
+      const {
+        withoutLineBreaks = false,
+      } = this.getOptions;
+      if (withoutLineBreaks && event.code === 'Enter') {
+        event.preventDefault();
+      }
       if (event.ctrlKey && event.code === 'Enter') {
         event.preventDefault();
         this.acceptTextArea();

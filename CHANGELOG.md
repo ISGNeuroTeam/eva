@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- TextArea:
+  - Added setting that prohibits line breaks.
+  - When the background is hidden, the text input field has borders.
 
 ### Changed
 
