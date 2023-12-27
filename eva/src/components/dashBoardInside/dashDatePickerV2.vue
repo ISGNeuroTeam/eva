@@ -524,10 +524,11 @@ export default {
     }
   },
   mounted() {
-    this.updater();
     this.setTokenValue = throttle(this.setTokenValue, 200);
     this.updateValueInStore = throttle(this.updateValueInStore, 200);
     this.setDate();
+    // Для старых значений
+    this.updater();
   },
   methods: {
     // TODO: Преобразование значений старого пикера в новые
@@ -536,14 +537,11 @@ export default {
       if (oldDate) {
         const {
           end = null,
-          endForStore = null,
           endCus = null,
           range = null,
           start = null,
-          startForStore = null,
           startCus = null,
           exactDate = null,
-          exactDateForStore = null,
           exactDateCustom = null,
           last = null,
         } = oldDate;
@@ -553,9 +551,28 @@ export default {
         let hideTime = null;
         if (range) {
           mode = 'range';
-          value = range;
           format = this.getVisualFromStore.timeOutputFormat;
           hideTime = this.getVisualFromStore.hideTimeSelect;
+          if (range?.shortcut) {
+            const defaultFormat = hideTime || this.hideTime
+              ? this.defaultFormat.dateTime
+              : this.defaultFormat.date;
+            const dateByShortcuts = this.calcDateByShortcut(
+              range.shortcut,
+              format || this.outputFormat || defaultFormat,
+            );
+            value = {
+              start: dateByShortcuts.start,
+              shortcut: range.shortcut,
+              end: dateByShortcuts.end,
+            };
+          } else {
+            value = {
+              start: null,
+              shortcut: range?.shortcut || null,
+              end: null,
+            };
+          }
         } else if (end || start) {
           mode = 'startEnd';
           value = {
@@ -593,19 +610,32 @@ export default {
           };
         }
         if (mode && value) {
-          this.$store.commit('setState', [{
-            object: this.getOptions,
-            prop: 'pickerMode',
-            value: mode,
-          }]);
-          this.$store.commit('setState', [{
-            object: this.getVisualFromStore,
-            prop: 'pickerValue',
-            value,
-          }]);
+          // Чтобы изменения точно применились после setDate
+          this.$nextTick(() => {
+            this.$nextTick(() => {
+              this.$store.commit('setState', [{
+                object: this.getOptions,
+                prop: 'pickerMode',
+                value: mode,
+              }]);
+              this.$store.commit('setState', [{
+                object: this.getVisualFromStore,
+                prop: 'pickerValue',
+                value,
+              }]);
+              this.localValue = value;
+              this.updateFormattedValue();
+              this.updateValueInStore();
+              this.setTokenValue();
+              this.$store.commit('setState', [{
+                object: this.getVisualFromStore,
+                prop: 'date',
+                value: null,
+              }]);
+            });
+          });
         }
         if (hideTime !== null && hideTime !== undefined) {
-          console.log(hideTime);
           this.$store.commit('setState', [{
             object: this.getOptions,
             prop: 'hideTime',
@@ -619,10 +649,11 @@ export default {
             value: format,
           }]);
         }
-        console.log({
-          mode,
-          value,
-        });
+        // console.group();
+        // console.log(`picker: ${this.idVisual}`);
+        // console.log(`mode: ${mode}`);
+        // console.log(`value: ${JSON.stringify(value)}`);
+        // console.groupEnd();
       }
     },
     checkFormatOnIncludesTime(format) {
@@ -754,23 +785,29 @@ export default {
     },
     setDateFromShortcut() {
       if (this.localValue?.shortcut) {
-        const updateShortcut = this.getShortcuts.find(
-          (sc) => sc.value === this.localValue.shortcut,
-        )?.key || '';
-        if (updateShortcut !== this.localValue.shortcut) {
-          this.$set(this.localValue, 'shortcutKey', updateShortcut);
-        }
+        // const updateShortcut = this.getShortcuts.find(
+        //   (sc) => sc.value === this.localValue.shortcut,
+        // )?.key || '';
+        // if (updateShortcut !== this.localValue.shortcut) {
+        //   this.$set(this.localValue, 'shortcutKey', updateShortcut);
+        // }
+        const defaultFormat = this.hideTime
+          ? this.defaultFormat.dateTime
+          : this.defaultFormat.date;
+
+        this.localValue = this.calcDateByShortcut(
+          this.localValue.shortcut,
+          this.outputFormat || defaultFormat,
+        );
       }
     },
     updateLocalValue() {
       if (this.reactiveValue) {
         this.$nextTick(() => {
-          this.$nextTick(() => {
-            this.localValue = {
-              ...this.localValue,
-              ...this.reactiveValue,
-            };
-          });
+          this.localValue = {
+            ...this.localValue,
+            ...this.reactiveValue,
+          };
         });
       } else {
         this.clearValue();
@@ -1020,6 +1057,78 @@ export default {
         }
       }
       return `${updatedValue}`;
+    },
+    calcDateByShortcut(shortcut, format) {
+      console.log('shortcut', shortcut, this.idVisual);
+      const date = {
+        start: '',
+        shortcut,
+        end: '',
+      };
+
+      const today = moment();
+
+      switch (shortcut) {
+        case 'thisDay':
+        case 'day':
+          date.start = today.clone().startOf('day');
+          date.end = today.clone().endOf('day');
+          break;
+        case 'lastDay':
+        case '-day':
+          date.start = today.clone().subtract(1, 'day').startOf('day');
+          date.end = today.clone().subtract(1, 'day').endOf('day');
+          break;
+        case 'thisWeek':
+        case 'isoWeek':
+          date.start = today.clone().startOf('isoWeek');
+          date.end = today.clone().endOf('isoWeek');
+          break;
+        case 'lastWeek':
+        case '-isoWeek':
+          date.start = today.clone().subtract(1, 'week').startOf('isoWeek');
+          date.end = today.clone().subtract(1, 'week').endOf('isoWeek');
+          break;
+        case 'last7Days':
+        case '7':
+          date.start = today.clone().subtract(7, 'days');
+          date.end = today.clone().endOf('day');
+          break;
+        case 'last30Days':
+        case '30':
+          date.start = today.clone().subtract(30, 'days');
+          date.end = today.clone().endOf('day');
+          break;
+        case 'thisMonth':
+        case 'month':
+          date.start = today.clone().startOf('month');
+          date.end = today.clone().endOf('month');
+          break;
+        case 'lastMonth':
+        case '-month':
+          date.start = today.clone().subtract(1, 'month').startOf('month');
+          date.end = today.clone().subtract(1, 'month').endOf('month');
+          break;
+        case 'thisYear':
+        case 'year':
+          date.start = today.clone().startOf('year');
+          date.end = today.clone().endOf('year');
+          break;
+        case 'lastYear':
+        case '-year':
+          date.start = today.clone().subtract(1, 'year').startOf('year');
+          date.end = today.clone().subtract(1, 'year').endOf('year');
+          break;
+        default:
+          break;
+      }
+
+      if (date.start && date.end) {
+        date.start = date.start.format(format);
+        date.end = date.end.format(format);
+      }
+
+      return date;
     },
   },
 };
