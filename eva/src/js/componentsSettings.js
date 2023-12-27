@@ -435,6 +435,8 @@ export default {
       'ListDS',
       'onButtonToken',
       'ListTokens',
+      'btnDebounce',
+      'btnDebounceTime',
     ],
     textarea: [
       'searchBtn',
@@ -448,6 +450,7 @@ export default {
       'validationNumberRangeMin',
       'validationNumberRangeMax',
       'readOnly',
+      'withoutLineBreaks',
     ],
     guntt: [
       'timeFormat',
@@ -658,6 +661,12 @@ export default {
     {
       option: 'readOnly',
       description: 'Только чтение',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'withoutLineBreaks',
+      description: 'Отключить перенос строк по [Enter]',
       elem: 'switch',
       default: false,
     },
@@ -1314,6 +1323,23 @@ export default {
         }
         return [];
       },
+    },
+    {
+      label: 'btnDebounce',
+      option: 'btnDebounce',
+      description: 'Блокировка кнопки при нажатии',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      label: 'btnDebounceTime',
+      relation: ['btnDebounce'],
+      option: 'btnDebounceTime',
+      description: 'Время блокировки в секундах',
+      elem: 'text-field',
+      elemType: 'number',
+      default: 1,
+      placeholder: '1',
     },
 
     // dashSelect

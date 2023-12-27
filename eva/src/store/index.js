@@ -329,17 +329,28 @@ export default new Vuex.Store({
           return token.action === action;
         })
         .forEach((token) => {
-          let value = objectValue;
-
-          if (typeof objectValue === 'object') {
+          let value = null;
+          const isArray = typeof objectValue !== 'string' && objectValue?.length;
+          const isObject = typeof objectValue === 'object' && !objectValue?.length;
+          if (isArray) {
+            let mappedValue = objectValue.map((el) => JSON.stringify(el));
+            if (token?.capture) {
+              mappedValue = objectValue.map((el) => el[token.capture]);
+            }
+            if (token?.delimetr) {
+              value = mappedValue.join(token.delimetr);
+            } else {
+              value = mappedValue.join(', ');
+            }
+          } else if (isObject) {
             const trimCapture = token.capture ? token.capture.trim() : '';
             if (trimCapture && trimCapture in objectValue) {
               value = objectValue[trimCapture];
             } else if (clickedField) {
               value = objectValue[clickedField];
-            } else {
-              value = null;
             }
+          } else {
+            value = objectValue;
           }
 
           const {
@@ -1224,7 +1235,18 @@ export default new Vuex.Store({
       if (!state[idDash]?.visualisationModalData) {
         Vue.set(state[idDash], 'visualisationModalData', {});
       }
+      if (data?.target && data?.prop) {
+        const visualisation = state[idDash][data.target];
 
+        if (visualisation) {
+          const modal = visualisation.options.titleActions.find((item) => item.title === data.prop);
+          if (modal) {
+            modal.open = true;
+            state[idDash].visualisationModalData = structuredClone(modal);
+          }
+        }
+        return;
+      }
       state[idDash].visualisationModalData = structuredClone(data);
     },
     setEditMode(state, { idDash, newModeState }) {

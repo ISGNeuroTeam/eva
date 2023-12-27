@@ -393,7 +393,7 @@
         ref="blockCode"
         class="block-code"
         :class="{ opencode: opencode }"
-        :style="blockToolStyle"
+        :style="blockToolStyle.default"
       >
         <div class="iconsNavigations">
           <v-btn
@@ -601,7 +601,7 @@
       <v-row
         class="block-tool"
         :class="{ opentool: opentool }"
-        :style="blockToolStyle"
+        :style="blockToolStyle.default"
       >
         <v-col
           v-for="tool in tools"
@@ -641,7 +641,7 @@
         ref="blockTocken"
         class="block-tocken"
         :class="{ opentocken: opentocken }"
-        :style="blockToolStyle"
+        :style="blockToolStyle.tokens"
       >
         <div
           v-for="(tocken, i) in tokens"
@@ -1441,9 +1441,16 @@ export default {
     },
     blockToolStyle() {
       return {
-        background: this.theme.$main_bg,
-        color: this.theme.$main_text,
-        'max-height': `${this.screenHeight - 50}px`,
+        tokens: {
+          background: this.theme.$main_bg,
+          color: this.theme.$main_text,
+          'max-height': '258px',
+        },
+        default: {
+          background: this.theme.$main_bg,
+          color: this.theme.$main_text,
+          'max-height': `${this.screenHeight - 50}px`,
+        },
       };
     },
     isEditDash() {
@@ -2369,6 +2376,10 @@ export default {
                 this.$set(this.event, 'prop', prop);
                 this.$set(this.event, 'tab', tab);
                 this.$set(this.event, 'value', value);
+              } else if (doing[0].toLowerCase() === 'openmodal') {
+                doing = doing[1].slice(0, doing[1].length - 1).split(',');
+                this.$set(this.event, 'target', doing[0]);
+                this.$set(this.event, 'prop', doing[1]);
               } else if (doing[0].toLowerCase() === 'open'.toLowerCase()) {
                 // open
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');

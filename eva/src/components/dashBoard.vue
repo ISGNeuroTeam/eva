@@ -967,21 +967,6 @@ export default {
       });
     }
   },
-  beforeDestroy() {
-    const elements = this.dashFromStore
-      ?.options?.titleActions?.filter((elem) => elem.type === 'modal');
-    if (elements?.length > 0) {
-      elements.forEach((element) => {
-        const nameElem = this.dashFromStore[element.elemName]?.name_elem;
-        visualisation.delete({
-          idDash: this.idDash,
-          id: element.elemName,
-          name: nameElem,
-          spaceName: element.type,
-        });
-      });
-    }
-  },
   methods: {
     async startSearch(search) {
       this.$store.commit('updateSearchStatus', {

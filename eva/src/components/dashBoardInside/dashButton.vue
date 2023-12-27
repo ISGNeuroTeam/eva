@@ -15,7 +15,7 @@
     >
       <v-btn
         class="name"
-        :disabled="eventLoading"
+        :disabled="eventLoading || timeout_waiting"
         :loading="eventLoading"
         :class="{ textDecoration: underline }"
         :style="{
@@ -25,7 +25,7 @@
           fontSize: `${fontSize}px`,
           background: optionsData.background,
         }"
-        @click="update()"
+        @click="onClickBtn"
       >
         {{ optionsData.name ? optionsData.name : 'Подтвердить' }}
       </v-btn>
@@ -109,6 +109,7 @@ export default {
       },
       eventLoading: false,
       underline: false,
+      timeout_waiting: false,
     };
   },
   computed: {
@@ -183,6 +184,7 @@ export default {
   },
   methods: {
     updateOptionsData() {
+      this.timeout_waiting = false;
       const options = this.getOptions;
       if (options.color) {
         this.optionsData.colorText = options.color;
@@ -201,6 +203,25 @@ export default {
       }
       this.underline = options.underline;
       this.optionsData.onButton = options?.onButton;
+    },
+    onClickBtn() {
+      const {
+        btnDebounce,
+        btnDebounceTime,
+      } = this.getOptions;
+      if (btnDebounce) {
+        if (this.timeout_waiting) {
+          return;
+        }
+        this.timeout_waiting = true;
+        this.update();
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => {
+          this.timeout_waiting = false;
+        }, Math.abs((btnDebounceTime || 1) * 1000));
+      } else {
+        this.update();
+      }
     },
     update() {
       if (this.optionsData.onButton) {
@@ -226,6 +247,9 @@ export default {
         id,
         tokens,
       });
+    },
+    actionOpenModal(item) {
+      this.$store.commit('setVisualisationModalData', { idDash: this.idDash, data: item });
     },
     actionOpen(targetLink, header, widthPersent, heightPersent) {
       // размер нового окна
@@ -337,6 +361,8 @@ export default {
               route: this.$router,
               store: this.$store,
             });
+          } else if (item.action.toLowerCase() === 'openmodal') {
+            this.actionOpenModal(item);
           } else if (item.action.toLowerCase() === 'open') {
             // если экшен open
             this.actionOpen(

@@ -248,8 +248,8 @@ export default {
           id: this.id,
           textarea: replacedText,
         });
-        this.setTocken();
       }
+      this.setTocken();
     },
     onKeyUpText() {
       const { options } = this.dashFromStore;
@@ -289,10 +289,16 @@ export default {
           id: this.id,
           textarea: replacedText,
         });
-        this.setTocken();
       }
+      this.setTocken();
     },
     setTockenByPress(event) {
+      const {
+        withoutLineBreaks = false,
+      } = this.getOptions;
+      if (withoutLineBreaks && event.code === 'Enter') {
+        event.preventDefault();
+      }
       if (event.ctrlKey && event.code === 'Enter') {
         event.preventDefault();
         this.acceptTextArea();
