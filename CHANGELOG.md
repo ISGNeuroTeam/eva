@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Data sources are not started if the token is passed in the go event and data sources do not have the option to start when loading the dashboard.
 
 ## [1.164.0]
 
