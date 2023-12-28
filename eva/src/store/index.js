@@ -2182,7 +2182,6 @@ export default new Vuex.Store({
         });
       });
       let newCurrentTabValue = 1;
-      const { options } = state[event.idDash][event.id];
       const currentTab = event.event.tab || state[id]?.currentTab;
       const isTabMode = state[id]?.tabs;
       const lastEl = state[id]?.tabList?.find(
@@ -2190,7 +2189,7 @@ export default new Vuex.Store({
       ) || 1;
       await dispatch('saveDashToStore', id);
 
-      if (options?.openNewScreen || openNewTab) {
+      if (openNewTab) {
         newCurrentTabValue = currentTab || 1;
         window.open(`/dashboards/${id}/${newCurrentTabValue}`);
       } else {
