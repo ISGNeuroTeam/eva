@@ -433,6 +433,7 @@ export default {
       'validationNumberRangeMin',
       'validationNumberRangeMax',
       'readOnly',
+      'withoutLineBreaks',
     ],
     guntt: [
       'timeFormat',
@@ -643,6 +644,12 @@ export default {
     {
       option: 'readOnly',
       description: 'Только чтение',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'withoutLineBreaks',
+      description: 'Отключить перенос строк по [Enter]',
       elem: 'switch',
       default: false,
     },
