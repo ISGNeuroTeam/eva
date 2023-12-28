@@ -447,7 +447,7 @@ export default {
       });
     },
     createTokens() {
-      const captures = ['top_left_point', 'bottom_right_point', 'zoom_level', 'dash_id'];
+      const captures = ['top_left_point', 'bottom_right_point', 'zoom_level', 'dash_id', 'tab'];
       this.actions.forEach((item, i) => {
         this.$set(this.actions[i], 'capture', captures);
       });
@@ -648,11 +648,13 @@ export default {
       });
       if (events.length !== 0) {
         events.forEach((item) => {
+          const copyItem = structuredClone(item);
           if (item.action === 'go') {
-            item.value[0] = tokenValue;
-            item.dashId = element.dashId;
+            copyItem.value[0] = tokenValue;
+            copyItem.dashId = element.dashId;
+            copyItem.tab = element?.tab;
             this.$store.dispatch('letEventGo', {
-              event: item,
+              event: copyItem,
               id: this.element,
               idDash: this.idDash,
               route: this.$router,

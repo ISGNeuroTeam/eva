@@ -2182,10 +2182,11 @@ export default new Vuex.Store({
         });
       });
       let newCurrentTabValue = 1;
+      const tabFromEvent = event.event?.tab ? `${event.event.tab}` : '1';
       const currentTab = event.event.tab || state[id]?.currentTab;
       const isTabMode = state[id]?.tabs;
       const lastEl = state[id]?.tabList?.find(
-        (el) => el.id.toString() === event.event.tab,
+        (el) => el.id.toString() === tabFromEvent,
       ) || 1;
       await dispatch('saveDashToStore', id);
 
