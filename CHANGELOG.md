@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Button. Transitions to another dashboard by events do not work.
 
 ## [1.164.0]
 
