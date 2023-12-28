@@ -1921,7 +1921,7 @@ export default {
         defaultValue: this.tokens[index]?.defaultValue || this.newTockenDop.defaultValue,
       };
       if (
-        token.capture === 'dash_id'
+        (token.capture === 'dash_id' || token.capture === 'tab')
           && (token.element.indexOf('map') !== -1)
           && (!token.defaultValue || Number.isNaN(+token.defaultValue))
       ) {
@@ -1930,7 +1930,8 @@ export default {
         const height = this.$refs.blockTocken.clientHeight;
 
         this.otstupBottom = height + 55;
-        this.msgWarn = 'Некорректное значение по-умолчанию. Данное поле является обязательным при использовании свойства dash_id.';
+        this.msgWarn = `Некорректное значение по-умолчанию.
+         Данное поле является обязательным при использовании свойства ${token.capture}.`;
 
         setTimeout(() => {
           this.openwarning = false;
