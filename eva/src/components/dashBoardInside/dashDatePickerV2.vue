@@ -796,7 +796,7 @@ export default {
           : this.defaultFormat.date;
 
         this.localValue = this.calcDateByShortcut(
-          this.localValue.shortcut,
+          this.localValue.shortcut || this.localValue?.shortcutKey || '',
           this.outputFormat || defaultFormat,
         );
       }
@@ -983,7 +983,7 @@ export default {
       });
     },
     setSelectionOnShortcut() {
-      // TODO: Костыль для применения кастомных шорткатов
+      // TODO: Костыль для выделения функциональных шорткатов
       const picker = this.$refs[`${this.idVisual}-range`];
       const childrenList = picker.$children;
       const containerId = `${this.idVisual}-range-picker-container`;
@@ -1059,7 +1059,6 @@ export default {
       return `${updatedValue}`;
     },
     calcDateByShortcut(shortcut, format) {
-      console.log('shortcut', shortcut, this.idVisual);
       const date = {
         start: '',
         shortcut,
@@ -1067,60 +1066,56 @@ export default {
       };
 
       const today = moment();
-
-      switch (shortcut) {
-        case 'thisDay':
-        case 'day':
-          date.start = today.clone().startOf('day');
-          date.end = today.clone().endOf('day');
-          break;
-        case 'lastDay':
-        case '-day':
-          date.start = today.clone().subtract(1, 'day').startOf('day');
-          date.end = today.clone().subtract(1, 'day').endOf('day');
-          break;
-        case 'thisWeek':
-        case 'isoWeek':
-          date.start = today.clone().startOf('isoWeek');
-          date.end = today.clone().endOf('isoWeek');
-          break;
-        case 'lastWeek':
-        case '-isoWeek':
-          date.start = today.clone().subtract(1, 'week').startOf('isoWeek');
-          date.end = today.clone().subtract(1, 'week').endOf('isoWeek');
-          break;
-        case 'last7Days':
-        case '7':
-          date.start = today.clone().subtract(7, 'days');
-          date.end = today.clone().endOf('day');
-          break;
-        case 'last30Days':
-        case '30':
-          date.start = today.clone().subtract(30, 'days');
-          date.end = today.clone().endOf('day');
-          break;
-        case 'thisMonth':
-        case 'month':
-          date.start = today.clone().startOf('month');
-          date.end = today.clone().endOf('month');
-          break;
-        case 'lastMonth':
-        case '-month':
-          date.start = today.clone().subtract(1, 'month').startOf('month');
-          date.end = today.clone().subtract(1, 'month').endOf('month');
-          break;
-        case 'thisYear':
-        case 'year':
-          date.start = today.clone().startOf('year');
-          date.end = today.clone().endOf('year');
-          break;
-        case 'lastYear':
-        case '-year':
-          date.start = today.clone().subtract(1, 'year').startOf('year');
-          date.end = today.clone().subtract(1, 'year').endOf('year');
-          break;
-        default:
-          break;
+      // Текущий день
+      if (shortcut === 'thisDay' || shortcut === 'day') {
+        date.start = today.clone().startOf('day');
+        date.end = today.clone().endOf('day');
+      // Предыущий день
+      } else if (shortcut === 'lastDay' || shortcut === '-day') {
+        date.start = today.clone().subtract(1, 'day').startOf('day');
+        date.end = today.clone().subtract(1, 'day').endOf('day');
+      // Текущая неделя
+      } else if (shortcut === 'thisWeek' || shortcut === 'isoWeek') {
+        date.start = today.clone().startOf('isoWeek');
+        date.end = today.clone().endOf('isoWeek');
+      // Предыдущая неделя
+      } else if (shortcut === 'lastWeek' || shortcut === '-isoWeek') {
+        date.start = today.clone().subtract(1, 'week').startOf('isoWeek');
+        date.end = today.clone().subtract(1, 'week').endOf('isoWeek');
+      // Последние 7 дней
+      } else if (shortcut === 'last7Days' || `${shortcut}` === '7') {
+        date.start = today.clone().subtract(7, 'days');
+        date.end = today.clone().endOf('day');
+      // Последние 30 дней
+      } else if (shortcut === 'last30Days' || `${shortcut}` === '30') {
+        date.start = today.clone().subtract(30, 'days');
+        date.end = today.clone().endOf('day');
+      // Текущий месяц
+      } else if (shortcut === 'thisMonth' || shortcut === 'month') {
+        date.start = today.clone().startOf('month');
+        date.end = today.clone().endOf('month');
+      // Предыдущий месяц
+      } else if (shortcut === 'lastMonth' || shortcut === '-month') {
+        date.start = today.clone().subtract(1, 'month').startOf('month');
+        date.end = today.clone().subtract(1, 'month').endOf('month');
+      // Текущий год
+      } else if (shortcut === 'thisYear' || shortcut === 'year') {
+        date.start = today.clone().startOf('year');
+        date.end = today.clone().endOf('year');
+      // Предыдущий год
+      } else if (shortcut === 'lastYear' || shortcut === '-year') {
+        date.start = today.clone().subtract(1, 'year').startOf('year');
+        date.end = today.clone().subtract(1, 'year').endOf('year');
+      // Кварталы
+      } else if (shortcut.includes('kv')) {
+        // Немного дублируется код из getShortcuts
+        // Пока оставлено как есть, в связи с пробемами обратной совместимости
+        const [, kv] = shortcut.match(/^([\d-]+)kv$/);
+        const [start, end] = kv.includes('-') ? kv.split('-') : [kv, kv];
+        date.start = moment().quarter(start).startOf('quarter');
+        date.end = moment().quarter(end).endOf('quarter');
+      } else {
+        return date;
       }
 
       if (date.start && date.end) {
