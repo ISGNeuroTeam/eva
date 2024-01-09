@@ -546,10 +546,12 @@ export default {
           exactDateCustom = null,
           last = null,
         } = oldDate;
+
         let mode = null;
         let value = null;
         let format = null;
         let hideTime = null;
+
         if (range) {
           mode = 'range';
           format = this.getVisualFromStore.timeOutputFormat;
@@ -570,7 +572,7 @@ export default {
           } else {
             value = {
               start: range.start,
-              shortcut: range?.shortcut || null,
+              shortcut: null,
               end: range.end,
             };
           }
@@ -619,20 +621,22 @@ export default {
                 prop: 'pickerMode',
                 value: mode,
               }]);
-              this.$store.commit('setState', [{
-                object: this.getVisualFromStore,
-                prop: 'pickerValue',
-                value,
-              }]);
-              this.localValue = value;
-              this.updateFormattedValue();
-              this.updateValueInStore();
-              this.setTokenValue();
-              this.$store.commit('setState', [{
-                object: this.getVisualFromStore,
-                prop: 'date',
-                value: null,
-              }]);
+              this.$nextTick(() => {
+                this.$store.commit('setState', [{
+                  object: this.getVisualFromStore,
+                  prop: 'pickerValue',
+                  value,
+                }]);
+                this.localValue = value;
+                this.updateFormattedValue();
+                this.updateValueInStore();
+                this.setTokenValue();
+                this.$store.commit('setState', [{
+                  object: this.getVisualFromStore,
+                  prop: 'date',
+                  value: null,
+                }]);
+              });
             });
           });
         }
