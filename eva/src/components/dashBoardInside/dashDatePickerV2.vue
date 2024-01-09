@@ -6,8 +6,8 @@
     <div
       class="date-picker"
       :style="{
-        maxHeight: parentHeight,
-        maxWidth: parentWidth,
+        maxHeight: `${parentHeight}px`,
+        maxWidth: `${parentWidth}px`,
       }"
     >
       <div class="date-picker__wrapper">
@@ -17,6 +17,7 @@
         <v-btn
           :id="`picker-btn-${idVisual}`"
           icon
+          small
           :color="getTheme.$main_text"
           @click="openPopup"
         >
@@ -343,7 +344,7 @@ export default {
       return !!this.fullScreenMode;
     },
     parentHeight() {
-      return this.sizeFrom.height;
+      return this.sizeFrom.height - 40;
     },
     parentWidth() {
       return this.sizeFrom.width;
@@ -785,15 +786,9 @@ export default {
     },
     setDateFromShortcut() {
       if (this.localValue?.shortcut) {
-        // const updateShortcut = this.getShortcuts.find(
-        //   (sc) => sc.value === this.localValue.shortcut,
-        // )?.key || '';
-        // if (updateShortcut !== this.localValue.shortcut) {
-        //   this.$set(this.localValue, 'shortcutKey', updateShortcut);
-        // }
         const defaultFormat = this.hideTime
-          ? this.defaultFormat.dateTime
-          : this.defaultFormat.date;
+          ? this.defaultFormat.date
+          : this.defaultFormat.dateTime;
 
         this.localValue = this.calcDateByShortcut(
           this.localValue.shortcut || this.localValue?.shortcutKey || '',
