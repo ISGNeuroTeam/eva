@@ -491,7 +491,7 @@ export default {
       }
     },
     localValue: {
-      handler() {
+      handler(val, oldVal) {
         this.setDateFromTokens();
       },
       deep: true,
@@ -520,13 +520,14 @@ export default {
     this.setDefaultOptions();
     this.setTokenAction();
     this.loadValueFromStore();
-    if (this.pickerMode === 'range') {
-      this.setDateFromShortcut();
-    }
   },
   mounted() {
     this.setTokenValue = throttle(this.setTokenValue, 200);
     this.updateValueInStore = throttle(this.updateValueInStore, 200);
+    if (this.pickerMode === 'range') {
+      this.setDateFromShortcut();
+    }
+    // debugger;
     this.setDate();
     // Для старых значений
     this.updater();
@@ -654,12 +655,12 @@ export default {
             value: format,
           }]);
         }
-        console.group();
-        console.log(`picker: ${this.idVisual}`);
-        console.log(`old date: ${JSON.stringify(oldDate)}`);
-        console.log(`mode: ${mode}`);
-        console.log(`value: ${JSON.stringify(value)}`);
-        console.groupEnd();
+        // console.group();
+        // console.log(`picker: ${this.idVisual}`);
+        // console.log(`old date: ${JSON.stringify(oldDate)}`);
+        // console.log(`mode: ${mode}`);
+        // console.log(`value: ${JSON.stringify(value)}`);
+        // console.groupEnd();
       }
     },
     checkFormatOnIncludesTime(format) {
@@ -767,17 +768,15 @@ export default {
       if (this.modelPopup) {
         this.closePopup();
       }
-      this.$nextTick(() => {
-        if (this.reactiveValue) {
-          this.setDefaultReactiveValue();
-          this.updateFormattedValue();
-        } else {
-          this.clearValue();
-          this.updateFormattedValue();
-        }
-        this.updateValueInStore();
-        this.setTokenValue();
-      });
+      if (this.reactiveValue) {
+        this.setDefaultReactiveValue();
+        this.updateFormattedValue();
+      } else {
+        this.updateFormattedValue();
+        this.clearValue();
+      }
+      this.updateValueInStore();
+      this.setTokenValue();
     },
     setDateFromTokens() {
       if (this.pickerMode === 'exactManual') {
@@ -900,9 +899,17 @@ export default {
         const start = this.localValue.start
           ? moment(this.localValue.start, oldFormat).format(format)
           : '...';
-        const end = this.localValue.end
+        let end = this.localValue.end
           ? moment(this.localValue.end, oldFormat).format(format)
           : '...';
+        if (this.pickerMode === 'range') {
+          if (end !== '...') {
+            end = moment(this.localValue.end, format).set({
+              hour: 23,
+              minute: 59,
+            }).format(format);
+          }
+        }
         this.formattedValue = `${start} - ${end}`;
         this.$set(this.localValue, 'start', start === '...' ? null : start);
         this.$set(this.localValue, 'end', end === '...' ? null : end);
@@ -1122,7 +1129,6 @@ export default {
         date.start = date.start.format(format);
         date.end = date.end.format(format);
       }
-
       return date;
     },
   },
