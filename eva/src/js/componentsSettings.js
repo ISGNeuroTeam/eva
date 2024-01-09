@@ -391,16 +391,14 @@ export default {
       'closeListByEnter',
     ],
     picker: [
-      'selectingExactDate',
-      'showLastTimeBlock',
-      'showChoseDateAndTimeBlock',
-      'showRangeDateBlock',
-      'showCustomInputBlock',
-      'timeOutputFormat',
-      'hideTimeSelect',
-      'useLastTimeTemplate',
-      'lastTimeTemplateStart',
-      'lastTimeTemplateEnd',
+      'pickerOptions',
+      'pickerMode',
+      'outputFormat',
+      'useTimestampInToken',
+      'hideTime',
+      'useTimeTemplate',
+      'timeTemplateStart',
+      'timeTemplateEnd',
       'rangeBtnList',
     ],
     pickerV2: [
@@ -907,7 +905,7 @@ export default {
       description: 'Набор кнопок выбора диапазона дат',
       relation() {
         // Вызывается в контексте modalSettings
-        return !this.options?.selectingExactDate || this.options?.pickerMode === 'range';
+        return this.options?.pickerMode === 'range';
       },
       elem: 'select-checkbox',
       default: [

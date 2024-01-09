@@ -118,7 +118,7 @@
                   Выбор времени
                 </div>
                 <div class="row">
-                  <div class="col-6">
+                  <div class="col-12">
                     <v-text-field
                       v-model="reactiveValue.count"
                       :color="getTheme.$main_text"
@@ -129,7 +129,7 @@
                       @input="updateLocalValue"
                     />
                   </div>
-                  <div class="col-6">
+                  <div class="col-12">
                     <v-select
                       v-model="reactiveValue.type"
                       label="Единица времени"
