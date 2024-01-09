@@ -569,9 +569,9 @@ export default {
             };
           } else {
             value = {
-              start: null,
+              start: range.start,
               shortcut: range?.shortcut || null,
-              end: null,
+              end: range.end,
             };
           }
         } else if (end || start) {
@@ -650,11 +650,12 @@ export default {
             value: format,
           }]);
         }
-        // console.group();
-        // console.log(`picker: ${this.idVisual}`);
-        // console.log(`mode: ${mode}`);
-        // console.log(`value: ${JSON.stringify(value)}`);
-        // console.groupEnd();
+        console.group();
+        console.log(`picker: ${this.idVisual}`);
+        console.log(`old date: ${JSON.stringify(oldDate)}`);
+        console.log(`mode: ${mode}`);
+        console.log(`value: ${JSON.stringify(value)}`);
+        console.groupEnd();
       }
     },
     checkFormatOnIncludesTime(format) {
