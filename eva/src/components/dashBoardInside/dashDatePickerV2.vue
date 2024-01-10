@@ -898,7 +898,6 @@ export default {
       };
     },
     updateFormat({ format, oldFormat }) {
-      // console.trace();
       if (['range', 'startEnd'].includes(this.pickerMode)) {
         const start = this.localValue.start
           ? moment(this.localValue.start, oldFormat).format(format)

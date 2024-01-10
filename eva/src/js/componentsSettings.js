@@ -831,7 +831,7 @@ export default {
       description: 'Скрыть выбор времени в календаре',
       elem: 'switch',
       relation() {
-        const targetModes = ['startEnd', 'range', 'exact'];
+        const targetModes = ['startEnd', 'exact'];
         return targetModes.includes(this.options?.pickerMode);
       },
       default: false,
@@ -861,8 +861,6 @@ export default {
       description: 'Шаблон стартового времени',
       relation() {
         // Вызывается в контексте modalSettings
-        // return !this.options?.selectingExactDate
-        //   && this.options.useLastTimeTemplate;
         return this.options?.pickerMode === 'time'
           && this.options.useTimeTemplate;
       },
@@ -892,7 +890,8 @@ export default {
     },
     {
       option: 'expandRangeButtonsSet',
-      description: 'Расширить набор кнопок выбора диапазона дат (1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.)',
+      description: 'Расширить набор кнопок выбора диапазона дат'
+        + ' (1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.)',
       relation() {
         // Вызывается в контексте modalSettings
         return this.options?.pickerMode === 'range';
