@@ -220,6 +220,7 @@ import {
 import moment from 'moment';
 import componentsSettings from '@/js/componentsSettings';
 import { throttle } from '@/js/utils/throttle';
+import { pluralizeTime } from '@/js/utils/pluralizeFn';
 
 export default {
   name: 'DashDatePickerV2',
@@ -832,23 +833,38 @@ export default {
       // Через includes на будущее, если будут подобные типы даты
       if (['time'].includes(this.pickerMode)) {
         if (this.localValue.type && this.localValue.count) {
-          const lastTimeText = this.getLastTimeTextByType(this.localValue.type);
-          this.formattedValue = `Последние ${this.localValue.count} ${lastTimeText}`;
+          this.formattedValue = this.getLastTimeTextByType(this.localValue.type, this.localValue.count);
         } else {
           this.formattedValue = '';
         }
       }
     },
-    getLastTimeTextByType(type) {
+    getLastTimeTextByType(type, count) {
       switch (type) {
         case 'second':
-          return 'секунд';
+          return pluralizeTime(
+            count,
+            ['секунда', 'секунды', 'секунд'],
+            'Период:',
+          );
         case 'minute':
-          return 'минут';
+          return pluralizeTime(
+            count,
+            ['минута', 'минуты', 'минут'],
+            'Период:',
+          );
         case 'hour':
-          return 'часов';
+          return pluralizeTime(
+            count,
+            ['час', 'часа', 'часов'],
+            'Период:',
+          );
         case 'day':
-          return 'дней';
+          return pluralizeTime(
+            count,
+            ['день', 'дня', 'дней'],
+            'Период:',
+          );
         default:
           return '';
       }
