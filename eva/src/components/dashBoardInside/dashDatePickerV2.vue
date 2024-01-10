@@ -473,25 +473,29 @@ export default {
     useTimestampInToken() {
       this.setTokenValue();
     },
-    hideTime(val) {
-      if (!this.outputFormat) {
-        if (val) {
-          this.updateFormat({
-            format: this.defaultFormat.date,
-            oldFormat: this.defaultFormat.dateTime,
-          });
-        } else {
-          this.updateFormat({
-            format: this.defaultFormat.dateTime,
-            oldFormat: this.defaultFormat.date,
-          });
+    hideTime(val, oldVal) {
+      const curValue = !!val;
+      const prevValue = !!oldVal;
+      if (curValue !== prevValue) {
+        if (!this.outputFormat) {
+          if (val) {
+            this.updateFormat({
+              format: this.defaultFormat.date,
+              oldFormat: this.defaultFormat.dateTime,
+            });
+          } else {
+            this.updateFormat({
+              format: this.defaultFormat.dateTime,
+              oldFormat: this.defaultFormat.date,
+            });
+          }
+          this.updateValueInStore();
+          this.setTokenValue();
         }
-        this.updateValueInStore();
-        this.setTokenValue();
       }
     },
     localValue: {
-      handler(val, oldVal) {
+      handler() {
         this.setDateFromTokens();
       },
       deep: true,
@@ -527,7 +531,6 @@ export default {
     if (this.pickerMode === 'range') {
       this.setDateFromShortcut();
     }
-    // debugger;
     this.setDate();
     // Для старых значений
     this.updater();
@@ -895,6 +898,7 @@ export default {
       };
     },
     updateFormat({ format, oldFormat }) {
+      // console.trace();
       if (['range', 'startEnd'].includes(this.pickerMode)) {
         const start = this.localValue.start
           ? moment(this.localValue.start, oldFormat).format(format)
@@ -1042,13 +1046,7 @@ export default {
         },
       });
     },
-    convertingTokens(element) {
-      this.getTokens.forEach((token) => {
-        element = element.replaceAll(`$${token.name}$`, token.value);
-      });
-      return element;
-    },
-    replaceTokens(value, noFormat) {
+    replaceTokens(value, noFormat = false) {
       let format = this.defaultFormat.dateTime;
       if (this.outputFormat) {
         format = this.outputFormat;
@@ -1058,7 +1056,10 @@ export default {
       let updatedValue = value;
 
       if (/\$\w+\$/.test(value)) {
-        updatedValue = this.convertingTokens(value);
+        this.getTokens.forEach((token) => {
+          updatedValue = updatedValue
+            .replaceAll(`$${token.name}$`, token.value);
+        });
         if (/^\d+$/.test(updatedValue) && !noFormat) {
           updatedValue = moment(+updatedValue * 1000).format(format);
         }
