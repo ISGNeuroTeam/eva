@@ -1,3 +1,17 @@
+# [1.165.0] - 2023-12-28
+
+### Added
+- TextArea:
+  - Introduced a setting that prohibits line breaks.
+  - When the background is hidden, the text input field now has borders.
+- Map:
+  - Added a tab field in token captures.
+
+### Fixed
+- Button:
+  - Resolved the issue where transitions to another dashboard by events were not working.
+
+
 # [1.164.0] - 2023-12-21
 
 ### Added
