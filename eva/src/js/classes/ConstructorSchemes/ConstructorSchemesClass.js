@@ -70,6 +70,7 @@ import GenerateElementsFromSearch from '@/js/classes/ConstructorSchemes/Generate
 import {
   ExporterToPDF,
 } from '@/js/classes/ConstructorSchemes/ExportToPDF';
+import SchemeBuilder from '@/js/classes/ConstructorSchemes/SchemeBuilder';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -1939,6 +1940,10 @@ class ConstructorSchemesClass {
       minimumLastSegmentLength = 30,
     },
   ) {
+    const builder = new SchemeBuilder(this.graphComponent.graph, {
+      data: dataFrom,
+    });
+    builder.prepareElements();
     const descriptionNodeStyles = {
       tag: {
         nodeId: 'label-node-default',

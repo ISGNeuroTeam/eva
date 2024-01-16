@@ -817,8 +817,8 @@ export default {
       elem: 'text-field',
       default: '',
       relation() {
-        const targetModes = ['startEnd', 'range', 'exact'];
-        return targetModes.includes(this.options?.pickerMode);
+        const mode = this.options?.pickerMode;
+        return mode === 'startEnd' || mode === 'exact' || mode === 'range';
       },
       placeholder(options) {
         return options?.hideTime
@@ -831,8 +831,8 @@ export default {
       description: 'Скрыть выбор времени в календаре',
       elem: 'switch',
       relation() {
-        const targetModes = ['startEnd', 'exact'];
-        return targetModes.includes(this.options?.pickerMode);
+        const mode = this.options?.pickerMode;
+        return mode === 'startEnd' || mode === 'exact';
       },
       default: false,
     },
@@ -841,8 +841,8 @@ export default {
       description: 'Использовать timestamp в токене независимо от формата даты',
       elem: 'switch',
       relation() {
-        const targetModes = ['startEnd', 'range', 'exact'];
-        return targetModes.includes(this.options?.pickerMode);
+        const mode = this.options?.pickerMode;
+        return mode === 'startEnd' || mode === 'range' || mode === 'exact';
       },
       default: false,
     },

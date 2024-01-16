@@ -271,9 +271,12 @@ export default {
     reactiveValue: {},
     // Значение в компоненте
     localValue: {},
+    // Модалка с пикером
     modelPopup: false,
+    // Позиция модалки
     popupPositionX: 0,
     popupPositionY: 0,
+    // Значения по-умолчанию
     defaultValueByMode: {
       range: {
         start: '',
@@ -302,13 +305,12 @@ export default {
         date: '',
       },
     },
+    // Формат даты по-умолчанию
     defaultFormat: {
       date: 'YYYY-MM-DD',
       dateTime: 'YYYY-MM-DD HH:mm',
     },
     // Только для режима range
-    shortcut: null,
-    shortcuts: [],
     defaultRangeBtnList: [
       'thisDay',
       'lastDay',
@@ -817,23 +819,31 @@ export default {
       }
     },
     updateFormattedValue() {
-      if (['range', 'startEnd'].includes(this.pickerMode)) {
+      if (
+        this.pickerMode === 'range'
+          || this.pickerMode === 'startEnd'
+      ) {
         if (!(this.localValue.start && this.localValue.end)) {
           this.formattedValue = '';
         } else {
           this.formattedValue = `${this.localValue.start || '...'} - ${this.localValue.end || '...'}`;
         }
       }
-      if (['exact'].includes(this.pickerMode)) {
+      if (this.pickerMode === 'exact') {
         this.formattedValue = `${this.localValue.date || ''}`;
       }
-      if (['exactManual', 'startEndManual'].includes(this.pickerMode)) {
+      if (
+        this.pickerMode === 'exactManual'
+          || this.pickerMode === 'startEndManual'
+      ) {
         this.setDateFromTokens();
       }
-      // Через includes на будущее, если будут подобные типы даты
-      if (['time'].includes(this.pickerMode)) {
+      if (this.pickerMode === 'time') {
         if (this.localValue.type && this.localValue.count) {
-          this.formattedValue = this.getLastTimeTextByType(this.localValue.type, this.localValue.count);
+          this.formattedValue = this.getLastTimeTextByType(
+            this.localValue.type,
+            this.localValue.count,
+          );
         } else {
           this.formattedValue = '';
         }
