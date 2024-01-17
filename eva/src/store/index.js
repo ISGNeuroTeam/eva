@@ -2212,7 +2212,8 @@ export default new Vuex.Store({
 
       // странная логика, не стал сильно менять
       const tabsEnabled = state[id]?.tabs;
-      const lastEl = state[id]?.tabList?.find((el) => el.id.toString() === event.event.tab);
+      const tabFromEvent = event.event?.tab ? `${event.event.tab}` : '1';
+      const lastEl = state[id]?.tabList?.find((el) => el.id.toString() === tabFromEvent);
       let newCurrentTabValue = 1;
       if (!tabsEnabled) {
         newCurrentTabValue = 1;

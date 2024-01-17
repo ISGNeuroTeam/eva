@@ -8,14 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- TextArea:
-  - Added setting that prohibits line breaks.
-  - When the background is hidden, the text input field has borders.
 
 ### Changed
 
 ### Fixed
 - Data sources are not started if the token is passed in the go event and data sources do not have the option to start when loading the dashboard.
+
+## [1.165.0]
+
+### Added
+- TextArea:
+  - Added setting that prohibits line breaks.
+  - When the background is hidden, the text input field has borders.
+- Map:
+  - Added field tab in token captures
+
+### Fixed
+- Button. Transitions to another dashboard by events do not work.
 
 ## [1.164.0]
 
