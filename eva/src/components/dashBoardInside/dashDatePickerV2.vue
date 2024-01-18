@@ -194,11 +194,11 @@
             <v-btn
               class="mt-3"
               small
-              :color="getTheme.$primary_button"
+              :color="getTheme.$accent_ui_color"
             >
               <span
                 :style="{
-                  color: getTheme.$main_text
+                  color: 'white'
                 }"
                 @click="setDate"
               >
@@ -522,6 +522,17 @@ export default {
       },
       deep: true,
     },
+    getShortcuts: {
+      handler(val, oldVal) {
+        const valToStr = JSON.stringify(val);
+        const oldValToStr = JSON.stringify(oldVal);
+        if (valToStr !== oldValToStr) {
+          this.clearValue();
+          this.setDate();
+        }
+      },
+      deep: true,
+    },
   },
   created() {
     this.setDefaultOptions();
@@ -661,12 +672,6 @@ export default {
             value: format,
           }]);
         }
-        // console.group();
-        // console.log(`picker: ${this.idVisual}`);
-        // console.log(`old date: ${JSON.stringify(oldDate)}`);
-        // console.log(`mode: ${mode}`);
-        // console.log(`value: ${JSON.stringify(value)}`);
-        // console.groupEnd();
       }
     },
     checkFormatOnIncludesTime(format) {
@@ -709,7 +714,7 @@ export default {
       this.popupPositionY = y;
     },
     setDefaultOptions() {
-      const options = componentsSettings.options.pickerV2;
+      const options = componentsSettings.options.picker;
       const defaultOptions = {};
       componentsSettings.optionFields.forEach((field) => {
         // Относится ли настройка к этой визуализации и есть ли у неё default
@@ -1035,9 +1040,13 @@ export default {
               .find((el) => el.$el.classList.contains('shortcuts-container'));
             if (shortcutContainer) {
               const currentShortcut = this.getShortcuts
-                .find((el) => (el.key === this.localValue.shortcut)
+                .find((el) => (el?.key === this.localValue.shortcut)
                     || (el.value === this.localValue.shortcut));
-              shortcutContainer.select(currentShortcut);
+              if (currentShortcut) {
+                shortcutContainer.select(currentShortcut);
+              } else {
+                this.clearValue();
+              }
             }
           }
         }
@@ -1097,7 +1106,9 @@ export default {
         shortcut,
         end: '',
       };
-
+      if (!shortcut) {
+        return date;
+      }
       const today = moment();
       // Текущий день
       if (shortcut === 'thisDay' || shortcut === 'day') {
@@ -1140,7 +1151,7 @@ export default {
         date.start = today.clone().subtract(1, 'year').startOf('year');
         date.end = today.clone().subtract(1, 'year').endOf('year');
       // Кварталы
-      } else if (shortcut.includes('kv')) {
+      } else if (shortcut?.length > 0 && shortcut.includes('kv')) {
         // Немного дублируется код из getShortcuts
         // Пока оставлено как есть, в связи с пробемами обратной совместимости
         const [, kv] = shortcut.match(/^([\d-]+)kv$/);
@@ -1162,9 +1173,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$picker-bg: var(--secondary_bg);
+$picker-text: var(--main_text);
+
+$picker-active-bg: var(--accent_ui_color);
+$picker-active-text: white;
+
+$picker-between-active-bg: var(--accent_ui_color);
+$picker-between-active-text: white;
+
+$picker-hover-bg: var(--accent_ui_color);
+$picker-hover-text: white;
+
+$picker-border: var(--main_border);
 .date-picker {
   padding: 6px;
-  color: var(--main_text);
+  color: $picker-text;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -1175,7 +1199,7 @@ export default {
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid var(--main_text);
+    border: 1px solid $picker-border;
     border-radius: 4px;
     max-width: 350px;
   }
@@ -1192,7 +1216,7 @@ export default {
     line-height: 1.1;
     font-weight: bold;
     margin-bottom: 5px;
-    color: var(--main_text);
+    color: $picker-text;
   }
   &__menu {
     overflow-y: visible;
@@ -1201,75 +1225,115 @@ export default {
   }
   &__group {
     &::v-deep .time-picker-column-item {
-      color: var(--main_text);
+      color: $picker-text;
     }
     &::v-deep .field-label {
-      color: var(--main_text);
+      color: $picker-text;
     }
     &::v-deep {
       .field.is-focused {
         .field-label {
-          color: var(--secondary_text) !important;
+          color: $picker-between-active-text !important;
         }
       }
     }
-    &::v-deep .field-input {
-      color: var(--main_text);
-    }
     &::v-deep .header-picker {
-      background-color: var(--secondary_bg) !important;
+      color: $picker-text;
+      background-color: $picker-bg !important;
     }
     &::v-deep .datepicker {
-      border: 1px solid var(--main_border);
+      border: 1px solid $picker-border;
     }
-    &::v-deep .field-input {
-      background-color: var(--secondary_bg);
-      border-color: var(--main_text);
+    &::v-deep .field {
+      .field-input {
+        background-color: $picker-bg;
+        border-color: $picker-border;
+        color: $picker-text;
+      }
+      &.is-focused {
+        .field-input {
+          background-color: $picker-bg;
+          border-color: $picker-border !important;
+          color: $picker-text;
+        }
+      }
     }
     &::v-deep .datetimepicker .datepicker {
-      background: var(--secondary_bg);
+      background: $picker-bg;
       .pickers-container {
-        background: var(--secondary_bg);
+        background: $picker-bg;
       }
     }
     &::v-deep .custom-button {
-      background: var(--secondary_bg);
+      background: $picker-bg;
       span {
-        color: var(--main_text) !important;
+        color: $picker-text !important;
+      }
+      .custom-button-effect {
+        background-color: $picker-bg !important;
+      }
+      &:hover {
+        .custom-button-effect {
+          background-color: $picker-hover-bg !important;
+        }
+      }
+    }
+    &::v-deep .datepicker-button.validate {
+      border-color: transparent !important;
+      svg {
+        fill: $picker-text !important;
+      }
+      .datepicker-button-effect {
+        background-color: $picker-bg !important;
+      }
+      &:hover {
+        svg {
+          fill: $picker-hover-text !important;
+        }
+        .datepicker-button-effect {
+          background-color: $picker-hover-bg !important;
+        }
       }
     }
     &::v-deep .datepicker-buttons-container {
-      background: var(--secondary_bg);
-      border-color: var(--main_border);
+      background: $picker-bg;
+      border-color: $picker-border;
       .datepicker-button {
-        background: var(--secondary_bg);
-        border-color: var(--main_border);
+        background: $picker-bg;
+        border-color: $picker-border;
       }
     }
     &::v-deep button.datepicker-day {
       &.enable {
         .datepicker-day-text {
-          color: var(--main_text) !important;
+          color: $picker-text !important;
         }
-
+        .datepicker-day-effect {
+          background-color: $picker-bg !important;
+        }
         &.selected {
           .datepicker-day-text {
-            color: var(--main_bg) !important;
+            color: $picker-active-text !important;
           }
           .datepicker-day-effect {
-            background-color: var(--accent_ui_color) !important;
+            background-color: $picker-active-bg !important;
           }
         }
-
         &.between {
           .datepicker-day-text {
-            color: var(--main_bg) !important;
+            color: $picker-between-active-text !important;
+          }
+          .datepicker-day-effect {
+            background-color: $picker-between-active-bg !important;
           }
         }
       }
       &:hover {
         .datepicker-day-text {
-          color: var(--main_bg) !important;
+          color: $picker-hover-text !important;
+        }
+        .datepicker-day-effect {
+          background-color: $picker-hover-bg !important;
         }
       }
     }
@@ -1277,63 +1341,83 @@ export default {
       background-color: transparent !important;
       border: 1px solid;
     }
-    &::v-deep .datepicker-container .datepicker-controls .datepicker-button svg {
-      fill: var(--main_text) !important;
+    &::v-deep .datepicker-container .datepicker-controls {
+      .datepicker-button {
+
+        svg {
+          fill: $picker-text !important;
+        }
+      }
     }
     &::v-deep .date-time-picker {
-      color: var(--main_text) !important;
+      color: $picker-text !important;
     }
     &::v-deep .shortcuts-container {
-      border-color: var(--main_border);
+      border-color: transparent;
       .custom-button-content {
         span {
           white-space: nowrap;
-          color: var(--accent_ui_color) !important;
+          color: $picker-text !important;
         }
       }
+      .custom-button-effect {
+        background-color: $picker-bg !important;
+      }
       .custom-button {
+        border-color: transparent !important;
         &.is-selected {
           .custom-button-content {
+            color: $picker-active-text !important;
             span {
-              color: var(--main_bg) !important;
+              color: $picker-active-text !important;
             }
           }
           .custom-button-effect {
-            background-color: var(--accent_ui_color) !important;
+            background-color: $picker-active-bg !important;
           }
         }
         &:hover {
           .custom-button-content {
             span {
-              color: var(--main_bg) !important;
+              color: $picker-hover-text !important;
             }
+          }
+          .custom-button-effect {
+            background-color: $picker-hover-bg !important;
           }
         }
 
       }
     }
     &::v-deep .year-month-selector {
-      background-color: var(--secondary_bg);
+      background-color: $picker-bg;
       .custom-button {
+        border-color: transparent !important;
         .custom-button-content {
-          color: var(--main_text) !important;
-          fill: var(--main_text) !important;
+          color: $picker-text !important;
+          fill: $picker-text !important;
+        }
+        .custom-button-effect {
+          background-color: $picker-bg !important;
         }
         &.is-selected {
           .custom-button-content {
-            color: var(--main_bg) !important;
+            color: $picker-active-text !important;
+          }
+          .custom-button-effect {
+            background-color: $picker-active-bg !important;
           }
         }
         &:hover {
           .custom-button-content {
-            color: var(--main_bg) !important;
+            color: $picker-hover-text !important;
             span {
-              fill: var(--main_bg) !important;
+              fill: $picker-hover-text !important;
             }
           }
-        }
-        .custom-button-effect {
-          background-color: var(--accent_ui_color) !important;
+          .custom-button-effect {
+            background-color: $picker-hover-bg !important;
+          }
         }
       }
     }

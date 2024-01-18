@@ -75,7 +75,6 @@ export default {
     },
 
     { name: 'Выбор времени', img: mdiCalendarMonth, type: 'picker' },
-    { name: 'Выбор времени UPD', img: mdiCalendarMonth, type: 'pickerV2' },
     { name: 'Граф', img: mdiGraphql, type: 'ygraph' },
     // { name: 'Граф_old', img: mdiGraph, type: 'graph' },
     { name: 'Диаграмма Гантта', img: mdiChartGantt, type: 'guntt' },
@@ -178,10 +177,6 @@ export default {
     picker: {
       width: 365,
       height: 195,
-    },
-    pickerV2: {
-      width: 365,
-      height: 150,
     },
     select: {
       width: 480,
@@ -310,7 +305,6 @@ export default {
     guntt: mdiChartGantt,
     select: mdiFormatListBulleted,
     picker: mdiCalendarMonth,
-    pickerV2: mdiCalendarMonth,
     single: mdiNumeric,
     button: mdiGestureTap,
     textarea: mdiCardTextOutline,
@@ -391,17 +385,6 @@ export default {
       'closeListByEnter',
     ],
     picker: [
-      'pickerOptions',
-      'pickerMode',
-      'outputFormat',
-      'useTimestampInToken',
-      'hideTime',
-      'useTimeTemplate',
-      'timeTemplateStart',
-      'timeTemplateEnd',
-      'rangeBtnList',
-    ],
-    pickerV2: [
       'pickerOptions',
       'pickerMode',
       'outputFormat',
@@ -793,7 +776,7 @@ export default {
           value: 'startEnd',
         },
         {
-          text: 'Начало-конец(ручной ввод)',
+          text: 'Начало-конец (ручной ввод)',
           value: 'startEndManual',
         },
         {
@@ -805,7 +788,7 @@ export default {
           value: 'exact',
         },
         {
-          text: 'Точная дата(ручной ввод)',
+          text: 'Точная дата (ручной ввод)',
           value: 'exactManual',
         },
       ],
@@ -818,7 +801,9 @@ export default {
       default: '',
       relation() {
         const mode = this.options?.pickerMode;
-        return mode === 'startEnd' || mode === 'exact' || mode === 'range';
+        return mode === 'startEnd'
+          || mode === 'exact'
+          || mode === 'range';
       },
       placeholder(options) {
         return options?.hideTime
@@ -882,6 +867,7 @@ export default {
       default: 'now()',
       placeholder: 'Пример: now()',
     },
+    // picker old options
     {
       option: 'selectingExactDate',
       description: 'Выбор точной даты',
@@ -1751,7 +1737,6 @@ export default {
     fromDataSearches: [
       'menu',
       'picker',
-      'pickerV2',
       'dynamicForm',
     ],
   },
