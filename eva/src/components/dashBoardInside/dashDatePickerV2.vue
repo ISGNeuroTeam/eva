@@ -806,7 +806,8 @@ export default {
           : this.defaultFormat.dateTime;
         if (this.getShortcuts?.length > 0) {
           const isValidShortcut = this.getShortcuts
-            .find(({ key }) => key === this.localValue?.shortcut);
+            .find(({ key, value }) => key === this.localValue?.shortcut
+              || value === this.localValue?.shortcut);
           if (isValidShortcut) {
             this.localValue = this.calcDateByShortcut(
               this.localValue.shortcut || this.localValue?.shortcutKey || '',
