@@ -57,6 +57,7 @@ onmessage = async (event) => {
 
   const cycle = new Promise((resolve) => {
     let timeOut = null;
+    let noCacheCount = 0;
     // eslint-disable-next-line func-names
     const tick = async function () {
       if (status === 'failed') {
@@ -123,10 +124,14 @@ onmessage = async (event) => {
           return res;
         });
       }
+      if (status === 'nocache') {
+        noCacheCount += 1;
+      }
       if (
         status === 'success'
         || status === 'failed'
-        // || status === 'nocache'
+        || status === 'canceled'
+        || noCacheCount > 2
       ) {
         clearTimeout(timeOut);
         resolve(result);
