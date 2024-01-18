@@ -762,7 +762,7 @@ export default {
       this.setDefaultReactiveValue();
     },
     loadValueFromStore() {
-      if (!this.getVisualFromStore.pickerValue) {
+      if (!this.getVisualFromStore?.pickerValue) {
         // Если в store нет значения - ставим default
         this.clearValue();
         // Затем устанавливаем это значение в store
@@ -1351,6 +1351,32 @@ $picker-border: var(--main_border);
     }
     &::v-deep .date-time-picker {
       color: $picker-text !important;
+    }
+    &::v-deep .time-picker {
+        .time-picker-column-item {
+          .time-picker-column-item-text {
+            color: $picker-text !important;
+          }
+          .time-picker-column-item-effect {
+            background-color: $picker-bg !important;
+          }
+          &.active {
+            .time-picker-column-item-text {
+              color: $picker-active-text !important;
+            }
+            .time-picker-column-item-effect {
+              background-color: $picker-active-bg !important;
+            }
+          }
+          &:hover {
+            .time-picker-column-item-text {
+              color: $picker-hover-text !important;
+            }
+            .time-picker-column-item-effect {
+              background-color: $picker-hover-bg !important;
+            }
+          }
+        }
     }
     &::v-deep .shortcuts-container {
       border-color: transparent;
