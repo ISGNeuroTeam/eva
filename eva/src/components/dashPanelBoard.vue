@@ -477,12 +477,14 @@
                 <v-btn
                   icon
                   class="search-play"
-                  :disabled="search.status === 'pending'"
                   :color="theme.$primary_button"
                   v-on="on"
-                  @click="startSearch(search)"
+                  @click="search.status === 'pending' ? stopSearch(search) : startSearch(search)"
                 >
-                  <v-icon>
+                  <v-icon v-if="search.status === 'pending'">
+                    {{ stop }}
+                  </v-icon>
+                  <v-icon v-else>
                     {{ play }}
                   </v-icon>
                 </v-btn>
@@ -1114,6 +1116,7 @@ import {
   mdiBellRingOutline,
   mdiContentCopy,
   mdiFilePdf,
+  mdiStop,
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
 import draggable from 'vuedraggable';
@@ -1125,6 +1128,7 @@ import settings from '../js/componentsSettings';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
 import { globalTockens } from '../constants/globalTockens';
 import Notifications from '@/components/notifications';
+import rest from '@/store/storeRest';
 
 export default {
   name: 'DashPanelBoard',
@@ -1180,6 +1184,7 @@ export default {
       dragVerticalIcon: mdiDragHorizontalVariant,
       pencil: mdiPencil,
       play: mdiPlay,
+      stop: mdiStop,
       clock: mdiClockOutline,
       download: mdiArrowDownBold,
       mdiAnimationPlay,
@@ -1977,6 +1982,9 @@ export default {
         sid: search.sid,
         status: 'empty',
       });
+    },
+    async stopSearch(search) {
+      await rest.abortRest(search.sid);
     },
     yesSearch() {
       // кнопка согласия на обновления если токен уже существует

@@ -1,10 +1,21 @@
 import { mdiNetwork, mdiAlertCircleOutline, mdiCheck } from '@mdi/js';
 import Vue from 'vue';
 
+const workers = new Map();
+
 export default {
   store: null,
   setStore(store) {
     this.store = store;
+  },
+  async abortRest(sid) {
+    if (workers.has(sid)) {
+      workers
+        .get(sid)
+        .postMessage({
+          action: 'abort',
+        });
+    }
   },
   async rest(formData, searchFrom, restAuth, idDash) {
     // console.log('>> rest:', searchFrom.sid);
@@ -18,6 +29,7 @@ export default {
 
     if (idDash !== 'reports' && window.Worker) {
       const worker = new Worker('/js/job-worker.js');
+      workers.set(searchFrom.sid, worker);
       return (new Promise((resolve) => {
         worker.postMessage({
           formData: Object.fromEntries(formData.entries()),
@@ -66,6 +78,7 @@ export default {
             // console.log('[notifications]', notifications)
             this.store.dispatch('notify/addNotifications', notifications);
           }
+          workers.delete(searchFrom.sid);
           return resolve({ data, schema } || []);
         };
       }));

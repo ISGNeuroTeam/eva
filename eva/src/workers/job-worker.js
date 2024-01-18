@@ -1,7 +1,15 @@
+const controller = new AbortController();
+
 // eslint-disable-next-line consistent-return
 onmessage = async (event) => {
-  const { searchFrom } = event.data;
+  const { searchFrom, action } = event.data;
   // console.log('[run] worker: %s', searchFrom.sid/*, event.data*/);
+
+  if (action === 'abort') {
+    controller.abort('Canceled by user');
+    return;
+  }
+
   const formData = new FormData();
   Object.keys(event.data.formData).forEach((key) => {
     formData.append(key, event.data.formData[key]);
@@ -10,6 +18,7 @@ onmessage = async (event) => {
   const response = await fetch('/api/makejob', {
     method: 'POST',
     body: formData,
+    signal: controller.signal,
   }).catch((error) => (error.message));
   if (typeof response === 'string') {
     return postMessage({
@@ -76,6 +85,7 @@ onmessage = async (event) => {
             twf: searchFrom.twf,
             cache_ttl: searchFrom.cache_ttl,
           }),
+          signal: controller.signal,
           //  mode: 'no-cors'
         },
       )
@@ -90,8 +100,11 @@ onmessage = async (event) => {
             `Запрос выполнить не удалось.&nbsp;&nbsp;Ошибка: ${error}`,
           ]);
           status = 'failed';
+          if (status === 'DOMException: The user aborted a request.') {
+            status = 'canceled';
+          }
           result = {
-            status: 'failed',
+            status,
             error: `${error.message}`,
           };
           clearTimeout(timeOut);
@@ -161,6 +174,7 @@ onmessage = async (event) => {
 
     const dataResponse = await fetch(`/api/getresult?cid=${cycleResult.cid}`, {
       cache: 'no-store',
+      signal: controller.signal,
     }).catch((error) => {
       errorMsg = error;
     });
