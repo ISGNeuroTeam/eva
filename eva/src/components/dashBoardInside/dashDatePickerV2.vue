@@ -804,11 +804,18 @@ export default {
         const defaultFormat = this.hideTime
           ? this.defaultFormat.date
           : this.defaultFormat.dateTime;
-
-        this.localValue = this.calcDateByShortcut(
-          this.localValue.shortcut || this.localValue?.shortcutKey || '',
-          this.outputFormat || defaultFormat,
-        );
+        if (this.getShortcuts?.length > 0) {
+          const isValidShortcut = this.getShortcuts
+            .find(({ key }) => key === this.localValue?.shortcut);
+          if (isValidShortcut) {
+            this.localValue = this.calcDateByShortcut(
+              this.localValue.shortcut || this.localValue?.shortcutKey || '',
+              this.outputFormat || defaultFormat,
+            );
+          } else {
+            this.clearValue();
+          }
+        }
       }
     },
     updateLocalValue() {
