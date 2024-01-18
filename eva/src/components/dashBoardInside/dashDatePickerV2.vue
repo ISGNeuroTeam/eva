@@ -508,14 +508,14 @@ export default {
         if (this.pickerMode === 'exactManual') {
           tokens.forEach(({ name }) => {
             if (this.localValue.date.includes(`$${name}$`)) {
-              this.setDate();
+              this.setDateFromTokens();
             }
           });
         } else if (this.pickerMode === 'startEndManual') {
           tokens.forEach(({ name }) => {
             if (this.localValue.start.includes(`$${name}$`)
             || this.localValue.end.includes(`$${name}$`)) {
-              this.setDate();
+              this.setDateFromTokens();
             }
           });
         }
