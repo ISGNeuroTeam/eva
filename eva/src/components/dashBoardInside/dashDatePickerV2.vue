@@ -439,6 +439,21 @@ export default {
         }
       });
     },
+    isValueWithTokens() {
+      if (this.getTokens?.length > 0) {
+        const tokenPattern = /\$[a-zA-Z0-9_]+\$/;
+        if (this.pickerMode === 'exactManual') {
+          return tokenPattern.test(this.localValue.date);
+        }
+        if (this.pickerMode === 'startEndManual') {
+          const startCheck = tokenPattern.test(this.localValue.start);
+          const endCheck = tokenPattern.test(this.localValue.end);
+          return startCheck || endCheck;
+        }
+        return false;
+      }
+      return false;
+    },
   },
   watch: {
     pickerMode(val, oldVal) {
@@ -498,7 +513,7 @@ export default {
       }
     },
     localValue: {
-      handler() {
+      handler(val, oldVal) {
         this.setDateFromTokens();
       },
       deep: true,
@@ -536,143 +551,139 @@ export default {
   },
   created() {
     this.setDefaultOptions();
+    // Для старых значений
+    this.updater();
     this.setTokenAction();
-    this.loadValueFromStore();
   },
   mounted() {
     this.setTokenValue = throttle(this.setTokenValue, 200);
     this.updateValueInStore = throttle(this.updateValueInStore, 200);
+    this.loadValueFromStore();
+
     if (this.pickerMode === 'range') {
       this.setDateFromShortcut();
     }
     this.setDate();
-    // Для старых значений
-    this.updater();
   },
   methods: {
     // TODO: Преобразование значений старого пикера в новые
     updater() {
-      const oldDate = this.getVisualFromStore.date;
-      if (oldDate) {
-        const {
-          end = null,
-          endCus = null,
-          range = null,
-          start = null,
-          startCus = null,
-          exactDate = null,
-          exactDateCustom = null,
-          last = null,
-        } = oldDate;
+      return new Promise((resolve) => {
+        const oldDate = this.getVisualFromStore.date;
+        if (oldDate) {
+          const {
+            end = null,
+            endCus = null,
+            range = null,
+            start = null,
+            startCus = null,
+            exactDate = null,
+            exactDateCustom = null,
+            last = null,
+          } = oldDate;
 
-        let mode = null;
-        let value = null;
-        let format = null;
-        let hideTime = null;
+          let mode = null;
+          let value = null;
+          let format = null;
+          let hideTime = null;
 
-        if (range) {
-          mode = 'range';
-          format = this.getVisualFromStore.timeOutputFormat;
-          hideTime = this.getVisualFromStore.hideTimeSelect;
-          if (range?.shortcut) {
-            const defaultFormat = hideTime || this.hideTime
-              ? this.defaultFormat.dateTime
-              : this.defaultFormat.date;
-            const dateByShortcuts = this.calcDateByShortcut(
-              range.shortcut,
-              format || this.outputFormat || defaultFormat,
-            );
+          if (range) {
+            mode = 'range';
+            format = this.getVisualFromStore.timeOutputFormat;
+            hideTime = this.getVisualFromStore.hideTimeSelect;
+            if (range?.shortcut) {
+              const defaultFormat = hideTime || this.hideTime
+                ? this.defaultFormat.dateTime
+                : this.defaultFormat.date;
+              const dateByShortcuts = this.calcDateByShortcut(
+                range.shortcut,
+                format || this.outputFormat || defaultFormat,
+              );
+              value = {
+                start: dateByShortcuts.start,
+                shortcut: range.shortcut,
+                end: dateByShortcuts.end,
+              };
+            } else {
+              value = {
+                start: range.start,
+                shortcut: null,
+                end: range.end,
+              };
+            }
+          } else if (end || start) {
+            mode = 'startEnd';
             value = {
-              start: dateByShortcuts.start,
-              shortcut: range.shortcut,
-              end: dateByShortcuts.end,
+              start,
+              end,
             };
-          } else {
+            format = this.getVisualFromStore.timeOutputFormat;
+            hideTime = this.getVisualFromStore.hideTimeSelect;
+          } else if (endCus || startCus) {
+            mode = 'startEndManual';
             value = {
-              start: range.start,
-              shortcut: null,
-              end: range.end,
+              start: startCus,
+              end: endCus,
+            };
+          } else if (exactDate) {
+            mode = 'exact';
+            value = {
+              date: exactDate,
+            };
+            format = this.getVisualFromStore.timeOutputFormat;
+            hideTime = this.getVisualFromStore.hideTimeSelect;
+          } else if (exactDateCustom) {
+            mode = 'exactManual';
+            value = {
+              date: exactDateCustom,
+            };
+          } else if (last && last?.every && last?.time) {
+            mode = 'time';
+            value = {
+              count: last.every,
+              type: last.time,
+              start: '',
+              end: '',
+              period: '',
             };
           }
-        } else if (end || start) {
-          mode = 'startEnd';
-          value = {
-            start,
-            end,
-          };
-          format = this.getVisualFromStore.timeOutputFormat;
-          hideTime = this.getVisualFromStore.hideTimeSelect;
-        } else if (endCus || startCus) {
-          mode = 'startEndManual';
-          value = {
-            start: startCus,
-            end: endCus,
-          };
-        } else if (exactDate) {
-          mode = 'exact';
-          value = {
-            date: exactDate,
-          };
-          format = this.getVisualFromStore.timeOutputFormat;
-          hideTime = this.getVisualFromStore.hideTimeSelect;
-        } else if (exactDateCustom) {
-          mode = 'exactManual';
-          value = {
-            date: exactDateCustom,
-          };
-        } else if (last && last?.every && last?.time) {
-          mode = 'time';
-          value = {
-            count: last.every,
-            type: last.time,
-            start: '',
-            end: '',
-            period: '',
-          };
-        }
-        if (mode && value) {
-          // Чтобы изменения точно применились после setDate
-          this.$nextTick(() => {
-            this.$nextTick(() => {
-              this.$store.commit('setState', [{
-                object: this.getOptions,
-                prop: 'pickerMode',
-                value: mode,
-              }]);
-              this.$nextTick(() => {
-                this.$store.commit('setState', [{
-                  object: this.getVisualFromStore,
-                  prop: 'pickerValue',
-                  value,
-                }]);
-                this.localValue = value;
-                this.updateFormattedValue();
-                this.updateValueInStore();
-                this.setTokenValue();
-                this.$store.commit('setState', [{
-                  object: this.getVisualFromStore,
-                  prop: 'date',
-                  value: null,
-                }]);
-              });
+          if (mode && value) {
+            // Чтобы изменения точно применились после setDate
+            this.$store.commit('setState', [{
+              object: this.getOptions,
+              prop: 'pickerMode',
+              value: mode,
+            }]);
+            this.localValue = this.defaultValueByMode[mode];
+            Object.keys(this.defaultValueByMode[mode]).forEach((key) => {
+              this.$set(this.localValue, key, value[key]);
             });
-          });
+            this.updateFormattedValue();
+            this.updateValueInStore();
+            this.setTokenValue();
+            this.$store.commit('setState', [{
+              object: this.getVisualFromStore,
+              prop: 'date',
+              value: null,
+            }]);
+          }
+          if (hideTime !== null && hideTime !== undefined) {
+            this.$store.commit('setState', [{
+              object: this.getOptions,
+              prop: 'hideTime',
+              value: hideTime,
+            }]);
+          }
+          if (format !== null && format !== undefined) {
+            this.$store.commit('setState', [{
+              object: this.getOptions,
+              prop: 'outputFormat',
+              value: format,
+            }]);
+          }
         }
-        if (hideTime !== null && hideTime !== undefined) {
-          this.$store.commit('setState', [{
-            object: this.getOptions,
-            prop: 'hideTime',
-            value: hideTime,
-          }]);
-        }
-        if (format !== null && format !== undefined) {
-          this.$store.commit('setState', [{
-            object: this.getOptions,
-            prop: 'outputFormat',
-            value: format,
-          }]);
-        }
-      }
+        resolve();
+      });
     },
     checkFormatOnIncludesTime(format) {
       const tokensTimeFormat = ['h', 'H', 's', 'k', 'm', 'a', 'A'];
@@ -743,13 +754,11 @@ export default {
           value: null,
         }]);
       }
-      this.$nextTick(() => {
-        this.$store.commit('setState', [{
-          object: this.getVisualFromStore,
-          prop: 'pickerValue',
-          value: structuredClone(this.localValue),
-        }]);
-      });
+      this.$store.commit('setState', [{
+        object: this.getVisualFromStore,
+        prop: 'pickerValue',
+        value: structuredClone(this.localValue),
+      }]);
     },
     setDefaultLocalValue() {
       this.localValue = this.defaultValueByMode[this.pickerMode];
@@ -779,15 +788,22 @@ export default {
       if (this.modelPopup) {
         this.closePopup();
       }
-      if (this.reactiveValue) {
-        this.setDefaultReactiveValue();
-        this.updateFormattedValue();
-      } else {
-        this.updateFormattedValue();
-        this.clearValue();
-      }
-      this.updateValueInStore();
-      this.setTokenValue();
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          if (this.isValueWithTokens) {
+            this.setDateFromTokens();
+          } else if (this.reactiveValue) {
+            this.setDefaultReactiveValue();
+            this.updateFormattedValue();
+          } else {
+            this.updateFormattedValue();
+            this.clearValue();
+          }
+
+          this.updateValueInStore();
+          this.setTokenValue();
+        });
+      });
     },
     setDateFromTokens() {
       if (this.pickerMode === 'exactManual') {
@@ -1095,7 +1111,7 @@ export default {
       } else if (this.hideTime) {
         format = this.defaultFormat.date;
       }
-      let updatedValue = value;
+      let updatedValue = structuredClone(value);
 
       if (/\$\w+\$/.test(value)) {
         this.getTokens.forEach((token) => {
