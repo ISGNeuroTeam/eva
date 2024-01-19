@@ -1120,46 +1120,6 @@ export default {
       }
     },
 
-    getData(searchID) {
-      // асинхронная функция для получения даных с реста
-      let db = null;
-      const request = indexedDB.open('EVA', 1);
-      request.onerror = (event) => {
-        console.error('error: ', event);
-      };
-      request.onupgradeneeded = (event) => {
-        // console.log('create');
-        db = event.target.result;
-        if (!db.objectStoreNames.contains('searches')) {
-          // if there's no "books" store
-          db.createObjectStore('searches'); // create it
-        }
-        request.onsuccess = () => {
-          db = request.result;
-          // console.log(`successEvent: ${db}`);
-        };
-      };
-      return new Promise((resolve) => {
-        request.onsuccess = () => {
-          db = request.result;
-          const transaction = db.transaction('searches'); // (1)
-          // получить хранилище объектов для работы с ним
-          const searches = transaction.objectStore('searches'); // (2)
-          const query = searches.get(String(searchID)); // (3) return store.get('Ire Aderinokun');
-          query.onsuccess = () => {
-            // (4)
-            if (query.result) {
-              resolve(query.result);
-            } else {
-              resolve([]);
-            }
-          };
-          query.onerror = () => {
-            console.error('Ошибка', query.error);
-          };
-        };
-      });
-    },
     getEvents({ event, partelement }) {
       let result = [];
       if (!this.$store.state[this.idDash].events) {
