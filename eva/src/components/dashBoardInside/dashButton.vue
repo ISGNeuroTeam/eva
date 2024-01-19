@@ -270,14 +270,6 @@ export default {
         `width=${width}, height=${height}, top=${top}, left=${left}`,
       );
     },
-    createReport(item, type) {
-      this.getData(item.sid, item.file, type);
-    },
-    exportSearch(item, type) {
-      item.searches.forEach((sid) => {
-        this.getData(sid, '', type);
-      });
-    },
     getEvents({ event, partelement }) {
       let result = [];
       if (!this.$store.state[this.idDash].events) {
@@ -371,16 +363,6 @@ export default {
               item.widthPersent,
               item.heightPersent,
             );
-          } else if (
-            item.action.toLowerCase() === 'changeReport'.toLowerCase()
-          ) {
-            // если экшен changeReport
-            this.createReport(item, 'report');
-          } else if (
-            item.action.toLowerCase() === 'exportSearch'.toLowerCase()
-          ) {
-            // если экшен exportSearch
-            this.exportSearch(item, 'search');
           } else if (item.action.toLowerCase() === 'download') {
             this.downloadEvent(item);
           }
@@ -436,80 +418,6 @@ export default {
       link.setAttribute('download', `${this.idDash}-${sid}.csv`); // указываем имя файла
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку
-    },
-    getData(sid, file, type) {
-      // создаем blob объект чтобы с его помощью использовать функцию для web worker
-      const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
-        type: 'text/javascript',
-      });
-
-      // создаем ссылку из нашего blob ресурса
-      const blobURL = window.URL.createObjectURL(blob);
-
-      // создаем новый worker и передаем ссылку на наш blob объект
-      const worker = new Worker(blobURL);
-
-      // при успешном выполнении функции что передали в blob изначально сработает этот код
-      worker.onmessage = function (event) {
-        if (event.data.length !== 0) {
-          // this.data = event.data;
-          if (type !== 'report') {
-            this.getSearch(event.data, sid);
-          }
-        } else {
-          // this.errorMsg = "Получить данные для отчета не удалось.";
-          // this.showError = true;
-        }
-
-        worker.terminate();
-      }.bind(this);
-
-      worker.postMessage(`${this.idDash}-${sid}`); // запускаем воркер на выполнение
-    },
-    getDataFromDb() {
-      return function ({ data }) {
-        let db = null;
-
-        const searchSid = data;
-
-        const request = indexedDB.open('EVA', 1);
-
-        request.onupgradeneeded = (event) => {
-          db = event.target.result;
-          if (!db.objectStoreNames.contains('searches')) {
-            // if there's no "books" store
-            db.createObjectStore('searches'); // create it
-          }
-
-          request.onsuccess = () => {
-            db = request.result;
-          };
-        };
-
-        request.onsuccess = () => {
-          db = request.result;
-
-          const transaction = db.transaction('searches'); // (1)
-
-          // получить хранилище объектов для работы с ним
-          const searches = transaction.objectStore('searches'); // (2)
-
-          const query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
-
-          query.onsuccess = () => {
-            // (4)
-            if (query.result) {
-              // сообщение которое будет передаваться как результат выполнения функции
-              // eslint-disable-next-line no-restricted-globals
-              self.postMessage(query.result);
-            } else {
-              // сообщение которое будет передаваться как результат выполнения функции
-              // eslint-disable-next-line no-restricted-globals
-              self.postMessage([]);
-            }
-          };
-        };
-      };
     },
   },
 };

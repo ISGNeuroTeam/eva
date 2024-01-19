@@ -1720,62 +1720,6 @@ export default new Vuex.Store({
     getGroups() {
       return rest.getGroups(restAuth);
     },
-    checkDataSearch(context, sid) {
-      return new Promise((resolve) => {
-        function setTransaction(dB) {
-          const transaction = dB.transaction('searches', 'readwrite'); // (1)
-
-          // получить хранилище объектов для работы с ним
-          const searches = transaction.objectStore('searches'); // (2)
-
-          const query = searches.get(sid);
-
-          query.onsuccess = () => {
-            // (4)
-
-            if (query.result) {
-              resolve(true);
-            } else {
-              resolve(false);
-            }
-          };
-
-          query.onerror = () => {
-            // console.log('Ошибка', query.error);
-          };
-        }
-        let db = null;
-
-        const request = indexedDB.open('EVA', 1);
-
-        request.onerror = (event) => {
-          console.error('error:', event);
-        };
-
-        request.onupgradeneeded = (event) => {
-          // console.log('create');
-          db = event.target.result;
-          if (!db.objectStoreNames.contains('searches')) {
-            // if there's no "books" store
-            db.createObjectStore('searches'); // create it
-          }
-
-          request.onsuccess = () => {
-            db = request.result;
-            // this.alreadyDB = request.result;
-            // console.log(`success: ${db}`);
-
-            setTransaction(db);
-          };
-        };
-
-        request.onsuccess = () => {
-          db = request.result;
-
-          setTransaction(db);
-        };
-      });
-    },
     // затем полученные данные нужно положить в indexed db
     putIntoDB(context, { result, sid, idDash }) {
       return new Promise((resolve) => {
@@ -1784,6 +1728,8 @@ export default new Vuex.Store({
 
           // получить хранилище объектов для работы с ним
           const searches = transaction.objectStore('searches'); // (2)
+
+          searches.clear();
 
           const query = searches.put(res, key); // (3)
 
