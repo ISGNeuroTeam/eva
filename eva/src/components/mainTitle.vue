@@ -291,6 +291,7 @@
 <script>
 import draggable from 'vuedraggable';
 import settings from '../js/componentsSettings';
+import rest from '@/store/storeRest';
 
 export default {
   name: 'MainTitle',
@@ -535,6 +536,9 @@ export default {
       },
     },
   },
+  beforeDestroy() {
+    this.stopAllSearches();
+  },
   async mounted() {
     if (this.dashFromStore) {
       const isSettingsOpen = this.dashFromStore
@@ -595,6 +599,9 @@ export default {
     this.sorting = Object.keys(elementsPos).sort((a, b) => (elementsPos[a] - elementsPos[b]));
   },
   methods: {
+    stopAllSearches() {
+      rest.abortAllRest();
+    },
     saveDashToStore() {
       clearTimeout(this.saveTO);
       this.saveTO = setTimeout(() => {

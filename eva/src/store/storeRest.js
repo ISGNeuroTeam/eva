@@ -17,6 +17,16 @@ export default {
         });
     }
   },
+  async abortAllRest() {
+    workers.forEach((worker) => {
+      worker.postMessage({
+        action: 'abort',
+      });
+    });
+    if (this.fetch_controller) {
+      this.fetch_controller.abort();
+    }
+  },
   async rest(formData, searchFrom, restAuth, idDash) {
     // console.log('>> rest:', searchFrom.sid);
     const jwt = Vue.$jwt.decode();
@@ -87,10 +97,12 @@ export default {
       console.warn('client is not support the worker API');
     }
 
+    const fetch_controller = this.fetch_controller = new AbortController();
     const response = await fetch('/api/makejob', {
       // сперва нужно подать post запрос
       method: 'POST',
       body: formData,
+      signal: fetch_controller.signal,
       // mode: 'no-cors'
     }).catch((error) => {
       console.error(error);
@@ -143,6 +155,7 @@ export default {
                     twf: searchFrom.twf,
                     cache_ttl: searchFrom.cache_ttl,
                   }),
+                  signal: fetch_controller.signal,
                   //  mode: 'no-cors'
                 },
               )
