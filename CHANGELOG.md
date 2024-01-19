@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.166.0]
+
+### Added
 - option to hide visualisation in pdf export
 - The Date-picker visualization has been updated:
     - General refactoring of the entire component and its data processing logic has been done
@@ -21,8 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         - Exact date (manual entry with token support)
     - Added option to disable date formatting separately for values in tokens
     - Implemented backward compatibility with previous version of the visualization
-
-### Changed
 
 ### Fixed
 - IndexedDB is not clearing out old results

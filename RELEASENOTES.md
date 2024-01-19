@@ -1,3 +1,24 @@
+# [1.166.0] - 2024-01-19
+
+### Added
+- Option to hide visualization in PDF export.
+- The Date-picker visualization has been updated:
+  - Underwent general refactoring, including improvements to the component and its data processing logic.
+  - Stabilized the date formatting operation.
+  - Split date entry modes into separate options:
+    - Date range
+    - Start / End Date
+    - Exact date
+    - Time period
+    - Start / End Date (manual entry with token entry support)
+    - Exact date (manual entry with token support)
+  - Added the option to disable date formatting separately for values in tokens.
+  - Implemented backward compatibility with the previous version of the visualization.
+
+### Fixed
+- IndexedDB is now clearing out old results.
+- Data sources are now started even if the token is passed in the "go" event, and data sources do not have the option to start when loading the dashboard.
+
 # [1.165.0] - 2023-12-28
 
 ### Added
