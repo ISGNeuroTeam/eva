@@ -337,6 +337,7 @@ export default {
     'visible',
     'level',
     'pinned',
+    'excludedFromPDF',
     'otherSettings',
   ],
   options: {
@@ -618,6 +619,12 @@ export default {
       option: 'pinned',
       description: 'Закрепить на всех вкладках',
       elem: 'switch',
+    },
+    {
+      option: 'excludedFromPDF',
+      description: 'Исключить из PDF',
+      elem: 'switch',
+      default: false,
     },
     {
       option: 'level',

@@ -2580,6 +2580,7 @@ export default {
                   || el?.classList?.contains('left-dash-setting')
                   || el?.classList?.contains('left-dash-setting')
                   || el?.classList?.contains('block-save')
+                  || el?.classList?.contains('excludedFromPDF')
                 );
               },
               onclone: (container) => {

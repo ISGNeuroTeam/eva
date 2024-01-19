@@ -14,6 +14,7 @@
     :data-grid="true"
     :grid="movableProps.grid"
     :class-name-active="!dataMod && !dragRes || !dragRes ? 'none' : 'active'"
+    :class=" excludedFromPDF ? 'excludedFromPDF' : ''"
     :style="{
       outlineColor: theme.$accent_ui_color,
     }"
@@ -111,6 +112,9 @@ export default {
     };
   },
   computed: {
+    excludedFromPDF() {
+      return this.$store.state[this.idDashFrom][this.id].options?.excludedFromPDF || false;
+    },
     isVisible() {
       if (!this.dashFromStore[this.id].options?.visible) {
         return this.dataMod;
