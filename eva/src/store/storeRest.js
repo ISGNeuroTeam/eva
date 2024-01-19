@@ -7,6 +7,7 @@ export default {
     this.store = store;
   },
   async rest(formData, searchFrom, restAuth, idDash) {
+    // console.log('>> rest:', searchFrom.sid);
     const jwt = Vue.$jwt.decode();
     formData.set('username', jwt.username);
     const { userTtlEnabled, userTtl } = await this.store.getters['app/userSettings'];
@@ -182,6 +183,7 @@ export default {
               if (
                 status === 'success'
                   || status === 'failed'
+                  || status === 'canceled'
                   || countNoCache > 10
               ) {
                 clearTimeout(timeOut);

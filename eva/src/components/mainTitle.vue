@@ -581,6 +581,8 @@ export default {
       this.$refs.tabPanel.$el.onwheel = this.scroll;
     }
     this.checkTabOverflow();
+    // загрузка ИД с обновленными токенами перед уходом по событию go
+    this.$store.dispatch('runPreloadSearches', this.idDash);
     window.onresize = this.checkTabOverflow;
 
     const { elements = [] } = this.dashFromStore;
