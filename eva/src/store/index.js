@@ -35,6 +35,7 @@ export default new Vuex.Store({
     savingDashQueue: [],
     readingDashQueue: [],
     preloadTokens: [],
+    preloadSearches: [],
   },
   mutations: {
     addSavingDashQueue(state, idDash) {
@@ -77,6 +78,12 @@ export default new Vuex.Store({
         state.preloadTokens.splice(idx, 1);
       } */
     },
+    searchesForDashLoading(state, { id, searches }) {
+      state.preloadSearches.unshift({ id, searches });
+    },
+    removePreloadSearches(state, id) {
+      Vue.set(state, 'preloadSearches', []);
+    },
     setTokens(state, { id, tokens, updateComponentValue = false }) {
       state[id].tockens?.forEach((token) => {
         const newTokens = tokens.filter((item) => item.name === token.name);
@@ -90,6 +97,7 @@ export default new Vuex.Store({
                   const [, component] = element.match(/^([\w-]+[\D])(-(\d+))?$/) || [];
                   let val = token.value;
                   if (component === 'select') {
+                    // eslint-disable-next-line no-restricted-globals
                     if (!isNaN(parseFloat(token.value)) && isFinite(token.value)) {
                       val = parseFloat(token.value);
                     }
@@ -1227,6 +1235,9 @@ export default new Vuex.Store({
       const search = state[idDash]?.searches.find(
         (searchItem) => searchItem.sid === sid || searchItem?.id === id,
       );
+      if (status === 'empty' && search.status === 'pending') {
+        return;
+      }
       if (search) {
         Vue.set(search, 'status', status);
       }
@@ -1350,6 +1361,30 @@ export default new Vuex.Store({
         if (idx > -1) {
           const { tokens } = state.preloadTokens[idx];
           return tokens;
+        }
+      }
+      return [];
+    },
+    async runPreloadSearches({ state, commit, dispatch }, id) {
+      const searches = await dispatch('pullOutPreloadSearches', id);
+      state[id].searches.forEach(({ sid, status }) => {
+        if (searches.includes(sid) && status !== 'pending') {
+          commit('updateSearchStatus', {
+            idDash: id,
+            sid,
+            status: 'empty',
+          });
+        }
+      });
+      commit('removePreloadSearches', id);
+      return searches;
+    },
+    pullOutPreloadSearches({ state }, id) {
+      if (state?.preloadSearches?.length > 0) {
+        const idx = state.preloadSearches.findIndex((item) => item.id === id);
+        if (idx > -1) {
+          const { searches } = state.preloadSearches[idx];
+          return searches;
         }
       }
       return [];
@@ -1685,62 +1720,6 @@ export default new Vuex.Store({
     getGroups() {
       return rest.getGroups(restAuth);
     },
-    checkDataSearch(context, sid) {
-      return new Promise((resolve) => {
-        function setTransaction(dB) {
-          const transaction = dB.transaction('searches', 'readwrite'); // (1)
-
-          // получить хранилище объектов для работы с ним
-          const searches = transaction.objectStore('searches'); // (2)
-
-          const query = searches.get(sid);
-
-          query.onsuccess = () => {
-            // (4)
-
-            if (query.result) {
-              resolve(true);
-            } else {
-              resolve(false);
-            }
-          };
-
-          query.onerror = () => {
-            // console.log('Ошибка', query.error);
-          };
-        }
-        let db = null;
-
-        const request = indexedDB.open('EVA', 1);
-
-        request.onerror = (event) => {
-          console.error('error:', event);
-        };
-
-        request.onupgradeneeded = (event) => {
-          // console.log('create');
-          db = event.target.result;
-          if (!db.objectStoreNames.contains('searches')) {
-            // if there's no "books" store
-            db.createObjectStore('searches'); // create it
-          }
-
-          request.onsuccess = () => {
-            db = request.result;
-            // this.alreadyDB = request.result;
-            // console.log(`success: ${db}`);
-
-            setTransaction(db);
-          };
-        };
-
-        request.onsuccess = () => {
-          db = request.result;
-
-          setTransaction(db);
-        };
-      });
-    },
     // затем полученные данные нужно положить в indexed db
     putIntoDB(context, { result, sid, idDash }) {
       return new Promise((resolve) => {
@@ -1749,6 +1728,8 @@ export default new Vuex.Store({
 
           // получить хранилище объектов для работы с ним
           const searches = transaction.objectStore('searches'); // (2)
+
+          searches.clear();
 
           const query = searches.put(res, key); // (3)
 
@@ -1933,18 +1914,9 @@ export default new Vuex.Store({
                 {
                   object: state,
                   prop: id,
-                  value: {},
+                  value: stateFrom.body ? JSON.parse(stateFrom.body) : {},
                 },
               ]);
-              if (stateFrom.body) {
-                commit('setState', [
-                  {
-                    object: state,
-                    prop: id,
-                    value: JSON.parse(stateFrom.body),
-                  },
-                ]);
-              }
               commit('setState', [
                 {
                   object: state[id],
@@ -2012,13 +1984,15 @@ export default new Vuex.Store({
               });
             }
             if (state[id].searches) {
-              state[id].searches.forEach((search) => commit('setState', [
-                {
-                  object: search,
-                  prop: 'status',
-                  value: 'empty',
-                },
-              ]));
+              state[id].searches
+                .filter(({ status, isStartImmediately }) => isStartImmediately && status !== 'pending')
+                .forEach((search) => commit('setState', [
+                  {
+                    object: search,
+                    prop: 'status',
+                    value: 'empty',
+                  },
+                ]));
             }
             resolve({ status: 'finish' });
             // }
@@ -2181,80 +2155,43 @@ export default new Vuex.Store({
           }
         });
       });
-      let newCurrentTabValue = 1;
+
+      // странная логика, не стал сильно менять
+      const tabsEnabled = state[id]?.tabs;
       const tabFromEvent = event.event?.tab ? `${event.event.tab}` : '1';
-      const currentTab = event.event.tab || state[id]?.currentTab;
-      const isTabMode = state[id]?.tabs;
-      const lastEl = state[id]?.tabList?.find(
-        (el) => el.id.toString() === tabFromEvent,
-      ) || 1;
+      const lastEl = state[id]?.tabList?.find((el) => el.id.toString() === tabFromEvent);
+      let newCurrentTabValue = 1;
+      if (!tabsEnabled) {
+        newCurrentTabValue = 1;
+      } else if (!event.event.tab) {
+        newCurrentTabValue = event.event.tab || state[id]?.currentTab || 1;
+      } else if (lastEl) {
+        newCurrentTabValue = lastEl?.id || 1;
+      }
+
+      // сохраняем хранилище перед уходом
+      commit('searchesForDashLoading', {
+        id,
+        searches: state[id].searches
+          // eslint-disable-next-line camelcase
+          .filter(({ original_otl }) => changed.find((name) => original_otl.includes(`$${name}$`)))
+          .map(({ sid }) => sid),
+      });
       await dispatch('saveDashToStore', id);
 
       if (openNewTab) {
-        newCurrentTabValue = currentTab || 1;
         window.open(`/dashboards/${id}/${newCurrentTabValue}`);
       } else {
-        if (!isTabMode) {
-          newCurrentTabValue = 1;
-        } else if (!event.event.tab) {
-          newCurrentTabValue = currentTab || 1;
-        } else {
-          newCurrentTabValue = lastEl?.id || 1;
-        }
-        event.route.push(`/dashboards/${id}/${newCurrentTabValue}`);
-      }
-
-      if (!openNewTab) {
-        commit('changeCurrentTab', {
-          idDash: id,
-          tab: newCurrentTabValue,
-        });
-      }
-      const { searches } = state[id];
-
-      if (searches) {
-        // также при обновлении токена нужно заново запускать серч и обновлять информацию
-        searches.forEach((searchItem) => {
-          changed.forEach((itemTok) => {
-            if (searchItem.original_otl.indexOf(`$${itemTok}$`) !== -1) {
-              // если в тексте запроса есть наш токен
-
-              commit('setLoading', {
-                search: searchItem.sid,
-                idDash: id,
-                should: true,
-                error: false,
-              });
-
-              dispatch('getDataApi', {
-                search: searchItem,
-                idDash: id,
-              }).then((response) => {
-                if (response.length !== 0) {
-                  dispatch('putIntoDB', {
-                    result: response,
-                    sid: searchItem.sid,
-                    idDash: id,
-                  }).then(() => {
-                    commit('setLoading', {
-                      search: searchItem.sid,
-                      idDash: id,
-                      should: false,
-                      error: false,
-                    });
-                  });
-                } else {
-                  commit('setLoading', {
-                    search: item.sid,
-                    idDash: id,
-                    should: false,
-                    error: true,
-                  });
-                }
-              });
-            }
+        event.route
+          .push(`/dashboards/${id}/${newCurrentTabValue}`)
+          .catch(() => {
+            commit('changeCurrentTab', {
+              idDash: id,
+              tab: newCurrentTabValue,
+            });
+            // загрузка ИД с обновленными по событию go
+            dispatch('runPreloadSearches', id);
           });
-        });
       }
     },
 
@@ -2376,6 +2313,7 @@ export default new Vuex.Store({
           logError: state.logError,
           dataResearch: state.dataResearch,
           preloadTokens: state.preloadTokens,
+          preloadSearches: state.preloadSearches,
         }),
         (val) => {
           storage.setItem('app', JSON.stringify(val));

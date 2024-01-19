@@ -13,6 +13,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.166.0]
+
+### Added
+- option to hide visualisation in pdf export
+- The Date-picker visualization has been updated:
+    - General refactoring of the entire component and its data processing logic has been done
+    - Date formatting operation has been stabilized
+    - Date entry modes have been split into separate modes:
+        - Date range
+        - Start / End Date
+        - Exact date
+        - Time period
+        - Start / End Date (manual entry with token entry support)
+        - Exact date (manual entry with token support)
+    - Added option to disable date formatting separately for values in tokens
+    - Implemented backward compatibility with previous version of the visualization
+
+### Fixed
+- IndexedDB is not clearing out old results
+- Data sources are not started if the token is passed in the go event and data sources do not have the option to start when loading the dashboard.
+
 ## [1.165.0]
 
 ### Added
