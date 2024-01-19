@@ -385,16 +385,14 @@ export default {
       'closeListByEnter',
     ],
     picker: [
-      'selectingExactDate',
-      'showLastTimeBlock',
-      'showChoseDateAndTimeBlock',
-      'showRangeDateBlock',
-      'showCustomInputBlock',
-      'timeOutputFormat',
-      'hideTimeSelect',
-      'useLastTimeTemplate',
-      'lastTimeTemplateStart',
-      'lastTimeTemplateEnd',
+      'pickerOptions',
+      'pickerMode',
+      'outputFormat',
+      'useTimestampInToken',
+      'hideTime',
+      'useTimeTemplate',
+      'timeTemplateStart',
+      'timeTemplateEnd',
       'rangeBtnList',
     ],
     graph: [
@@ -760,8 +758,130 @@ export default {
 
     // datepicker
     {
+      group: 'Настройки Дата-пикера',
+      option: 'pickerOptions',
+    },
+    {
+      description: 'Режим ввода',
+      optionGroup: 'pickerOptions',
+      option: 'pickerMode',
+      elem: 'select',
+      items: [
+        {
+          text: 'Диапазон',
+          value: 'range',
+        },
+        {
+          text: 'Начало-конец',
+          value: 'startEnd',
+        },
+        {
+          text: 'Начало-конец (ручной ввод)',
+          value: 'startEndManual',
+        },
+        {
+          text: 'Время',
+          value: 'time',
+        },
+        {
+          text: 'Точная дата',
+          value: 'exact',
+        },
+        {
+          text: 'Точная дата (ручной ввод)',
+          value: 'exactManual',
+        },
+      ],
+      default: 'range',
+    },
+    {
+      option: 'outputFormat',
+      description: 'Формат даты',
+      elem: 'text-field',
+      default: '',
+      relation() {
+        const mode = this.options?.pickerMode;
+        return mode === 'startEnd'
+          || mode === 'exact'
+          || mode === 'range';
+      },
+      placeholder(options) {
+        return options?.hideTime
+          ? 'Пример: YYYY-MM-DD'
+          : 'Пример: YYYY-MM-DD HH:mm';
+      },
+    },
+    {
+      option: 'hideTime',
+      description: 'Скрыть выбор времени в календаре',
+      elem: 'switch',
+      relation() {
+        const mode = this.options?.pickerMode;
+        return mode === 'startEnd' || mode === 'exact';
+      },
+      default: false,
+    },
+    {
+      option: 'useTimestampInToken',
+      description: 'Использовать timestamp в токене независимо от формата даты',
+      elem: 'switch',
+      relation() {
+        const mode = this.options?.pickerMode;
+        return mode === 'startEnd' || mode === 'range' || mode === 'exact';
+      },
+      default: false,
+    },
+    {
+      option: 'useTimeTemplate',
+      description: 'Использовать шаблон для функционала последнего времени',
+      elem: 'switch',
+      relation() {
+        // Вызывается в контексте modalSettings
+        return this.options?.pickerMode === 'time';
+      },
+      default: false,
+    },
+    {
+      option: 'timeTemplateStart',
+      description: 'Шаблон стартового времени',
+      relation() {
+        // Вызывается в контексте modalSettings
+        return this.options?.pickerMode === 'time'
+          && this.options.useTimeTemplate;
+      },
+      elem: 'text-field',
+      // eslint-disable-next-line no-template-curly-in-string
+      default: 'now() - ${sec}',
+      // eslint-disable-next-line no-template-curly-in-string
+      placeholder: 'Пример: now() - ${sec}',
+    },
+    {
+      option: 'timeTemplateEnd',
+      description: 'Шаблон конечного времени',
+      relation() {
+        // Вызывается в контексте modalSettings
+        return this.options?.pickerMode === 'time'
+          && this.options.useTimeTemplate;
+      },
+      elem: 'text-field',
+      default: 'now()',
+      placeholder: 'Пример: now()',
+    },
+    // picker old options
+    {
       option: 'selectingExactDate',
       description: 'Выбор точной даты',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      option: 'expandRangeButtonsSet',
+      description: 'Расширить набор кнопок выбора диапазона дат'
+        + ' (1 кв., 2 кв., 1 пг., 3 кв., 9 месяцев, 4 кв., 2 пг.)',
+      relation() {
+        // Вызывается в контексте modalSettings
+        return this.options?.pickerMode === 'range';
+      },
       elem: 'switch',
       default: false,
     },
@@ -770,7 +890,7 @@ export default {
       description: 'Набор кнопок выбора диапазона дат',
       relation() {
         // Вызывается в контексте modalSettings
-        return !this.options?.selectingExactDate;
+        return this.options?.pickerMode === 'range';
       },
       elem: 'select-checkbox',
       default: [
