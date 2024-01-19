@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- option to hide visualisation in pdf export
 - The Date-picker visualization has been updated:
     - General refactoring of the entire component and its data processing logic has been done
     - Date formatting operation has been stabilized
