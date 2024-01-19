@@ -513,7 +513,7 @@ export default {
       }
     },
     localValue: {
-      handler(val, oldVal) {
+      handler() {
         this.setDateFromTokens();
       },
       deep: true,
