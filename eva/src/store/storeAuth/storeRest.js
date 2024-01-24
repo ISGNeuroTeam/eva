@@ -129,7 +129,12 @@ export default {
   // и на рест после определенной заполненности
   putLog(text, now = new Date()) {
     // возвращаем промис, потому что записи происходят асинхронно
+    // eslint-disable-next-line consistent-return
     return new Promise((resolve) => {
+      if (text === 'The user aborted a request.') {
+        // eslint-disable-next-line no-promise-executor-return
+        return resolve('canceled');
+      }
       // переменная в которой будет лежать объект подключения к базе данных
       let db = null;
 

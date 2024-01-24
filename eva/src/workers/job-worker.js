@@ -6,8 +6,14 @@ onmessage = async (event) => {
   // console.log('[run] worker: %s', searchFrom.sid/*, event.data*/);
 
   if (action === 'abort') {
-    controller.abort('Canceled by user');
-    return;
+    controller.abort('Пользователь прервал запрос');
+    const msg = 'The user aborted a request';
+    return postMessage({
+      status: 'canceled',
+      statusText: msg,
+      // error: msg,
+      answer: msg,
+    });
   }
 
   const formData = new FormData();

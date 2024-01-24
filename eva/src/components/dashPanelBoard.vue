@@ -479,7 +479,7 @@
                   class="search-play"
                   :color="theme.$primary_button"
                   v-on="on"
-                  @click="search.status === 'pending' ? stopSearch(search) : startSearch(search)"
+                  @click="startStopSearch(search)"
                 >
                   <v-icon v-if="search.status === 'pending'">
                     {{ stop }}
@@ -1975,6 +1975,13 @@ export default {
             status: 'empty',
           });
         });
+    },
+    startStopSearch(search) {
+      if (search.status === 'pending') {
+        this.stopSearch(search);
+      } else {
+        this.startSearch(search);
+      }
     },
     async startSearch(search) {
       this.$store.commit('updateSearchStatus', {
