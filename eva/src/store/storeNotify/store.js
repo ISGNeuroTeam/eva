@@ -49,6 +49,10 @@ export default {
   actions: {
 
     addNotification({ commit }, payload) {
+      // hide messages The user aborted a request
+      if (payload.message.includes('The user aborted a request')) {
+        return;
+      }
       // commit('removeOldNotifications');
       const time = moment().unix();
       const newItem = {

@@ -308,20 +308,29 @@
               </div>
             </v-menu>
           </div>
+
           <v-btn
             class="action-btn"
             dark
             depressed
             small
+            width="92px"
             :color="theme.$ok_color"
-            :loading="loading"
-            @click="launchSearch"
+            @click="loading ? stopSearch() : launchSearch()"
           >
-            <span class="action-btn-text">Поиск</span>
+            <span
+              v-if="loading"
+              class="action-btn-text"
+            >Стоп</span>
+            <span
+              v-else
+              class="action-btn-text"
+            >Поиск</span>
             <v-icon class="action-btn-icon">
-              {{ mdiMagnify }}
+              {{ loading ? mdiStop : mdiMagnify }}
             </v-icon>
           </v-btn>
+
         </div>
       </div>
     </div>
@@ -337,6 +346,7 @@
 import {
   mdiRefresh,
   mdiMagnify,
+  mdiStop,
   mdiChevronDown,
   mdiCalendarMonthOutline,
   mdiCheck,
@@ -357,6 +367,7 @@ import '../../js/codeMirror/codeHighlight.js';
 import '../../js/codeMirror/token-hover.js';
 import '../../js/codeMirror/text-hover.js';
 import { isDarkColor } from '@/js/colorutility/isDarkColor';
+import rest from '@/store/storeRest';
 
 export default {
   components: {
@@ -384,6 +395,7 @@ export default {
       },
       mdiRefresh,
       mdiMagnify,
+      mdiStop,
       mdiChevronDown,
       mdiCheck,
       mdiCalendarMonthOutline,
@@ -563,6 +575,9 @@ export default {
     },
     async launchSearch() {
       this.$emit('launchSearch', structuredClone(this.search));
+    },
+    async stopSearch() {
+      await rest.abortAllRest();
     },
     hashCode(otl) {
       return otl

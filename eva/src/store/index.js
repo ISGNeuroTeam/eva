@@ -1232,7 +1232,7 @@ export default new Vuex.Store({
     updateSearchStatus: (state, {
       idDash, sid, status, id,
     }) => {
-      const search = state[idDash]?.searches.find(
+      const search = state[idDash]?.searches?.find(
         (searchItem) => searchItem.sid === sid || searchItem?.id === id,
       );
       if (status === 'empty' && search.status === 'pending') {
